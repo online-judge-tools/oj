@@ -3,12 +3,22 @@
 ## How to use
 
 ``` sh
-$ ./main.py download $URL
+$ ./main.py [login,download] $URL
 ```
 
 Example:
 
 ``` sh
+$ ./main.py login http://agc001.contest.atcoder.jp/tasks/agc001_a
+[+] problem recognized: <onlinejudge.atcoder.AtCoder object at 0x7f9c4b0fb208>
+Username: hoge
+Password: 
+[*] load cookie from: /home/user/local/share/onlinejudge/cookie.jar
+[x] POST: https://agc001.contest.atcoder.jp/login
+[+] 302 Found
+[+] You signed in.
+[*] save cookie to: /home/user/local/share/onlinejudge/cookie.jar
+
 $ ./main.py download http://agc001.contest.atcoder.jp/tasks/agc001_a
 [+] problem recognized: <onlinejudge.atcoder.AtCoder object at 0x7f2925a5df60>
 [x] GET: http://agc001.contest.atcoder.jp/tasks/agc001_a

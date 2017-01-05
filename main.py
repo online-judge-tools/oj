@@ -50,17 +50,20 @@ def download(args):
 def login(args):
     problem = onlinejudge.problem.from_url(args.url)
     logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
-    if args.username is None:
-        args.username = input('Username: ')
-    if args.password is None:
-        args.password = getpass.getpass()
+    def get_credentials():
+        if args.username is None:
+            args.username = input('Username: ')
+        if args.password is None:
+            args.password = getpass.getpass()
+        return args.username, args.password
     with utils.session(cookiejar=args.cookie) as sess:
-        problem.login(sess, args.username, args.password)
+        problem.login(sess, get_credentials)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-c', '--cookie', default=os.path.join(default_data_dir, 'cookie.jar'))
+    parser.add_argument('-x', '--extra-option', action='append')
     subparsers = parser.add_subparsers(dest='command')
 
     # download

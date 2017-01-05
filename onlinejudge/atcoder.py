@@ -55,8 +55,15 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         if m:
             return cls(m.group(1), m.group(2))
 
-    def login(self, session, username, password):
+    def login(self, session, get_credentials):
         url = 'https://{}.contest.atcoder.jp/login'.format(self.contest_id)
+        logger.info(prefix['status'] + 'GET: %s', url)
+        resp = session.get(url, allow_redirects=False)
+        logger.error(prefix['info'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+        if resp.status_code == 302:  # AtCoder redirects to the top page if success
+            logger.info(prefix['info'] + 'You have already signed in.')
+            return
+        username, password = get_credentials()
         logger.info(prefix['status'] + 'POST: %s', url)
         resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
         if resp.status_code == 302:  # AtCoder redirects to the top page if success
