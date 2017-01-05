@@ -5,6 +5,7 @@ import onlinejudge.yukicoder
 import onlinejudge.implementation.utils as utils
 from onlinejudge.logging import logger, prefix
 import argparse
+import sys
 import os
 import os.path
 import getpass
@@ -56,14 +57,24 @@ def login(args):
         if args.password is None:
             args.password = getpass.getpass()
         return args.username, args.password
+    kwargs = {}
+    if problem.service_name == 'yukicoder':
+        method = ''
+        for x in args.extra_option:
+            if x.startswith('method='):
+                method += x[ len('method=') : ]
+        if method not in [ 'github', 'twitter' ]:
+            logger.error(prefix['failure'] + 'login for yukicoder: one of following options required: -x method=github, -x method=twitter')
+            sys.exit(1)
+        kwargs['method'] = method
     with utils.session(cookiejar=args.cookie) as sess:
-        problem.login(sess, get_credentials)
+        problem.login(sess, get_credentials, **kwargs)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-c', '--cookie', default=os.path.join(default_data_dir, 'cookie.jar'))
-    parser.add_argument('-x', '--extra-option', action='append')
+    parser.add_argument('-x', '--extra-option', action='append', default=[])
     subparsers = parser.add_subparsers(dest='command')
 
     # download

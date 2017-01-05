@@ -8,15 +8,18 @@ import http.cookiejar
 import http.client # for the description string of status codes
 from onlinejudge.logging import logger, prefix
 
+def describe_status_code(status_code):
+    return '{} {}'.format(status_code, http.client.responses[status_code])
+
 def download(url, session, get_options={}):
     logger.info(prefix['status'] + 'GET: %s', url)
     if session is None:
         session = requests.Session()
     resp = session.get(url, **get_options)
     if resp.status_code != 200:
-        logger.error(prefix['error'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+        logger.error(prefix['error'] + describe_status_code(resp.status_code))
         raise requests.HTTPError
-    logger.info(prefix['success'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+    logger.info(prefix['success'] + describe_status_code(resp.status_code))
     return resp.content
 
 @contextlib.contextmanager

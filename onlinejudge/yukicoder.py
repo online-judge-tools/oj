@@ -2,11 +2,14 @@
 import onlinejudge
 import onlinejudge.problem
 import onlinejudge.implementation.utils as utils
+from onlinejudge.logging import logger, prefix
 import re
 import bs4
+import requests
+import urllib.parse
 
 class Yukicoder(onlinejudge.problem.OnlineJudge):
-    onlinejudge_name = 'yukicoder'
+    service_name = 'yukicoder'
 
     def __init__(self, problem_no=None, problem_id=None):
         assert problem_no or problem_id
@@ -55,5 +58,53 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
                 return cls(problem_no=int(n))
             else:
                 return cls(problem_id=int(n))
+
+    def login(self, session, get_credentials, method=None):
+        if method == 'github':
+            return self.login_with_github(session, get_credentials)
+        elif method == 'twitter':
+            return self.login_with_twitter(session, get_credentials)
+        else:
+            assert False
+    def login_with_github(self, session, get_credentials):
+        url = 'https://yukicoder.me/auth/github'
+        logger.info(prefix['status'] + 'GET: %s', url)
+        resp = session.get(url)
+        logger.info(prefix['info'] + utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
+            logger.info(prefix['info'] + 'You have already signed in.')
+            return
+        username, password = get_credentials()
+        payload = {}
+        soup = bs4.BeautifulSoup(resp.content, 'lxml')
+        form = soup.find('form')
+        logger.debug(prefix['debug'] + 'form: %s', str(form))
+        for tag in soup.find_all('input'):
+            logger.debug(prefix['debug'] + 'input: %s', str(tag))
+            if tag['name']:
+                if tag['name'] == 'login':
+                    value = username
+                elif tag['name'] == 'password':
+                    value = password
+                elif tag['value']:
+                    value = tag['value']
+                else:
+                    continue
+                payload[tag['name']] = value
+        url = urllib.parse.urljoin(resp.url, form['action'])
+        logger.info(prefix['status'] + 'POST: %s', url)
+        resp = session.post(url, data=payload)
+        logger.info(prefix['info'] + utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
+            logger.info(prefix['success'] + 'You signed in.')
+        else:
+            logger.error(prefix['error'] + 'You failed to sign in. Wrong user ID or password.')
+            raise requests.HTTPError
+
+    def login_with_twitter(self, session, get_credentials):
+        url = 'https://yukicoder.me/auth/twitter'
+        raise NotImplementedError
 
 onlinejudge.problem.list += [ Yukicoder ]

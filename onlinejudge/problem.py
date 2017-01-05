@@ -11,7 +11,7 @@ class OnlineJudge(object):
 
     def get_url(self):
         raise NotImplementedError
-    def login(self, session, username, password):
+    def login(self, session, username, password):  # TODO: Should this method exists here? Contest class is needed.
         raise NotImplementedError
 
 

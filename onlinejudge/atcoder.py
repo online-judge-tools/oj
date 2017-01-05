@@ -9,7 +9,7 @@ import requests
 import http.client # for the description string of status codes
 
 class AtCoder(onlinejudge.problem.OnlineJudge):
-    onlinejudge_name = 'atcoder'
+    service_name = 'atcoder'
 
     def __init__(self, contest_id, problem_id):
         self.contest_id = contest_id
@@ -59,7 +59,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         url = 'https://{}.contest.atcoder.jp/login'.format(self.contest_id)
         logger.info(prefix['status'] + 'GET: %s', url)
         resp = session.get(url, allow_redirects=False)
-        logger.error(prefix['info'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+        logger.error(prefix['info'] + utils.describe_status_code(resp.status_code))
         if resp.status_code == 302:  # AtCoder redirects to the top page if success
             logger.info(prefix['info'] + 'You have already signed in.')
             return
@@ -67,10 +67,10 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         logger.info(prefix['status'] + 'POST: %s', url)
         resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
         if resp.status_code == 302:  # AtCoder redirects to the top page if success
-            logger.info(prefix['success'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+            logger.info(prefix['success'] + utils.describe_status_code(resp.status_code))
             logger.info(prefix['success'] + 'You signed in.')
         else:
-            logger.error(prefix['error'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+            logger.error(prefix['error'] + utils.describe_status_code(resp.status_code))
             logger.error(prefix['error'] + 'You failed to sign in. Wrong user ID or password.')
             raise requests.HTTPError
 
