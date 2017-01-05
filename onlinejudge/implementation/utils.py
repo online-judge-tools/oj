@@ -44,15 +44,15 @@ class SampleZipper(object):
     def add(self, s, name=''):
         if self.dangling is None:
             if re.search('output', name, re.IGNORECASE) or re.search('出力', name):
-                logger.warning(prefix['warning'] + 'strange name for input string: %s: %s', name, repr(s))
+                logger.warning(prefix['warning'] + 'strange name for input string: %s', name)
             self.dangling = (s, name)
         else:
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
-                logger.warning(prefix['warning'] + 'strange name for output string: %s: %s', name, repr(s))
+                logger.warning(prefix['warning'] + 'strange name for output string: %s', name)
             self.data += [( self.dangling, (s, name) )]
             self.dangling = None
 
     def get(self):
         if self.dangling is not None:
-            logger.warning(prefix['warning'] + 'dangling sample string: %s: %s', self.dangling[1], repr(self.dangling[0]))
+            logger.error(prefix['error'] + 'dangling sample string: %s', self.dangling[1])
         return self.data

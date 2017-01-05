@@ -2,6 +2,7 @@
 import onlinejudge
 import onlinejudge.atcoder
 import onlinejudge.yukicoder
+import onlinejudge.anarchygolf
 import onlinejudge.implementation.utils as utils
 from onlinejudge.logging import logger, prefix
 import argparse
@@ -26,9 +27,17 @@ def parcentformat(s, table):
             result += m.group(0)
     return result
 
+def get_problem(s):
+    problem = onlinejudge.problem.from_url(s)
+    if problem:
+        logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
+        return problem
+    else:
+        logger.info(prefix['error'] + 'unknown problem: %s', s)
+        sys.exit(1)
+
 def download(args):
-    problem = onlinejudge.problem.from_url(args.url)
-    logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
+    problem = get_problem(args.url)
     kwargs = {}
     if problem.service_name == 'yukicoder':
         for x in args.extra_option:
@@ -54,8 +63,7 @@ def download(args):
             logger.info(prefix['success'] + 'saved to: %s', path)
 
 def login(args):
-    problem = onlinejudge.problem.from_url(args.url)
-    logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
+    problem = get_problem(args.url)
     kwargs = {}
     if problem.service_name == 'yukicoder':
         method = ''

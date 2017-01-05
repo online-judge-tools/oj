@@ -85,6 +85,7 @@ $ apt install python3-colorama
     -   AtCoder
     -   Yukicoder
     -   Yukicoder (テストケース一括ダウンロード) (with `-x all` option)
+    -   Anarchy Golf
 
 ## License
 
