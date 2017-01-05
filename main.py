@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-import argparse
-import os
-import os.path
-import re
-import colorama
 import onlinejudge
 import onlinejudge.atcoder
 import onlinejudge.yukicoder
 from onlinejudge.logging import logger, prefix
+import argparse
+import os
+import os.path
+import getpass
+import re
+import colorama
+import requests
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/local/share'), 'onlinejudge')
 
@@ -44,6 +46,15 @@ def download(args):
                 fh.write(s)
             logger.info(prefix['success'] + 'saved to: %s', path)
 
+def login(args):
+    problem = onlinejudge.problem.from_url(args.url)
+    logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
+    if args.username is None:
+        args.username = input('Username: ')
+    if args.password is None:
+        args.password = getpass.getpass()
+    problem.login(requests.Session(), args.username, args.password)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
@@ -54,6 +65,11 @@ def main():
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', default='test/sample-%i.%e')
     subparser.add_argument('--overwrite', action='store_true')
+    # login
+    subparser = subparsers.add_parser('login')
+    subparser.add_argument('url')
+    subparser.add_argument('-u', '--username')
+    subparser.add_argument('-p', '--password')
     # submit
     subparser = subparsers.add_parser('submit')
     subparser.add_argument('url')
@@ -63,10 +79,14 @@ def main():
     args = parser.parse_args()
     if args.command == 'download':
         download(args)
+    elif args.command == 'login':
+        login(args)
     elif args.command == 'submit':
-        it = onlinejudge.from_url(args.url)
+        raise NotImplementedError
     elif args.command == 'test':
         raise NotImplementedError
+    else:
+        assert False
 
 if __name__ == '__main__':
     main()

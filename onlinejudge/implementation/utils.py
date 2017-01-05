@@ -10,9 +10,9 @@ def download(url, session, get_options={}):
         session = requests.Session()
     resp = session.get(url, **get_options)
     if resp.status_code != 200:
-        logger.error(prefix['error'] + '%d %s', resp.status_code, http.client.responses(resp.status_code))
+        logger.error(prefix['error'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
         raise requests.HTTPError
-    logger.info(prefix['success'] + '200 ' + http.client.responses[200])
+    logger.info(prefix['success'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
     return resp.content
 
 class SampleZipper(object):

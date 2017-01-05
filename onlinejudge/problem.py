@@ -9,6 +9,12 @@ class OnlineJudge(object):
     def from_url(self, s):
         pass
 
+    def get_url(self):
+        raise NotImplementedError
+    def login(self, session, username, password):
+        raise NotImplementedError
+
+
 list = []
 def from_url(s):
     for cls in list:

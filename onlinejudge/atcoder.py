@@ -2,8 +2,11 @@
 import onlinejudge
 import onlinejudge.problem
 import onlinejudge.implementation.utils as utils
+from onlinejudge.logging import logger, prefix
 import re
 import bs4
+import requests
+import http.client # for the description string of status codes
 
 class AtCoder(onlinejudge.problem.OnlineJudge):
     onlinejudge_name = 'atcoder'
@@ -51,5 +54,17 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         m = re.match('^https?://([0-9A-Za-z-]+)\.contest\.atcoder\.jp/tasks/([0-9A-Za-z_]+)/?$', s)
         if m:
             return cls(m.group(1), m.group(2))
+
+    def login(self, session, username, password):
+        url = 'https://{}.contest.atcoder.jp/login'.format(self.contest_id)
+        logger.info(prefix['status'] + 'POST: %s', url)
+        resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
+        if resp.status_code == 302:  # AtCoder redirects to the top page if success
+            logger.info(prefix['success'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+            logger.info(prefix['success'] + 'You signed in.')
+        else:
+            logger.error(prefix['error'] + '%d %s', resp.status_code, http.client.responses[resp.status_code])
+            logger.error(prefix['error'] + 'You failed to sign in. Wrong user ID or password.')
+            raise requests.HTTPError
 
 onlinejudge.problem.list += [ AtCoder ]
