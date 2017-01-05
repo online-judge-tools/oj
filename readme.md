@@ -1,5 +1,7 @@
 # Online Judge Tools
 
+A sample case downloader for online judges.
+
 ## How to use
 
 ``` sh
@@ -80,6 +82,9 @@ $ apt install python3-colorama
 ## Features
 
 -   Download sample cases
+    -   AtCoder
+    -   Yukicoder
+    -   Yukicoder (テストケース一括ダウンロード) (with `-x all` option)
 
 ## License
 
