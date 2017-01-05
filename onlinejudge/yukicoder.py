@@ -4,9 +4,13 @@ import onlinejudge.problem
 import onlinejudge.implementation.utils as utils
 from onlinejudge.logging import logger, prefix
 import re
+import io
+import os.path
 import bs4
 import requests
 import urllib.parse
+import zipfile
+import collections
 
 class Yukicoder(onlinejudge.problem.OnlineJudge):
     service_name = 'yukicoder'
@@ -18,7 +22,12 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         self.problem_no = problem_no
         self.problem_id = problem_id
 
-    def download(self, session=None):
+    def download(self, session=None, is_all=False):
+        if is_all:
+            return self.download_all(session=session)
+        else:
+            return self.download_samples(session=session)
+    def download_samples(self, session=None):
         content = utils.download(self.get_url(), session)
         soup = bs4.BeautifulSoup(content, 'lxml')
         samples = utils.SampleZipper()
@@ -28,6 +37,15 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
                 s, name = it
                 samples.add(s, name)
         return samples.get()
+    def download_all(self, session=None):
+        url = 'http://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
+        content = utils.download(url, session)
+        samples = collections.defaultdict(list)
+        with zipfile.ZipFile(io.BytesIO(content)) as fh:
+            for name in sorted(fh.namelist()):  # "test_in" < "test_out"
+                s = fh.read(name).decode()
+                samples[os.path.basename(name)] += [( s, name )]
+        return sorted(samples.values())
 
     def parse_sample_tag(self, tag):
         assert isinstance(tag, bs4.Tag)

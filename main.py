@@ -29,8 +29,13 @@ def parcentformat(s, table):
 def download(args):
     problem = onlinejudge.problem.from_url(args.url)
     logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
+    kwargs = {}
+    if problem.service_name == 'yukicoder':
+        for x in args.extra_option:
+            if x == 'all':
+                kwargs['is_all'] = True
     with utils.session(cookiejar=args.cookie) as sess:
-        samples = problem.download(session=sess)
+        samples = problem.download(session=sess, **kwargs)
     for i, sample in enumerate(samples):
         logger.info('')
         logger.info(prefix['info'] + 'sample %d', i)
@@ -51,12 +56,6 @@ def download(args):
 def login(args):
     problem = onlinejudge.problem.from_url(args.url)
     logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
-    def get_credentials():
-        if args.username is None:
-            args.username = input('Username: ')
-        if args.password is None:
-            args.password = getpass.getpass()
-        return args.username, args.password
     kwargs = {}
     if problem.service_name == 'yukicoder':
         method = ''
@@ -67,6 +66,12 @@ def login(args):
             logger.error(prefix['failure'] + 'login for yukicoder: one of following options required: -x method=github, -x method=twitter')
             sys.exit(1)
         kwargs['method'] = method
+    def get_credentials():
+        if args.username is None:
+            args.username = input('Username: ')
+        if args.password is None:
+            args.password = getpass.getpass()
+        return args.username, args.password
     with utils.session(cookiejar=args.cookie) as sess:
         problem.login(sess, get_credentials, **kwargs)
 
