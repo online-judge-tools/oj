@@ -2,6 +2,7 @@
 import onlinejudge
 import onlinejudge.atcoder
 import onlinejudge.yukicoder
+import onlinejudge.implementation.utils as utils
 from onlinejudge.logging import logger, prefix
 import argparse
 import os
@@ -9,7 +10,6 @@ import os.path
 import getpass
 import re
 import colorama
-import requests
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/local/share'), 'onlinejudge')
 
@@ -28,7 +28,8 @@ def parcentformat(s, table):
 def download(args):
     problem = onlinejudge.problem.from_url(args.url)
     logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
-    samples = problem.download()
+    with utils.session(cookiejar=args.cookie) as sess:
+        samples = problem.download(session=sess)
     for i, sample in enumerate(samples):
         logger.info('')
         logger.info(prefix['info'] + 'sample %d', i)
@@ -53,13 +54,15 @@ def login(args):
         args.username = input('Username: ')
     if args.password is None:
         args.password = getpass.getpass()
-    problem.login(requests.Session(), args.username, args.password)
+    with utils.session(cookiejar=args.cookie) as sess:
+        problem.login(sess, args.username, args.password)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('--cookie', default=os.path.join(default_data_dir, 'cookie.jar'))
+    parser.add_argument('-c', '--cookie', default=os.path.join(default_data_dir, 'cookie.jar'))
     subparsers = parser.add_subparsers(dest='command')
+
     # download
     subparser = subparsers.add_parser('download')
     subparser.add_argument('url')
