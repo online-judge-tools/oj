@@ -87,3 +87,13 @@ class FormSender(object):
         resp = session.request(method, url, data=self.payload, **kwargs)
         log.status(describe_status_code(resp.status_code))
         return resp
+
+def dos2unix(s):
+    return s.replace('\r\n', '\n')
+def textfile(s): # should have trailing newline
+    if s.endswith('\n'):
+        return s
+    elif '\r\n' in s:
+        return s + '\r\n'
+    else:
+        return s + '\n'

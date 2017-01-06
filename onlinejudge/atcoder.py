@@ -22,7 +22,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         for pre in soup.find_all('pre'):
             name = self.parse_sample_tag(pre)
             if name is not None:
-                s = pre.string.strip().replace('\r\n', '\n') + '\n'
+                s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
                 l = self.get_tag_lang(pre)
                 if lang is None:
                     lang = l

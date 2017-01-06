@@ -56,7 +56,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         while pprv and pprv.string and pprv.string.strip() == '':
             pprv = pprv.previous_sibling
         if prv.name == 'h6' and tag.parent.name == 'div' and tag.parent['class'] == ['paragraph'] and pprv.name == 'h5':
-            return tag.string.strip() + '\n', pprv.string + ' ' + prv.string
+            return utils.textfile(tag.string.lstrip()), pprv.string + ' ' + prv.string
 
     def get_url(self):
         if self.problem_no:
