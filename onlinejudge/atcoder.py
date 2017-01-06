@@ -55,7 +55,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         if m:
             return cls(m.group(1), m.group(2))
 
-    def login(self, session, get_credentials):
+    def login(self, get_credentials, sesison=None):
         url = 'https://{}.contest.atcoder.jp/login'.format(self.contest_id)
         logger.info(prefix['status'] + 'GET: %s', url)
         resp = session.get(url, allow_redirects=False)

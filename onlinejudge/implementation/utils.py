@@ -3,7 +3,9 @@ import re
 import os
 import os.path
 import requests
+import bs4
 import contextlib
+import urllib.parse
 import http.cookiejar
 import http.client # for the description string of status codes
 from onlinejudge.logging import logger, prefix
@@ -56,3 +58,32 @@ class SampleZipper(object):
         if self.dangling is not None:
             logger.error(prefix['error'] + 'dangling sample string: %s', self.dangling[1])
         return self.data
+
+class FormSender(object):
+    def __init__(self, form, url):
+        assert isinstance(form, bs4.Tag)
+        assert form.name == 'form'
+        self.form = form
+        self.url = url
+        self.payload = {}
+        for input in self.form.find_all('input'):
+            logger.debug(prefix['debug'] + 'input: %s', str(input))
+            try:
+                if input['name'] and input['value']:
+                    self.payload[input['name']] = input['value']
+            except KeyError:
+                pass
+
+    def set(self, key, value):
+        self.payload[key] = value
+
+    def get(self):
+        return self.payload
+
+    def request(self, session, **kwargs):
+        url = urllib.parse.urljoin(self.url, self.form['action'])
+        method = self.form['method'].upper()
+        logger.info(prefix['status'] + '%s: %s', method, url)
+        resp = session.request(method, url, data=self.payload, **kwargs)
+        logger.info(prefix['info'] + describe_status_code(resp.status_code))
+        return resp

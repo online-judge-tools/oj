@@ -92,7 +92,26 @@ def login(args):
             args.password = getpass.getpass()
         return args.username, args.password
     with utils.session(cookiejar=args.cookie) as sess:
-        problem.login(sess, get_credentials, **kwargs)
+        problem.login(get_credentials, session=sess, **kwargs)
+
+def submit(args):
+    problem = get_problem(args.url)
+    if args.language not in problem.get_languages():
+        logger.error(prefix['error'] + 'language is unknown')
+        logger.info(prefix['info'] + 'supported languages are:')
+        for lang in problem.get_languages():
+            logger.info('%s (%s)', lang, problem.get_language_description(lang))
+        sys.exit(1)
+    with open(args.file) as fh:
+        code = fh.buffer.read()
+    try:
+        s = code.decode()
+    except UnicodeDecodeError as e:
+        logger.info(prefix['failure'] + '%s: %s', e.__class__.__name__, str(e))
+        s = repr(code)[ 1 : ]
+    logger.info(prefix['info'] + 'code:\n%s', s)
+    with utils.session(cookiejar=args.cookie) as sess:
+        problem.submit(code, language=args.language, session=sess)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -114,6 +133,8 @@ def main():
     # submit
     subparser = subparsers.add_parser('submit')
     subparser.add_argument('url')
+    subparser.add_argument('file')
+    subparser.add_argument('-l', '--language')
     # test
     subparser = subparsers.add_parser('test')
 
@@ -123,7 +144,7 @@ def main():
     elif args.command == 'login':
         login(args)
     elif args.command == 'submit':
-        raise NotImplementedError
+        submit(args)
     elif args.command == 'test':
         raise NotImplementedError
     else:
