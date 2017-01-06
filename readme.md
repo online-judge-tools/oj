@@ -2,6 +2,17 @@
 
 A sample case downloader for online judges.
 
+## todo
+
+-   codeforces, hackerrank, aoj あたりは対応したい
+    -   他はそのうち
+-   テストケース増やす
+    -   dogfoodingしてやばそうなの探す
+-   テストケースをもうちょっと綺麗に
+-   設定ファイルを作る
+-   他の細かいツールをmergeする
+-   サービスそのものを表現するクラスを切る
+
 ## How to use
 
 ``` sh
