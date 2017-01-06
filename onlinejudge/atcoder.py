@@ -18,12 +18,26 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         content = utils.download(self.get_url(), session, get_options={ 'allow_redirects': False })  # allow_redirects: if the URL is wrong, AtCoder redirects to the top page
         soup = bs4.BeautifulSoup(content, 'lxml')
         samples = utils.SampleZipper()
+        lang = None
         for pre in soup.find_all('pre'):
-            it = self.parse_sample_tag(pre)
-            if it is not None:
-                s, name = it
+            name = self.parse_sample_tag(pre)
+            if name is not None:
+                s = pre.string.strip().replace('\r\n', '\n') + '\n'
+                l = self.get_tag_lang(pre)
+                if lang is None:
+                    lang = l
+                elif lang != l:
+                    log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
+                    continue
                 samples.add(s, name)
         return samples.get()
+
+    def get_tag_lang(self, tag):
+        assert isinstance(tag, bs4.Tag)
+        for parent in tag.parents:
+            for cls in parent.attrs.get('class') or []:
+                if cls.startswith('lang-'):
+                    return cls
 
     def parse_sample_tag(self, tag):
         assert isinstance(tag, bs4.Tag)
@@ -32,16 +46,16 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
             prv = tag.previous_sibling
             while prv and prv.string.strip() == '':
                 prv = prv.previous_sibling
-            if prv.name == 'h3' and tag.parent.name == 'section':
-                return tag.string.strip().replace('\r\n', '\n') + '\n', prv.string
+            if tag.string and prv.name == 'h3' and tag.parent.name == 'section':
+                return prv.string
         except AttributeError:
             pass
         try:
             prv = tag.parent.previous_sibling
             while prv and prv.string.strip() == '':
                 prv = prv.previous_sibling
-            if tag.parent.name == 'section' and prv.name == 'h3':
-                return tag.string.strip().replace('\r\n', '\n') + '\n', prv.string
+            if tag.string and tag.parent.name == 'section' and prv.name == 'h3':
+                return prv.string
         except AttributeError:
             pass
 
