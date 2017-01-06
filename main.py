@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import onlinejudge
 import onlinejudge.atcoder
 import onlinejudge.yukicoder
 import onlinejudge.anarchygolf
 import onlinejudge.implementation.utils as utils
-from onlinejudge.logging import logger, prefix
+import onlinejudge.implementation.logging as log
 import argparse
 import sys
 import os
@@ -30,10 +29,10 @@ def parcentformat(s, table):
 def get_problem(s):
     problem = onlinejudge.problem.from_url(s)
     if problem:
-        logger.info(prefix['success'] + 'problem recognized: %s', str(problem))
+        log.success('problem recognized: %s', str(problem))
         return problem
     else:
-        logger.info(prefix['error'] + 'unknown problem: %s', s)
+        log.failure('unknown problem: %s', s)
         sys.exit(1)
 
 def download(args):
@@ -51,8 +50,8 @@ def download(args):
     with utils.session(cookiejar=args.cookie) as sess:
         samples = problem.download(session=sess, **kwargs)
     for i, sample in enumerate(samples):
-        logger.info('')
-        logger.info(prefix['info'] + 'sample %d', i)
+        log.emit('')
+        log.info('sample %d', i)
         for ext, (s, name) in zip(['in', 'out'], sample):
             table = {}
             table['i'] = str(i+1)
@@ -61,17 +60,17 @@ def download(args):
             table['b'] = os.path.basename(name)
             table['d'] = os.path.dirname(name)
             path = parcentformat(args.format, table)
-            logger.info(prefix['status'] + '%sput: %s', ext, name)
-            logger.info(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
+            log.status('%sput: %s', ext, name)
+            log.emit(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
             if os.path.exists(path):
-                logger.warning(prefix['warning'] + 'file already exists: %s', path)
+                log.warning('file already exists: %s', path)
                 if not args.overwrite:
-                    logger.warning(prefix['failure'] + 'skipped')
+                    log.warning('skipped')
                     continue
             os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, 'w') as fh:
                 fh.write(s)
-            logger.info(prefix['success'] + 'saved to: %s', path)
+            log.success('saved to: %s', path)
 
 def login(args):
     problem = get_problem(args.url)
@@ -82,7 +81,7 @@ def login(args):
             if x.startswith('method='):
                 method += x[ len('method=') : ]
         if method not in [ 'github', 'twitter' ]:
-            logger.error(prefix['failure'] + 'login for yukicoder: one of following options required: -x method=github, -x method=twitter')
+            log.failure('login for yukicoder: one of following options required: -x method=github, -x method=twitter')
             sys.exit(1)
         kwargs['method'] = method
     def get_credentials():
@@ -97,23 +96,30 @@ def login(args):
 def submit(args):
     problem = get_problem(args.url)
     if args.language not in problem.get_languages():
-        logger.error(prefix['error'] + 'language is unknown')
-        logger.info(prefix['info'] + 'supported languages are:')
+        log.error('language is unknown')
+        log.info('supported languages are:')
         for lang in problem.get_languages():
-            logger.info('%s (%s)', lang, problem.get_language_description(lang))
+            log.emit('%s (%s)', lang, problem.get_language_description(lang))
         sys.exit(1)
     with open(args.file) as fh:
         code = fh.buffer.read()
     try:
         s = code.decode()
     except UnicodeDecodeError as e:
-        logger.info(prefix['failure'] + '%s: %s', e.__class__.__name__, str(e))
+        log.failure('%s: %s', e.__class__.__name__, str(e))
         s = repr(code)[ 1 : ]
-    logger.info(prefix['info'] + 'code:\n%s', s)
+    log.info('code:\n%s', s)
     with utils.session(cookiejar=args.cookie) as sess:
         problem.submit(code, language=args.language, session=sess)
 
 def main():
+    # logging
+    log.setLevel(log.logging.INFO)
+    handler = log.logging.StreamHandler(sys.stdout)
+    handler.setLevel(log.logging.INFO)
+    log.addHandler(handler)
+
+    # argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-c', '--cookie', default=os.path.join(default_data_dir, 'cookie.jar'))

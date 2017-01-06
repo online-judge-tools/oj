@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import onlinejudge
 import onlinejudge.problem
 import onlinejudge.implementation.utils as utils
-from onlinejudge.logging import logger, prefix
+import onlinejudge.implementation.logging as log
 import re
 import bs4
 import requests
@@ -34,7 +33,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
             while prv and prv.string.strip() == '':
                 prv = prv.previous_sibling
             if prv.name == 'h3' and tag.parent.name == 'section':
-                return tag.string.lstrip().replace('\r\n', '\n'), prv.string
+                return tag.string.strip().replace('\r\n', '\n') + '\n', prv.string
         except AttributeError:
             pass
         try:
@@ -42,7 +41,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
             while prv and prv.string.strip() == '':
                 prv = prv.previous_sibling
             if tag.parent.name == 'section' and prv.name == 'h3':
-                return tag.string.lstrip().replace('\r\n', '\n'), prv.string
+                return tag.string.strip().replace('\r\n', '\n') + '\n', prv.string
         except AttributeError:
             pass
 
@@ -57,21 +56,21 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
 
     def login(self, get_credentials, sesison=None):
         url = 'https://{}.contest.atcoder.jp/login'.format(self.contest_id)
-        logger.info(prefix['status'] + 'GET: %s', url)
+        log.status('GET: %s', url)
         resp = session.get(url, allow_redirects=False)
-        logger.error(prefix['info'] + utils.describe_status_code(resp.status_code))
+        log.status(utils.describe_status_code(resp.status_code))
         if resp.status_code == 302:  # AtCoder redirects to the top page if success
-            logger.info(prefix['info'] + 'You have already signed in.')
+            log.info('You have already signed in.')
             return
         username, password = get_credentials()
-        logger.info(prefix['status'] + 'POST: %s', url)
+        log.status('POST: %s', url)
         resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
         if resp.status_code == 302:  # AtCoder redirects to the top page if success
-            logger.info(prefix['success'] + utils.describe_status_code(resp.status_code))
-            logger.info(prefix['success'] + 'You signed in.')
+            log.success(utils.describe_status_code(resp.status_code))
+            log.success('You signed in.')
         else:
-            logger.error(prefix['error'] + utils.describe_status_code(resp.status_code))
-            logger.error(prefix['error'] + 'You failed to sign in. Wrong user ID or password.')
+            log.failure(utils.describe_status_code(resp.status_code))
+            log.failure('You failed to sign in. Wrong user ID or password.')
             raise requests.HTTPError
 
 onlinejudge.problem.list += [ AtCoder ]

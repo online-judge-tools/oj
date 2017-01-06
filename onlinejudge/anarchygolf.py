@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import onlinejudge
 import onlinejudge.problem
 import onlinejudge.implementation.utils as utils
-from onlinejudge.logging import logger, prefix
+import onlinejudge.implementation.logging as log
 import re
 import bs4
 

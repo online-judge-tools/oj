@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import onlinejudge
 import onlinejudge.problem
 import onlinejudge.implementation.utils as utils
-from onlinejudge.logging import logger, prefix
+import onlinejudge.implementation.logging as log
 import re
 import io
 import os.path
@@ -58,7 +56,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         while pprv and pprv.string and pprv.string.strip() == '':
             pprv = pprv.previous_sibling
         if prv.name == 'h6' and tag.parent.name == 'div' and tag.parent['class'] == ['paragraph'] and pprv.name == 'h5':
-            return tag.string.lstrip(), pprv.string + ' ' + prv.string
+            return tag.string.strip() + '\n', pprv.string + ' ' + prv.string
 
     def get_url(self):
         if self.problem_no:
@@ -88,21 +86,21 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
     def login_with_github(self, session, get_credentials):
         # get
         url = 'https://yukicoder.me/auth/github'
-        logger.info(prefix['status'] + 'GET: %s', url)
+        log.status('GET: %s', url)
         resp = session.get(url)
-        logger.info(prefix['info'] + utils.describe_status_code(resp.status_code))
+        log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
         if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
-            logger.info(prefix['info'] + 'You have already signed in.')
+            log.info('You have already signed in.')
             return True
         # redirect to github.com
         soup = bs4.BeautifulSoup(resp.content, 'lxml')
         form = soup.find('form')
         if not form:
-            logger.error(prefix['error'] + 'form not found')
-            logger.info(prefix['info'] + 'Did you logged in?')
+            log.error('form not found')
+            log.info('Did you logged in?')
             return False
-        logger.debug(prefix['debug'] + 'form: %s', str(form))
+        log.debug('form: %s', str(form))
         # post
         username, password = get_credentials()
         form = utils.FormSender(form, url=resp.url)
@@ -111,10 +109,10 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         resp = form.request(session)
         resp.raise_for_status()
         if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
-            logger.info(prefix['success'] + 'You signed in.')
+            log.success('You signed in.')
             return True
         else:
-            logger.error(prefix['error'] + 'You failed to sign in. Wrong user ID or password.')
+            log.failure('You failed to sign in. Wrong user ID or password.')
             return False
 
     def login_with_twitter(self, session, get_credentials):
@@ -166,16 +164,16 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         assert language in self.get_languages()
         # get
         url = self.get_url() + '/submit'
-        logger.info(prefix['status'] + 'GET: %s', url)
+        log.status('GET: %s', url)
         resp = session.get(url)
-        logger.info(prefix['info'] + utils.describe_status_code(resp.status_code))
+        log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
         # post
         soup = bs4.BeautifulSoup(resp.content, 'lxml')
         form = soup.find('form', action=re.compile('/submit$'))
         if not form:
-            logger.error(prefix['error'] + 'form not found')
-            logger.info(prefix['info'] + 'Did you logged in?')
+            log.error('form not found')
+            log.info('Did you logged in?')
             return False
         form = utils.FormSender(form, url=resp.url)
         form.set('source', code)
@@ -184,10 +182,10 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         resp.raise_for_status()
         # result
         if re.match('^https?://yukicoder.me/submissions/[0-9]+/?$', resp.url):
-            logger.info(prefix['success'] + 'success: result: %s', resp.url)
+            log.success('success: result: %s', resp.url)
             return True
         else:
-            logger.info(prefix['failure'] + 'failure')
+            log.failure('failure')
             return False
 
 onlinejudge.problem.list += [ Yukicoder ]
