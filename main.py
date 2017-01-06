@@ -43,13 +43,24 @@ def download(args):
         for x in args.extra_option:
             if x == 'all':
                 kwargs['is_all'] = True
+    if args.format is None:
+        if problem.service_name == 'yukicoder' and kwargs['is_all']:
+            args.format = 'test/%b.%e'
+        else:
+            args.format = 'test/sample-%i.%e'
     with utils.session(cookiejar=args.cookie) as sess:
         samples = problem.download(session=sess, **kwargs)
     for i, sample in enumerate(samples):
         logger.info('')
         logger.info(prefix['info'] + 'sample %d', i)
         for ext, (s, name) in zip(['in', 'out'], sample):
-            path = parcentformat(args.format, { 'i': str(i+1), 'e': ext })
+            table = {}
+            table['i'] = str(i+1)
+            table['e'] = ext
+            table['n'] = name
+            table['b'] = os.path.basename(name)
+            table['d'] = os.path.dirname(name)
+            path = parcentformat(args.format, table)
             logger.info(prefix['status'] + '%sput: %s', ext, name)
             logger.info(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
             if os.path.exists(path):
@@ -93,7 +104,7 @@ def main():
     # download
     subparser = subparsers.add_parser('download')
     subparser.add_argument('url')
-    subparser.add_argument('-f', '--format', default='test/sample-%i.%e')
+    subparser.add_argument('-f', '--format')
     subparser.add_argument('--overwrite', action='store_true')
     # login
     subparser = subparsers.add_parser('login')
