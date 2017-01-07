@@ -30,17 +30,16 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         soup = bs4.BeautifulSoup(resp.content, 'lxml')
         samples = utils.SampleZipper()
         lang = None
-        for pre in soup.find_all('pre'):
-            name = self.parse_sample_tag(pre)
-            if name is not None:
-                s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
-                l = self.get_tag_lang(pre)
-                if lang is None:
-                    lang = l
-                elif lang != l:
-                    log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
-                    continue
-                samples.add(s, name)
+        for pre, h3 in self.find_sample_tags(soup):
+            s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
+            name = h3.string
+            l = self.get_tag_lang(pre)
+            if lang is None:
+                lang = l
+            elif lang != l:
+                log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
+                continue
+            samples.add(s, name)
         return samples.get()
 
     def get_messages_from_cookie(self, cookies):
@@ -72,25 +71,21 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
                 if cls.startswith('lang-'):
                     return cls
 
-    def parse_sample_tag(self, tag):
-        assert isinstance(tag, bs4.Tag)
-        assert tag.name == 'pre'
-        try:
-            prv = tag.previous_sibling
-            while prv and prv.string.strip() == '':
-                prv = prv.previous_sibling
-            if tag.string and prv.name == 'h3' and tag.parent.name == 'section':
-                return prv.string
-        except AttributeError:
-            pass
-        try:
-            prv = tag.parent.previous_sibling
-            while prv and prv.string.strip() == '':
-                prv = prv.previous_sibling
-            if tag.string and tag.parent.name == 'section' and prv.name == 'h3':
-                return prv.string
-        except AttributeError:
-            pass
+    def find_sample_tags(self, soup):
+        result = []
+        for pre in soup.find_all('pre'):
+            log.debug('pre tag: %s', str(pre))
+            if not pre.string:
+                continue
+            prv = utils.previous_sibling_tag(pre)
+            if prv and prv.name == 'h3' and prv.string:  # AtCoder's javascript recognizes `h3+pre' as a sample input/output
+                result += [( pre, prv )]
+            else:
+                if pre.parent and pre.parent.name == 'section':  # AtCoder's javascript sometimes fails. e.g. http://abc001.contest.atcoder.jp/tasks/abc001_1
+                    prv = pre.parent and utils.previous_sibling_tag(pre.parent)
+                    if prv and prv.name == 'h3' and prv.string:
+                        result += [( pre, prv )]
+        return result
 
     def get_url(self):
         return 'http://{}.contest.atcoder.jp/tasks/{}'.format(self.contest_id, self.problem_id)

@@ -113,12 +113,6 @@ def submit(args):
         problem.submit(code, language=args.language, session=sess)
 
 def main():
-    # logging
-    log.setLevel(log.logging.INFO)
-    handler = log.logging.StreamHandler(sys.stdout)
-    handler.setLevel(log.logging.INFO)
-    log.addHandler(handler)
-
     # argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
@@ -145,6 +139,16 @@ def main():
     subparser = subparsers.add_parser('test')
 
     args = parser.parse_args()
+
+    # logging
+    log_level = log.logging.INFO
+    if args.verbose:
+        log_level = log.logging.DEBUG
+    log.setLevel(log_level)
+    handler = log.logging.StreamHandler(sys.stdout)
+    handler.setLevel(log_level)
+    log.addHandler(handler)
+
     if args.command == 'download':
         download(args)
     elif args.command == 'login':
