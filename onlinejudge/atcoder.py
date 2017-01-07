@@ -5,6 +5,8 @@ import onlinejudge.implementation.logging as log
 import re
 import bs4
 import requests
+import urllib.parse
+import json
 import http.client # for the description string of status codes
 
 class AtCoder(onlinejudge.problem.OnlineJudge):
@@ -15,8 +17,17 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         self.problem_id = problem_id
 
     def download(self, session=None):
-        content = utils.download(self.get_url(), session, get_options={ 'allow_redirects': False })  # allow_redirects: if the URL is wrong, AtCoder redirects to the top page
-        soup = bs4.BeautifulSoup(content, 'lxml')
+        url = self.get_url()
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        msgs = self.get_messages_from_cookie(resp.cookies)
+        for msg in msgs:
+            log.status('message: %s', msg)
+        if msgs:
+            log.failure('interrupted')
+            return []
+        soup = bs4.BeautifulSoup(resp.content, 'lxml')
         samples = utils.SampleZipper()
         lang = None
         for pre in soup.find_all('pre'):
@@ -31,6 +42,28 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
                     continue
                 samples.add(s, name)
         return samples.get()
+
+    def get_messages_from_cookie(self, cookies):
+        msgtags = []
+        for cookie in cookies:
+            log.debug('cookie: %s', str(cookie))
+            if cookie.name.startswith('__message_'):
+                msg = json.loads(urllib.parse.unquote_plus(cookie.value))
+                msgtags += [ msg['c'] ]
+                log.debug('message: %s: %s', cookie.name, str(msg))
+        msgs = []
+        for msgtag in msgtags:
+            soup = bs4.BeautifulSoup(msgtag, 'lxml')
+            msg = None
+            for tag in soup.find_all():
+                if tag.string and tag.string.strip():
+                    msg = tag.string
+                    break
+            if msg is None:
+                log.error('failed to parse message')
+            else:
+                msgs += [ msg ]
+        return msgs
 
     def get_tag_lang(self, tag):
         assert isinstance(tag, bs4.Tag)
@@ -68,23 +101,22 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         if m:
             return cls(m.group(1), m.group(2))
 
-    def login(self, get_credentials, sesison=None):
+    def login(self, get_credentials, session=None):
         url = 'https://{}.contest.atcoder.jp/login'.format(self.contest_id)
         log.status('GET: %s', url)
         resp = session.get(url, allow_redirects=False)
         log.status(utils.describe_status_code(resp.status_code))
-        if resp.status_code == 302:  # AtCoder redirects to the top page if success
-            log.info('You have already signed in.')
-            return
+        msgs = self.get_messages_from_cookie(resp.cookies)
+        for msg in msgs:
+            log.status('message: %s', msg)
+        if msgs:
+            return 'login' not in resp.url
         username, password = get_credentials()
         log.status('POST: %s', url)
         resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
-        if resp.status_code == 302:  # AtCoder redirects to the top page if success
-            log.success(utils.describe_status_code(resp.status_code))
-            log.success('You signed in.')
-        else:
-            log.failure(utils.describe_status_code(resp.status_code))
-            log.failure('You failed to sign in. Wrong user ID or password.')
-            raise requests.HTTPError
+        msgs = self.get_messages_from_cookie(resp.cookies)
+        for msg in msgs:
+            log.status('message: %s', msg)
+        return 'login' not in resp.url  # AtCoder redirects to the top page if success
 
 onlinejudge.problem.list += [ AtCoder ]
