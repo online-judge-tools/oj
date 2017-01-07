@@ -74,11 +74,10 @@ class FormSender(object):
         self.payload = {}
         for input in self.form.find_all('input'):
             log.debug('input: %s', str(input))
-            try:
-                if input['name'] and input['value']:
-                    self.payload[input['name']] = input['value']
-            except KeyError:
-                pass
+            if input.attrs.get('type') in [ 'checkbox', 'radio' ]:
+                continue
+            if 'name' in input.attrs and 'value' in input.attrs:
+                self.payload[input['name']] = input['value']
 
     def set(self, key, value):
         self.payload[key] = value

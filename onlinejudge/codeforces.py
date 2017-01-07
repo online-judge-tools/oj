@@ -44,6 +44,32 @@ class Codeforces(onlinejudge.problem.OnlineJudge):
             samples.add(s, title.string)
         return samples.get()
 
+    def login(self, get_credentials, session=None):
+        url = 'http://codeforces.com/enter'
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        if resp.url != url:  # redirected
+            log.info('You have already signed in.')
+            return True
+        soup = bs4.BeautifulSoup(resp.content, 'lxml')
+        form = soup.find('form', id='enterForm')
+        log.debug('form: %s', str(form))
+        username, password = get_credentials()
+        form = utils.FormSender(form, url=resp.url)
+        form.set('handle', username)
+        form.set('password', password)
+        form.set('remember', 'on')
+        resp = form.request(session)
+        resp.raise_for_status()
+        if resp.url != url:  # redirected
+            log.success('Welcome, %s.', username)
+            return True
+        else:
+            log.failure('Invalid handle or password.')
+            return False
+
     def get_url(self):
         table = {}
         table['contest']    = 'http://codeforces.com/contest/{}/problem/{}'

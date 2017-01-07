@@ -6,7 +6,7 @@ A sample case downloader for online judges.
 
 -   hackerrank, aoj あたりは対応したい
     -   他はそのうち
-    -   atcoderのsubmit や codeforcesのlogin/submitも
+    -   atcoder/codeforcesのsubmitも
 -   テストケース増やす
     -   dogfoodingしてやばそうなの探す
 -   テストケースをもうちょっと綺麗に
@@ -102,6 +102,7 @@ $ apt install python3-colorama
 -   Login
     -   AtCoder
     -   Yukicoder
+    -   Codeforces
 -   Submit your solution
     -   Yukicoder
 
