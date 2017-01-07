@@ -68,7 +68,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match('^https?://yukicoder\.me/problems/(no/)?([0-9]+)/?$', s)
+        m = re.match(r'^https?://yukicoder\.me/problems/(no/)?([0-9]+)/?$', s)
         if m:
             n = int(m.group(2).lstrip('0') or '0')
             if m.group(1):
@@ -170,7 +170,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         resp.raise_for_status()
         # post
         soup = bs4.BeautifulSoup(resp.content, 'lxml')
-        form = soup.find('form', action=re.compile('/submit$'))
+        form = soup.find('form', action=re.compile(r'/submit$'))
         if not form:
             log.error('form not found')
             log.info('Did you logged in?')
@@ -181,7 +181,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         resp = form.request(session=session)
         resp.raise_for_status()
         # result
-        if re.match('^https?://yukicoder.me/submissions/[0-9]+/?$', resp.url):
+        if re.match(r'^https?://yukicoder\.me/submissions/[0-9]+/?$', resp.url):
             log.success('success: result: %s', resp.url)
             return True
         else:

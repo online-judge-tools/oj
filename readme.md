@@ -4,8 +4,9 @@ A sample case downloader for online judges.
 
 ## todo
 
--   codeforces, hackerrank, aoj あたりは対応したい
+-   hackerrank, aoj あたりは対応したい
     -   他はそのうち
+    -   atcoderのsubmit や codeforcesのlogin/submitも
 -   テストケース増やす
     -   dogfoodingしてやばそうなの探す
 -   テストケースをもうちょっと綺麗に
@@ -97,6 +98,7 @@ $ apt install python3-colorama
     -   Yukicoder
     -   Yukicoder (テストケース一括ダウンロード) (with `-x all` option)
     -   Anarchy Golf
+    -   Codeforces
 -   Login
     -   AtCoder
     -   Yukicoder

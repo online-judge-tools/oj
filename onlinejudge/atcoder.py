@@ -92,7 +92,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match('^https?://([0-9A-Za-z-]+)\.contest\.atcoder\.jp/tasks/([0-9A-Za-z_]+)/?$', s)
+        m = re.match(r'^https?://([0-9A-Za-z-]+)\.contest\.atcoder\.jp/tasks/([0-9A-Za-z_]+)/?$', s)
         if m:
             return cls(m.group(1), m.group(2))
 

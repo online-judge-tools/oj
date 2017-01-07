@@ -2,6 +2,7 @@
 import onlinejudge.atcoder
 import onlinejudge.yukicoder
 import onlinejudge.anarchygolf
+import onlinejudge.codeforces
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import argparse

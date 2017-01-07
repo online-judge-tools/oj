@@ -43,7 +43,7 @@ class AnarchyGolf(onlinejudge.problem.OnlineJudge):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match('^http://golf\.shinh\.org/p\.rb\?([0-9A-Za-z_+]+)$', s)
+        m = re.match(r'^http://golf\.shinh\.org/p\.rb\?([0-9A-Za-z_+]+)$', s)
         if m:
             return cls(m.group(1))
 
