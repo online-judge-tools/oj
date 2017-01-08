@@ -39,9 +39,12 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         return samples.get()
     def download_all(self, session=None):
         url = 'http://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
-        content = utils.download(url, session)
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
         samples = collections.defaultdict(list)
-        with zipfile.ZipFile(io.BytesIO(content)) as fh:
+        with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
             for name in sorted(fh.namelist()):  # "test_in" < "test_out"
                 s = fh.read(name).decode()
                 samples[os.path.basename(name)] += [( s, name )]
