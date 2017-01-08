@@ -27,8 +27,8 @@ def download(url, session, get_options={}):
     if resp.status_code != 200:
         log.error(describe_status_code(resp.status_code))
         raise requests.HTTPError
-    log.success(describe_status_code(resp.status_code))
-    return resp.content
+    log.status(describe_status_code(resp.status_code))
+    return resp.content.decode(resp.encoding)
 
 @contextlib.contextmanager
 def session(cookiejar):

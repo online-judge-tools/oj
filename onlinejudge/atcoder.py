@@ -27,7 +27,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         if msgs:
             log.failure('interrupted')
             return []
-        soup = bs4.BeautifulSoup(resp.content, 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
         samples = utils.SampleZipper()
         lang = None
         for pre, h3 in self.find_sample_tags(soup):

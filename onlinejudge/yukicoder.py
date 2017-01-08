@@ -31,6 +31,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         soup = bs4.BeautifulSoup(content, 'lxml')
         samples = utils.SampleZipper()
         for pre in soup.find_all('pre'):
+            log.debug('pre: %s', str(pre))
             it = self.parse_sample_tag(pre)
             if it is not None:
                 s, name = it
@@ -56,6 +57,8 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         while pprv and pprv.string and pprv.string.strip() == '':
             pprv = pprv.previous_sibling
         if prv.name == 'h6' and tag.parent.name == 'div' and tag.parent['class'] == ['paragraph'] and pprv.name == 'h5':
+            log.debug('h6: %s', str(prv))
+            log.debug('name.encode(): %s', prv.string.encode())
             return utils.textfile(tag.string.lstrip()), pprv.string + ' ' + prv.string
 
     def get_url(self):
@@ -94,7 +97,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
             log.info('You have already signed in.')
             return True
         # redirect to github.com
-        soup = bs4.BeautifulSoup(resp.content, 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
         form = soup.find('form')
         if not form:
             log.error('form not found')
@@ -169,12 +172,13 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
         # post
-        soup = bs4.BeautifulSoup(resp.content, 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
         form = soup.find('form', action=re.compile(r'/submit$'))
         if not form:
             log.error('form not found')
             log.info('Did you logged in?')
             return False
+        log.debug('form: %s', str(form))
         form = utils.FormSender(form, url=resp.url)
         form.set('source', code)
         form.set('lang', language)
