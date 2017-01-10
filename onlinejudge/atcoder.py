@@ -51,7 +51,7 @@ class AtCoderService(onlinejudge.service.Service):
     def from_url(cls, s):
         if re.match(r'^https?://atcoder\.jp/?$', s):
             return cls()
-        if re.match(r'^https?://[0-9A-Z-a-z-]+\.atcoder\.jp/?$', s):
+        if re.match(r'^https?://[0-9A-Z-a-z-]+\.contest\.atcoder\.jp/?$', s):
             return cls()
 
     @classmethod
