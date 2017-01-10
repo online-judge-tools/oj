@@ -4,35 +4,34 @@ A sample case downloader for online judges.
 
 ## todo
 
+-   使ってくれて不具合見つけて報告してくれる人探す
 -   hackerrank, aoj あたりは対応したい
     -   他はそのうち
     -   atcoder/codeforcesのsubmitも
 -   テストケース増やす
-    -   dogfoodingしてやばそうなの探す
--   テストケースをもうちょっと綺麗に
 -   設定ファイルを作る
 -   他の細かいツールをmergeする
 -   サービスそのものを表現するクラスを切る
 
+## How to setup
+
+Requirements:
+
+``` sh
+$ pip3 install requests
+$ pip3 install beautifulsoup4
+$ pip3 install colorama
+```
+
 ## How to use
 
 ``` sh
-$ ./main.py [login,download] $URL
+$ ./main.py [download,login,submit] URL
 ```
 
 Example:
 
 ``` sh
-$ ./main.py login http://agc001.contest.atcoder.jp/tasks/agc001_a
-[+] problem recognized: <onlinejudge.atcoder.AtCoder object at 0x7f9c4b0fb208>
-Username: hoge
-Password: 
-[*] load cookie from: /home/user/local/share/onlinejudge/cookie.jar
-[x] POST: https://agc001.contest.atcoder.jp/login
-[+] 302 Found
-[+] You signed in.
-[*] save cookie to: /home/user/local/share/onlinejudge/cookie.jar
-
 $ ./main.py download http://agc001.contest.atcoder.jp/tasks/agc001_a
 [+] problem recognized: <onlinejudge.atcoder.AtCoder object at 0x7f2925a5df60>
 [x] GET: http://agc001.contest.atcoder.jp/tasks/agc001_a
@@ -73,22 +72,6 @@ $ ./main.py download http://agc001.contest.atcoder.jp/tasks/agc001_a
 [x] output: Sample Output 2
 135
 [+] saved to: test/sample-4.out
-```
-
-## Requirements
-
-``` sh
-$ pip3 install requests
-$ pip3 install beautifulsoup4
-$ pip3 install colorama
-```
-
-Or, in Ubuntu:
-
-``` sh
-$ apt install python3-requests
-$ apt install python3-bs4
-$ apt install python3-colorama
 ```
 
 ## Features
