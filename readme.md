@@ -11,7 +11,7 @@ A sample case downloader for online judges.
 -   テストケース増やす
 -   設定ファイルを作る
 -   他の細かいツールをmergeする
--   サービスそのものを表現するクラスを切る
+-   submitの時の言語指定どうしよう
 
 ## How to setup
 
