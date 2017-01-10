@@ -88,8 +88,9 @@ class FormSender(object):
     def get(self):
         return self.payload
 
-    def request(self, session, **kwargs):
-        url = urllib.parse.urljoin(self.url, self.form['action'])
+    def request(self, session, action=None, **kwargs):
+        action = action or self.form['action']
+        url = urllib.parse.urljoin(self.url, action)
         method = self.form['method'].upper()
         log.status('%s: %s', method, url)
         resp = session.request(method, url, data=self.payload, **kwargs)

@@ -5,13 +5,30 @@ A sample case downloader for online judges.
 ## todo
 
 -   使ってくれて不具合見つけて報告してくれる人探す
--   hackerrank, aoj あたりは対応したい
+-   aoj 対応したい
     -   他はそのうち
-    -   atcoder/codeforcesのsubmitも
+    -   atcoder/codeforces/hackerrankのsubmitも
 -   テストケース増やす
 -   設定ファイルを作る
 -   他の細かいツールをmergeする
 -   submitの時の言語指定どうしよう
+
+## Features
+
+-   Download sample cases
+    -   AtCoder
+    -   Yukicoder
+    -   Yukicoder (テストケース一括ダウンロード) (with `-x all` option)
+    -   Anarchy Golf
+    -   Codeforces
+    -   HackerRank (using `Run Code`)
+-   Login
+    -   AtCoder
+    -   Yukicoder (via github.com)
+    -   Codeforces
+    -   HackerRank
+-   Submit your solution
+    -   Yukicoder
 
 ## How to setup
 
@@ -73,21 +90,6 @@ $ ./main.py download http://agc001.contest.atcoder.jp/tasks/agc001_a
 135
 [+] saved to: test/sample-4.out
 ```
-
-## Features
-
--   Download sample cases
-    -   AtCoder
-    -   Yukicoder
-    -   Yukicoder (テストケース一括ダウンロード) (with `-x all` option)
-    -   Anarchy Golf
-    -   Codeforces
--   Login
-    -   AtCoder
-    -   Yukicoder
-    -   Codeforces
--   Submit your solution
-    -   Yukicoder
 
 ## License
 
