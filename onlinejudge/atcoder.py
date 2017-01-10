@@ -27,7 +27,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
         if msgs:
             log.failure('interrupted')
             return []
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
         lang = None
         for pre, h3 in self.find_sample_tags(soup):
@@ -52,7 +52,7 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
                 log.debug('message: %s: %s', cookie.name, str(msg))
         msgs = []
         for msgtag in msgtags:
-            soup = bs4.BeautifulSoup(msgtag, 'lxml')
+            soup = bs4.BeautifulSoup(msgtag, utils.html_parser)
             msg = None
             for tag in soup.find_all():
                 if tag.string and tag.string.strip():

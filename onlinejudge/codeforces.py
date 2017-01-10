@@ -27,7 +27,7 @@ class Codeforces(onlinejudge.problem.OnlineJudge):
         log.status('GET: %s', url)
         resp = session.get(url)
         log.status(utils.describe_status_code(resp.status_code))
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
         for tag in soup.find_all('div', class_=re.compile('^(in|out)put$')):  # Codeforces writes very nice HTML :)
             log.debug('tag: %s', str(tag))
@@ -53,7 +53,7 @@ class Codeforces(onlinejudge.problem.OnlineJudge):
         if resp.url != url:  # redirected
             log.info('You have already signed in.')
             return True
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', id='enterForm')
         log.debug('form: %s', str(form))
         username, password = get_credentials()

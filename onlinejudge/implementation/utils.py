@@ -10,6 +10,8 @@ import urllib.parse
 import http.cookiejar
 import http.client # for the description string of status codes
 
+html_parser = 'html.parser'  # TODO: this is NOT a utility.
+
 def describe_status_code(status_code):
     return '{} {}'.format(status_code, http.client.responses[status_code])
 

@@ -28,7 +28,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
             return self.download_samples(session=session)
     def download_samples(self, session=None):
         content = utils.download(self.get_url(), session)
-        soup = bs4.BeautifulSoup(content, 'lxml')
+        soup = bs4.BeautifulSoup(content, utils.html_parser)
         samples = utils.SampleZipper()
         for pre in soup.find_all('pre'):
             log.debug('pre: %s', str(pre))
@@ -100,7 +100,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
             log.info('You have already signed in.')
             return True
         # redirect to github.com
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form')
         if not form:
             log.error('form not found')
@@ -175,7 +175,7 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
         log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
         # post
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'lxml')
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', action=re.compile(r'/submit$'))
         if not form:
             log.error('form not found')

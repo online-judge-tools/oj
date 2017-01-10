@@ -13,7 +13,7 @@ class AnarchyGolf(onlinejudge.problem.OnlineJudge):
 
     def download(self, session=None):
         content = utils.download(self.get_url(), session, get_options={ 'allow_redirects': False })  # allow_redirects: if the URL is wrong, AtCoder redirects to the top page
-        soup = bs4.BeautifulSoup(content, 'lxml')
+        soup = bs4.BeautifulSoup(content, utils.html_parser)
         samples = utils.SampleZipper()
         for h2 in soup.find_all('h2'):
             it = self.parse_sample_tag(h2)
