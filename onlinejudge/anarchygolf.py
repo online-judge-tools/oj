@@ -6,6 +6,7 @@ import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import re
 import bs4
+import requests
 
 
 class AnarchyGolfService(onlinejudge.service.Service):
@@ -32,17 +33,24 @@ class AnarchyGolfProblem(onlinejudge.problem.Problem):
         self.problem_id = problem_id
 
     def download(self, session=None):
-        content = utils.download(self.get_url(), session, get_options={ 'allow_redirects': False })  # allow_redirects: if the URL is wrong, AtCoder redirects to the top page
-        soup = bs4.BeautifulSoup(content, utils.html_parser)
+        session = session or requests.Session()
+        url = self.get_url()
+        # get
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
         for h2 in soup.find_all('h2'):
-            it = self.parse_sample_tag(h2)
+            it = self._parse_sample_tag(h2)
             if it is not None:
                 s, name = it
                 samples.add(s, name)
         return samples.get()
 
-    def parse_sample_tag(self, tag):
+    def _parse_sample_tag(self, tag):
         assert isinstance(tag, bs4.Tag)
         assert tag.name == 'h2'
         name = tag.contents[0]

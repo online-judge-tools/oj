@@ -17,7 +17,9 @@ class CodeforcesService(onlinejudge.service.Service):
         return cls.__instance
 
     def login(self, get_credentials, session=None):
+        session = session or requests.Session()
         url = 'http://codeforces.com/enter'
+        # get
         log.status('GET: %s', url)
         resp = session.get(url)
         log.status(utils.describe_status_code(resp.status_code))
@@ -25,6 +27,7 @@ class CodeforcesService(onlinejudge.service.Service):
         if resp.url != url:  # redirected
             log.info('You have already signed in.')
             return True
+        # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', id='enterForm')
         log.debug('form: %s', str(form))
@@ -33,6 +36,7 @@ class CodeforcesService(onlinejudge.service.Service):
         form.set('handle', username)
         form.set('password', password)
         form.set('remember', 'on')
+        # post
         resp = form.request(session)
         resp.raise_for_status()
         if resp.url != url:  # redirected
@@ -69,10 +73,14 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
                 self.kind = 'gym'
 
     def download(self, session=None):
+        session = session or requests.Session()
         url = self.get_url()
+        # get
         log.status('GET: %s', url)
         resp = session.get(url)
         log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
         for tag in soup.find_all('div', class_=re.compile('^(in|out)put$')):  # Codeforces writes very nice HTML :)

@@ -29,9 +29,10 @@ class YukicoderService(onlinejudge.service.Service):
         else:
             assert False
 
-    def login_with_github(self, session, get_credentials):
-        # get
+    def login_with_github(self, get_credentials, session=None):
+        session = session or requests.Session()
         url = 'https://yukicoder.me/auth/github'
+        # get
         log.status('GET: %s', url)
         resp = session.get(url)
         log.status(utils.describe_status_code(resp.status_code))
@@ -40,6 +41,7 @@ class YukicoderService(onlinejudge.service.Service):
             log.info('You have already signed in.')
             return True
         # redirect to github.com
+        # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form')
         if not form:
@@ -61,7 +63,8 @@ class YukicoderService(onlinejudge.service.Service):
             log.failure('You failed to sign in. Wrong user ID or password.')
             return False
 
-    def login_with_twitter(self, session, get_credentials):
+    def login_with_twitter(self, get_credentials, session=None):
+        session = session or requests.Session()
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
 
@@ -91,22 +94,32 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         else:
             return self.download_samples(session=session)
     def download_samples(self, session=None):
-        content = utils.download(self.get_url(), session)
-        soup = bs4.BeautifulSoup(content, utils.html_parser)
+        session = session or requests.Session()
+        url = self.get_url()
+        # get
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        # parse
+        soup = bs4.BeautifulSoup(resp.content, utils.html_parser)
         samples = utils.SampleZipper()
         for pre in soup.find_all('pre'):
             log.debug('pre: %s', str(pre))
-            it = self.parse_sample_tag(pre)
+            it = self._parse_sample_tag(pre)
             if it is not None:
                 s, name = it
                 samples.add(s, name)
         return samples.get()
     def download_all(self, session=None):
+        session = session or requests.Session()
         url = 'http://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
+        # get
         log.status('GET: %s', url)
         resp = session.get(url)
         log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
+        # parse
         samples = collections.defaultdict(list)
         with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
             for name in sorted(fh.namelist()):  # "test_in" < "test_out"
@@ -114,7 +127,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 samples[os.path.basename(name)] += [( s, name )]
         return sorted(samples.values())
 
-    def parse_sample_tag(self, tag):
+    def _parse_sample_tag(self, tag):
         assert isinstance(tag, bs4.Tag)
         assert tag.name == 'pre'
         prv = tag.previous_sibling

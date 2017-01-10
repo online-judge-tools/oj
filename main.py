@@ -11,22 +11,9 @@ import sys
 import os
 import os.path
 import getpass
-import re
 import colorama
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/local/share'), 'onlinejudge')
-
-def parcentformat(s, table):
-    assert '%' not in table or table['%'] == '%'
-    table['%'] = '%'
-    result = ''
-    for m in re.finditer('[^%]|%(.)', s):
-        if m.group(1):
-            if m.group(1) in table:
-                result += table[m.group(1)]
-        else:
-            result += m.group(0)
-    return result
 
 def download(args):
     problem = onlinejudge.dispatch.problem_from_url(args.url)
@@ -54,7 +41,7 @@ def download(args):
             table['n'] = name
             table['b'] = os.path.basename(name)
             table['d'] = os.path.dirname(name)
-            path = parcentformat(args.format, table)
+            path = utils.parcentformat(args.format, table)
             log.status('%sput: %s', ext, name)
             log.emit(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
             if os.path.exists(path):

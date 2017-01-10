@@ -9,7 +9,6 @@ import bs4
 import requests
 import urllib.parse
 import json
-import http.client # for the description string of status codes
 
 
 class AtCoderService(onlinejudge.service.Service):
@@ -20,18 +19,23 @@ class AtCoderService(onlinejudge.service.Service):
         return cls.__instance
 
     def login(self, get_credentials, session=None):
+        session = session or requests.Session()
         url = 'https://practice.contest.atcoder.jp/login'
+        # get
         log.status('GET: %s', url)
         resp = session.get(url, allow_redirects=False)
         log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         for msg in msgs:
             log.status('message: %s', msg)
         if msgs:
             return 'login' not in resp.url
+        # post
         username, password = get_credentials()
         log.status('POST: %s', url)
         resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
+        resp.raise_for_status()
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         for msg in msgs:
             log.status('message: %s', msg)
@@ -80,23 +84,27 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         self.problem_id = problem_id
 
     def download(self, session=None):
+        session = session or requests.Session()
         url = self.get_url()
+        # get
         log.status('GET: %s', url)
         resp = session.get(url)
         log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         for msg in msgs:
             log.status('message: %s', msg)
         if msgs:
             log.failure('interrupted')
             return []
+        # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
         lang = None
-        for pre, h3 in self.find_sample_tags(soup):
+        for pre, h3 in self._find_sample_tags(soup):
             s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
             name = h3.string
-            l = self.get_tag_lang(pre)
+            l = self._get_tag_lang(pre)
             if lang is None:
                 lang = l
             elif lang != l:
@@ -105,14 +113,14 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             samples.add(s, name)
         return samples.get()
 
-    def get_tag_lang(self, tag):
+    def _get_tag_lang(self, tag):
         assert isinstance(tag, bs4.Tag)
         for parent in tag.parents:
             for cls in parent.attrs.get('class') or []:
                 if cls.startswith('lang-'):
                     return cls
 
-    def find_sample_tags(self, soup):
+    def _find_sample_tags(self, soup):
         result = []
         for pre in soup.find_all('pre'):
             log.debug('pre tag: %s', str(pre))

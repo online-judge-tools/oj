@@ -8,9 +8,21 @@ import bs4
 import contextlib
 import urllib.parse
 import http.cookiejar
-import http.client # for the description string of status codes
+import http.client
 
 html_parser = 'html.parser'  # TODO: this is NOT a utility.
+
+def parcentformat(s, table):
+    assert '%' not in table or table['%'] == '%'
+    table['%'] = '%'
+    result = ''
+    for m in re.finditer('[^%]|%(.)', s):
+        if m.group(1):
+            if m.group(1) in table:
+                result += table[m.group(1)]
+        else:
+            result += m.group(0)
+    return result
 
 def describe_status_code(status_code):
     return '{} {}'.format(status_code, http.client.responses[status_code])
@@ -20,17 +32,6 @@ def previous_sibling_tag(tag):
     while tag and not isinstance(tag, bs4.Tag):
         tag = tag.previous_sibling
     return tag
-
-def download(url, session, get_options={}):
-    log.status('GET: %s', url)
-    if session is None:
-        session = requests.Session()
-    resp = session.get(url, **get_options)
-    if resp.status_code != 200:
-        log.error(describe_status_code(resp.status_code))
-        raise requests.HTTPError
-    log.status(describe_status_code(resp.status_code))
-    return resp.content.decode(resp.encoding)
 
 @contextlib.contextmanager
 def session(cookiejar):
