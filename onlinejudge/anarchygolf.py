@@ -1,13 +1,33 @@
 #!/usr/bin/env python3
+import onlinejudge.service
 import onlinejudge.problem
+import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import re
 import bs4
 
-class AnarchyGolf(onlinejudge.problem.OnlineJudge):
-    service_name = 'anarchygolf'
 
+class AnarchyGolfService(onlinejudge.service.Service):
+    __instance = None # singleton
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+        return cls.__instance
+
+    def get_url(self):
+        return 'http://golf.shinh.org/'
+
+    def get_name(self):
+        return 'anarchygolf'
+
+    @classmethod
+    def from_url(cls, s):
+        if re.match(r'^http://golf\.shinh\.org/?$', s):
+            return cls()
+
+
+class AnarchyGolfProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_id):
         self.problem_id = problem_id
 
@@ -41,10 +61,15 @@ class AnarchyGolf(onlinejudge.problem.OnlineJudge):
     def get_url(self):
         return 'http://golf.shinh.org/p.rb?{}'.format(self.problem_id)
 
+    def get_service(self):
+        return AnarchyGolfService()
+
     @classmethod
     def from_url(cls, s):
         m = re.match(r'^http://golf\.shinh\.org/p\.rb\?([0-9A-Za-z_+]+)$', s)
         if m:
             return cls(m.group(1))
 
-onlinejudge.problem.list += [ AnarchyGolf ]
+
+onlinejudge.dispatch.services += [ AnarchyGolfService ]
+onlinejudge.dispatch.problems += [ AnarchyGolfProblem ]

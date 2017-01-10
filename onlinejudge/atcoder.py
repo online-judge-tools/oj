@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import onlinejudge.service
 import onlinejudge.problem
+import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import re
@@ -9,40 +11,47 @@ import urllib.parse
 import json
 import http.client # for the description string of status codes
 
-class AtCoder(onlinejudge.problem.OnlineJudge):
-    service_name = 'atcoder'
 
-    def __init__(self, contest_id, problem_id):
-        self.contest_id = contest_id
-        self.problem_id = problem_id
+class AtCoderService(onlinejudge.service.Service):
+    __instance = None # singleton
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+        return cls.__instance
 
-    def download(self, session=None):
-        url = self.get_url()
+    def login(self, get_credentials, session=None):
+        url = 'https://practice.contest.atcoder.jp/login'
         log.status('GET: %s', url)
-        resp = session.get(url)
+        resp = session.get(url, allow_redirects=False)
         log.status(utils.describe_status_code(resp.status_code))
-        msgs = self.get_messages_from_cookie(resp.cookies)
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         for msg in msgs:
             log.status('message: %s', msg)
         if msgs:
-            log.failure('interrupted')
-            return []
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        samples = utils.SampleZipper()
-        lang = None
-        for pre, h3 in self.find_sample_tags(soup):
-            s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
-            name = h3.string
-            l = self.get_tag_lang(pre)
-            if lang is None:
-                lang = l
-            elif lang != l:
-                log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
-                continue
-            samples.add(s, name)
-        return samples.get()
+            return 'login' not in resp.url
+        username, password = get_credentials()
+        log.status('POST: %s', url)
+        resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        for msg in msgs:
+            log.status('message: %s', msg)
+        return 'login' not in resp.url  # AtCoder redirects to the top page if success
 
-    def get_messages_from_cookie(self, cookies):
+    def get_url(self):
+        return 'https://atcoder.jp/'
+
+    def get_name(self):
+        return 'atcoder'
+
+    @classmethod
+    def from_url(cls, s):
+        if re.match(r'^https?://atcoder\.jp/?$', s):
+            return cls()
+        if re.match(r'^https?://[0-9A-Z-a-z-]+\.atcoder\.jp/?$', s):
+            return cls()
+
+    @classmethod
+    def _get_messages_from_cookie(cls, cookies):
         msgtags = []
         for cookie in cookies:
             log.debug('cookie: %s', str(cookie))
@@ -63,6 +72,38 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
             else:
                 msgs += [ msg ]
         return msgs
+
+
+class AtCoderProblem(onlinejudge.problem.Problem):
+    def __init__(self, contest_id, problem_id):
+        self.contest_id = contest_id
+        self.problem_id = problem_id
+
+    def download(self, session=None):
+        url = self.get_url()
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        for msg in msgs:
+            log.status('message: %s', msg)
+        if msgs:
+            log.failure('interrupted')
+            return []
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        samples = utils.SampleZipper()
+        lang = None
+        for pre, h3 in self.find_sample_tags(soup):
+            s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
+            name = h3.string
+            l = self.get_tag_lang(pre)
+            if lang is None:
+                lang = l
+            elif lang != l:
+                log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
+                continue
+            samples.add(s, name)
+        return samples.get()
 
     def get_tag_lang(self, tag):
         assert isinstance(tag, bs4.Tag)
@@ -90,28 +131,15 @@ class AtCoder(onlinejudge.problem.OnlineJudge):
     def get_url(self):
         return 'http://{}.contest.atcoder.jp/tasks/{}'.format(self.contest_id, self.problem_id)
 
+    def get_service(self):
+        return AtCoderService()
+
     @classmethod
     def from_url(cls, s):
         m = re.match(r'^https?://([0-9A-Za-z-]+)\.contest\.atcoder\.jp/tasks/([0-9A-Za-z_]+)/?$', s)
         if m:
             return cls(m.group(1), m.group(2))
 
-    def login(self, get_credentials, session=None):
-        url = 'https://{}.contest.atcoder.jp/login'.format(self.contest_id)
-        log.status('GET: %s', url)
-        resp = session.get(url, allow_redirects=False)
-        log.status(utils.describe_status_code(resp.status_code))
-        msgs = self.get_messages_from_cookie(resp.cookies)
-        for msg in msgs:
-            log.status('message: %s', msg)
-        if msgs:
-            return 'login' not in resp.url
-        username, password = get_credentials()
-        log.status('POST: %s', url)
-        resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
-        msgs = self.get_messages_from_cookie(resp.cookies)
-        for msg in msgs:
-            log.status('message: %s', msg)
-        return 'login' not in resp.url  # AtCoder redirects to the top page if success
 
-onlinejudge.problem.list += [ AtCoder ]
+onlinejudge.dispatch.services += [ AtCoderService ]
+onlinejudge.dispatch.problems += [ AtCoderProblem ]

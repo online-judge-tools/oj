@@ -1,15 +1,61 @@
 #!/usr/bin/env python3
+import onlinejudge.service
 import onlinejudge.problem
+import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import re
 import bs4
 import string
 
-# NOTE: Codeforces has its API: http://codeforces.com/api/help
-class Codeforces(onlinejudge.problem.OnlineJudge):
-    service_name = 'codeforces'
 
+class CodeforcesService(onlinejudge.service.Service):
+    __instance = None # singleton
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+        return cls.__instance
+
+    def login(self, get_credentials, session=None):
+        url = 'http://codeforces.com/enter'
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        if resp.url != url:  # redirected
+            log.info('You have already signed in.')
+            return True
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        form = soup.find('form', id='enterForm')
+        log.debug('form: %s', str(form))
+        username, password = get_credentials()
+        form = utils.FormSender(form, url=resp.url)
+        form.set('handle', username)
+        form.set('password', password)
+        form.set('remember', 'on')
+        resp = form.request(session)
+        resp.raise_for_status()
+        if resp.url != url:  # redirected
+            log.success('Welcome, %s.', username)
+            return True
+        else:
+            log.failure('Invalid handle or password.')
+            return False
+
+    def get_url(self):
+        return 'http://codeforces.com/'
+
+    def get_name(self):
+        return 'codeforces'
+
+    @classmethod
+    def from_url(cls, s):
+        if re.match(r'^http://codeforces\.com/?$', s):
+            return cls()
+
+
+# NOTE: Codeforces has its API: http://codeforces.com/api/help
+class CodeforcesProblem(onlinejudge.problem.Problem):
     def __init__(self, contest_id, index, kind=None):
         assert isinstance(contest_id, int)
         assert index in string.ascii_uppercase
@@ -44,38 +90,15 @@ class Codeforces(onlinejudge.problem.OnlineJudge):
             samples.add(s, title.string)
         return samples.get()
 
-    def login(self, get_credentials, session=None):
-        url = 'http://codeforces.com/enter'
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
-        if resp.url != url:  # redirected
-            log.info('You have already signed in.')
-            return True
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        form = soup.find('form', id='enterForm')
-        log.debug('form: %s', str(form))
-        username, password = get_credentials()
-        form = utils.FormSender(form, url=resp.url)
-        form.set('handle', username)
-        form.set('password', password)
-        form.set('remember', 'on')
-        resp = form.request(session)
-        resp.raise_for_status()
-        if resp.url != url:  # redirected
-            log.success('Welcome, %s.', username)
-            return True
-        else:
-            log.failure('Invalid handle or password.')
-            return False
-
     def get_url(self):
         table = {}
         table['contest']    = 'http://codeforces.com/contest/{}/problem/{}'
         table['problemset'] = 'http://codeforces.com/problemset/problem/{}/{}'
         table['gym']        = 'http://codeforces.com/gym/{}/problem/{}'
         return table[self.kind].format(self.contest_id, self.index)
+
+    def get_service(self):
+        return CodeforcesService()
 
     @classmethod
     def from_url(cls, s):
@@ -89,4 +112,6 @@ class Codeforces(onlinejudge.problem.OnlineJudge):
             if m:
                 return cls(int(m.group(1)), normalize(m.group(2)), kind=kind)
 
-onlinejudge.problem.list += [ Codeforces ]
+
+onlinejudge.dispatch.services += [ CodeforcesService ]
+onlinejudge.dispatch.problems += [ CodeforcesProblem ]

@@ -3,6 +3,7 @@ import onlinejudge.atcoder
 import onlinejudge.yukicoder
 import onlinejudge.anarchygolf
 import onlinejudge.codeforces
+import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import argparse
@@ -27,24 +28,17 @@ def parcentformat(s, table):
             result += m.group(0)
     return result
 
-def get_problem(s):
-    problem = onlinejudge.problem.from_url(s)
-    if problem:
-        log.success('problem recognized: %s', str(problem))
-        return problem
-    else:
-        log.failure('unknown problem: %s', s)
-        sys.exit(1)
-
 def download(args):
-    problem = get_problem(args.url)
+    problem = onlinejudge.dispatch.problem_from_url(args.url)
+    if problem is None:
+        sys.exit(1)
     kwargs = {}
-    if problem.service_name == 'yukicoder':
+    if problem.get_service().get_name() == 'yukicoder':
         for x in args.extra_option:
             if x == 'all':
                 kwargs['is_all'] = True
     if args.format is None:
-        if problem.service_name == 'yukicoder' and kwargs.get('is_all'):
+        if problem.get_service().get_name() == 'yukicoder' and kwargs.get('is_all'):
             args.format = 'test/%b.%e'
         else:
             args.format = 'test/sample-%i.%e'
@@ -74,9 +68,11 @@ def download(args):
             log.success('saved to: %s', path)
 
 def login(args):
-    problem = get_problem(args.url)
+    service = onlinejudge.dispatch.service_from_url(args.url)
+    if service is None:
+        sys.exit(1)
     kwargs = {}
-    if problem.service_name == 'yukicoder':
+    if service.get_name() == 'yukicoder':
         method = ''
         for x in args.extra_option:
             if x.startswith('method='):
@@ -92,10 +88,12 @@ def login(args):
             args.password = getpass.getpass()
         return args.username, args.password
     with utils.session(cookiejar=args.cookie) as sess:
-        problem.login(get_credentials, session=sess, **kwargs)
+        service.login(get_credentials, session=sess, **kwargs)
 
 def submit(args):
-    problem = get_problem(args.url)
+    problem = onlinejudge.dispatch.problem_from_url(args.url)
+    if problem is None:
+        sys.exit(1)
     if args.language not in problem.get_languages():
         log.error('language is unknown')
         log.info('supported languages are:')

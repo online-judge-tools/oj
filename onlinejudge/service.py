@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
-class Problem(object):
-    def download(self, session=None):
-        raise NotImplementedError
-    def submit(self, code, language, session=None):
+class Service(object):
+    def login(self, get_credentials, session=None):
         raise NotImplementedError
     def get_url(self):
         raise NotImplementedError
-    def get_service(self):
+    def get_name(self):
         raise NotImplementedError
     @classmethod
     def from_url(self, s):

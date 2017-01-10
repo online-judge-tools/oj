@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import onlinejudge.service
 import onlinejudge.problem
+import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import re
@@ -11,9 +13,71 @@ import urllib.parse
 import zipfile
 import collections
 
-class Yukicoder(onlinejudge.problem.OnlineJudge):
-    service_name = 'yukicoder'
 
+class YukicoderService(onlinejudge.service.Service):
+    __instance = None # singleton
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+        return cls.__instance
+
+    def login(self, get_credentials, session=None, method=None):
+        if method == 'github':
+            return self.login_with_github(session, get_credentials)
+        elif method == 'twitter':
+            return self.login_with_twitter(session, get_credentials)
+        else:
+            assert False
+
+    def login_with_github(self, session, get_credentials):
+        # get
+        url = 'https://yukicoder.me/auth/github'
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
+            log.info('You have already signed in.')
+            return True
+        # redirect to github.com
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        form = soup.find('form')
+        if not form:
+            log.error('form not found')
+            log.info('Did you logged in?')
+            return False
+        log.debug('form: %s', str(form))
+        # post
+        username, password = get_credentials()
+        form = utils.FormSender(form, url=resp.url)
+        form.set('login', username)
+        form.set('password', password)
+        resp = form.request(session)
+        resp.raise_for_status()
+        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
+            log.success('You signed in.')
+            return True
+        else:
+            log.failure('You failed to sign in. Wrong user ID or password.')
+            return False
+
+    def login_with_twitter(self, session, get_credentials):
+        url = 'https://yukicoder.me/auth/twitter'
+        raise NotImplementedError
+
+    def get_url(self):
+        return 'http://yukicoder.me/'
+
+    def get_name(self):
+        return 'yukicoder'
+
+    @classmethod
+    def from_url(cls, s):
+        if re.match(r'^https?://yukicoder\.me/?$', s):
+            return cls()
+
+
+class YukicoderProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_no=None, problem_id=None):
         assert problem_no or problem_id
         assert not problem_no or isinstance(problem_no, int)
@@ -81,49 +145,6 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
                 return cls(problem_no=int(n))
             else:
                 return cls(problem_id=int(n))
-
-    def login(self, get_credentials, session=None, method=None):
-        if method == 'github':
-            return self.login_with_github(session, get_credentials)
-        elif method == 'twitter':
-            return self.login_with_twitter(session, get_credentials)
-        else:
-            assert False
-    def login_with_github(self, session, get_credentials):
-        # get
-        url = 'https://yukicoder.me/auth/github'
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
-        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
-            log.info('You have already signed in.')
-            return True
-        # redirect to github.com
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        form = soup.find('form')
-        if not form:
-            log.error('form not found')
-            log.info('Did you logged in?')
-            return False
-        log.debug('form: %s', str(form))
-        # post
-        username, password = get_credentials()
-        form = utils.FormSender(form, url=resp.url)
-        form.set('login', username)
-        form.set('password', password)
-        resp = form.request(session)
-        resp.raise_for_status()
-        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
-            log.success('You signed in.')
-            return True
-        else:
-            log.failure('You failed to sign in. Wrong user ID or password.')
-            return False
-
-    def login_with_twitter(self, session, get_credentials):
-        url = 'https://yukicoder.me/auth/twitter'
-        raise NotImplementedError
 
     # Fri Jan  6 16:49:14 JST 2017
     _languages = []
@@ -195,4 +216,9 @@ class Yukicoder(onlinejudge.problem.OnlineJudge):
             log.failure('failure')
             return False
 
-onlinejudge.problem.list += [ Yukicoder ]
+    def get_service(self):
+        return YukicoderService()
+
+
+onlinejudge.dispatch.services += [ YukicoderService ]
+onlinejudge.dispatch.problems += [ YukicoderProblem ]
