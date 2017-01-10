@@ -105,3 +105,15 @@ def textfile(s): # should have trailing newline
         return s + '\r\n'
     else:
         return s + '\n'
+
+# http://stackoverflow.com/questions/31875/is-there-a-simple-elegant-way-to-define-singletons-in-python/12850496#12850496
+def singleton(cls):
+    instance = cls()
+    # Always return the same object
+    cls.__new__ = staticmethod(lambda cls: instance)
+    # Disable __init__
+    try:
+        del cls.__init__
+    except AttributeError:
+        pass
+    return cls

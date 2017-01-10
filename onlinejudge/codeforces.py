@@ -9,12 +9,8 @@ import bs4
 import string
 
 
+@utils.singleton
 class CodeforcesService(onlinejudge.service.Service):
-    __instance = None # singleton
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = object.__new__(cls)
-        return cls.__instance
 
     def login(self, get_credentials, session=None):
         session = session or requests.Session()

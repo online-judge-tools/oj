@@ -9,12 +9,8 @@ import bs4
 import requests
 
 
+@utils.singleton
 class AnarchyGolfService(onlinejudge.service.Service):
-    __instance = None # singleton
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = object.__new__(cls)
-        return cls.__instance
 
     def get_url(self):
         return 'http://golf.shinh.org/'
