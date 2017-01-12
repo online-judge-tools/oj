@@ -45,10 +45,12 @@ $ chmod +x ~/bin/oj
 ## How to use
 
 ``` sh
-$ ./main.py [download,login,submit] URL
+$ oj [download,login,submit] URL
 ```
 
-Example:
+For details, see `--help`.
+
+## Example
 
 ``` sh
 $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
