@@ -98,7 +98,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
         # parse
-        soup = bs4.BeautifulSoup(resp.content, utils.html_parser)
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
         for pre in soup.find_all('pre'):
             log.debug('pre: %s', str(pre))
