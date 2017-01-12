@@ -2,17 +2,6 @@
 
 A sample case downloader for online judges.
 
-## todo
-
--   使ってくれて不具合見つけて報告してくれる人探す
--   aoj 対応したい
-    -   他はそのうち
-    -   atcoder/codeforces/hackerrankのsubmitも
--   テストケース増やす
--   設定ファイルを作る
--   他の細かいツールをmergeする
--   submitの時の言語指定どうしよう
-
 ## Features
 
 -   Download sample cases
@@ -30,14 +19,27 @@ A sample case downloader for online judges.
 -   Submit your solution
     -   Yukicoder
 
-## How to setup
+## How to install
 
-Requirements:
+from PyPI: <https://pypi.python.org/pypi/online-judge-tools>
+
+``` sh
+$ pip3 install online-judge-tools
+```
+
+or
 
 ``` sh
 $ pip3 install requests
 $ pip3 install beautifulsoup4
 $ pip3 install colorama
+$ : and
+$ git clone https://github.com/kmyk/online-judge-tools
+$ cat <<EOF > ~/bin/oj
+#!/bin/sh
+exec $PWD/online-judge-tools/oj "\$@"
+EOF
+$ chmod +x ~/bin/oj
 ```
 
 ## How to use
@@ -49,7 +51,7 @@ $ ./main.py [download,login,submit] URL
 Example:
 
 ``` sh
-$ ./main.py download http://agc001.contest.atcoder.jp/tasks/agc001_a
+$ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
 [+] problem recognized: <onlinejudge.atcoder.AtCoder object at 0x7f2925a5df60>
 [x] GET: http://agc001.contest.atcoder.jp/tasks/agc001_a
 [+] 200 OK
