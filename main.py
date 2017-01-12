@@ -45,6 +45,8 @@ def download(args):
             path = utils.parcentformat(args.format, table)
             log.status('%sput: %s', ext, name)
             log.emit(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
+            if not path: # doesn't save if --format ''
+                continue
             if os.path.exists(path):
                 log.warning('file already exists: %s', path)
                 if not args.overwrite:
