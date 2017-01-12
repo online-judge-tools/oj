@@ -139,7 +139,8 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         if prv.name == 'h6' and tag.parent.name == 'div' and tag.parent['class'] == ['paragraph'] and pprv.name == 'h5':
             log.debug('h6: %s', str(prv))
             log.debug('name.encode(): %s', prv.string.encode())
-            return utils.textfile(tag.string.lstrip()), pprv.string + ' ' + prv.string
+            s = tag.string or ''  # tag.string for the tag "<pre></pre>" returns None
+            return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
 
     def get_url(self):
         if self.problem_no:
