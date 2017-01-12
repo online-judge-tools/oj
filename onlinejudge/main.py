@@ -7,8 +7,13 @@ import argparse
 import sys
 import os
 import os.path
+import re
+import glob
 import getpass
 import colorama
+import collections
+import subprocess
+import time
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
 
@@ -97,6 +102,118 @@ def submit(args):
     with utils.session(cookiejar=args.cookie) as sess:
         problem.submit(code, language=args.language, session=sess)
 
+def test(args):
+    # glob with --format by default
+    if not args.test:
+        table = {}
+        table['s'] = '*'
+        table['e'] = '*'
+        pattern = utils.parcentformat(args.format, table)
+        args.test = glob.glob(pattern)
+        for path in args.test:
+            log.debug('testcase globbed: %s', path)
+    # construct relationship of files
+    table = {}
+    table['s'] = '(?P<name>.+)'
+    table['e'] = '(?P<ext>in|out)'
+    pattern = re.compile('^' + utils.parcentformat(args.format, table) + '$')
+    tests = collections.defaultdict(dict)
+    for path in args.test:
+        m = pattern.match(os.path.normpath(path))
+        if not m:
+            log.error('unrecognizable file found: %s', path)
+            sys.exit(1)
+        name = m.groupdict()['name']
+        ext  = m.groupdict()['ext']
+        assert ext not in tests[name]
+        tests[name][ext] = path
+    for name in tests:
+        if 'in' not in tests[name]:
+            assert 'out' in tests[name]
+            log.error('dangling output case: %s', tests[name]['out'])
+            sys.exit(1)
+    if not tests:
+        log.error('no cases found')
+        sys.exit(1)
+    log.info('%d cases found', len(tests))
+    # run tests
+    rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
+    bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
+    green = lambda s: colorama.Fore.GREEN + s + colorama.Fore.RESET
+    red = lambda s: colorama.Fore.RED + s + colorama.Fore.RESET
+    slowest, slowest_name = -1, ''
+    ac_count = 0
+    for name, it in sorted(tests.items()):
+        log.emit('')
+        log.info('%s', name)
+        with open(it['in']) as inf:
+            # run
+            begin = time.perf_counter()
+            try:
+                proc = subprocess.Popen(args.command, shell=args.shell, stdin=inf, stdout=subprocess.PIPE, stderr=sys.stderr)
+            except FileNotFoundError:
+                log.error('No such file or directory: %s', args.command)
+                sys.exit(1)
+            except PermissionError:
+                log.error('Permission denied: %s', args.command)
+                sys.exit(1)
+            answer, _ = proc.communicate()
+            end = time.perf_counter()
+            answer = answer.decode()
+            if args.rstrip:
+                answer = answer.rstrip(rstrip_targets)
+            if slowest < end - begin:
+                slowest = end - begin
+                slowest_name = name
+            log.status('time: %f sec', end - begin)
+            # check
+            is_ac = True
+            if proc.returncode != 0:
+                log.failure(red('RE') + ': return code %d', proc.returncode)
+                is_ac = False
+            if 'out' in it:
+                with open(it['out']) as outf:
+                    correct = outf.read()
+                if args.rstrip:
+                    correct = correct.rstrip(rstrip_targets)
+                # compare
+                if args.mode == 'all':
+                    if answer != correct:
+                        log.failure(red('WA'))
+                        log.emit('output:\n%s', bold(answer))
+                        log.emit('expected:\n%s', bold(correct))
+                        is_ac = False
+                elif args.mode == 'line':
+                    answer  = answer .splitlines()
+                    correct = correct.splitlines()
+                    for i, (x, y) in enumerate(zip(answer + [ None ] * len(correct), correct + [ None ] * len(answer))):
+                        if x is None and y is None:
+                            break
+                        elif x is None:
+                            log.failure(red('WA') + ': line %d: line is nothing: expected "%s"', i, bold(y))
+                            is_ac = False
+                        elif y is None:
+                            log.failure(red('WA') + ': line %d: unexpected line: output "%s"', i, bold(x))
+                            is_ac = False
+                        elif x != y:
+                            log.failure(red('WA') + ': line %d: output "%s": expected "%s"', i, bold(x), bold(y))
+                            is_ac = False
+                else:
+                    assert False
+            else:
+                log.emit(bold(answer))
+            if is_ac:
+                log.success(green('AC'))
+                ac_count += 1
+    # summarize
+    log.emit('')
+    log.status('slowest: %f sec  (for %s)', slowest, slowest_name)
+    if ac_count == len(tests):
+        log.success('test ' + green('success') + ': %d cases', len(tests))
+    else:
+        log.failure('test ' + red('failed') + ': %d AC / %d cases', ac_count, len(tests))
+        sys.exit(1)
+
 def main(args=None):
 
     # argparse
@@ -104,9 +221,9 @@ def main(args=None):
     parser.add_argument('-v', '--verbose', action='store_true')
     default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
     parser.add_argument('-c', '--cookie', default=default_cookie_path,
-            help='default: {}'.format(default_cookie_path))
+            help='path for cookie. (default: {})'.format(default_cookie_path))
     parser.add_argument('-x', '--extra-option', action='append', default=[])
-    subparsers = parser.add_subparsers(dest='command', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
+    subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
     subparser = subparsers.add_parser('download', help='download sample cases',
@@ -164,10 +281,24 @@ supported services:
     subparser.add_argument('-l', '--language')
 
     # test
-    subparser = subparsers.add_parser('test', help='test your code (not implementated yet)',
+    subparser = subparsers.add_parser('test', help='test your code',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
+format string for --format:
+  %s                    name
+  %e                    extension: "in" or "out"
+  (both %s and %e are required.)
+
+tips:
+  You can do similar things with shell: e.g. `for f in test/*.in ; do echo $f ; diff <(./a.out < $f) ${f%.in%.out} ; done`
 ''')
+    subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
+    subparser.add_argument('--shell', action='store_true', help='use the --command as a shellscript instead of a path')
+    subparser.add_argument('-f', '--format', default='test/%s.%e', help='a format string to recognize the relationship of test cases. (default: "test/%%s.%%e")')
+    subparser.add_argument('-m', '--mode', choices=[ 'all', 'line' ], default='all', help='mode to check an output with the correct answer. (default: all)')
+    subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
+    subparser.add_argument('--rstrip', action='store_true', help='rstrip output before comapre')
+    subparser.add_argument('test', nargs='*', help='paths of test cases. (if empty: globbed from --format)')
 
     args = parser.parse_args(args=args)
 
@@ -182,13 +313,14 @@ supported services:
 
     log.debug('args: %s', str(args))
 
-    if args.command == 'download':
+    if args.subcommand == 'download':
         download(args)
-    elif args.command == 'login':
+    elif args.subcommand == 'login':
         login(args)
-    elif args.command == 'submit':
+    elif args.subcommand == 'submit':
         submit(args)
-    elif args.command == 'test':
-        raise NotImplementedError
+    elif args.subcommand == 'test':
+        test(args)
     else:
-        parser.error('command is required')
+        parser.print_help(file=sys.stderr)
+        sys.exit(1)

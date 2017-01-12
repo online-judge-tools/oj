@@ -1,6 +1,6 @@
 # Online Judge Tools
 
-A sample case downloader for online judges.
+Tools for online judge services. Downloading sample cases and Testing your code with them.
 
 ## Features
 
@@ -18,6 +18,8 @@ A sample case downloader for online judges.
     -   HackerRank
 -   Submit your solution
     -   Yukicoder
+-   Test your solution
+    -   (all services)
 
 ## How to install
 
@@ -33,7 +35,7 @@ or
 $ pip3 install requests
 $ pip3 install beautifulsoup4
 $ pip3 install colorama
-$ : and
+and
 $ git clone https://github.com/kmyk/online-judge-tools
 $ cat <<EOF > ~/bin/oj
 #!/bin/sh
@@ -45,7 +47,9 @@ $ chmod +x ~/bin/oj
 ## How to use
 
 ``` sh
-$ oj [download,login,submit] URL
+$ oj [download,login] URL
+$ oj submit URL FILE [-l LANGUAGE]
+$ oj test [-c COMMAND] [TEST...]
 ```
 
 For details, see `--help`.
