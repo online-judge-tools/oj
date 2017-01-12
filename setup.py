@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='online-judge-tools',
-    version='0.1.1',
+    version='0.1.2',
     description='Tools for online-judge services',
     install_requires=[
         'requests',
