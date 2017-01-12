@@ -9,7 +9,7 @@ import os.path
 import getpass
 import colorama
 
-default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/local/share'), 'onlinejudge')
+default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
 
 def download(args):
     problem = onlinejudge.dispatch.problem_from_url(args.url)
