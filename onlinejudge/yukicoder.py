@@ -118,9 +118,13 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         # parse
         samples = collections.defaultdict(list)
         with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
-            for name in sorted(fh.namelist()):  # "test_in" < "test_out"
-                s = fh.read(name).decode()
-                samples[os.path.basename(name)] += [( s, name )]
+            for filename in sorted(fh.namelist()):  # "test_in" < "test_out"
+                s = fh.read(filename).decode()
+                name = os.path.basename(filename)
+                if os.path.splitext(name)[1] == '.in':  # ".in" extension is confusing
+                    name = os.path.splitext(name)[0]
+                print(filename, name)
+                samples[os.path.basename(filename)] += [( s, name )]
         return sorted(samples.values())
 
     def _parse_sample_tag(self, tag):
