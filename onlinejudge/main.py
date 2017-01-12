@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-import onlinejudge.atcoder
-import onlinejudge.yukicoder
-import onlinejudge.anarchygolf
-import onlinejudge.codeforces
-import onlinejudge.hackerrank
-import onlinejudge.dispatch
+import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import argparse
@@ -101,7 +96,7 @@ def submit(args):
     with utils.session(cookiejar=args.cookie) as sess:
         problem.submit(code, language=args.language, session=sess)
 
-def main():
+def main(args=None):
     # argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true')
@@ -127,7 +122,7 @@ def main():
     # test
     subparser = subparsers.add_parser('test')
 
-    args = parser.parse_args()
+    args = parser.parse_args(args=args)
 
     # logging
     log_level = log.logging.INFO
@@ -138,6 +133,8 @@ def main():
     handler.setLevel(log_level)
     log.addHandler(handler)
 
+    log.debug('args: %s', str(args))
+
     if args.command == 'download':
         download(args)
     elif args.command == 'login':
@@ -147,7 +144,4 @@ def main():
     elif args.command == 'test':
         raise NotImplementedError
     else:
-        assert False
-
-if __name__ == '__main__':
-    main()
+        parser.error('command is required')
