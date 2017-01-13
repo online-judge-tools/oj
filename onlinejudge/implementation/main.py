@@ -230,7 +230,8 @@ def main(args=None):
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 supported services:
-  AnarchyGolf
+  Anarchy Golf
+  Aizu Online Judge
   AtCoder
   Codeforces
   HackerRank
@@ -290,7 +291,7 @@ format string for --format:
   (both %s and %e are required.)
 
 tips:
-  You can do similar things with shell: e.g. `for f in test/*.in ; do echo $f ; diff <(./a.out < $f) ${f%.in%.out} ; done`
+  You can do similar things with shell: e.g. `for f in test/*.in ; do echo $f ; diff <(./a.out < $f) ${f/.in/.out} ; done`
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('--shell', action='store_true', help='use the --command as a shellscript instead of a path')
