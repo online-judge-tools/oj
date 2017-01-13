@@ -4,4 +4,5 @@ import onlinejudge.yukicoder
 import onlinejudge.anarchygolf
 import onlinejudge.codeforces
 import onlinejudge.hackerrank
+import onlinejudge.aoj
 import onlinejudge.dispatch

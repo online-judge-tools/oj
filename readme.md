@@ -11,6 +11,7 @@ Tools for online judge services. Downloading sample cases and Testing your code 
     -   Anarchy Golf
     -   Codeforces
     -   HackerRank (using `Run Code`)
+    -   Aizu Online Judge
 -   Login
     -   AtCoder
     -   Yukicoder (via github.com)
