@@ -130,12 +130,8 @@ class YukicoderProblem(onlinejudge.problem.Problem):
     def _parse_sample_tag(self, tag):
         assert isinstance(tag, bs4.Tag)
         assert tag.name == 'pre'
-        prv = tag.previous_sibling
-        while prv and prv.string and prv.string.strip() == '':
-            prv = prv.previous_sibling
-        pprv = tag.parent.previous_sibling
-        while pprv and pprv.string and pprv.string.strip() == '':
-            pprv = pprv.previous_sibling
+        prv = utils.previous_sibling_tag(tag)
+        pprv = tag.parent and utils.previous_sibling_tag(tag.parent)
         if prv.name == 'h6' and tag.parent.name == 'div' and tag.parent['class'] == ['paragraph'] and pprv.name == 'h5':
             log.debug('h6: %s', str(prv))
             log.debug('name.encode(): %s', prv.string.encode())
