@@ -6,7 +6,7 @@ with open('readme.md') as fh:
 
 setup(
     name='online-judge-tools',
-    version='0.1.5',
+    version='0.1.6',
     description='Tools for online-judge services',
     install_requires=[
         'requests',

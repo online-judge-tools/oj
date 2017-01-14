@@ -19,11 +19,13 @@ Tools for online judge services. Downloading sample cases and Testing your code 
     -   HackerRank
 -   Submit your solution
     -   Yukicoder
--   Test your solution
-    -   (all services)
 -   Generate scanner for input  (experimental)
     -   AtCoder
     -   Yukicoder
+-   Test your solution
+    -   (all services)
+-   Generate output files from input and reference implementation
+    -   (all services)
 
 ## How to install
 
