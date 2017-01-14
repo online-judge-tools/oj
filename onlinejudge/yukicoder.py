@@ -229,6 +229,20 @@ class YukicoderProblem(onlinejudge.problem.Problem):
     def get_service(self):
         return YukicoderService()
 
+    def get_input_format(self, session=None):
+        session = session or requests.Session()
+        url = self.get_url()
+        # get
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        for h4 in soup.find_all('h4'):
+            if h4.string == '入力':
+                return h4.parent.find('pre').string
+
 
 onlinejudge.dispatch.services += [ YukicoderService ]
 onlinejudge.dispatch.problems += [ YukicoderProblem ]

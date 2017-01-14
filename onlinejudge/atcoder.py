@@ -144,6 +144,29 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         if m:
             return cls(m.group(1), m.group(2))
 
+    def get_input_format(self, session=None):
+        session = session or requests.Session()
+        url = self.get_url()
+        # get
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        for msg in msgs:
+            log.status('message: %s', msg)
+        if msgs:
+            log.failure('interrupted')
+            return ''
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        for h3 in soup.find_all('h3'):
+            if h3.string == '入力':
+                s = ''
+                for it in h3.parent.find('pre'):
+                    s += it.string or it  # AtCoder uses <var>...</var> for math symbols
+                return s
+
 
 onlinejudge.dispatch.services += [ AtCoderService ]
 onlinejudge.dispatch.problems += [ AtCoderProblem ]

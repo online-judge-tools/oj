@@ -3,6 +3,7 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
+from onlinejudge.implementation.cmd_generate_scanner import generate_scanner
 import argparse
 import sys
 import os
@@ -301,6 +302,27 @@ tips:
     subparser.add_argument('--rstrip', action='store_true', help='rstrip output before comapre')
     subparser.add_argument('test', nargs='*', help='paths of test cases. (if empty: globbed from --format)')
 
+    # test
+    subparser = subparsers.add_parser('generate-scanner', help='generate input scanner  (experimental)',
+            formatter_class=argparse.RawTextHelpFormatter,
+            epilog='''\
+supported services:
+  AtCoder
+  Yukicoder
+
+example:
+  http://agc001.contest.atcoder.jp/tasks/agc001_a
+  input format:
+    N
+    L_1 L_2 \dots L_{2N}
+  generated code:
+    int N; cin >> N;
+    vector<int> L(2*N); REPEAT (i,2*N) cin >> L[i];
+''')
+    subparser.add_argument('--repeat-macro', help='use repeat macro with given name')
+    subparser.add_argument('--scanf', action='store_true', help='use scanf instead of cin')
+    subparser.add_argument('url')
+
     args = parser.parse_args(args=args)
 
     # logging
@@ -322,6 +344,8 @@ tips:
         submit(args)
     elif args.subcommand == 'test':
         test(args)
+    elif args.subcommand == 'generate-scanner':
+        generate_scanner(args)
     else:
         parser.print_help(file=sys.stderr)
         sys.exit(1)

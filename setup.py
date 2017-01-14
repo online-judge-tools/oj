@@ -6,12 +6,13 @@ with open('readme.md') as fh:
 
 setup(
     name='online-judge-tools',
-    version='0.1.4',
+    version='0.1.5',
     description='Tools for online-judge services',
     install_requires=[
         'requests',
         'beautifulsoup4',
         'colorama',
+        'sympy',
     ],
     long_description=readme,
     author='Kimiyuki Onaka',

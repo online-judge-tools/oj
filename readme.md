@@ -21,6 +21,9 @@ Tools for online judge services. Downloading sample cases and Testing your code 
     -   Yukicoder
 -   Test your solution
     -   (all services)
+-   Generate scanner for input  (experimental)
+    -   AtCoder
+    -   Yukicoder
 
 ## How to install
 
