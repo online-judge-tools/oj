@@ -69,10 +69,6 @@ def exec_command(command, **kwargs):
     answer, _ = proc.communicate()
     return answer, proc
 
-bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
-green = lambda s: colorama.Fore.GREEN + s + colorama.Fore.RESET
-red = lambda s: colorama.Fore.RED + s + colorama.Fore.RESET
-
 def test(args):
     if not args.test:
         args.test = glob_with_format(args.format) # by default
@@ -99,7 +95,7 @@ def test(args):
             # check
             is_ac = True
             if proc.returncode != 0:
-                log.failure(red('RE') + ': return code %d', proc.returncode)
+                log.failure(log.red('RE') + ': return code %d', proc.returncode)
                 is_ac = False
             if 'out' in it:
                 with open(it['out']) as outf:
@@ -109,10 +105,10 @@ def test(args):
                 # compare
                 if args.mode == 'all':
                     if answer != correct:
-                        log.failure(red('WA'))
+                        log.failure(log.red('WA'))
                         if not args.silent:
-                            log.emit('output:\n%s', bold(answer))
-                            log.emit('expected:\n%s', bold(correct))
+                            log.emit('output:\n%s', log.bold(answer))
+                            log.emit('expected:\n%s', log.bold(correct))
                         is_ac = False
                 elif args.mode == 'line':
                     answer  = answer .splitlines()
@@ -121,28 +117,28 @@ def test(args):
                         if x is None and y is None:
                             break
                         elif x is None:
-                            log.failure(red('WA') + ': line %d: line is nothing: expected "%s"', i, bold(y))
+                            log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i, log.bold(y))
                             is_ac = False
                         elif y is None:
-                            log.failure(red('WA') + ': line %d: unexpected line: output "%s"', i, bold(x))
+                            log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i, log.bold(x))
                             is_ac = False
                         elif x != y:
-                            log.failure(red('WA') + ': line %d: output "%s": expected "%s"', i, bold(x), bold(y))
+                            log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i, log.bold(x), log.bold(y))
                             is_ac = False
                 else:
                     assert False
             else:
-                log.emit(bold(answer))
+                log.emit(log.bold(answer))
             if is_ac:
-                log.success(green('AC'))
+                log.success(log.green('AC'))
                 ac_count += 1
     # summarize
     log.emit('')
     log.status('slowest: %f sec  (for %s)', slowest, slowest_name)
     if ac_count == len(tests):
-        log.success('test ' + green('success') + ': %d cases', len(tests))
+        log.success('test ' + log.green('success') + ': %d cases', len(tests))
     else:
-        log.failure('test ' + red('failed') + ': %d AC / %d cases', ac_count, len(tests))
+        log.failure('test ' + log.red('failed') + ': %d AC / %d cases', ac_count, len(tests))
         sys.exit(1)
 
 def generate_output(args):
@@ -161,7 +157,7 @@ def generate_output(args):
             answer, _ = exec_command(args.command, shell=args.shell, stdin=inf)
             end = time.perf_counter()
             log.status('time: %f sec', end - begin)
-        log.emit(bold(answer.decode().rstrip()))
+        log.emit(log.bold(answer.decode().rstrip()))
         path = path_from_format(args.format, match_with_format(args.format, it['in']).groupdict()['name'], 'out')
         with open(path, 'w') as fh:
             fh.buffer.write(answer)

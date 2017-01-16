@@ -43,3 +43,7 @@ def exception(s, *args):
     logger.error(prefix['exception'] + str(s), *args)
 def critical(s, *args):
     logger.critical(prefix['critical'] + str(s), *args)
+
+bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
+green = lambda s: colorama.Fore.GREEN + s + colorama.Fore.RESET
+red = lambda s: colorama.Fore.RED + s + colorama.Fore.RESET

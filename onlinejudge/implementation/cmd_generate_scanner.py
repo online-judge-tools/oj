@@ -163,11 +163,8 @@ def export(it, repeat_macro=None, use_scanf=False):
         s += go(line, 0)
     return s
 
-red = lambda s: colorama.Fore.RED + s + colorama.Fore.RESET
-bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
-
 def generate_scanner(args):
-    log.warning('This feature is ' + red('experimental') + '.')
+    log.warning('This feature is ' + log.red('experimental') + '.')
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
@@ -184,4 +181,4 @@ def generate_scanner(args):
         log.error('somethin wrong')
         raise
     log.success('success:')
-    log.emit(bold(it.rstrip()))
+    log.emit(log.bold(it.rstrip()))

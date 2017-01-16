@@ -33,8 +33,7 @@ class AtCoderService(onlinejudge.service.Service):
         resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
         resp.raise_for_status()
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        for msg in msgs:
-            log.status('message: %s', msg)
+        AtCoderService._report_messages(msgs)
         return 'login' not in resp.url  # AtCoder redirects to the top page if success
 
     def get_url(self):
@@ -73,11 +72,20 @@ class AtCoderService(onlinejudge.service.Service):
                 msgs += [ msg ]
         return msgs
 
+    @classmethod
+    def _report_messages(cls, msgs, unexpected=False):
+        for msg in msgs:
+            log.status('message: %s', msg)
+        if msgs and unexpected:
+            log.failure('unexpected messages found')
+        return bool(msgs)
+
 
 class AtCoderProblem(onlinejudge.problem.Problem):
     def __init__(self, contest_id, problem_id):
         self.contest_id = contest_id
         self.problem_id = problem_id
+        self._task_id = None
 
     def download(self, session=None):
         session = session or requests.Session()
@@ -88,10 +96,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        for msg in msgs:
-            log.status('message: %s', msg)
-        if msgs:
-            log.failure('interrupted')
+        if AtCoderService._report_messages(msgs, unexpected=True):
             return []
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
@@ -153,10 +158,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        for msg in msgs:
-            log.status('message: %s', msg)
-        if msgs:
-            log.failure('interrupted')
+        if AtCoderService._report_messages(msgs, unexpected=True):
             return ''
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
@@ -166,6 +168,85 @@ class AtCoderProblem(onlinejudge.problem.Problem):
                 for it in h3.parent.find('pre'):
                     s += it.string or it  # AtCoder uses <var>...</var> for math symbols
                 return s
+
+    def get_language_dict(self, session=None):
+        session = session or requests.Session()
+        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
+        # get
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        if AtCoderService._report_messages(msgs, unexpected=True):
+            return {}
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        select = soup.find('select', class_='submit-language-selector')  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
+        language_dict = {}
+        for option in select.find_all('option'):
+            language_dict[option.attrs['value']] = { 'description': option.string }
+        return language_dict
+
+    def submit(self, code, language, session=None):
+        assert language in self.get_language_dict(session=session)
+        session = session or requests.Session()
+        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
+        # get
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        if AtCoderService._report_messages(msgs, unexpected=True):
+            return False
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        form = soup.find('form', action=re.compile(r'^/submit\?task_id='))
+        if not form:
+            log.error('form not found')
+            return False
+        log.debug('form: %s', str(form))
+        # post
+        task_id = self._get_task_id(session=session)
+        form = utils.FormSender(form, url=resp.url)
+        form.set('task_id', str(task_id))
+        form.set('source_code', code)
+        form.set('language_id_{}'.format(task_id), language)
+        resp = form.request(session=session)
+        resp.raise_for_status()
+        # result
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        AtCoderService._report_messages(msgs)
+        if '/submissions/me' in resp.url:
+            log.success('success: result: %s', resp.url)
+            return True
+        else:
+            log.failure('failure')
+            return False
+
+    def _get_task_id(self, session=None):
+        if self._task_id is None:
+            session = session or requests.Session()
+            url = self.get_url()
+            # get
+            log.status('GET: %s', url)
+            resp = session.get(url)
+            log.status(utils.describe_status_code(resp.status_code))
+            resp.raise_for_status()
+            msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+            if AtCoderService._report_messages(msgs, unexpected=True):
+                return {}
+            # parse
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            submit = soup.find('a', href=re.compile(r'^/submit\?task_id='))
+            if not submit:
+                log.error('link to submit not found')
+                return False
+            m = re.match(r'^/submit\?task_id=([0-9]+)$', submit.attrs['href'])
+            assert m
+            self._task_id = int(m.group(1))
+        return self._task_id
 
 
 onlinejudge.dispatch.services += [ AtCoderService ]

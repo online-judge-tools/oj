@@ -93,6 +93,7 @@ class FormSender(object):
         url = urllib.parse.urljoin(self.url, action)
         method = self.form['method'].upper()
         log.status('%s: %s', method, url)
+        log.debug('payload: %s', str(self.payload))
         resp = session.request(method, url, data=self.payload, **kwargs)
         log.status(describe_status_code(resp.status_code))
         return resp

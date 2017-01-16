@@ -157,69 +157,68 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 return cls(problem_id=int(n))
 
     # Fri Jan  6 16:49:14 JST 2017
-    _languages = []
-    _languages += [( 'cpp', 'C++11 (gcc 4.8.5)' )]
-    _languages += [( 'cpp14' , 'C++14 (gcc 6.2.0)' )]
-    _languages += [( 'c', 'C (gcc 4.8.5)' )]
-    _languages += [( 'java8', 'Java8 (openjdk 1.8.0_111)' )]
-    _languages += [( 'csharp', 'C# (mono 4.6.1)' )]
-    _languages += [( 'perl', 'Perl (5.16.3)' )]
-    _languages += [( 'perl6', 'Perl6 (rakudo 2016.10-114-g8e79509)' )]
-    _languages += [( 'php', 'PHP (5.4.16)' )]
-    _languages += [( 'python', 'Python2 (2.7.11)' )]
-    _languages += [( 'python3', 'Python3 (3.5.1)' )]
-    _languages += [( 'pypy2', 'PyPy2 (4.0.0)' )]
-    _languages += [( 'pypy3', 'PyPy3 (2.4.0)' )]
-    _languages += [( 'ruby', 'Ruby (2.3.1p112)' )]
-    _languages += [( 'd', 'D (dmd 2.071.1)' )]
-    _languages += [( 'go', 'Go (1.7.3)' )]
-    _languages += [( 'haskell', 'Haskell (7.8.3)' )]
-    _languages += [( 'scala', 'Scala (2.11.8)' )]
-    _languages += [( 'nim', 'Nim (0.15.2)' )]
-    _languages += [( 'rust', 'Rust (1.12.1)' )]
-    _languages += [( 'kotlin', 'Kotlin (1.0.2)' )]
-    _languages += [( 'scheme', 'Scheme (Gauche-0.9.4)' )]
-    _languages += [( 'crystal', 'Crystal (0.19.4)' )]
-    _languages += [( 'ocaml', 'OCaml (4.01.1)' )]
-    _languages += [( 'fsharp', 'F# (4.0)' )]
-    _languages += [( 'elixir', 'Elixir (0.12.5)' )]
-    _languages += [( 'lua', 'Lua (LuaJit 2.0.4)' )]
-    _languages += [( 'fortran', 'Fortran (gFortran 4.8.5)' )]
-    _languages += [( 'node', 'JavaScript (node v7.0.0)' )]
-    _languages += [( 'vim', 'Vim script (v8.0.0124)' )]
-    _languages += [( 'sh', 'Bash (Bash 4.2.46)' )]
-    _languages += [( 'text', 'Text (cat 8.22)' )]
-    _languages += [( 'nasm', 'Assembler (nasm 2.10.07)' )]
-    _languages += [( 'bf', 'Brainfuck (BFI 1.1)' )]
-    _languages += [( 'Whitespace', 'Whitespace (0.3)' )]
-    def get_languages(self):
-        return list(map(lambda l: l[0], self.__class__._languages))
-    def get_language_description(self, s):
-        return dict(self.__class__._languages)[s]
+    _language_dict = {}
+    _language_dict['cpp']        = { 'description': 'C++11 (gcc 4.8.5)' }
+    _language_dict['cpp14' ]     = { 'description': 'C++14 (gcc 6.2.0)' }
+    _language_dict['c']          = { 'description': 'C (gcc 4.8.5)' }
+    _language_dict['java8']      = { 'description': 'Java8 (openjdk 1.8.0_111)' }
+    _language_dict['csharp']     = { 'description': 'C# (mono 4.6.1)' }
+    _language_dict['perl']       = { 'description': 'Perl (5.16.3)' }
+    _language_dict['perl6']      = { 'description': 'Perl6 (rakudo 2016.10-114-g8e79509)' }
+    _language_dict['php']        = { 'description': 'PHP (5.4.16)' }
+    _language_dict['python']     = { 'description': 'Python2 (2.7.11)' }
+    _language_dict['python3']    = { 'description': 'Python3 (3.5.1)' }
+    _language_dict['pypy2']      = { 'description': 'PyPy2 (4.0.0)' }
+    _language_dict['pypy3']      = { 'description': 'PyPy3 (2.4.0)' }
+    _language_dict['ruby']       = { 'description': 'Ruby (2.3.1p112)' }
+    _language_dict['d']          = { 'description': 'D (dmd 2.071.1)' }
+    _language_dict['go']         = { 'description': 'Go (1.7.3)' }
+    _language_dict['haskell']    = { 'description': 'Haskell (7.8.3)' }
+    _language_dict['scala']      = { 'description': 'Scala (2.11.8)' }
+    _language_dict['nim']        = { 'description': 'Nim (0.15.2)' }
+    _language_dict['rust']       = { 'description': 'Rust (1.12.1)' }
+    _language_dict['kotlin']     = { 'description': 'Kotlin (1.0.2)' }
+    _language_dict['scheme']     = { 'description': 'Scheme (Gauche-0.9.4)' }
+    _language_dict['crystal']    = { 'description': 'Crystal (0.19.4)' }
+    _language_dict['ocaml']      = { 'description': 'OCaml (4.01.1)' }
+    _language_dict['fsharp']     = { 'description': 'F# (4.0)' }
+    _language_dict['elixir']     = { 'description': 'Elixir (0.12.5)' }
+    _language_dict['lua']        = { 'description': 'Lua (LuaJit 2.0.4)' }
+    _language_dict['fortran']    = { 'description': 'Fortran (gFortran 4.8.5)' }
+    _language_dict['node']       = { 'description': 'JavaScript (node v7.0.0)' }
+    _language_dict['vim']        = { 'description': 'Vim script (v8.0.0124)' }
+    _language_dict['sh']         = { 'description': 'Bash (Bash 4.2.46)' }
+    _language_dict['text']       = { 'description': 'Text (cat 8.22)' }
+    _language_dict['nasm']       = { 'description': 'Assembler (nasm 2.10.07)' }
+    _language_dict['bf']         = { 'description': 'Brainfuck (BFI 1.1)' }
+    _language_dict['Whitespace'] = { 'description': 'Whitespace (0.3)' }
+    def get_language_dict(self, session=None):  # TODO: get dynamically
+        return self.__class__._language_dict
 
     def submit(self, code, language=None, session=None):
-        assert language in self.get_languages()
-        # get
+        assert language in self.get_language_dict(session=session)
+        session = session or requests.Session()
         url = self.get_url() + '/submit'
+        # get
         log.status('GET: %s', url)
         resp = session.get(url)
         log.status(utils.describe_status_code(resp.status_code))
         resp.raise_for_status()
-        # post
+        # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', action=re.compile(r'/submit$'))
         if not form:
             log.error('form not found')
-            log.info('Did you logged in?')
             return False
         log.debug('form: %s', str(form))
+        # post
         form = utils.FormSender(form, url=resp.url)
         form.set('source', code)
         form.set('lang', language)
         resp = form.request(session=session)
         resp.raise_for_status()
         # result
-        if re.match(r'^https?://yukicoder\.me/submissions/[0-9]+/?$', resp.url):
+        if '/submissions/' in resp.url:
             log.success('success: result: %s', resp.url)
             return True
         else:

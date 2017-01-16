@@ -87,21 +87,27 @@ def submit(args):
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
-    if args.language not in problem.get_languages():
-        log.error('language is unknown')
-        log.info('supported languages are:')
-        for lang in problem.get_languages():
-            log.emit('%s (%s)', lang, problem.get_language_description(lang))
-        sys.exit(1)
+    # code
     with open(args.file) as fh:
         code = fh.buffer.read()
     try:
-        s = code.decode()
+        s = code.decode() # for logging
     except UnicodeDecodeError as e:
         log.failure('%s: %s', e.__class__.__name__, str(e))
         s = repr(code)[ 1 : ]
-    log.info('code:\n%s', s)
+    log.info('code:')
+    log.emit(log.bold(s))
+    # session
     with utils.session(cookiejar=args.cookie) as sess:
+        # language
+        langs = problem.get_language_dict(session=sess)
+        if args.language not in langs:
+            log.error('language is unknown')
+            log.info('supported languages are:')
+            for lang in sorted(langs.keys()):
+                log.emit('%s (%s)', lang, langs[lang]['description'])
+            sys.exit(1)
+        # submit
         problem.submit(code, language=args.language, session=sess)
 
 
@@ -166,6 +172,7 @@ extra opitons via -x:
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 supported services:
+  AtCoder
   Yukicoder
 ''')
     subparser.add_argument('url')
