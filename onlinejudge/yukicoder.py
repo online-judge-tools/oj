@@ -209,7 +209,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         form = soup.find('form', action=re.compile(r'/submit$'))
         if not form:
             log.error('form not found')
-            return False
+            return None
         log.debug('form: %s', str(form))
         # post
         form = utils.FormSender(form, url=resp.url)
@@ -220,10 +220,10 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         # result
         if '/submissions/' in resp.url:
             log.success('success: result: %s', resp.url)
-            return True
+            return resp.url
         else:
             log.failure('failure')
-            return False
+            return None
 
     def get_service(self):
         return YukicoderService()

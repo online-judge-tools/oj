@@ -18,6 +18,7 @@ import subprocess
 import time
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
+default_url_open = 'xdg-open'
 
 def download(args):
     problem = onlinejudge.dispatch.problem_from_url(args.url)
@@ -108,7 +109,10 @@ def submit(args):
                 log.emit('%s (%s)', lang, langs[lang]['description'])
             sys.exit(1)
         # submit
-        problem.submit(code, language=args.language, session=sess)
+        url = problem.submit(code, language=args.language, session=sess)
+        if url and args.open:
+            log.info('open the submission page')
+            subprocess.check_call([ args.open, url ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 
 def main(args=None):
@@ -178,6 +182,7 @@ supported services:
     subparser.add_argument('url')
     subparser.add_argument('file')
     subparser.add_argument('-l', '--language')
+    subparser.add_argument('--open', nargs='?', const=default_url_open, help='open the result page after submission')
 
     # test
     subparser = subparsers.add_parser('test', help='test your code',

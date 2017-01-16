@@ -199,13 +199,13 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         resp.raise_for_status()
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
-            return False
+            return None
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', action=re.compile(r'^/submit\?task_id='))
         if not form:
             log.error('form not found')
-            return False
+            return None
         log.debug('form: %s', str(form))
         # post
         task_id = self._get_task_id(session=session)
@@ -220,10 +220,10 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         AtCoderService._report_messages(msgs)
         if '/submissions/me' in resp.url:
             log.success('success: result: %s', resp.url)
-            return True
+            return resp.url
         else:
             log.failure('failure')
-            return False
+            return None
 
     def _get_task_id(self, session=None):
         if self._task_id is None:
