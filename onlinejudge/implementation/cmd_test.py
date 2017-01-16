@@ -110,8 +110,9 @@ def test(args):
                 if args.mode == 'all':
                     if answer != correct:
                         log.failure(red('WA'))
-                        log.emit('output:\n%s', bold(answer))
-                        log.emit('expected:\n%s', bold(correct))
+                        if not args.silent:
+                            log.emit('output:\n%s', bold(answer))
+                            log.emit('expected:\n%s', bold(correct))
                         is_ac = False
                 elif args.mode == 'line':
                     answer  = answer .splitlines()
