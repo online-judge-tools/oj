@@ -14,6 +14,7 @@ import glob
 import getpass
 import colorama
 import collections
+import itertools
 import subprocess
 import time
 
@@ -114,7 +115,6 @@ def submit(args):
             log.info('open the submission page')
             subprocess.check_call([ args.open, url ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
-
 def main(args=None):
 
     # argparse
@@ -127,7 +127,9 @@ def main(args=None):
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
-    subparser = subparsers.add_parser('download', help='download sample cases',
+    subparser = subparsers.add_parser('download',
+            aliases=[ 'd', 'dl' ],
+            help='download sample cases',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 supported services:
@@ -154,7 +156,9 @@ extra opitons via -x:
     subparser.add_argument('--overwrite', action='store_true')
 
     # login
-    subparser = subparsers.add_parser('login', help='login to a service',
+    subparser = subparsers.add_parser('login',
+            aliases=[ 'l' ],
+            help='login to a service',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 supported services:
@@ -172,7 +176,9 @@ extra opitons via -x:
     subparser.add_argument('-p', '--password')
 
     # submit
-    subparser = subparsers.add_parser('submit', help='submit your solution',
+    subparser = subparsers.add_parser('submit',
+            aliases=[ 's' ],
+            help='submit your solution',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 supported services:
@@ -185,7 +191,9 @@ supported services:
     subparser.add_argument('--open', nargs='?', const=default_url_open, help='open the result page after submission')
 
     # test
-    subparser = subparsers.add_parser('test', help='test your code',
+    subparser = subparsers.add_parser('test',
+            aliases=[ 't' ],
+            help='test your code',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 format string for --format:
@@ -206,7 +214,9 @@ tips:
     subparser.add_argument('test', nargs='*', help='paths of test cases. (if empty: globbed from --format)')
 
     # generate scanner
-    subparser = subparsers.add_parser('generate-scanner', help='generate input scanner  (experimental)',
+    subparser = subparsers.add_parser('generate-scanner',
+            aliases=[ 'g/s' ],
+            help='generate input scanner  (experimental)',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 supported services:
@@ -221,13 +231,21 @@ example:
   generated code:
     int N; cin >> N;
     vector<int> L(2*N); REPEAT (i,2*N) cin >> L[i];
+
+tips:
+  in Vim, the command "r! oj g/s -s http://agc001.contest.atcoder.jp/tasks/agc001_a" inserts above generated code.
+  in Emacs, the command "C-u M-! oj g/s -s http://agc001.contest.atcoder.jp/tasks/agc001_a" does.
+  also, you may want to use some plugins about template, e.g. https://github.com/thinca/vim-template
 ''')
     subparser.add_argument('--repeat-macro', help='use repeat macro with given name')
     subparser.add_argument('--scanf', action='store_true', help='use scanf instead of cin')
+    subparser.add_argument('-s', '--silent', action='store_true')
     subparser.add_argument('url')
 
     # generate output
-    subparser = subparsers.add_parser('generate-output', help='generate output files form input and reference implementation',
+    subparser = subparsers.add_parser('generate-output',
+            aliases=[ 'g/o' ],
+            help='generate output files form input and reference implementation',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 format string for --format:
@@ -250,23 +268,23 @@ tips:
     if args.verbose:
         log_level = log.logging.DEBUG
     log.setLevel(log_level)
-    handler = log.logging.StreamHandler(sys.stdout)
+    handler = log.logging.StreamHandler(sys.stderr)
     handler.setLevel(log_level)
     log.addHandler(handler)
 
     log.debug('args: %s', str(args))
 
-    if args.subcommand == 'download':
+    if args.subcommand in [ 'download', 'd', 'dl' ]:
         download(args)
-    elif args.subcommand == 'login':
+    elif args.subcommand in [ 'login', 'l' ]:
         login(args)
-    elif args.subcommand == 'submit':
+    elif args.subcommand in [ 'submit', 's' ]:
         submit(args)
-    elif args.subcommand == 'test':
+    elif args.subcommand in [ 'test', 't' ]:
         test(args)
-    elif args.subcommand == 'generate-scanner':
+    elif args.subcommand in [ 'generate-scanner', 'g/s' ]:
         generate_scanner(args)
-    elif args.subcommand == 'generate-output':
+    elif args.subcommand in [ 'generate-output', 'g/o' ]:
         generate_output(args)
     else:
         parser.print_help(file=sys.stderr)

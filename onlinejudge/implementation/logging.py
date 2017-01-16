@@ -6,6 +6,8 @@ def setLevel(lvl):
     logger.setLevel(lvl)
 def addHandler(handler):
     logger.addHandler(handler)
+def removeHandler(handler):
+    logger.removeHandler(handler)
 
 import colorama
 from colorama import Fore, Back, Style

@@ -8,6 +8,7 @@ import sympy
 import sympy.parsing.sympy_parser as sympy_parser
 import colorama
 import collections
+import sys
 
 def tokenize(pre):
     it = []
@@ -164,7 +165,11 @@ def export(it, repeat_macro=None, use_scanf=False):
     return s
 
 def generate_scanner(args):
-    log.warning('This feature is ' + log.red('experimental') + '.')
+    if not args.silent:
+        log.warning('This feature is ' + log.red('experimental') + '.')
+    if args.silent:
+        for handler in log.logger.handlers:
+            log.removeHandler(handler)
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
@@ -181,4 +186,4 @@ def generate_scanner(args):
         log.error('somethin wrong')
         raise
     log.success('success:')
-    log.emit(log.bold(it.rstrip()))
+    print(log.bold(it.rstrip()))  # to stdout
