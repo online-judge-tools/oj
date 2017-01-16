@@ -42,6 +42,7 @@ or
 $ pip3 install requests
 $ pip3 install beautifulsoup4
 $ pip3 install colorama
+$ pip3 install sympy
 and
 $ git clone https://github.com/kmyk/online-judge-tools
 $ cat <<EOF > ~/bin/oj
