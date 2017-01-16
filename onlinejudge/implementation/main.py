@@ -235,7 +235,8 @@ example:
 tips:
   in Vim, the command "r! oj g/s -s http://agc001.contest.atcoder.jp/tasks/agc001_a" inserts above generated code.
   in Emacs, the command "C-u M-! oj g/s -s http://agc001.contest.atcoder.jp/tasks/agc001_a" does.
-  also, you may want to use some plugins about template, e.g. https://github.com/thinca/vim-template
+  I recommend that map it to some command, like "nnoremap <space>gs :r! oj generate-scanner --silent --repeat-macro=repeat ",
+               and use some plugin for templates, e.g. https://github.com/thinca/vim-template.
 ''')
     subparser.add_argument('--repeat-macro', help='use repeat macro with given name')
     subparser.add_argument('--scanf', action='store_true', help='use scanf instead of cin')
