@@ -9,6 +9,8 @@ import contextlib
 import urllib.parse
 import http.cookiejar
 import http.client
+import subprocess
+import sys
 
 html_parser = 'html.parser'  # TODO: this is NOT a utility.
 
@@ -119,3 +121,15 @@ def singleton(cls):
     except AttributeError:
         pass
     return cls
+
+def exec_command(command, **kwargs):
+    try:
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
+    except FileNotFoundError:
+        log.error('No such file or directory: %s', command)
+        sys.exit(1)
+    except PermissionError:
+        log.error('Permission denied: %s', command)
+        sys.exit(1)
+    answer, _ = proc.communicate()
+    return answer, proc

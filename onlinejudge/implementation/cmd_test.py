@@ -9,7 +9,6 @@ import re
 import glob
 import colorama
 import collections
-import subprocess
 import time
 
 def glob_with_format(format):
@@ -57,18 +56,6 @@ def construct_relationship_of_files(paths, format):
     log.info('%d cases found', len(tests))
     return tests
 
-def exec_command(command, **kwargs):
-    try:
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
-    except FileNotFoundError:
-        log.error('No such file or directory: %s', command)
-        sys.exit(1)
-    except PermissionError:
-        log.error('Permission denied: %s', command)
-        sys.exit(1)
-    answer, _ = proc.communicate()
-    return answer, proc
-
 def test(args):
     if not args.test:
         args.test = glob_with_format(args.format) # by default
@@ -83,7 +70,7 @@ def test(args):
         with open(it['in']) as inf:
             # run
             begin = time.perf_counter()
-            answer, proc = exec_command(args.command, shell=args.shell, stdin=inf)
+            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf)
             end = time.perf_counter()
             answer = answer.decode()
             if args.rstrip:
@@ -154,7 +141,7 @@ def generate_output(args):
             continue
         with open(it['in']) as inf:
             begin = time.perf_counter()
-            answer, _ = exec_command(args.command, shell=args.shell, stdin=inf)
+            answer, _ = utils.exec_command(args.command, shell=args.shell, stdin=inf)
             end = time.perf_counter()
             log.status('time: %f sec', end - begin)
         log.emit(log.bold(answer.decode().rstrip()))

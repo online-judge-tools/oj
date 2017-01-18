@@ -5,6 +5,7 @@ import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 from onlinejudge.implementation.cmd_generate_scanner import generate_scanner
 from onlinejudge.implementation.cmd_test import test, generate_output
+from onlinejudge.implementation.cmd_split_input import split_input, split_input_auto_footer
 import argparse
 import sys
 import os
@@ -262,6 +263,71 @@ tips:
     subparser.add_argument('-f', '--format', default='test/%s.%e', help='a format string to recognize the relationship of test cases. (default: "test/%%s.%%e")')
     subparser.add_argument('test', nargs='*', help='paths of input cases. (if empty: globbed from --format)')
 
+    # split input
+    subparser = subparsers.add_parser('split-input',
+            aliases=[ 's/i' ],
+            help='split a input file which contains many cases, using your implementation',
+            formatter_class=argparse.RawTextHelpFormatter,
+            epilog='''\
+format string for --output:
+  %i                    index
+
+command for --command:
+  Specify a command which outputs something after reading each case.
+  It can be easily made from your solution for the problem.
+  exampe:
+    #include <iostream>
+    using namespace std;
+    int main() {
+        while (true) {
+            int v, e; cin >> v >> e;
+            if (v == 0 and e == 0) break;
+            for (int i = 0; i < e; ++ i) {
+                int v, w; char c; cin >> v >> w >> c;
+            }
+            cout << "foo" << endl;
+        }
+        return 0;
+    }
+
+example:
+  if original input is below, it consists of two cases:
+    4 2
+    0 1 A
+    1 2 B
+    6 6
+    0 1 A
+    0 2 A
+    0 3 B
+    0 4 A
+    1 2 B
+    4 5 C
+    0 0
+  then the result with appropriate options:
+    4 2
+    0 1 A
+    1 2 B
+    0 0
+  ans
+    6 6
+    0 1 A
+    0 2 A
+    0 3 B
+    0 4 A
+    1 2 B
+    4 5 C
+    0 0
+''')
+    subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
+    subparser.add_argument('--shell', action='store_true', help='use the --command as a shellscript instead of a path')
+    subparser.add_argument('-i', '--input',  metavar='PATH', required=True, help='input file  (required)')
+    subparser.add_argument('-o', '--output', metavar='FORMAT', required=True, help='output path  (required)')
+    subparser.add_argument('-t', '--time', metavar='SECOND', default=0.1, type=float, help='the interval between two cases')
+    subparser.add_argument('--ignore', metavar='N', default=0, type=int, help='ignore initial N lines of input')
+    subparser.add_argument('--header', help='put a header string to the output')
+    subparser.add_argument('--footer', help='put a footer string to the output')
+    subparser.add_argument('--auto-footer', action='store_const', const=split_input_auto_footer, dest='footer', help='use the original last line as a footer')
+
     args = parser.parse_args(args=args)
 
     # logging
@@ -287,6 +353,10 @@ tips:
         generate_scanner(args)
     elif args.subcommand in [ 'generate-output', 'g/o' ]:
         generate_output(args)
+    elif args.subcommand in [ 'split-input', 's/i' ]:
+        split_input(args)
     else:
         parser.print_help(file=sys.stderr)
         sys.exit(1)
+
+

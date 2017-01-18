@@ -1,6 +1,6 @@
 # Online Judge Tools
 
-Tools for online judge services. Downloading sample cases and Testing your code with them.
+Tools for online judge services. Downloading sample cases, Testing/Submitting your code, and various utilities.
 
 ## Features
 
@@ -24,9 +24,8 @@ Tools for online judge services. Downloading sample cases and Testing your code 
     -   AtCoder
     -   Yukicoder
 -   Test your solution
-    -   (all services)
 -   Generate output files from input and reference implementation
-    -   (all services)
+-   Split an input file with many cases to files
 
 ## How to install
 
