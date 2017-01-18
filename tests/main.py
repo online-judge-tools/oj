@@ -12,7 +12,7 @@ class MainTest(unittest.TestCase):
     def test_main(self):
         cwd = os.getcwd()
         ojtools = os.path.join( cwd, 'oj' )
-        for name in glob.glob('**/url', recursive=True):
+        for name in glob.glob('**/md5.sum', recursive=True):
             os.chdir(os.path.dirname(name))
             with open('url') as fh:
                 url = fh.read().rstrip()
