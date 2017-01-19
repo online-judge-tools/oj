@@ -6,6 +6,7 @@ import onlinejudge.implementation.logging as log
 from onlinejudge.implementation.cmd_generate_scanner import generate_scanner
 from onlinejudge.implementation.cmd_test import test, generate_output
 from onlinejudge.implementation.cmd_split_input import split_input, split_input_auto_footer
+from onlinejudge.implementation.cmd_test_reactive import test_reactive
 import argparse
 import sys
 import os
@@ -328,6 +329,17 @@ example:
     subparser.add_argument('--footer', help='put a footer string to the output')
     subparser.add_argument('--auto-footer', action='store_const', const=split_input_auto_footer, dest='footer', help='use the original last line as a footer')
 
+    # test reactive
+    subparser = subparsers.add_parser('test-reactive',
+            aliases=[ 't/r' ],
+            help='test for reactive problem',
+            formatter_class=argparse.RawTextHelpFormatter,
+            epilog='''\
+''')
+    subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
+    subparser.add_argument('--shell', action='store_true', help='use the judge  and --command as a shellscript instead of a path')
+    subparser.add_argument('judge', help='judge program using standard I/O')
+
     args = parser.parse_args(args=args)
 
     # logging
@@ -349,6 +361,8 @@ example:
         submit(args)
     elif args.subcommand in [ 'test', 't' ]:
         test(args)
+    elif args.subcommand in [ 'test-reactiv', 't/r' ]:
+        test_reactive(args)
     elif args.subcommand in [ 'generate-scanner', 'g/s' ]:
         generate_scanner(args)
     elif args.subcommand in [ 'generate-output', 'g/o' ]:

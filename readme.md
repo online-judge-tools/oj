@@ -24,6 +24,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   AtCoder
     -   Yukicoder
 -   Test your solution
+-   Test your solution for reactive problem
 -   Generate output files from input and reference implementation
 -   Split an input file with many cases to files
 
