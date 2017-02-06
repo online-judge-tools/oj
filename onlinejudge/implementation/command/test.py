@@ -97,7 +97,7 @@ def test(args):
         with open(it['in']) as inf:
             # run
             begin = time.perf_counter()
-            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf)
+            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
             answer = answer.decode()
             if args.rstrip:
@@ -108,7 +108,10 @@ def test(args):
             log.status('time: %f sec', end - begin)
             # check
             is_ac = True
-            if proc.returncode != 0:
+            if proc.returncode is None:
+                log.failure(log.red('TLE'))
+                is_ac = False
+            elif proc.returncode != 0:
                 log.failure(log.red('RE') + ': return code %d', proc.returncode)
                 is_ac = False
             if 'out' in it:

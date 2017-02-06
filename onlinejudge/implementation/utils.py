@@ -122,7 +122,7 @@ def singleton(cls):
         pass
     return cls
 
-def exec_command(command, **kwargs):
+def exec_command(command, timeout=None, **kwargs):
     try:
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
     except FileNotFoundError:
@@ -131,5 +131,8 @@ def exec_command(command, **kwargs):
     except PermissionError:
         log.error('Permission denied: %s', command)
         sys.exit(1)
-    answer, _ = proc.communicate()
+    try:
+        answer, _ = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        answer = b''
     return answer, proc
