@@ -77,6 +77,7 @@ class FormSender(object):
         self.form = form
         self.url = url
         self.payload = {}
+        self.files = {}
         for input in self.form.find_all('input'):
             log.debug('input: %s', str(input))
             if input.attrs.get('type') in [ 'checkbox', 'radio' ]:
@@ -90,13 +91,16 @@ class FormSender(object):
     def get(self):
         return self.payload
 
+    def set_file(self, key, value):
+        self.files[key] = value
+
     def request(self, session, action=None, **kwargs):
         action = action or self.form['action']
         url = urllib.parse.urljoin(self.url, action)
         method = self.form['method'].upper()
         log.status('%s: %s', method, url)
         log.debug('payload: %s', str(self.payload))
-        resp = session.request(method, url, data=self.payload, **kwargs)
+        resp = session.request(method, url, data=self.payload, files=self.files, **kwargs)
         log.status(describe_status_code(resp.status_code))
         return resp
 

@@ -213,7 +213,10 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         log.debug('form: %s', str(form))
         # post
         form = utils.FormSender(form, url=resp.url)
-        form.set('source', code)
+        if False:
+            form.set('source', code)
+        else:
+            form.set_file('file', ('source', code))
         form.set('lang', language)
         resp = form.request(session=session)
         resp.raise_for_status()
