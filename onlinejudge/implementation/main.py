@@ -19,9 +19,10 @@ import collections
 import itertools
 import subprocess
 import time
+import shutil
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
-default_url_open = 'xdg-open'
+default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
 
 def download(args):
     problem = onlinejudge.dispatch.problem_from_url(args.url)
@@ -52,7 +53,7 @@ def download(args):
             path = utils.parcentformat(args.format, table)
             log.status('%sput: %s', ext, name)
             log.emit(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
-            if not path: # doesn't save if --format ''
+            if args.dry_run:
                 continue
             if os.path.exists(path):
                 log.warning('file already exists: %s', path)
@@ -111,11 +112,31 @@ def submit(args):
             for lang in sorted(langs.keys()):
                 log.emit('%s (%s)', lang, langs[lang]['description'])
             sys.exit(1)
+        # confirm
+        if args.wait:
+            log.status('sleep(%.2f)', args.wait)
+            time.sleep(args.wait)
+        if not args.yes:
+            sys.stdout.write('Are you sure? [y/N] ')
+            sys.stdout.flush()
+            c = sys.stdin.read(1)
+            if c != 'y':
+                log.info('terminated.')
+                return
         # submit
         url = problem.submit(code, language=args.language, session=sess)
         if url and args.open:
-            log.info('open the submission page')
-            subprocess.check_call([ args.open, url ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+            if not isinstance(args.open, str):
+                args.open = None
+                for browser in default_url_opener:
+                    args.open = shutil.which(browser)
+                    if args.open:
+                        break
+            if not args.open:
+                log.failure('couldn\'t open the url. please specify a browser')
+            else:
+                log.info('open the submission page with: %s', args.open)
+                subprocess.check_call([ args.open, url ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 def main(args=None):
 
@@ -156,6 +177,7 @@ extra opitons via -x:
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases')
     subparser.add_argument('--overwrite', action='store_true')
+    subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
 
     # login
     subparser = subparsers.add_parser('login',
@@ -190,7 +212,9 @@ supported services:
     subparser.add_argument('url')
     subparser.add_argument('file')
     subparser.add_argument('-l', '--language')
-    subparser.add_argument('--open', nargs='?', const=default_url_open, help='open the result page after submission')
+    subparser.add_argument('--open', nargs='?', const=True, help='open the result page after submission')
+    subparser.add_argument('-w', '--wait', metavar='SECCOND', type=float, default=3, help='sleep before submitting')
+    subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
 
     # test
     subparser = subparsers.add_parser('test',
