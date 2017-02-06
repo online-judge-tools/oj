@@ -3,140 +3,19 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-from onlinejudge.implementation.cmd_generate_scanner import generate_scanner
-from onlinejudge.implementation.cmd_test import test, generate_output
-from onlinejudge.implementation.cmd_split_input import split_input, split_input_auto_footer
-from onlinejudge.implementation.cmd_test_reactive import test_reactive
+from onlinejudge.implementation.command.download import download
+from onlinejudge.implementation.command.login import login
+from onlinejudge.implementation.command.submit import submit
+from onlinejudge.implementation.command.generate_scanner import generate_scanner
+from onlinejudge.implementation.command.test import test, generate_output
+from onlinejudge.implementation.command.split_input import split_input, split_input_auto_footer
+from onlinejudge.implementation.command.test_reactive import test_reactive
 import argparse
 import sys
 import os
 import os.path
-import re
-import glob
-import getpass
-import colorama
-import collections
-import itertools
-import subprocess
-import time
-import shutil
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
-default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
-
-def download(args):
-    problem = onlinejudge.dispatch.problem_from_url(args.url)
-    if problem is None:
-        sys.exit(1)
-    kwargs = {}
-    if problem.get_service().get_name() == 'yukicoder':
-        for x in args.extra_option:
-            if x == 'all':
-                kwargs['is_all'] = True
-    if args.format is None:
-        if problem.get_service().get_name() == 'yukicoder' and kwargs.get('is_all'):
-            args.format = 'test/%b.%e'
-        else:
-            args.format = 'test/sample-%i.%e'
-    with utils.session(cookiejar=args.cookie) as sess:
-        samples = problem.download(session=sess, **kwargs)
-    for i, sample in enumerate(samples):
-        log.emit('')
-        log.info('sample %d', i)
-        for ext, (s, name) in zip(['in', 'out'], sample):
-            table = {}
-            table['i'] = str(i+1)
-            table['e'] = ext
-            table['n'] = name
-            table['b'] = os.path.basename(name)
-            table['d'] = os.path.dirname(name)
-            path = utils.parcentformat(args.format, table)
-            log.status('%sput: %s', ext, name)
-            log.emit(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
-            if args.dry_run:
-                continue
-            if os.path.exists(path):
-                log.warning('file already exists: %s', path)
-                if not args.overwrite:
-                    log.warning('skipped')
-                    continue
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'w') as fh:
-                fh.write(s)
-            log.success('saved to: %s', path)
-
-def login(args):
-    service = onlinejudge.dispatch.service_from_url(args.url)
-    if service is None:
-        sys.exit(1)
-    kwargs = {}
-    if service.get_name() == 'yukicoder':
-        method = ''
-        for x in args.extra_option:
-            if x.startswith('method='):
-                method += x[ len('method=') : ]
-        if method not in [ 'github', 'twitter' ]:
-            log.failure('login for yukicoder: one of following options required: -x method=github, -x method=twitter')
-            sys.exit(1)
-        kwargs['method'] = method
-    def get_credentials():
-        if args.username is None:
-            args.username = input('Username: ')
-        if args.password is None:
-            args.password = getpass.getpass()
-        return args.username, args.password
-    with utils.session(cookiejar=args.cookie) as sess:
-        service.login(get_credentials, session=sess, **kwargs)
-
-def submit(args):
-    problem = onlinejudge.dispatch.problem_from_url(args.url)
-    if problem is None:
-        sys.exit(1)
-    # code
-    with open(args.file) as fh:
-        code = fh.buffer.read()
-    try:
-        s = code.decode() # for logging
-    except UnicodeDecodeError as e:
-        log.failure('%s: %s', e.__class__.__name__, str(e))
-        s = repr(code)[ 1 : ]
-    log.info('code:')
-    log.emit(log.bold(s))
-    # session
-    with utils.session(cookiejar=args.cookie) as sess:
-        # language
-        langs = problem.get_language_dict(session=sess)
-        if args.language not in langs:
-            log.error('language is unknown')
-            log.info('supported languages are:')
-            for lang in sorted(langs.keys()):
-                log.emit('%s (%s)', lang, langs[lang]['description'])
-            sys.exit(1)
-        # confirm
-        if args.wait:
-            log.status('sleep(%.2f)', args.wait)
-            time.sleep(args.wait)
-        if not args.yes:
-            sys.stdout.write('Are you sure? [y/N] ')
-            sys.stdout.flush()
-            c = sys.stdin.read(1)
-            if c != 'y':
-                log.info('terminated.')
-                return
-        # submit
-        url = problem.submit(code, language=args.language, session=sess)
-        if url and args.open:
-            if not isinstance(args.open, str):
-                args.open = None
-                for browser in default_url_opener:
-                    args.open = shutil.which(browser)
-                    if args.open:
-                        break
-            if not args.open:
-                log.failure('couldn\'t open the url. please specify a browser')
-            else:
-                log.info('open the submission page with: %s', args.open)
-                subprocess.check_call([ args.open, url ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 def main(args=None):
 
