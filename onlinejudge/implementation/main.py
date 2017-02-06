@@ -116,6 +116,7 @@ tips:
     subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
     subparser.add_argument('--rstrip', action='store_true', help='rstrip output before comapre')
     subparser.add_argument('-s', '--silent', action='store_true', help='don\'t report output and correct answer even if not AC  (for --mode all)')
+    subparser.add_argument('-e', '--error', type=float, help='check as floating point number: correct if its absolute or relative error doesn\'t exceed it')
     subparser.add_argument('test', nargs='*', help='paths of test cases. (if empty: globbed from --format)')
 
     # generate scanner

@@ -10,6 +10,7 @@ import glob
 import colorama
 import collections
 import time
+import math
 
 def glob_with_format(format):
     table = {}
@@ -56,11 +57,37 @@ def construct_relationship_of_files(paths, format):
     log.info('%d cases found', len(tests))
     return tests
 
+def compare_as_floats(xs, ys, error):
+    def f(x):
+        try:
+            y = float(x)
+            if not math.isfinite(y):
+                log.warning('not an real number found: %f', y)
+            return y
+        except ValueError:
+            return x
+    xs = list(map(f, xs.split()))
+    ys = list(map(f, ys.split()))
+    if len(xs) != len(ys):
+        return False
+    for x, y in zip(xs, ys):
+        if isinstance(x, float) and isinstance(y, float):
+            if not math.isclose(x, y, rel_tol=error, abs_tol=error):
+                return False
+        else:
+            if x != y:
+                return False
+    return True
+
 def test(args):
     if not args.test:
         args.test = glob_with_format(args.format) # by default
     tests = construct_relationship_of_files(args.test, args.format)
     # run tests
+    if args.error: # float mode
+        match = lambda a, b: compare_as_floats(a, b, args.error)
+    else:
+        match = lambda a, b: a == b
     rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
     slowest, slowest_name = -1, ''
     ac_count = 0
@@ -91,7 +118,7 @@ def test(args):
                     correct = correct.rstrip(rstrip_targets)
                 # compare
                 if args.mode == 'all':
-                    if answer != correct:
+                    if not match(answer, correct):
                         log.failure(log.red('WA'))
                         if not args.silent:
                             log.emit('output:\n%s', log.bold(answer))
@@ -109,7 +136,7 @@ def test(args):
                         elif y is None:
                             log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i, log.bold(x))
                             is_ac = False
-                        elif x != y:
+                        elif not match(x, y):
                             log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i, log.bold(x), log.bold(y))
                             is_ac = False
                 else:
