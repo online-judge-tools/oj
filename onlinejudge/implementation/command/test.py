@@ -145,7 +145,8 @@ def test(args):
                 else:
                     assert False
             else:
-                log.emit(log.bold(answer))
+                if not args.silent:
+                    log.emit(log.bold(answer))
             if is_ac:
                 log.success(log.green('AC'))
                 ac_count += 1
