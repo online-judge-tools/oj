@@ -195,7 +195,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
     def get_language_dict(self, session=None):  # TODO: get dynamically
         return self.__class__._language_dict
 
-    def submit(self, code, language=None, session=None):
+    def submit(self, code, language, session=None):
         assert language in self.get_language_dict(session=session)
         session = session or requests.Session()
         url = self.get_url() + '/submit'

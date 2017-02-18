@@ -5,6 +5,8 @@ class Problem(object):
         raise NotImplementedError
     def submit(self, code, language, session=None):
         raise NotImplementedError
+    def get_language_dict(self, session=None): # => dict like: { language_id: { 'description': str } }
+        raise NotImplementedError
     def get_url(self):
         raise NotImplementedError
     def get_service(self):
