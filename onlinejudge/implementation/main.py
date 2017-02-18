@@ -129,6 +129,7 @@ tips:
 supported services:
   AtCoder
   Yukicoder
+  HackerRank
 
 example:
   http://agc001.contest.atcoder.jp/tasks/agc001_a

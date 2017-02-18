@@ -66,9 +66,9 @@ class HackerRankService(onlinejudge.service.Service):
 
 
 class HackerRankProblem(onlinejudge.problem.Problem):
-    def __init__(self, contest_name, challange_name):
-        self.contest_name = contest_name
-        self.challange_name = challange_name
+    def __init__(self, contest_slug, challenge_slug):
+        self.contest_slug = contest_slug
+        self.challenge_slug = challenge_slug
 
     def download(self, session=None, method='run_code'):
         if method == 'run_code':
@@ -90,7 +90,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         csrftoken = soup.find('meta', attrs={ 'name': 'csrf-token' }).attrs['content']
         # post
-        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/compile_tests'.format(self.contest_name, self.challange_name)
+        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/compile_tests'.format(self.contest_slug, self.challenge_slug)
         payload = { 'code': ':', 'language': 'bash', 'customtestcase': False }
         log.debug('payload: %s', payload)
         log.status('POST: %s', url)
@@ -101,12 +101,12 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         it = json.loads(resp.content.decode())
         log.debug('json: %s', it)
         if not it['status']:
-            log.error('Run Code: fails')
+            log.error('Run Code: failed')
             return []
         model_id = it['model']['id']
         now = datetime.datetime.now()
         unixtime = int(datetime.datetime.now().timestamp() * 10**3)
-        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/compile_tests/{}?_={}'.format(self.contest_name, self.challange_name, it['model']['id'], unixtime)
+        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/compile_tests/{}?_={}'.format(self.contest_slug, self.challenge_slug, it['model']['id'], unixtime)
         # sleep
         log.status('sleep(3)')
         time.sleep(3)
@@ -119,7 +119,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         it = json.loads(resp.content.decode())
         log.debug('json: %s', it)
         if not it['status']:
-            log.error('Run Code: fails')
+            log.error('Run Code: failed')
             return []
         samples = []
         for i, (inf, outf) in enumerate(zip(it['model']['stdin'], it['model']['expected_output'])):
@@ -131,11 +131,14 @@ class HackerRankProblem(onlinejudge.problem.Problem):
 
     def download_with_parsing_html(self, session=None):
         session = session or requests.Session()
-        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_name, self.challange_name)
+        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
         raise NotImplementedError
 
     def get_url(self):
-        return 'https://www.hackerrank.com/contests/{}/challenges/{}'.format(self.contest_name, self.challange_name)
+        if self.contest_slug == 'master':
+            return 'https://www.hackerrank.com/challenges/{}'.format(self.challenge_slug)
+        else:
+            return 'https://www.hackerrank.com/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
 
     def get_service(self):
         return HackerRankService()
@@ -145,7 +148,68 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         m = re.match(r'^https?://www\.hackerrank\.com/contests/([0-9A-Za-z-]+)/challenges/([0-9A-Za-z-]+)/?$', s)
         if m:
             return cls(m.group(1), m.group(2))
+        m = re.match(r'^https?://www\.hackerrank\.com/challenges/([0-9A-Za-z-]+)/?$', s)
+        if m:
+            return cls('master', m.group(1))
 
+    def _get_model(self, session=None):
+        session = session or requests.Session()
+        # get
+        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        # parse
+        it = json.loads(resp.content.decode())
+        log.debug('json: %s', it)
+        if not it['status']:
+            log.error('get model: failed')
+            return None
+        return it['model']
+
+    def get_language_dict(self, session=None):
+        session = session or requests.Session()
+        info = self._get_model(session=session)
+        # lang_display_mapping from https://hrcdn.net/hackerrank/assets/codeshell/dist/codeshell-449bb296b091277fedc42b23f7c9c447.js, Sun Feb 19 02:25:36 JST 2017
+        lang_display_mapping = { 'c': 'C', 'cpp': 'C++', 'java': 'Java 7', 'csharp': 'C#', 'haskell': 'Haskell', 'php': 'PHP', 'python': 'Python 2', 'pypy': 'Pypy 2', 'pypy3': 'Pypy 3', 'ruby': 'Ruby', 'perl': 'Perl', 'bash': 'BASH', 'oracle': 'Oracle', 'mysql': 'MySQL', 'sql': 'SQL', 'clojure': 'Clojure', 'scala': 'Scala', 'code': 'Generic', 'text': 'Plain Text', 'brainfuck': 'Brainfuck', 'javascript': 'Javascript', 'typescript': 'Typescript', 'lua': 'Lua', 'sbcl': 'Common Lisp (SBCL)', 'erlang': 'Erlang', 'go': 'Go', 'd': 'D', 'ocaml': 'OCaml', 'pascal': 'Pascal', 'python3': 'Python 3', 'groovy': 'Groovy', 'objectivec': 'Objective-C', 'text_pseudo': 'Plain Text', 'fsharp': 'F#', 'visualbasic': 'VB. NET', 'cobol': 'COBOL', 'tsql': 'MS SQL Server', 'lolcode': 'LOLCODE', 'smalltalk': 'Smalltalk', 'tcl': 'Tcl', 'whitespace': 'Whitespace', 'css': 'CSS', 'html': 'HTML', 'java8': 'Java 8', 'db2': 'DB2', 'octave': 'Octave', 'r': 'R', 'xquery': 'XQuery', 'racket': 'Racket', 'xml': 'XML', 'rust': 'Rust', 'swift': 'Swift', 'elixir': 'Elixir', 'fortran': 'Fortran', 'ada': 'Ada', 'nim': 'Nim', 'julia': 'Julia', 'cpp14': 'C++14', 'coffeescript': 'Coffeescript' }
+        result = {}
+        for lang in info['languages']:
+            descr = lang_display_mapping.get(lang)
+            if descr is None:
+                log.warning('display mapping for language `%s\' not found', lang)
+                descr = lang
+            result[lang] = { 'description': descr }
+        return result
+
+    def submit(self, code, language, session=None):
+        session = session or requests.Session()
+        # get
+        url = self.get_url()
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        csrftoken = soup.find('meta', attrs={ 'name': 'csrf-token' }).attrs['content']
+        # post
+        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/submissions'.format(self.contest_slug, self.challenge_slug)
+        payload = { 'code': code, 'language': language }
+        log.debug('payload: %s', payload)
+        log.status('POST: %s', url)
+        resp = session.post(url, json=payload, headers={ 'X-CSRF-Token': csrftoken })
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        # parse
+        it = json.loads(resp.content.decode())
+        log.debug('json: %s', it)
+        if not it['status']:
+            log.failure('Submit Code: failed')
+            return None
+        model_id = it['model']['id']
+        url = self.get_url().rstrip('/') + '/submissions/code/{}'.format(model_id)
+        log.success('success: result: %s', url)
+        return url
 
 onlinejudge.dispatch.services += [ HackerRankService ]
 onlinejudge.dispatch.problems += [ HackerRankProblem ]

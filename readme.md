@@ -20,6 +20,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 -   Submit your solution
     -   AtCoder
     -   Yukicoder
+    -   HackerRank
 -   Generate scanner for input  (experimental)
     -   AtCoder
     -   Yukicoder
