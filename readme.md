@@ -1,5 +1,11 @@
 # Online Judge Tools
 
+[![Travis](https://img.shields.io/travis/kmyk/online-judge-tools.svg)](https://travis-ci.org/kmyk/online-judge-tools)
+[![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)]()
+[![PyPI](https://img.shields.io/pypi/pyversions/online-judge-tools.svg)]()
+[![PyPI](https://img.shields.io/pypi/status/online-judge-tools.svg)]()
+[![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)]()
+
 Tools for online judge services. Downloading sample cases, Testing/Submitting your code, and various utilities.
 
 ## Features
