@@ -1,6 +1,7 @@
 # Python Version: 3.x
 import onlinejudge.service
 import onlinejudge.problem
+import onlinejudge.submission
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -220,7 +221,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         AtCoderService._report_messages(msgs)
         if '/submissions/me' in resp.url:
             log.success('success: result: %s', resp.url)
-            return resp.url
+            return AtCoderSubmission.from_url(resp.url, problem_id=self.problem_id)
         else:
             log.failure('failure')
             return None
@@ -248,6 +249,52 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             self._task_id = int(m.group(1))
         return self._task_id
 
+class AtCoderSubmission(onlinejudge.submission.Submission):
+    def __init__(self, contest_id, submission_id, problem_id=None):
+        self.contest_id = contest_id
+        self.submission_id = submission_id
+        self.problem_id = problem_id
+
+    @classmethod
+    def from_url(cls, s):
+        m = re.match(r'^https?://([0-9A-Za-z-]+)\.contest\.atcoder\.jp/submissions/(0|[1-9][0-9]*)/?$', s)
+        if m:
+            return cls(m.group(1), int(m.group(2)))
+
+    def get_url(self):
+        return 'http://{}.contest.atcoder.jp/submissions/{}'.format(self.contest_id, self.submission_id)
+
+    def get_problem(self):
+        if self.problem_id is not None:
+            return AtCoderProblem(self.contest_id, self.problem_id)
+
+    def get_service(self):
+        return AtCoderService()
+
+    def download(self, session=None):
+        session = session or requests.Session()
+        url = self.get_url()
+        # get
+        log.status('GET: %s', url)
+        resp = session.get(url)
+        log.status(utils.describe_status_code(resp.status_code))
+        resp.raise_for_status()
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        if AtCoderService._report_messages(msgs, unexpected=True):
+            return []
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        code = None
+        for pre in soup.find_all('pre'):
+            log.debug('pre tag: %s', str(pre))
+            prv = utils.previous_sibling_tag(pre)
+            if not (prv and prv.name == 'h3' and 'Source code' in prv.text):
+                continue
+            code = pre.string
+        if code is None:
+            log.error('source code not found')
+        return code
 
 onlinejudge.dispatch.services += [ AtCoderService ]
 onlinejudge.dispatch.problems += [ AtCoderProblem ]
+onlinejudge.dispatch.submissions += [ AtCoderSubmission ]

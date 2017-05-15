@@ -45,8 +45,8 @@ def submit(args):
                 log.info('terminated.')
                 return
         # submit
-        url = problem.submit(code, language=args.language, session=sess)
-        if url and args.open:
+        submission = problem.submit(code, language=args.language, session=sess)
+        if submission and args.open:
             if not isinstance(args.open, str):
                 args.open = None
                 for browser in default_url_opener:
@@ -57,4 +57,4 @@ def submit(args):
                 log.failure('couldn\'t open the url. please specify a browser')
             else:
                 log.info('open the submission page with: %s', args.open)
-                subprocess.check_call([ args.open, url ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                subprocess.check_call([ args.open, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)

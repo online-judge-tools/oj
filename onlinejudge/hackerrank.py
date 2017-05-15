@@ -1,6 +1,7 @@
 # Python Version: 3.x
 import onlinejudge.service
 import onlinejudge.problem
+import onlinejudge.submission
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -209,7 +210,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         model_id = it['model']['id']
         url = self.get_url().rstrip('/') + '/submissions/code/{}'.format(model_id)
         log.success('success: result: %s', url)
-        return url
+        return onlinejudge.submission.CompatibilitySubmission(url, problem=self)
 
 onlinejudge.dispatch.services += [ HackerRankService ]
 onlinejudge.dispatch.problems += [ HackerRankProblem ]

@@ -1,6 +1,7 @@
 # Python Version: 3.x
 import onlinejudge.service
 import onlinejudge.problem
+import onlinejudge.submission
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -223,7 +224,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         # result
         if '/submissions/' in resp.url:
             log.success('success: result: %s', resp.url)
-            return resp.url
+            return onlinejudge.submission.CompatibilitySubmission(resp.url, problem=self)
         else:
             log.failure('failure')
             return None
