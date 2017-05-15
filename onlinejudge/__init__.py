@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# Python Version: 3.x
 import onlinejudge.atcoder
 import onlinejudge.yukicoder
 import onlinejudge.anarchygolf

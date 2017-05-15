@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# Python Version: 3.x
 
 class Service(object):
     def login(self, get_credentials, session=None):

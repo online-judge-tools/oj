@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# Python Version: 3.x
 # -*- coding: utf-8 -*-
 import onlinejudge
 import onlinejudge.implementation.utils as utils

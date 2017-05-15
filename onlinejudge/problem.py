@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# Python Version: 3.x
 
 class Problem(object):
     def download(self, session=None):

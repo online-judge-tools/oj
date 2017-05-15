@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# Python Version: 3.x
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log

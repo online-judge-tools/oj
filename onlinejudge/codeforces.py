@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# Python Version: 3.x
 import onlinejudge.service
 import onlinejudge.problem
 import onlinejudge.dispatch
