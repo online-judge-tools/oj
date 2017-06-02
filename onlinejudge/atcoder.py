@@ -9,6 +9,7 @@ import re
 import bs4
 import requests
 import urllib.parse
+import posixpath
 import json
 
 
@@ -45,9 +46,11 @@ class AtCoderService(onlinejudge.service.Service):
 
     @classmethod
     def from_url(cls, s):
-        if re.match(r'^https?://atcoder\.jp/?$', s):
-            return cls()
-        if re.match(r'^https?://[0-9A-Z-a-z-]+\.contest\.atcoder\.jp/?$', s):
+        # example: https://atcoder.jp/
+        # example: http://agc012.contest.atcoder.jp/
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and (result.netloc == 'atcoder.jp' or result.netloc.endswith('.contest.atcoder.jp')):
             return cls()
 
     @classmethod
@@ -146,9 +149,16 @@ class AtCoderProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match(r'^https?://([0-9A-Za-z-]+)\.contest\.atcoder\.jp/tasks/([0-9A-Za-z_]+)/?$', s)
-        if m:
-            return cls(m.group(1), m.group(2))
+        # example: http://agc012.contest.atcoder.jp/tasks/agc012_d
+        result = urllib.parse.urlparse(s)
+        dirname, basename = posixpath.split(posixpath.normpath(result.path))
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc.count('.') == 3 \
+                and result.netloc.endswith('.contest.atcoder.jp') \
+                and result.netloc.split('.')[0] \
+                and dirname == '/tasks' \
+                and basename:
+            return cls(result.netloc.split('.')[0], basename)
 
     def get_input_format(self, session=None):
         session = session or requests.Session()
@@ -257,9 +267,20 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match(r'^https?://([0-9A-Za-z-]+)\.contest\.atcoder\.jp/submissions/(0|[1-9][0-9]*)/?$', s)
-        if m:
-            return cls(m.group(1), int(m.group(2)))
+        # example: http://agc001.contest.atcoder.jp/submissions/1246803
+        result = urllib.parse.urlparse(s)
+        dirname, basename = posixpath.split(posixpath.normpath(result.path))
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc.count('.') == 3 \
+                and result.netloc.endswith('.contest.atcoder.jp') \
+                and result.netloc.split('.')[0] \
+                and dirname == '/submissions':
+            try:
+                basename = int(basename)
+            except ValueError:
+                basename = None
+            if basename is not None:
+                return cls(result.netloc.split('.')[0], basename)
 
     def get_url(self):
         return 'http://{}.contest.atcoder.jp/submissions/{}'.format(self.contest_id, self.submission_id)

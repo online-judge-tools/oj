@@ -4,9 +4,8 @@ import onlinejudge.problem
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import re
 import io
-import os.path
+import posixpath
 import bs4
 import requests
 import urllib.parse
@@ -25,7 +24,10 @@ class AOJService(onlinejudge.service.Service):
 
     @classmethod
     def from_url(cls, s):
-        if re.match(r'^http://judge\.u-aizu\.ac\.jp/onlinejudge(/(index\.jsp)?)?$', s):
+        # example: http://judge.u-aizu.ac.jp/onlinejudge/
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'judge.u-aizu.ac.jp':
             return cls()
 
 
@@ -60,9 +62,17 @@ class AOJProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match(r'^http://judge\.u-aizu\.ac\.jp/onlinejudge/description\.jsp\?id=([0-9A-Za-z_]+)$', s)
-        if m:
-            return cls(m.group(1))
+        # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1169
+        # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A&lang=jp
+        result = urllib.parse.urlparse(s)
+        querystring = urllib.parse.parse_qs(result.query)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'judge.u-aizu.ac.jp' \
+                and posixpath.normpath(result.path) == '/onlinejudge/description.jsp' \
+                and querystring.get('id') \
+                and len(querystring['id']) == 1:
+            n, = querystring['id']
+            return cls(n)
 
     def get_service(self):
         return AOJService()

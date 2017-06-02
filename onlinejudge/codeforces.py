@@ -5,6 +5,8 @@ import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import re
+import urllib.parse
+import posixpath
 import bs4
 import string
 
@@ -50,7 +52,10 @@ class CodeforcesService(onlinejudge.service.Service):
 
     @classmethod
     def from_url(cls, s):
-        if re.match(r'^http://codeforces\.com/?$', s):
+        # example: http://codeforces.com/
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'codeforces.com':
             return cls()
 
 
@@ -106,15 +111,18 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s):
-        table = {}
-        table['contest']    = r'^http://codeforces\.com/contest/([0-9]+)/problem/([0A-Za-z])/?$'  # e.g. http://codeforces.com/contest/538/problem/H
-        table['problemset'] = r'^http://codeforces\.com/problemset/problem/([0-9]+)/([0A-Za-z])/?$'  # e.g. http://codeforces.com/problemset/problem/700/B
-        table['gym']        = r'^http://codeforces\.com/gym/([0-9]+)/problem/([0A-Za-z])/?$'  # e.g. http://codeforces.com/gym/101021/problem/A
-        normalize = lambda c: c == '0' and 'A' or c.upper()
-        for kind, expr in table.items():
-            m = re.match(expr, s)
-            if m:
-                return cls(int(m.group(1)), normalize(m.group(2)), kind=kind)
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'codeforces.com':
+            table = {}
+            table['contest']    = r'^/contest/([0-9]+)/problem/([0A-Za-z])$'  # example: http://codeforces.com/contest/538/problem/H
+            table['problemset'] = r'^/problemset/problem/([0-9]+)/([0A-Za-z])$'  # example: http://codeforces.com/problemset/problem/700/B
+            table['gym']        = r'^/gym/([0-9]+)/problem/([0A-Za-z])$'  # example: http://codeforces.com/gym/101021/problem/A
+            normalize = lambda c: c == '0' and 'A' or c.upper()
+            for kind, expr in table.items():
+                m = re.match(expr, posixpath.normpath(result.path))
+                if m:
+                    return cls(int(m.group(1)), normalize(m.group(2)), kind=kind)
 
 
 onlinejudge.dispatch.services += [ CodeforcesService ]
