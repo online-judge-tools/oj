@@ -1,4 +1,5 @@
 # Python Version: 3.x
+# -*- coding: utf-8 -*-
 import onlinejudge.service
 import onlinejudge.problem
 import onlinejudge.dispatch
@@ -49,9 +50,15 @@ class AOJProblem(onlinejudge.problem.Problem):
         for pre in soup.find_all('pre'):
             log.debug('pre: %s', str(pre))
             hn = utils.previous_sibling_tag(pre)
+            if hn is None:
+                div = pre.parent
+                if div is not None:
+                    log.debug('div: %s', str(hn))
+                    hn = utils.previous_sibling_tag(div)
             log.debug('hN: %s', str(hn))
             log.debug(hn)
-            if hn and hn.name in [ 'h2', 'h3' ] and hn.string and 'ample' in hn.string.lower(): # 'ample' is the suffix of 'sample', 'example'
+            keywords = [ 'sample', 'example', '入力例', '出力例' ]
+            if hn and hn.name in [ 'h2', 'h3' ] and hn.string and any(filter(lambda keyword: keyword in hn.string.lower(), keywords)):
                 s = utils.textfile(pre.string.lstrip())
                 name = hn.string
                 samples.add(s, name)
