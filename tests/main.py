@@ -66,6 +66,22 @@ class MainTest(unittest.TestCase):
                 'sample-4.in': '318d4b3abfa30cc8fad4b1d34430aea3',
                 'sample-7.in': 'dcac31a5a6542979ce45064ab0bfa83d',
             },
+            'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=2256&lang=jp': {
+                'sample-1.in': 'c89817f1ee0b53209d66abc94e457f7f',
+                'sample-1.out': 'b9c2c5761360aad068453f4e64dd5a4e',
+            },
+            'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=2310&lang=jp': {
+                'sample-1.in': '27ed9e879684b438fa6cc80c4261daf7',
+                'sample-1.out': '48a24b70a0b376535542b996af517398',
+                'sample-2.in': 'bb84849858ca512e14e071e25120ed78',
+                'sample-2.out': '6d7fce9fee471194aa8b5b6e47267f03',
+                'sample-3.in': '4c4ae7fb491ec5c6ad57d9d5711e44a6',
+                'sample-3.out': '9ae0ea9e3c9c6e1b9b6252c8395efdc1',
+                'sample-4.in': 'ad1109594a97eabe9bee60a743006de7',
+                'sample-4.out': '84bc3da1b3e33a18e8d5e1bdd7a18d7a',
+                'sample-5.in': 'b80447e0bc0c4ecc6fb3001b6a4e79f6',
+                'sample-5.out': 'c30f7472766d25af1dc80b3ffc9a58c7',
+            },
         }
         self.snippet_call_download(problems)
 
