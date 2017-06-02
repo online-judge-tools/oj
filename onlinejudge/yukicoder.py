@@ -8,6 +8,7 @@ import onlinejudge.implementation.logging as log
 import re
 import io
 import os.path
+import posixpath
 import bs4
 import requests
 import urllib.parse
@@ -73,7 +74,10 @@ class YukicoderService(onlinejudge.service.Service):
 
     @classmethod
     def from_url(cls, s):
-        if re.match(r'^https?://yukicoder\.me/?$', s):
+        # example: http://yukicoder.me/
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'yukicoder.me':
             return cls()
 
 
@@ -149,13 +153,22 @@ class YukicoderProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match(r'^https?://yukicoder\.me/problems/(no/)?([0-9]+)/?$', s)
-        if m:
-            n = int(m.group(2).lstrip('0') or '0')
-            if m.group(1):
-                return cls(problem_no=int(n))
-            else:
-                return cls(problem_id=int(n))
+        # example: http://yukicoder.me/problems/no/499
+        # example: http://yukicoder.me/problems/1476
+        result = urllib.parse.urlparse(s)
+        dirname, basename = posixpath.split(posixpath.normpath(result.path))
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'yukicoder.me':
+            try:
+                n = int(basename)
+            except ValueError:
+                n = None
+            if n is not None:
+                if dirname == '/problems/no':
+                    return cls(problem_no=int(n))
+                if dirname == '/problems':
+                    return cls(problem_id=int(n))
+            return cls()
 
     # Fri Jan  6 16:49:14 JST 2017
     _language_dict = {}

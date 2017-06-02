@@ -4,7 +4,8 @@ import onlinejudge.problem
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import re
+import urllib.parse
+import posixpath
 import bs4
 import requests
 
@@ -20,7 +21,10 @@ class AnarchyGolfService(onlinejudge.service.Service):
 
     @classmethod
     def from_url(cls, s):
-        if re.match(r'^http://golf\.shinh\.org/?$', s):
+        # example: http://golf.shinh.org/
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'golf.shinh.org':
             return cls()
 
 
@@ -70,9 +74,13 @@ class AnarchyGolfProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match(r'^http://golf\.shinh\.org/p\.rb\?([0-9A-Za-z_+]+)$', s)
-        if m:
-            return cls(m.group(1))
+        # example: http://golf.shinh.org/p.rb?The+B+Programming+Language
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'golf.shinh.org' \
+                and posixpath.normpath(result.path) == '/p.rb' \
+                and result.query:
+            return cls(result.query)
 
 
 onlinejudge.dispatch.services += [ AnarchyGolfService ]

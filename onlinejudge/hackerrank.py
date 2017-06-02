@@ -9,6 +9,7 @@ import re
 import bs4
 import requests
 import urllib.parse
+import posixpath
 import json
 import datetime
 import time
@@ -60,9 +61,10 @@ class HackerRankService(onlinejudge.service.Service):
 
     @classmethod
     def from_url(cls, s):
-        if re.match(r'^https?://www\.hackerrank\.com/?$', s):
-            return cls()
-        if re.match(r'^https?://www\.hackerrank\.com/domains/?$', s):
+        # example: https://www.hackerrank.com/dashboard
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc in ('hackerrank.com', 'www.hackerrank.com'):
             return cls()
 
 
@@ -146,12 +148,17 @@ class HackerRankProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s):
-        m = re.match(r'^https?://www\.hackerrank\.com/contests/([0-9A-Za-z-]+)/challenges/([0-9A-Za-z-]+)/?$', s)
-        if m:
-            return cls(m.group(1), m.group(2))
-        m = re.match(r'^https?://www\.hackerrank\.com/challenges/([0-9A-Za-z-]+)/?$', s)
-        if m:
-            return cls('master', m.group(1))
+        # example: https://www.hackerrank.com/contests/university-codesprint-2/challenges/the-story-of-a-tree
+        # example: https://www.hackerrank.com/challenges/fp-hello-world
+        result = urllib.parse.urlparse(s)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc in ('hackerrank.com', 'www.hackerrank.com'):
+            m = re.match(r'^/contests/([0-9A-Za-z-]+)/challenges/([0-9A-Za-z-]+)$', posixpath.normpath(result.path))
+            if m:
+                return cls(m.group(1), m.group(2))
+            m = re.match(r'^/challenges/([0-9A-Za-z-]+)$', posixpath.normpath(result.path))
+            if m:
+                return cls('master', m.group(1))
 
     def _get_model(self, session=None):
         session = session or requests.Session()
