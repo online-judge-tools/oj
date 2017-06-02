@@ -4,6 +4,7 @@ import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import os
 import colorama
+import sys
 
 def download(args):
     problem = onlinejudge.dispatch.problem_from_url(args.url)
