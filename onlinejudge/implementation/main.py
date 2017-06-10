@@ -42,6 +42,9 @@ supported services:
   HackerRank
   Yukicoder
 
+supported services with --system:
+  Yukicoder
+
 format string for --format:
   %i                    index: 1, 2, 3, ...
   %e                    extension: "in" or "out"
@@ -49,14 +52,12 @@ format string for --format:
   %b                    os.path.basename(name)
   %d                    os.path.dirname(name)
   %%                    '%' itself
-
-extra opitons via -x:
-  -x all                for yukicoder, use "テストケース一括ダウンロード"
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases')
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
+    subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
 
     # login
     subparser = subparsers.add_parser('login',

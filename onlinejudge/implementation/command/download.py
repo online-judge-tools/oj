@@ -11,12 +11,14 @@ def download(args):
     if problem is None:
         sys.exit(1)
     kwargs = {}
-    if problem.get_service().get_name() == 'yukicoder':
-        for x in args.extra_option:
-            if x == 'all':
-                kwargs['is_all'] = True
+    if args.system:
+        supported_service_names = [ 'yukicoder' ]
+        if problem.get_service().get_name() not in supported_service_names:
+            log.error('--system for %s is not supported', problem.get_service().get_name())
+            sys.exit(1)
+        kwargs['is_system'] = True
     if args.format is None:
-        if problem.get_service().get_name() == 'yukicoder' and kwargs.get('is_all'):
+        if kwargs.get('is_system'):
             args.format = 'test/%b.%e'
         else:
             args.format = 'test/sample-%i.%e'
