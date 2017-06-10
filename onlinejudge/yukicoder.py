@@ -21,9 +21,9 @@ class YukicoderService(onlinejudge.service.Service):
 
     def login(self, get_credentials, session=None, method=None):
         if method == 'github':
-            return self.login_with_github(session, get_credentials)
+            return self.login_with_github(get_credentials, session=session)
         elif method == 'twitter':
-            return self.login_with_twitter(session, get_credentials)
+            return self.login_with_twitter(get_credentials, session=session)
         else:
             assert False
 

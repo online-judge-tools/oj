@@ -25,7 +25,6 @@ def main(args=None):
     default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
     parser.add_argument('-c', '--cookie', default=default_cookie_path,
             help='path for cookie. (default: {})'.format(default_cookie_path))
-    parser.add_argument('-x', '--extra-option', action='append', default=[])
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
@@ -71,13 +70,14 @@ supported services:
   HackerRank
   Yukicoder
 
-extra opitons via -x:
-  -x method=github      for yukicoder, login via github
-  -x method=twitter     for yukicoder, login via github (not implementated yet)
+strings for --method:
+  github                for yukicoder, login via github (default)
+  twitter               for yukicoder, login via twitter (not implementated yet)
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-u', '--username')
     subparser.add_argument('-p', '--password')
+    subparser.add_argument('--method')
 
     # submit
     subparser = subparsers.add_parser('submit',
