@@ -12,6 +12,7 @@ import requests
 import urllib.parse
 import zipfile
 import collections
+import itertools
 
 
 @utils.singleton
@@ -36,7 +37,12 @@ class AOJProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_id):
         self.problem_id = problem_id
 
-    def download(self, session=None):
+    def download(self, session=None, is_system=False):
+        if is_system:
+            return self.download_system(session=session)
+        else:
+            return self.download_samples(session=session)
+    def download_samples(self, session=None):
         session = session or requests.Session()
         url = self.get_url()
         # get
@@ -63,6 +69,30 @@ class AOJProblem(onlinejudge.problem.Problem):
                 name = hn.string
                 samples.add(s, name)
         return samples.get()
+    def download_system(self, session=None):
+        session = session or requests.Session()
+        get_url = lambda case, type: 'http://analytic.u-aizu.ac.jp:8080/aoj/testcase.jsp?id={}&case={}&type={}'.format(self.problem_id, case, type)
+        testcases = []
+        for case in itertools.count(1):
+            # input
+            url = get_url(case, 'in')
+            # get
+            log.status('GET: %s', url)
+            resp = session.get(url)
+            log.status(utils.describe_status_code(resp.status_code))
+            if resp.status_code != 200:
+                break
+            in_txt = resp.text
+            # output
+            url = get_url(case, 'out')
+            # get
+            log.status('GET: %s', url)
+            resp = session.get(url)
+            log.status(utils.describe_status_code(resp.status_code))
+            resp.raise_for_status()
+            out_txt = resp.text
+            testcases += [ ( ( in_txt, 'in%d.txt' % case ), ( out_txt, 'out%d.txt' % case ) ) ]
+        return testcases
 
     def get_url(self):
         return 'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id={}'.format(self.problem_id)

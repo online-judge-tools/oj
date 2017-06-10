@@ -12,14 +12,17 @@ def download(args):
         sys.exit(1)
     kwargs = {}
     if args.system:
-        supported_service_names = [ 'yukicoder' ]
+        supported_service_names = [ 'aoj', 'yukicoder' ]
         if problem.get_service().get_name() not in supported_service_names:
             log.error('--system for %s is not supported', problem.get_service().get_name())
             sys.exit(1)
         kwargs['is_system'] = True
     if args.format is None:
         if kwargs.get('is_system'):
-            args.format = 'test/%b.%e'
+            if problem.get_service().get_name() == 'yukicoder':
+                args.format = 'test/%b.%e'
+            else:
+                args.format = 'test/%i.%e'
         else:
             args.format = 'test/sample-%i.%e'
     with utils.session(cookiejar=args.cookie) as sess:

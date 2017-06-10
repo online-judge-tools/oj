@@ -42,6 +42,7 @@ supported services:
   Yukicoder
 
 supported services with --system:
+  Aizu Online Judge
   Yukicoder
 
 format string for --format:
