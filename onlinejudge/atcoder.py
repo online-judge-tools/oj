@@ -230,8 +230,10 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         AtCoderService._report_messages(msgs)
         if '/submissions/me' in resp.url:
+            # example: https://practice.contest.atcoder.jp/submissions/me#32174
+            # CAUTION: this URL is not a URL of the submission
             log.success('success: result: %s', resp.url)
-            return AtCoderSubmission.from_url(resp.url, problem_id=self.problem_id)
+            return onlinejudge.submission.CompatibilitySubmission(resp.url)
         else:
             log.failure('failure')
             return None
@@ -266,7 +268,7 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
         self.problem_id = problem_id
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s, problem_id=None):
         # example: http://agc001.contest.atcoder.jp/submissions/1246803
         result = urllib.parse.urlparse(s)
         dirname, basename = posixpath.split(posixpath.normpath(result.path))
@@ -280,7 +282,7 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
             except ValueError:
                 basename = None
             if basename is not None:
-                return cls(result.netloc.split('.')[0], basename)
+                return cls(result.netloc.split('.')[0], basename, problem_id=problem_id)
 
     def get_url(self):
         return 'http://{}.contest.atcoder.jp/submissions/{}'.format(self.contest_id, self.submission_id)
