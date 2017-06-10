@@ -172,9 +172,13 @@ def generate_output(args):
             continue
         with open(it['in']) as inf:
             begin = time.perf_counter()
-            answer, _ = utils.exec_command(args.command, shell=args.shell, stdin=inf)
+            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf)
             end = time.perf_counter()
             log.status('time: %f sec', end - begin)
+        if proc.returncode != 0:
+            log.failure(log.red('RE') + ': return code %d', proc.returncode)
+            log.info('skipped.')
+            continue
         log.emit(log.bold(answer.decode().rstrip()))
         path = path_from_format(args.format, match_with_format(args.format, it['in']).groupdict()['name'], 'out')
         with open(path, 'w') as fh:
