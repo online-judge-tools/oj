@@ -13,10 +13,12 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 -   Download sample cases
     -   AtCoder
     -   Yukicoder
-    -   Yukicoder (テストケース一括ダウンロード) (with `-x all` option)
     -   Anarchy Golf
     -   Codeforces
     -   HackerRank (using `Run Code`)
+    -   Aizu Online Judge
+-   Download system test cases
+    -   Yukicoder
     -   Aizu Online Judge
 -   Login
     -   AtCoder
