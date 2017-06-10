@@ -25,7 +25,6 @@ def main(args=None):
     default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
     parser.add_argument('-c', '--cookie', default=default_cookie_path,
             help='path for cookie. (default: {})'.format(default_cookie_path))
-    parser.add_argument('-x', '--extra-option', action='append', default=[])
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
@@ -42,6 +41,10 @@ supported services:
   HackerRank
   Yukicoder
 
+supported services with --system:
+  Aizu Online Judge
+  Yukicoder
+
 format string for --format:
   %i                    index: 1, 2, 3, ...
   %e                    extension: "in" or "out"
@@ -49,14 +52,12 @@ format string for --format:
   %b                    os.path.basename(name)
   %d                    os.path.dirname(name)
   %%                    '%' itself
-
-extra opitons via -x:
-  -x all                for yukicoder, use "テストケース一括ダウンロード"
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases')
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
+    subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
 
     # login
     subparser = subparsers.add_parser('login',
@@ -70,13 +71,14 @@ supported services:
   HackerRank
   Yukicoder
 
-extra opitons via -x:
-  -x method=github      for yukicoder, login via github
-  -x method=twitter     for yukicoder, login via github (not implementated yet)
+strings for --method:
+  github                for yukicoder, login via github (default)
+  twitter               for yukicoder, login via twitter (not implementated yet)
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-u', '--username')
     subparser.add_argument('-p', '--password')
+    subparser.add_argument('--method')
 
     # submit
     subparser = subparsers.add_parser('submit',

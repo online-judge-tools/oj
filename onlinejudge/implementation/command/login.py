@@ -11,14 +11,16 @@ def login(args):
         sys.exit(1)
     kwargs = {}
     if service.get_name() == 'yukicoder':
-        method = ''
-        for x in args.extra_option:
-            if x.startswith('method='):
-                method += x[ len('method=') : ]
-        if method not in [ 'github', 'twitter' ]:
-            log.failure('login for yukicoder: one of following options required: -x method=github, -x method=twitter')
+        if not args.method:
+            args.method = 'github'
+        if args.method not in [ 'github', 'twitter' ]:
+            log.failure('login for yukicoder: invalid option: --method %s', args.method)
             sys.exit(1)
-        kwargs['method'] = method
+        kwargs['method'] = args.method
+    else:
+        if args.method:
+            log.failure('login for %s: invalid option: --method %s', service.get_name(), args.method)
+            sys.exit(1)
     def get_credentials():
         if args.username is None:
             args.username = input('Username: ')

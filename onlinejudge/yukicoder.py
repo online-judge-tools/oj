@@ -21,9 +21,9 @@ class YukicoderService(onlinejudge.service.Service):
 
     def login(self, get_credentials, session=None, method=None):
         if method == 'github':
-            return self.login_with_github(session, get_credentials)
+            return self.login_with_github(get_credentials, session=session)
         elif method == 'twitter':
-            return self.login_with_twitter(session, get_credentials)
+            return self.login_with_twitter(get_credentials, session=session)
         else:
             assert False
 
@@ -89,9 +89,9 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         self.problem_no = problem_no
         self.problem_id = problem_id
 
-    def download(self, session=None, is_all=False):
-        if is_all:
-            return self.download_all(session=session)
+    def download(self, session=None, is_system=False):
+        if is_system:
+            return self.download_system(session=session)
         else:
             return self.download_samples(session=session)
     def download_samples(self, session=None):
@@ -112,7 +112,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 s, name = it
                 samples.add(s, name)
         return samples.get()
-    def download_all(self, session=None):
+    def download_system(self, session=None):
         session = session or requests.Session()
         url = 'http://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         # get

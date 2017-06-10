@@ -11,7 +11,7 @@ import tempfile
 
 class MainTest(unittest.TestCase):
 
-    def snippet_call_download(self, problems):
+    def snippet_call_download(self, problems, is_system=False):
         cwd = os.getcwd()
         ojtools = os.path.join( cwd, 'oj' )
         tempdir = tempfile.mkdtemp()
@@ -19,7 +19,10 @@ class MainTest(unittest.TestCase):
         for url, files in problems.items():
             if os.path.exists('test'):
                 shutil.rmtree('test')
-            subprocess.check_call([ ojtools, 'download', url ], stdout=sys.stdout, stderr=sys.stderr)
+            cmd = [ ojtools, 'download', url ]
+            if is_system:
+                cmd += [ '--system' ]
+            subprocess.check_call(cmd, stdout=sys.stdout, stderr=sys.stderr)
             result = {}
             for name in os.listdir('test'):
                 with open(os.path.join('test', name)) as fh:
@@ -84,6 +87,21 @@ class MainTest(unittest.TestCase):
             },
         }
         self.snippet_call_download(problems)
+
+    def test_call_download_aoj_system(self):
+        problems = {
+            'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ITP1_1_B': {
+                '1.in': 'b026324c6904b2a9cb4b88d6d61c81d1',
+                '1.out': 'b026324c6904b2a9cb4b88d6d61c81d1',
+                '2.in': '6d7fce9fee471194aa8b5b6e47267f03',
+                '2.out': '66a7c1d5cb75ef2542524d888fd32f4a',
+                '3.in': '9caff0735bc6e80121cedcb98ca51821',
+                '3.out': 'fef5f767008b27f5c3801382264f46ef',
+                '4.in': '919d117956d3135c4c683ff021352f5c',
+                '4.out': 'b39ffd5aa5029d696193c8362dcb1d19',
+            },
+        }
+        self.snippet_call_download(problems, is_system=True)
 
     def test_call_download_yukicoder(self):
         problems = {
