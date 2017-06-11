@@ -67,7 +67,7 @@ class YukicoderService(onlinejudge.service.Service):
         raise NotImplementedError
 
     def get_url(self):
-        return 'http://yukicoder.me/'
+        return 'https://yukicoder.me/'
 
     def get_name(self):
         return 'yukicoder'
@@ -114,7 +114,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         return samples.get()
     def download_system(self, session=None):
         session = session or requests.Session()
-        url = 'http://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
+        url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         # get
         log.status('GET: %s', url)
         resp = session.get(url)
@@ -153,7 +153,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s):
-        # example: http://yukicoder.me/problems/no/499
+        # example: https://yukicoder.me/problems/no/499
         # example: http://yukicoder.me/problems/1476
         result = urllib.parse.urlparse(s)
         dirname, basename = posixpath.split(posixpath.normpath(result.path))
