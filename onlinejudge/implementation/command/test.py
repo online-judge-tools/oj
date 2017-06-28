@@ -106,6 +106,7 @@ def test(args):
                 slowest = end - begin
                 slowest_name = name
             log.status('time: %f sec', end - begin)
+            proc.terminate()
             # check
             is_ac = True
             if proc.returncode is None:
