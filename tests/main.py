@@ -100,6 +100,10 @@ class MainTest(unittest.TestCase):
                 '4.in': '919d117956d3135c4c683ff021352f5c',
                 '4.out': 'b39ffd5aa5029d696193c8362dcb1d19',
             },
+            'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1169&lang=jp': {
+                '1.in': 'f0ecaede832a038d0e940c2c4d0ab5e5',
+                '1.out': '8d2f7846dc2fc10ef37dcb548635c788',
+            },
         }
         self.snippet_call_download(problems, is_system=True)
 
