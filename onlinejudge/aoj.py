@@ -83,6 +83,8 @@ class AOJProblem(onlinejudge.problem.Problem):
             if resp.status_code != 200:
                 break
             in_txt = resp.text
+            if case == 2 and testcases[0][0][0] == in_txt:
+                break # if the querystring case=??? is ignored
             # output
             url = get_url(case, 'out')
             # get
