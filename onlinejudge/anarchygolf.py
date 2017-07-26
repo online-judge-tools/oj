@@ -78,7 +78,7 @@ class AnarchyGolfProblem(onlinejudge.problem.Problem):
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'golf.shinh.org' \
-                and posixpath.normpath(result.path) == '/p.rb' \
+                and utils.normpath(result.path) == '/p.rb' \
                 and result.query:
             return cls(result.query)
 
