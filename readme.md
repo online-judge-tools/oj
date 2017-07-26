@@ -17,6 +17,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Codeforces
     -   HackerRank (using `Run Code`)
     -   Aizu Online Judge
+    -   CS Academy
 -   Download system test cases
     -   Yukicoder
     -   Aizu Online Judge
