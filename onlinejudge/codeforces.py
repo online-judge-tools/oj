@@ -120,7 +120,7 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
             table['gym']        = r'^/gym/([0-9]+)/problem/([0A-Za-z])$'  # example: http://codeforces.com/gym/101021/problem/A
             normalize = lambda c: c == '0' and 'A' or c.upper()
             for kind, expr in table.items():
-                m = re.match(expr, posixpath.normpath(result.path))
+                m = re.match(expr, utils.normpath(result.path))
                 if m:
                     return cls(int(m.group(1)), normalize(m.group(2)), kind=kind)
 

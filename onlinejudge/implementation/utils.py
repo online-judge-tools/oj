@@ -10,6 +10,7 @@ import urllib.parse
 import http.cookiejar
 import http.client
 import subprocess
+import posixpath
 import sys
 
 html_parser = 'html.parser'  # TODO: this is NOT a utility.
@@ -140,3 +141,11 @@ def exec_command(command, timeout=None, **kwargs):
     except subprocess.TimeoutExpired:
         answer = b''
     return answer, proc
+
+# We should use this instead of posixpath.normpath
+# posixpath.normpath doesn't collapse a leading duplicated slashes. see: https://stackoverflow.com/questions/7816818/why-doesnt-os-normpath-collapse-a-leading-double-slash
+def normpath(path):
+    path = posixpath.normpath(path)
+    if path.startswith('//'):
+        path = '/' + path.lstrip('/')
+    return path

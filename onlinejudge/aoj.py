@@ -107,7 +107,7 @@ class AOJProblem(onlinejudge.problem.Problem):
         querystring = urllib.parse.parse_qs(result.query)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'judge.u-aizu.ac.jp' \
-                and posixpath.normpath(result.path) == '/onlinejudge/description.jsp' \
+                and utils.normpath(result.path) == '/onlinejudge/description.jsp' \
                 and querystring.get('id') \
                 and len(querystring['id']) == 1:
             n, = querystring['id']

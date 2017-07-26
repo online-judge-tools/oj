@@ -156,7 +156,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         # example: https://yukicoder.me/problems/no/499
         # example: http://yukicoder.me/problems/1476
         result = urllib.parse.urlparse(s)
-        dirname, basename = posixpath.split(posixpath.normpath(result.path))
+        dirname, basename = posixpath.split(utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'yukicoder.me':
             try:

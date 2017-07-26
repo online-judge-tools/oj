@@ -151,7 +151,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
     def from_url(cls, s):
         # example: http://agc012.contest.atcoder.jp/tasks/agc012_d
         result = urllib.parse.urlparse(s)
-        dirname, basename = posixpath.split(posixpath.normpath(result.path))
+        dirname, basename = posixpath.split(utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc.count('.') == 3 \
                 and result.netloc.endswith('.contest.atcoder.jp') \
@@ -271,7 +271,7 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
     def from_url(cls, s, problem_id=None):
         # example: http://agc001.contest.atcoder.jp/submissions/1246803
         result = urllib.parse.urlparse(s)
-        dirname, basename = posixpath.split(posixpath.normpath(result.path))
+        dirname, basename = posixpath.split(utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc.count('.') == 3 \
                 and result.netloc.endswith('.contest.atcoder.jp') \
