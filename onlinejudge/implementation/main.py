@@ -40,6 +40,7 @@ supported services:
   Codeforces
   HackerRank
   Yukicoder
+  CS Academy
 
 supported services with --system:
   Aizu Online Judge
