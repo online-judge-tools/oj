@@ -143,7 +143,7 @@ class MainTest(unittest.TestCase):
                 'sample-1.out': '3e1ce07401b37846f4d6aab1efbe771b',
                 'sample-4.out': '60f3f85857568779dbd10bc4fc506f35',
             },
-            'http://yukicoder.me/problems/no/260': {
+            'http://yukicoder.me/problems/no/260/': {
                 'sample-3.out': '15aac79ea3df9c684a6472d156241987',
                 'sample-2.in': 'fdd3527dacad0f949c31f7c4e7fd0c12',
                 'sample-2.out': '49a6957c6e2e1c5ce89cde8898949ae1',
@@ -246,7 +246,7 @@ class MainTest(unittest.TestCase):
                 'sample-1.in': 'ffa1fbc1d14328005da451b67c65d35a',
                 'sample-1.out': '3e49d46d6c574dc91c9736436eb06d0a',
             },
-            'http://agc001.contest.atcoder.jp/tasks/agc001_a': {
+            'http://agc001.contest.atcoder.jp//////tasks//////agc001_a//////?hoge=fuga#piyo': {
                 'sample-1.in': '1aba94ea0ab5e89d4a11b3724bdeb5cc',
                 'sample-2.out': '615010a656a5bb29d1898f163619611f',
                 'sample-2.in': 'd38a35564e44aa124f04f5088e7203d9',
