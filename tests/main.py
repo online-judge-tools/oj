@@ -252,6 +252,20 @@ class MainTest(unittest.TestCase):
                 'sample-2.in':  'd38a35564e44aa124f04f5088e7203d9',
                 'sample-1.out': '6d7fce9fee471194aa8b5b6e47267f03',
             },
+            'https://beta.atcoder.jp/contests/abc073/tasks/abc073_a': {
+                'sample-1.in':  '22cab69bca05d296a2d779a52cdee643',
+                'sample-1.out': '3ae2ea0c3867b219ef54d914437e76be',
+                'sample-2.in':  '8faff61bc1198cc6bdc19adafc27fc82',
+                'sample-2.out': 'e14b420b7266f69a2b2b457f3bbec804',
+                'sample-3.in':  '80ad60f95c32a3f6e413b5bb7c094e99',
+                'sample-3.out': '3ae2ea0c3867b219ef54d914437e76be',
+                'sample-4.in':  '22cab69bca05d296a2d779a52cdee643',
+                'sample-4.out': '3ae2ea0c3867b219ef54d914437e76be',
+                'sample-5.in':  '8faff61bc1198cc6bdc19adafc27fc82',
+                'sample-5.out': 'e14b420b7266f69a2b2b457f3bbec804',
+                'sample-6.in':  '80ad60f95c32a3f6e413b5bb7c094e99',
+                'sample-6.out': '3ae2ea0c3867b219ef54d914437e76be',
+            },
         }
         self.snippet_call_download(problems)
 

@@ -158,7 +158,18 @@ class AtCoderProblem(onlinejudge.problem.Problem):
                 and result.netloc.split('.')[0] \
                 and dirname == '/tasks' \
                 and basename:
-            return cls(result.netloc.split('.')[0], basename)
+            contest_id = result.netloc.split('.')[0]
+            problem_id = basename
+            return cls(contest_id, problem_id)
+
+        # example: https://beta.atcoder.jp/contests/abc073/tasks/abc073_a
+        m = re.match(r'^/contests/(\w+)/tasks/(\w+)$', utils.normpath(result.path))
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'beta.atcoder.jp' \
+                and m:
+            contest_id = m.group(1)
+            problem_id = m.group(2)
+            return cls(contest_id, problem_id)
 
     def get_input_format(self, session=None):
         session = session or requests.Session()
@@ -277,12 +288,26 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
                 and result.netloc.endswith('.contest.atcoder.jp') \
                 and result.netloc.split('.')[0] \
                 and dirname == '/submissions':
+            contest_id = result.netloc.split('.')[0]
             try:
-                basename = int(basename)
+                submission_id = int(basename)
             except ValueError:
-                basename = None
-            if basename is not None:
-                return cls(result.netloc.split('.')[0], basename, problem_id=problem_id)
+                submission_id = None
+            if submission_id is not None:
+                return cls(contest_id, submission_id, problem_id=problem_id)
+
+        # example: https://beta.atcoder.jp/contests/abc073/submissions/1592381
+        m = re.match(r'^/contests/(\w+)/submissions/(\d+)$', utils.normpath(result.path))
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'beta.atcoder.jp' \
+                and m:
+            contest_id = m.group(1)
+            try:
+                submission_id = int(m.group(2))
+            except ValueError:
+                submission_id = None
+            if submission_id is not None:
+                return cls(contest_id, submission_id, problem_id=problem_id)
 
     def get_url(self):
         return 'http://{}.contest.atcoder.jp/submissions/{}'.format(self.contest_id, self.submission_id)
