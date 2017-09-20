@@ -15,7 +15,7 @@ import string
 class CodeforcesService(onlinejudge.service.Service):
 
     def login(self, get_credentials, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'http://codeforces.com/enter'
         # get
         log.status('GET: %s', url)
@@ -74,7 +74,7 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
                 self.kind = 'gym'
 
     def download(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)

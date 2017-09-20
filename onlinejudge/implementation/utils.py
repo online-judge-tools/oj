@@ -1,5 +1,6 @@
 # Python Version: 3.x
 import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.version as version
 import re
 import os
 import os.path
@@ -36,19 +37,23 @@ def previous_sibling_tag(tag):
         tag = tag.previous_sibling
     return tag
 
+def new_default_session():  # without setting cookiejar
+    session = requests.Session()
+    session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
+    return session
+
 @contextlib.contextmanager
-def session(cookiejar):
-    s = requests.Session()
-    s.cookies = http.cookiejar.LWPCookieJar(cookiejar)
-    if os.path.exists(cookiejar):
-        log.info('load cookie from: %s', cookiejar)
-        s.cookies.load()
-    yield s
-    log.info('save cookie to: %s', cookiejar)
-    if os.path.dirname(cookiejar):
-        os.makedirs(os.path.dirname(cookiejar), exist_ok=True)
-    s.cookies.save()
-    os.chmod(cookiejar, 0o600)  # NOTE: to make secure a little bit
+def with_cookiejar(session, path):
+    session.cookies = http.cookiejar.LWPCookieJar(path)
+    if os.path.exists(path):
+        log.info('load cookie from: %s', path)
+        session.cookies.load()
+    yield session
+    log.info('save cookie to: %s', path)
+    if os.path.dirname(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+    session.cookies.save()
+    os.chmod(path, 0o600)  # NOTE: to make secure a little bit
 
 class SampleZipper(object):
     def __init__(self):

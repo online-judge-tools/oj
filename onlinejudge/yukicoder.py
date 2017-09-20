@@ -28,7 +28,7 @@ class YukicoderService(onlinejudge.service.Service):
             assert False
 
     def login_with_github(self, get_credentials, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/github'
         # get
         log.status('GET: %s', url)
@@ -62,7 +62,7 @@ class YukicoderService(onlinejudge.service.Service):
             return False
 
     def login_with_twitter(self, get_credentials, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
 
@@ -95,7 +95,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         else:
             return self.download_samples(session=session)
     def download_samples(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)
@@ -113,7 +113,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 samples.add(s, name)
         return samples.get()
     def download_system(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         # get
         log.status('GET: %s', url)
@@ -211,7 +211,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
 
     def submit(self, code, language, session=None):
         assert language in self.get_language_dict(session=session)
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url() + '/submit'
         # get
         log.status('GET: %s', url)
@@ -246,7 +246,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         return YukicoderService()
 
     def get_input_format(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)
