@@ -1,4 +1,5 @@
 # Python Version: 3.x
+from onlinejudge.implementation.version import *
 import onlinejudge.atcoder
 import onlinejudge.yukicoder
 import onlinejudge.anarchygolf

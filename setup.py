@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 from setuptools import setup, find_packages
+from onlinejudge.implementation.version import __author__, __email__, __license__, __version__
 
 with open('readme.md') as fh:
     readme = fh.read()
 
 setup(
     name='online-judge-tools',
-    version='0.1.17',
+    version=__version__,
     description='Tools for online-judge services',
     install_requires=[
         'requests',
@@ -15,10 +16,10 @@ setup(
         'sympy',
     ],
     long_description=readme,
-    author='Kimiyuki Onaka',
-    author_email='kimiyuki95@gmail.com',
+    author=__author__,
+    author_email=__email__,
     url='https://github.com/kmyk/online-judge-tools',
-    license='MIT License',
+    license=__license__,
     packages=find_packages(exclude=( 'tests', 'docs' )),
     scripts=[ 'oj' ],
     classifiers=[
