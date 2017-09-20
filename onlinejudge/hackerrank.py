@@ -128,7 +128,10 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         for i, (inf, outf) in enumerate(zip(it['model']['stdin'], it['model']['expected_output'])):
             inname  = 'Testcase {} Input'.format(i)
             outname = 'Testcase {} Expected Output'.format(i)
-            samples += [[ ( utils.textfile(inf), inname ), ( utils.textfile(outf), outname ) ]]
+            samples += [ {
+                'input': { 'data': utils.textfile(inf), 'name': inname },
+                'output': { 'data': utils.textfile(outf), 'name': outname },
+                } ]
         return samples
 
 

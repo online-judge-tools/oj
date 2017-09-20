@@ -83,7 +83,7 @@ class AOJProblem(onlinejudge.problem.Problem):
             if resp.status_code != 200:
                 break
             in_txt = resp.text
-            if case == 2 and testcases[0][0][0] == in_txt:
+            if case == 2 and testcases[0]['input']['data'] == in_txt:
                 break # if the querystring case=??? is ignored
             # output
             url = get_url(case, 'out')
@@ -93,7 +93,10 @@ class AOJProblem(onlinejudge.problem.Problem):
             log.status(utils.describe_status_code(resp.status_code))
             resp.raise_for_status()
             out_txt = resp.text
-            testcases += [ ( ( in_txt, 'in%d.txt' % case ), ( out_txt, 'out%d.txt' % case ) ) ]
+            testcases += [ {
+                'input': { 'data': in_txt, 'name': 'in%d.txt' % case },
+                'output': { 'data': out_txt, 'name': 'out%d.txt' % case },
+                } ]
         return testcases
 
     def get_url(self):
