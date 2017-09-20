@@ -158,3 +158,14 @@ def normpath(path):
     if path.startswith('//'):
         path = '/' + path.lstrip('/')
     return path
+
+
+def request(method, url, session=None, raise_for_status=True, **kwargs):
+    assert method in [ 'GET', 'POST' ]
+    kwargs.setdefault('allow_redirects', True)
+    log.status('%s: %s', method, url)
+    resp = session.request(method, url, **kwargs)
+    log.status(describe_status_code(resp.status_code))
+    if raise_for_status:
+        resp.raise_for_status()
+    return resp

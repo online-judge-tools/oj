@@ -46,10 +46,7 @@ class AOJProblem(onlinejudge.problem.Problem):
         session = session or utils.new_default_session()
         url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', url, session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
@@ -77,9 +74,7 @@ class AOJProblem(onlinejudge.problem.Problem):
             # input
             url = get_url(case, 'in')
             # get
-            log.status('GET: %s', url)
-            resp = session.get(url)
-            log.status(utils.describe_status_code(resp.status_code))
+            resp = utils.request('GET', url, session=session, raise_for_status=False)
             if resp.status_code != 200:
                 break
             in_txt = resp.text
@@ -88,10 +83,7 @@ class AOJProblem(onlinejudge.problem.Problem):
             # output
             url = get_url(case, 'out')
             # get
-            log.status('GET: %s', url)
-            resp = session.get(url)
-            log.status(utils.describe_status_code(resp.status_code))
-            resp.raise_for_status()
+            resp = utils.request('GET', url, session=session)
             out_txt = resp.text
             testcases += [ {
                 'input': { 'data': in_txt, 'name': 'in%d.txt' % case },
