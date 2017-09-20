@@ -7,6 +7,7 @@ import colorama
 import sys
 
 def download(args):
+    # prepare values
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
@@ -25,12 +26,19 @@ def download(args):
                 args.format = 'test/%i.%e'
         else:
             args.format = 'test/sample-%i.%e'
+
+    # get samples from the server
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         samples = problem.download(session=sess, **kwargs)
+
+    # write samples to files
     for i, sample in enumerate(samples):
         log.emit('')
         log.info('sample %d', i)
-        for ext, (s, name) in zip(['in', 'out'], sample):
+        for kind in [ 'input', 'output' ]:
+            ext = kind[: -3]
+            data = sample[kind]['data']
+            name = sample[kind]['name']
             table = {}
             table['i'] = str(i+1)
             table['e'] = ext
@@ -39,7 +47,7 @@ def download(args):
             table['d'] = os.path.dirname(name)
             path = utils.parcentformat(args.format, table)
             log.status('%sput: %s', ext, name)
-            log.emit(colorama.Style.BRIGHT + s.rstrip() + colorama.Style.RESET_ALL)
+            log.emit(colorama.Style.BRIGHT + data.rstrip() + colorama.Style.RESET_ALL)
             if args.dry_run:
                 continue
             if os.path.exists(path):
@@ -49,5 +57,5 @@ def download(args):
                     continue
             os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, 'w') as fh:
-                fh.write(s)
+                fh.write(data)
             log.success('saved to: %s', path)

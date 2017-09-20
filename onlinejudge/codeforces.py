@@ -18,10 +18,7 @@ class CodeforcesService(onlinejudge.service.Service):
         session = session or utils.new_default_session()
         url = 'http://codeforces.com/enter'
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', url, session=session)
         if resp.url != url:  # redirected
             log.info('You have already signed in.')
             return True
@@ -75,12 +72,8 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
 
     def download(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()

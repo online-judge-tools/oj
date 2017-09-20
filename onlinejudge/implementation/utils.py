@@ -1,4 +1,5 @@
 # Python Version: 3.x
+# -*- coding: utf-8 -*-
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.version as version
 import re
@@ -64,11 +65,14 @@ class SampleZipper(object):
         if self.dangling is None:
             if re.search('output', name, re.IGNORECASE) or re.search('出力', name):
                 log.warning('strange name for input string: %s', name)
-            self.dangling = (s, name)
+            self.dangling = { 'data': s, 'name': name }
         else:
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
                 log.warning('strange name for output string: %s', name)
-            self.data += [( self.dangling, (s, name) )]
+            self.data += [ {
+                'input': self.dangling,
+                'output': { 'data': s, 'name': name },
+                } ]
             self.dangling = None
 
     def get(self):
@@ -154,3 +158,14 @@ def normpath(path):
     if path.startswith('//'):
         path = '/' + path.lstrip('/')
     return path
+
+
+def request(method, url, session=None, raise_for_status=True, **kwargs):
+    assert method in [ 'GET', 'POST' ]
+    kwargs.setdefault('allow_redirects', True)
+    log.status('%s: %s', method, url)
+    resp = session.request(method, url, **kwargs)
+    log.status(describe_status_code(resp.status_code))
+    if raise_for_status:
+        resp.raise_for_status()
+    return resp

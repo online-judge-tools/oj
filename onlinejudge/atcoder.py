@@ -20,10 +20,7 @@ class AtCoderService(onlinejudge.service.Service):
         session = session or utils.new_default_session()
         url = 'https://practice.contest.atcoder.jp/login'
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url, allow_redirects=False)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', url, session=session, allow_redirects=False)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         for msg in msgs:
             log.status('message: %s', msg)
@@ -31,9 +28,7 @@ class AtCoderService(onlinejudge.service.Service):
             return 'login' not in resp.url
         # post
         username, password = get_credentials()
-        log.status('POST: %s', url)
-        resp = session.post(url, data={ 'name': username, 'password': password }, allow_redirects=False)
-        resp.raise_for_status()
+        resp = utils.request('POST', url, session=session, data={ 'name': username, 'password': password }, allow_redirects=False)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         AtCoderService._report_messages(msgs)
         return 'login' not in resp.url  # AtCoder redirects to the top page if success
@@ -93,12 +88,8 @@ class AtCoderProblem(onlinejudge.problem.Problem):
 
     def download(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return []
@@ -173,12 +164,8 @@ class AtCoderProblem(onlinejudge.problem.Problem):
 
     def get_input_format(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return ''
@@ -193,12 +180,9 @@ class AtCoderProblem(onlinejudge.problem.Problem):
 
     def get_language_dict(self, session=None):
         session = session or utils.new_default_session()
-        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
+        resp = utils.request('GET', url, session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return {}
@@ -213,12 +197,9 @@ class AtCoderProblem(onlinejudge.problem.Problem):
     def submit(self, code, language, session=None):
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
-        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
+        resp = utils.request('GET', url, session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return None
@@ -252,12 +233,8 @@ class AtCoderProblem(onlinejudge.problem.Problem):
     def _get_task_id(self, session=None):
         if self._task_id is None:
             session = session or utils.new_default_session()
-            url = self.get_url()
             # get
-            log.status('GET: %s', url)
-            resp = session.get(url)
-            log.status(utils.describe_status_code(resp.status_code))
-            resp.raise_for_status()
+            resp = utils.request('GET', self.get_url(), session=session)
             msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
             if AtCoderService._report_messages(msgs, unexpected=True):
                 return {}
@@ -321,12 +298,8 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
 
     def download(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return []

@@ -36,13 +36,10 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
 
     def download(self, session=None):
         session = session or utils.new_default_session()
+        base_url = self.get_url()
 
         # get csrftoken
-        url = self.get_url()
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', base_url, session=session)
         csrftoken = None
         for cookie in session.cookies:
             if cookie.name == 'csrftoken' and cookie.domain == 'csacademy.com':
@@ -57,10 +54,7 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
                 'x-requested-with': 'XMLHttpRequest',
             }
         contest_url = 'https://csacademy.com/contest/{}/'.format(self.contest_name)
-        log.status('GET: %s', contest_url)
-        resp = session.get(contest_url, headers=headers)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', contest_url, session=session, headers=headers)
         # parse config
         assert resp.encoding is None
         config = json.loads( resp.content.decode() ) # NOTE: Should I memoize this? Is the CSAcademyRound class required?
@@ -78,12 +72,9 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
         headers = {
                 'x-csrftoken': csrftoken,
                 'x-requested-with': 'XMLHttpRequest',
-                'Referer': url,
+                'Referer': base_url,
             }
-        log.status('POST: %s', get_contest_task_url)
-        resp = session.post(get_contest_task_url, files=payload, headers=headers)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('POST', get_contest_task_url, session=session, files=payload, headers=headers)
         # parse
         assert resp.encoding is None
         contest_task = json.loads( resp.content.decode() ) # NOTE: Should I memoize this?
@@ -94,7 +85,10 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
         for test_number, example_test in enumerate(contest_task['state']['EvalTask'][0]['exampleTests']):
             inname  = 'Input {}'.format(test_number)
             outname = 'Output {}'.format(test_number)
-            samples += [[ ( example_test['input'], inname ), ( example_test['output'], outname ) ]]
+            samples += [ {
+                'input': { 'data': example_test['input'], 'name': inname },
+                'output': { 'data': example_test['output'], 'name': outname },
+                } ]
         return samples
 
 

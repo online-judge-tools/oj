@@ -22,10 +22,7 @@ class HackerRankService(onlinejudge.service.Service):
         session = session or utils.new_default_session()
         url = 'https://www.hackerrank.com/login'
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', url, session=session)
         if resp.url != url:
             log.info('You have already signed in.')
             return True
@@ -84,11 +81,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
     def download_with_running_code(self, session=None):
         session = session or utils.new_default_session()
         # get
-        url = self.get_url()
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         csrftoken = soup.find('meta', attrs={ 'name': 'csrf-token' }).attrs['content']
@@ -96,10 +89,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/compile_tests'.format(self.contest_slug, self.challenge_slug)
         payload = { 'code': ':', 'language': 'bash', 'customtestcase': False }
         log.debug('payload: %s', payload)
-        log.status('POST: %s', url)
-        resp = session.post(url, json=payload, headers={ 'X-CSRF-Token': csrftoken })
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('POST', url, session=session, json=payload, headers={ 'X-CSRF-Token': csrftoken })
         # parse
         it = json.loads(resp.content.decode())
         log.debug('json: %s', it)
@@ -114,10 +104,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         log.status('sleep(3)')
         time.sleep(3)
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url, headers={ 'X-CSRF-Token': csrftoken })
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', url, session=session, headers={ 'X-CSRF-Token': csrftoken })
         # parse
         it = json.loads(resp.content.decode())
         log.debug('json: %s', it)
@@ -128,7 +115,10 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         for i, (inf, outf) in enumerate(zip(it['model']['stdin'], it['model']['expected_output'])):
             inname  = 'Testcase {} Input'.format(i)
             outname = 'Testcase {} Expected Output'.format(i)
-            samples += [[ ( utils.textfile(inf), inname ), ( utils.textfile(outf), outname ) ]]
+            samples += [ {
+                'input': { 'data': utils.textfile(inf), 'name': inname },
+                'output': { 'data': utils.textfile(outf), 'name': outname },
+                } ]
         return samples
 
 
@@ -164,9 +154,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         session = session or utils.new_default_session()
         # get
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', url, session=session)
         # parse
         it = json.loads(resp.content.decode())
         log.debug('json: %s', it)
@@ -192,11 +180,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
     def submit(self, code, language, session=None):
         session = session or utils.new_default_session()
         # get
-        url = self.get_url()
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         csrftoken = soup.find('meta', attrs={ 'name': 'csrf-token' }).attrs['content']
@@ -204,10 +188,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/submissions'.format(self.contest_slug, self.challenge_slug)
         payload = { 'code': code, 'language': language }
         log.debug('payload: %s', payload)
-        log.status('POST: %s', url)
-        resp = session.post(url, json=payload, headers={ 'X-CSRF-Token': csrftoken })
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('POST', url, session=session, json=payload, headers={ 'X-CSRF-Token': csrftoken })
         # parse
         it = json.loads(resp.content.decode())
         log.debug('json: %s', it)

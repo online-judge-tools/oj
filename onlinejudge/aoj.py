@@ -44,12 +44,8 @@ class AOJProblem(onlinejudge.problem.Problem):
             return self.download_samples(session=session)
     def download_samples(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
@@ -75,25 +71,21 @@ class AOJProblem(onlinejudge.problem.Problem):
         testcases = []
         for case in itertools.count(1):
             # input
-            url = get_url(case, 'in')
             # get
-            log.status('GET: %s', url)
-            resp = session.get(url)
-            log.status(utils.describe_status_code(resp.status_code))
+            resp = utils.request('GET', get_url(case, 'in'), session=session, raise_for_status=False)
             if resp.status_code != 200:
                 break
             in_txt = resp.text
-            if case == 2 and testcases[0][0][0] == in_txt:
+            if case == 2 and testcases[0]['input']['data'] == in_txt:
                 break # if the querystring case=??? is ignored
             # output
-            url = get_url(case, 'out')
             # get
-            log.status('GET: %s', url)
-            resp = session.get(url)
-            log.status(utils.describe_status_code(resp.status_code))
-            resp.raise_for_status()
+            resp = utils.request('GET', get_url(case, 'out'), session=session)
             out_txt = resp.text
-            testcases += [ ( ( in_txt, 'in%d.txt' % case ), ( out_txt, 'out%d.txt' % case ) ) ]
+            testcases += [ {
+                'input': { 'data': in_txt, 'name': 'in%d.txt' % case },
+                'output': { 'data': out_txt, 'name': 'out%d.txt' % case },
+                } ]
         return testcases
 
     def get_url(self):

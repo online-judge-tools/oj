@@ -31,10 +31,7 @@ class YukicoderService(onlinejudge.service.Service):
         session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/github'
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', url, session=session)
         if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
             log.info('You have already signed in.')
             return True
@@ -96,12 +93,8 @@ class YukicoderProblem(onlinejudge.problem.Problem):
             return self.download_samples(session=session)
     def download_samples(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
@@ -109,28 +102,31 @@ class YukicoderProblem(onlinejudge.problem.Problem):
             log.debug('pre: %s', str(pre))
             it = self._parse_sample_tag(pre)
             if it is not None:
-                s, name = it
-                samples.add(s, name)
+                data, name = it
+                samples.add(data, name)
         return samples.get()
     def download_system(self, session=None):
         session = session or utils.new_default_session()
-        url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
+        resp = utils.request('GET', url, session=session)
         # parse
-        samples = collections.defaultdict(list)
+        samples = collections.defaultdict(dict)
         with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
             for filename in sorted(fh.namelist()):  # "test_in" < "test_out"
-                s = fh.read(filename).decode()
-                name = os.path.basename(filename)
+                dirname = os.path.dirname(filename)
+                basename = os.path.basename(filename)
+                kind = { 'test_in': 'input', 'test_out': 'output' }[dirname]
+                data = fh.read(filename).decode()
+                name = basename
                 if os.path.splitext(name)[1] == '.in':  # ".in" extension is confusing
                     name = os.path.splitext(name)[0]
                 print(filename, name)
-                samples[os.path.basename(filename)] += [( s, name )]
-        return sorted(samples.values())
+                samples[basename][kind] = { 'data': data, 'name': name }
+        for sample in samples.values():
+            if 'input' not in sample or 'output' not in sample:
+                log.error('dangling sample found: %s', str(sample))
+        return list(map(lambda it: it[1], sorted(samples.items())))
 
     def _parse_sample_tag(self, tag):
         assert isinstance(tag, bs4.Tag)
@@ -212,12 +208,8 @@ class YukicoderProblem(onlinejudge.problem.Problem):
     def submit(self, code, language, session=None):
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
-        url = self.get_url() + '/submit'
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url() + '/submit', session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', action=re.compile(r'/submit$'))
@@ -247,12 +239,8 @@ class YukicoderProblem(onlinejudge.problem.Problem):
 
     def get_input_format(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        log.status('GET: %s', url)
-        resp = session.get(url)
-        log.status(utils.describe_status_code(resp.status_code))
-        resp.raise_for_status()
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         for h4 in soup.find_all('h4'):
