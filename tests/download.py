@@ -9,7 +9,7 @@ import shutil
 import time
 import tempfile
 
-class MainTest(unittest.TestCase):
+class DownloadTest(unittest.TestCase):
 
     def snippet_call_download(self, problems, is_system=False):
         cwd = os.getcwd()
