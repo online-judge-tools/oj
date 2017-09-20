@@ -25,7 +25,7 @@ def download(args):
                 args.format = 'test/%i.%e'
         else:
             args.format = 'test/sample-%i.%e'
-    with utils.session(cookiejar=args.cookie) as sess:
+    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         samples = problem.download(session=sess, **kwargs)
     for i, sample in enumerate(samples):
         log.emit('')

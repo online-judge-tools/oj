@@ -24,7 +24,7 @@ def submit(args):
     log.info('code:')
     log.emit(log.bold(s))
     # session
-    with utils.session(cookiejar=args.cookie) as sess:
+    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # language
         langs = problem.get_language_dict(session=sess)
         if args.language not in langs:

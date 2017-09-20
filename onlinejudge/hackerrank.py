@@ -19,7 +19,7 @@ import time
 class HackerRankService(onlinejudge.service.Service):
 
     def login(self, get_credentials, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'https://www.hackerrank.com/login'
         # get
         log.status('GET: %s', url)
@@ -82,7 +82,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
             assert False
 
     def download_with_running_code(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         # get
         url = self.get_url()
         log.status('GET: %s', url)
@@ -133,7 +133,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
 
 
     def download_with_parsing_html(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
         raise NotImplementedError
 
@@ -161,7 +161,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
                 return cls('master', m.group(1))
 
     def _get_model(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         # get
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
         resp = session.get(url)
@@ -176,7 +176,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         return it['model']
 
     def get_language_dict(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         info = self._get_model(session=session)
         # lang_display_mapping from https://hrcdn.net/hackerrank/assets/codeshell/dist/codeshell-449bb296b091277fedc42b23f7c9c447.js, Sun Feb 19 02:25:36 JST 2017
         lang_display_mapping = { 'c': 'C', 'cpp': 'C++', 'java': 'Java 7', 'csharp': 'C#', 'haskell': 'Haskell', 'php': 'PHP', 'python': 'Python 2', 'pypy': 'Pypy 2', 'pypy3': 'Pypy 3', 'ruby': 'Ruby', 'perl': 'Perl', 'bash': 'BASH', 'oracle': 'Oracle', 'mysql': 'MySQL', 'sql': 'SQL', 'clojure': 'Clojure', 'scala': 'Scala', 'code': 'Generic', 'text': 'Plain Text', 'brainfuck': 'Brainfuck', 'javascript': 'Javascript', 'typescript': 'Typescript', 'lua': 'Lua', 'sbcl': 'Common Lisp (SBCL)', 'erlang': 'Erlang', 'go': 'Go', 'd': 'D', 'ocaml': 'OCaml', 'pascal': 'Pascal', 'python3': 'Python 3', 'groovy': 'Groovy', 'objectivec': 'Objective-C', 'text_pseudo': 'Plain Text', 'fsharp': 'F#', 'visualbasic': 'VB. NET', 'cobol': 'COBOL', 'tsql': 'MS SQL Server', 'lolcode': 'LOLCODE', 'smalltalk': 'Smalltalk', 'tcl': 'Tcl', 'whitespace': 'Whitespace', 'css': 'CSS', 'html': 'HTML', 'java8': 'Java 8', 'db2': 'DB2', 'octave': 'Octave', 'r': 'R', 'xquery': 'XQuery', 'racket': 'Racket', 'xml': 'XML', 'rust': 'Rust', 'swift': 'Swift', 'elixir': 'Elixir', 'fortran': 'Fortran', 'ada': 'Ada', 'nim': 'Nim', 'julia': 'Julia', 'cpp14': 'C++14', 'coffeescript': 'Coffeescript' }
@@ -190,7 +190,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         return result
 
     def submit(self, code, language, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         # get
         url = self.get_url()
         log.status('GET: %s', url)

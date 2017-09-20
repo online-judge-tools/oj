@@ -35,7 +35,7 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
         self.task_name = task_name
 
     def download(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
 
         # get csrftoken
         url = self.get_url()

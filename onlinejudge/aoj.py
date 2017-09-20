@@ -43,7 +43,7 @@ class AOJProblem(onlinejudge.problem.Problem):
         else:
             return self.download_samples(session=session)
     def download_samples(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)
@@ -70,7 +70,7 @@ class AOJProblem(onlinejudge.problem.Problem):
                 samples.add(s, name)
         return samples.get()
     def download_system(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         get_url = lambda case, type: 'http://analytic.u-aizu.ac.jp:8080/aoj/testcase.jsp?id={}&case={}&type={}'.format(self.problem_id, case, type)
         testcases = []
         for case in itertools.count(1):

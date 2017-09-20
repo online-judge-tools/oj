@@ -173,7 +173,7 @@ def generate_scanner(args):
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
-    with utils.session(cookiejar=args.cookie) as sess:
+    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         it = problem.get_input_format(session=sess)
     if not it:
         log.error('input format not found')

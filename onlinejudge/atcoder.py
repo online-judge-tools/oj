@@ -17,7 +17,7 @@ import json
 class AtCoderService(onlinejudge.service.Service):
 
     def login(self, get_credentials, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'https://practice.contest.atcoder.jp/login'
         # get
         log.status('GET: %s', url)
@@ -92,7 +92,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         self._task_id = None
 
     def download(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)
@@ -172,7 +172,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             return cls(contest_id, problem_id)
 
     def get_input_format(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)
@@ -192,7 +192,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
                 return s
 
     def get_language_dict(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
         # get
         log.status('GET: %s', url)
@@ -212,7 +212,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
 
     def submit(self, code, language, session=None):
         assert language in self.get_language_dict(session=session)
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
         # get
         log.status('GET: %s', url)
@@ -251,7 +251,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
 
     def _get_task_id(self, session=None):
         if self._task_id is None:
-            session = session or requests.Session()
+            session = session or utils.new_default_session()
             url = self.get_url()
             # get
             log.status('GET: %s', url)
@@ -320,7 +320,7 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
         return AtCoderService()
 
     def download(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)

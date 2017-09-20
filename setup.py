@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from setuptools import setup, find_packages
-from onlinejudge.implementation.version import __author__, __email__, __license__, __version__
+from onlinejudge.implementation.version import __author__, __email__, __license__, __url__, __version__
 
 with open('readme.md') as fh:
     readme = fh.read()
@@ -18,7 +18,7 @@ setup(
     long_description=readme,
     author=__author__,
     author_email=__email__,
-    url='https://github.com/kmyk/online-judge-tools',
+    url=__url__,
     license=__license__,
     packages=find_packages(exclude=( 'tests', 'docs' )),
     scripts=[ 'oj' ],

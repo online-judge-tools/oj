@@ -33,7 +33,7 @@ class AnarchyGolfProblem(onlinejudge.problem.Problem):
         self.problem_id = problem_id
 
     def download(self, session=None):
-        session = session or requests.Session()
+        session = session or utils.new_default_session()
         url = self.get_url()
         # get
         log.status('GET: %s', url)
