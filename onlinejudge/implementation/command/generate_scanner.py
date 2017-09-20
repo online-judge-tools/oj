@@ -10,17 +10,18 @@ import colorama
 import collections
 import sys
 
-def tokenize(pre):
-    it = []
+def tokenize(pre):  # => [ [ dict ] ]
     for y, line in enumerate(pre.splitlines()):
+        # remove mathjax tokens
         line = line.replace('$', '').replace('\\(', '').replace('\\)', '')
         line = line.replace('\\ ', ' ').replace('\\quad', ' ')
-        it += [ [] ]
+        # tokenize each line
+        tokens = []
         for x, s in enumerate(line.split()):
             if s in [ '..', '...', '\\dots', '…', '⋯' ]:
-                it[-1] += [ { 'kind': 'dots', 'dir': ['hr', 'vr'][x == 0] } ]
+                tokens += [ { 'kind': 'dots', 'dir': ['hr', 'vr'][x == 0] } ]
             elif s in [ ':', '\\vdots', '⋮' ]:
-                it[-1] += [ { 'kind': 'dots', 'dir': 'vr' } ]
+                tokens += [ { 'kind': 'dots', 'dir': 'vr' } ]
             elif '\\' in s:
                 assert False
             elif '_' in s:
@@ -30,21 +31,12 @@ def tokenize(pre):
                     ix = ix[1:-1]
                 if ',' in ix:
                     raise NotImplementedError
-                it[-1] += [ { 'kind': 'indexed', 'name': s, 'index': ix } ]
+                tokens += [ { 'kind': 'indexed', 'name': s, 'index': ix } ]
             else:
-                it[-1] += [ { 'kind': 'fixed', 'name': s } ]
-    return it
+                tokens += [ { 'kind': 'fixed', 'name': s } ]
+        yield tokens
 
-def merge_ops(xs):
-    ys = []
-    for x in xs:
-        if ys and ys[-1]['kind'] == x['kind'] and x['kind'] in [ 'decl', 'decl-vector',  'read', 'read-indexed'  ]:
-            ys[-1]['targets'] += x['targets']
-        else:
-            ys += [ x ]
-    return ys
-
-def simplify(s):
+def simplify_expr(s):
     transformations = sympy_parser.standard_transformations + ( sympy_parser.implicit_multiplication_application ,)
     local_dict = { 'N': sympy.Symbol('N') }
     return str(sympy_parser.parse_expr(s, local_dict=local_dict, transformations=transformations))
@@ -62,30 +54,24 @@ def parse(tokens):
                 if 'r' not in f or f['r'] < item['index']:
                     f['r'] = item['index']
     for name in env:
-        env[name]['n'] = simplify('{}-{}+1'.format(env[name]['r'], env[name]['l']))
-    it = []
+        env[name]['n'] = simplify_expr('{}-{}+1'.format(env[name]['r'], env[name]['l']))
     used = set()
     for y, line in enumerate(tokens):
         for x, item in enumerate(line):
-            decls = []
-            reads = []
             if item['kind'] == 'fixed':
-                decls += [ { 'kind': 'decl', 'names': [ item['name'] ] } ]
-                reads += [ { 'kind': 'read', 'names': [ item['name'] ] } ]
+                yield { 'kind': 'decl', 'names': [ item['name'] ] }
+                yield { 'kind': 'read', 'names': [ item['name'] ] }
             elif item['kind'] == 'indexed':
                 pass
             elif item['kind'] == 'dots':
-                it += merge_ops(decls) + merge_ops(reads)
-                decls = []
-                reads = []
                 if item['dir'] == 'hr':
                     assert line[x-1]['kind'] == 'indexed'
                     name = line[x-1]['name']
                     if name in used:
                         continue
                     n = env[name]['n']
-                    it += [ { 'kind': 'decl-vector', 'targets': [ { 'name': name, 'length': n } ] } ]
-                    it += [ { 'kind': 'loop', 'length': n, 'body': [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ] } ]
+                    yield { 'kind': 'decl-vector', 'targets': [ { 'name': name, 'length': n } ] }
+                    yield { 'kind': 'loop', 'length': n, 'body': [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ] }
                     used.add(name)
                 elif item['dir'] == 'vr':
                     names = []
@@ -101,19 +87,42 @@ def parse(tokens):
                         continue
                     acc = []
                     n = env[names[0]]['n']
+                    body = []
                     for name in names:
                         assert env[name]['n'] == n
-                        decls += [ { 'kind': 'decl-vector',  'targets': [ { 'name': name, 'length': n } ] } ]
-                        reads += [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ]
-                    it += merge_ops(decls)
-                    it += [ { 'kind': 'loop', 'length': n, 'body': merge_ops(reads) } ]
+                        yield { 'kind': 'decl-vector',  'targets': [ { 'name': name, 'length': n } ] } 
+                        body += [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ]
+                    yield { 'kind': 'loop', 'length': n, 'body': body }
                     decls = []
                     reads = []
                 else:
                     assert False
             else:
                 assert False
-            it += merge_ops(decls) + merge_ops(reads)
+
+def get_names(targets):
+    return list(map(lambda target: target['name'], targets))
+
+def postprocess(it):
+    def go(it):
+        i = 0
+        while i < len(it):
+            if i - 1 >= 0 and it[i - 1]['kind'] == 'read' and it[i]['kind'] == 'decl':
+                if not set(it[i - 1]['names']).intersection(it[i]['names']):
+                    it[i - 1], it[i] = it[i], it[i - 1]
+                    i -= 2
+            elif i - 1 >= 0 and it[i - 1]['kind'] == it[i]['kind'] and it[i]['kind'] in [ 'decl', 'decl-vector', 'read', 'read-indexed' ]:
+                if it[i]['kind'] in [ 'read', 'decl' ]:
+                    it[i - 1]['names'] += it[i]['names']
+                else:
+                    it[i - 1]['targets'] += it[i]['targets']
+                del it[i]
+                i -= 1
+            elif it[i]['kind'] == 'loop':
+                it[i]['body'] = go(it[i]['body'])
+            i += 1
+        return it
+    it = go(it)
     return it
 
 def paren_if(n, lr):
@@ -146,7 +155,7 @@ def export(it, repeat_macro=None, use_scanf=False):
             if repeat_macro is None:
                 s += 'for (int {} = 0; {} < {}; ++ {}) '.format(i, i, it['length'], i)
             else:
-                s += '{} ({},{}) '.format(repeat_macro, i, it['length'])
+                s += '{} ({}, {}) '.format(repeat_macro, i, it['length'])
             if len(it['body']) == 0:
                 s += ';'
             elif len(it['body']) == 1:
@@ -179,9 +188,15 @@ def generate_scanner(args):
         log.error('input format not found')
         sys.exit(1)
     try:
-        it = tokenize(it)
-        it = parse(it)
+        log.debug('original data: %s', repr(it))
+        it = list(tokenize(it))
+        log.debug('tokenized: %s', str(it))
+        it = list(parse(it))
+        log.debug('parsed: %s', str(it))
+        it = postprocess(it)
+        log.debug('postprocessed: %s', str(it))
         it = export(it, use_scanf=args.scanf, repeat_macro=args.repeat_macro)
+        log.debug('result: %s', repr(it))
     except:
         log.error('somethin wrong')
         raise
