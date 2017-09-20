@@ -36,10 +36,10 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
 
     def download(self, session=None):
         session = session or utils.new_default_session()
+        base_url = self.get_url()
 
         # get csrftoken
-        url = self.get_url()
-        resp = utils.request('GET', url, session=session)
+        resp = utils.request('GET', base_url, session=session)
         csrftoken = None
         for cookie in session.cookies:
             if cookie.name == 'csrftoken' and cookie.domain == 'csacademy.com':
@@ -72,7 +72,7 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
         headers = {
                 'x-csrftoken': csrftoken,
                 'x-requested-with': 'XMLHttpRequest',
-                'Referer': url,
+                'Referer': base_url,
             }
         resp = utils.request('POST', get_contest_task_url, session=session, files=payload, headers=headers)
         # parse

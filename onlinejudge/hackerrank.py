@@ -81,8 +81,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
     def download_with_running_code(self, session=None):
         session = session or utils.new_default_session()
         # get
-        url = self.get_url()
-        resp = utils.request('GET', url, session=session)
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         csrftoken = soup.find('meta', attrs={ 'name': 'csrf-token' }).attrs['content']
@@ -181,8 +180,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
     def submit(self, code, language, session=None):
         session = session or utils.new_default_session()
         # get
-        url = self.get_url()
-        resp = utils.request('GET', url, session=session)
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         csrftoken = soup.find('meta', attrs={ 'name': 'csrf-token' }).attrs['content']

@@ -72,9 +72,8 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
 
     def download(self, session=None):
         session = session or utils.new_default_session()
-        url = self.get_url()
         # get
-        resp = utils.request('GET', url, session=session)
+        resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = utils.SampleZipper()
