@@ -65,6 +65,14 @@ class GenerateScannerTest(unittest.TestCase):
                 'vector<int> S(N), K(N); for (int i = 0; i < N; ++ i) cin >> S[i] >> K[i];\n',
                 ]),
             )
+        self.call_generate_scanner(
+            url='https://yukicoder.me/problems/no/11',
+            expected=''.join([
+                'int W, H, N; scanf("%d%d%d", &W, &H, &N);\n',
+                'vector<int> S(N), K(N); repeat (i, N) scanf("%d%d", &S[i], &K[i]);\n',
+                ]),
+            options=[ '--scanf', '--repeat-macro', 'repeat' ]
+            )
 
     def test_call_generate_scanner_yukicoder_others(self):
         self.call_generate_scanner(
@@ -80,6 +88,20 @@ class GenerateScannerTest(unittest.TestCase):
             )
         self.call_generate_scanner(
             url='https://yukicoder.me/problems/no/12',
+            expected=''.join([
+                'int N; cin >> N;\n',
+                'vector<int> A(N); REP (i, N) cin >> A[i];\n',
+                ]),
+            options=[ '--repeat-macro', 'REP' ],
+            )
+
+    def test_call_generate_scanner_atcoder_others(self):
+        self.call_generate_scanner(
+            url='https://beta.atcoder.jp/contests/arc083/tasks/arc083_a',
+            expected='int A, B, C, D, E, F; cin >> A >> B >> C >> D >> E >> F;\n',
+            )
+        self.call_generate_scanner(
+            url='https://beta.atcoder.jp/contests/abc071/tasks/arc081_a',
             expected=''.join([
                 'int N; cin >> N;\n',
                 'vector<int> A(N); REP (i, N) cin >> A[i];\n',
