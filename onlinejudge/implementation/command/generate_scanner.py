@@ -146,7 +146,7 @@ def export(it, repeat_macro=None, use_scanf=False):
             if repeat_macro is None:
                 s += 'for (int {} = 0; {} < {}; ++ {}) '.format(i, i, it['length'], i)
             else:
-                s += '{} ({},{}) '.format(repeat_macro, i, it['length'])
+                s += '{} ({}, {}) '.format(repeat_macro, i, it['length'])
             if len(it['body']) == 0:
                 s += ';'
             elif len(it['body']) == 1:
