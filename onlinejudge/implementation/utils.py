@@ -14,7 +14,11 @@ import http.client
 import subprocess
 import posixpath
 import sys
+import ast
+import time
+import selenium.webdriver
 
+default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
 html_parser = 'html.parser'  # TODO: this is NOT a utility.
 
 def parcentformat(s, table):
@@ -43,8 +47,11 @@ def new_default_session():  # without setting cookiejar
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
     return session
 
+default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
+
 @contextlib.contextmanager
 def with_cookiejar(session, path):
+    path = path or default_cookie_path
     session.cookies = http.cookiejar.LWPCookieJar(path)
     if os.path.exists(path):
         log.info('load cookie from: %s', path)
@@ -55,6 +62,66 @@ def with_cookiejar(session, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
     session.cookies.save()
     os.chmod(path, 0o600)  # NOTE: to make secure a little bit
+
+@contextlib.contextmanager
+def run_webdriver(webdriver, target_url, cookie_path, headless=True):
+    # launch
+    if webdriver is None:
+         log.error('webdriver is not specified')
+         sys.exit(1)
+    elif 'phantomjs' in os.path.basename(webdriver):
+        kwargs = {}
+        if '/' in webdriver:
+            kwargs['executable_path'] = webdriver
+        driver = selenium.webdriver.PhantomJS(**kwargs)
+    elif 'chrom' in os.path.basename(webdriver):
+        kwargs = {}
+        if '/' in webdriver:
+            kwargs['executable_path'] = webdriver
+        kwargs['chrome_options'] = selenium.webdriver.ChromeOptions()
+        if headless:
+            kwargs['chrome_options'].add_argument('--headless')
+            kwargs['chrome_options'].add_argument('--disable-gpu')
+        driver = selenium.webdriver.Chrome(**kwargs)
+    else:
+        parser.error('unknown webdriver: %s', webdriver)
+
+    # workaround
+    # NOTE: selenium can read/write only cookies of the current domain
+    domain = '.'.join(urllib.parse.urlparse(target_url).netloc.split('.')[- 2 :])
+
+    # default cookie path
+    default_selenium_cookie_path = os.path.join(default_data_dir, 'cookie-' + driver.name + '-' + domain + '.jar')
+    cookie_path = cookie_path or default_selenium_cookie_path
+
+    # load cookie
+    if os.path.exists(cookie_path):
+        log.info('load cookie for %s from: %s', driver.name, cookie_path)
+        driver.get(target_url)
+        time.sleep(1)
+        with open(cookie_path) as fh:
+            cookies = ast.literal_eval(fh.read())
+        for cookie in cookies:
+            log.debug('cookie: %s', repr(cookie))
+            try:
+                driver.add_cookie(cookie)
+            except selenium.common.exceptions.WebDriverException as e:
+                log.debug('exception:\n%s', str(e))
+
+    yield driver
+
+    # save cookie
+    log.info('save cookie for %s to: %s', driver.name, cookie_path)
+    driver.get(target_url)
+    time.sleep(1)
+    if os.path.dirname(cookie_path):
+        os.makedirs(os.path.dirname(cookie_path), exist_ok=True)
+    with open(cookie_path, 'w') as fh:
+        fh.write(repr(driver.get_cookies()) + '\n')
+    os.chmod(cookie_path, 0o600)  # NOTE: to make secure a little bit
+
+    driver.close()
+
 
 class SampleZipper(object):
     def __init__(self):

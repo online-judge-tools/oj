@@ -10,10 +10,12 @@ import subprocess
 default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
 
 def submit(args):
+    # parse url
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
-    # code
+
+    # read code
     with open(args.file) as fh:
         code = fh.buffer.read()
     try:
@@ -23,8 +25,22 @@ def submit(args):
         s = repr(code)[ 1 : ]
     log.info('code:')
     log.emit(log.bold(s))
-    # session
-    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
+
+    # prepare kwargs
+    kwargs = {}
+    if problem.get_service().get_name() == 'topcoder':
+        if args.full_submission:
+            kwargs['kind'] = 'test'
+        else:
+            kwargs['kind'] = 'example'
+
+    # make session
+    if problem.get_service().get_name() == 'topcoder':
+        sess = utils.run_webdriver(args.webdriver, target_url=problem.get_service().get_url(), headless=not args.verbose, cookie_path=args.cookie)
+    else:
+        sess = utils.with_cookiejar(utils.new_default_session(), path=args.cookie)
+
+    with sess as sess:
         # language
         langs = problem.get_language_dict(session=sess)
         if args.language not in langs:
@@ -33,6 +49,7 @@ def submit(args):
             for lang in sorted(langs.keys()):
                 log.emit('%s (%s)', lang, langs[lang]['description'])
             sys.exit(1)
+
         # confirm
         if args.wait:
             log.status('sleep(%.2f)', args.wait)
@@ -44,8 +61,11 @@ def submit(args):
             if c != 'y':
                 log.info('terminated.')
                 return
+
         # submit
-        submission = problem.submit(code, language=args.language, session=sess)
+        submission = problem.submit(code, language=args.language, session=sess, **kwargs)
+
+        # show result
         if submission is None:
             log.failure('submission failed')
         else:
