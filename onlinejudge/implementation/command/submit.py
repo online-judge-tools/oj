@@ -30,7 +30,7 @@ def submit(args):
     kwargs = {}
     if problem.get_service().get_name() == 'topcoder':
         if args.full_submission:
-            kwargs['kind'] = 'test'
+            kwargs['kind'] = 'full'
         else:
             kwargs['kind'] = 'example'
 

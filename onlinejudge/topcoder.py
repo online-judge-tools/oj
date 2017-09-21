@@ -145,9 +145,18 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
 
         # submit
         log.status('click: Test')
-        alt_text = { 'example': 'Test', 'full': 'Submission' }[kind]
+        alt_text = { 'example': 'Test', 'full': 'Submit' }[kind]
         driver.find_element_by_xpath('//form[@name = "codingForm"]//img[@alt = "%s"]' % alt_text).click()
-        time.sleep(2)
+
+        # check
+        for _ in range(8):
+            if 'module=SubmitSuccess' in driver.current_url:
+                break
+            time.sleep(1)
+        else:
+            message = driver.find_element_by_xpath('//textarea[@name = "messages"]').text
+            log.failure('%s', message)
+            return None
 
         log.success('success: result: %s', driver.current_url)
         return onlinejudge.submission.CompatibilitySubmission(driver.current_url)
