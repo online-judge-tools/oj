@@ -145,7 +145,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
 
         # submit
         log.status('click: Test')
-        alt_text = { 'example': 'Test', 'full': 'Submission' }[kind]
+        alt_text = { 'example': 'Test', 'full': 'Submit' }[kind]
         driver.find_element_by_xpath('//form[@name = "codingForm"]//img[@alt = "%s"]' % alt_text).click()
         time.sleep(2)
 
