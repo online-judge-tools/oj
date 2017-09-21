@@ -154,6 +154,8 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
                 break
             time.sleep(1)
         else:
+            message = driver.find_element_by_xpath('//textarea[@name = "messages"]').text
+            log.failure('%s', message)
             return None
 
         log.success('success: result: %s', driver.current_url)
