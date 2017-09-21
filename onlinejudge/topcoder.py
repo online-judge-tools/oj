@@ -144,8 +144,8 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
             driver.switch_to.active_element.send_keys(selenium.webdriver.common.keys.Keys.CONTROL, selenium.webdriver.common.keys.Keys.DELETE)
 
         # submit
-        log.status('click: Test')
         alt_text = { 'example': 'Test', 'full': 'Submit' }[kind]
+        log.status('click: %s', alt_text)
         driver.find_element_by_xpath('//form[@name = "codingForm"]//img[@alt = "%s"]' % alt_text).click()
 
         # check
