@@ -26,10 +26,12 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Yukicoder (via github.com)
     -   Codeforces
     -   HackerRank
+    -   TopCoder
 -   Submit your solution
     -   AtCoder
     -   Yukicoder
     -   HackerRank
+    -   TopCoder (Marathon Match)
 -   Generate scanner for input  (experimental)
     -   AtCoder
     -   Yukicoder
