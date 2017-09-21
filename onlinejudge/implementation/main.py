@@ -15,16 +15,13 @@ import sys
 import os
 import os.path
 
-default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
-
 def main(args=None):
 
     # argparse
     parser = argparse.ArgumentParser(description='Tools for online judge services')
     parser.add_argument('-v', '--verbose', action='store_true')
-    default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
-    parser.add_argument('-c', '--cookie', default=default_cookie_path,
-            help='path for cookie. (default: {})'.format(default_cookie_path))
+    parser.add_argument('-c', '--cookie', help='path to cookie. (default: {})'.format(utils.default_cookie_path))
+    parser.add_argument('--webdriver', help='path to webdriver. required in some services.')
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
@@ -71,10 +68,19 @@ supported services:
   Codeforces
   HackerRank
   Yukicoder
+  TopCoder
 
 strings for --method:
   github                for yukicoder, login via github (default)
   twitter               for yukicoder, login via twitter (not implementated yet)
+
+note for TopCoder:
+  Since TopCoder's web-interface it too complex, I implementated it using a Web Browser Automation technology, Selenium. You must install and specify a webdriver for this.
+  for example, in Ubuntu:
+    install:
+      $ apt get install chromium-chromedriver
+    login:
+      $ oj --verbose --webdriver /usr/lib/chromium-browser/chromedriver login https://www.topcoder.com/
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-u', '--username')
@@ -90,6 +96,12 @@ strings for --method:
 supported services:
   AtCoder
   Yukicoder
+  TopCoder (Marathon Match)
+
+note for TopCoder:
+  A webdriver is required.
+  for example:
+    $ oj --webdriver /usr/lib/chromium-browser/chromedriver submit https://community.topcoder.com/tc?module=MatchDetails&rd=16997 --language C++ ConstrainedPermutation.cpp
 ''')
     subparser.add_argument('url')
     subparser.add_argument('file')
@@ -97,6 +109,7 @@ supported services:
     subparser.add_argument('--open', nargs='?', const=True, help='open the result page after submission')
     subparser.add_argument('-w', '--wait', metavar='SECCOND', type=float, default=3, help='sleep before submitting')
     subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
+    subparser.add_argument('--full-submission', action='store_true', help='for TopCoder Marathon Match. use this to do "Submit", the default behavier is "Test Exampls".')
 
     # test
     subparser = subparsers.add_parser('test',
