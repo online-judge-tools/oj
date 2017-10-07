@@ -154,7 +154,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             return cls(contest_id, problem_id)
 
         # example: https://beta.atcoder.jp/contests/abc073/tasks/abc073_a
-        m = re.match(r'^/contests/(\w+)/tasks/(\w+)$', utils.normpath(result.path))
+        m = re.match(r'^/contests/([\w\-_]+)/tasks/([\w\-_]+)$', utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'beta.atcoder.jp' \
                 and m:
@@ -274,7 +274,7 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
                 return cls(contest_id, submission_id, problem_id=problem_id)
 
         # example: https://beta.atcoder.jp/contests/abc073/submissions/1592381
-        m = re.match(r'^/contests/(\w+)/submissions/(\d+)$', utils.normpath(result.path))
+        m = re.match(r'^/contests/([\w\-_]+)/submissions/(\d+)$', utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'beta.atcoder.jp' \
                 and m:
