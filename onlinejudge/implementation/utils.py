@@ -42,6 +42,12 @@ def previous_sibling_tag(tag):
         tag = tag.previous_sibling
     return tag
 
+def next_sibling_tag(tag):
+    tag = tag.next_sibling
+    while tag and not isinstance(tag, bs4.Tag):
+        tag = tag.next_sibling
+    return tag
+
 def new_default_session():  # without setting cookiejar
     session = requests.Session()
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
