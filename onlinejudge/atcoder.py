@@ -154,7 +154,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             return cls(contest_id, problem_id)
 
         # example: https://beta.atcoder.jp/contests/abc073/tasks/abc073_a
-        m = re.match(r'^/contests/(\w+)/tasks/(\w+)$', utils.normpath(result.path))
+        m = re.match(r'^/contests/([\w\-_]+)/tasks/([\w\-_]+)$', utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'beta.atcoder.jp' \
                 and m:
@@ -172,11 +172,17 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         for h3 in soup.find_all('h3'):
-            if h3.string == '入力':
-                s = ''
-                for it in h3.parent.find('pre'):
-                    s += it.string or it  # AtCoder uses <var>...</var> for math symbols
-                return s
+            if h3.string in ( '入力', 'Input' ):
+                tag = h3
+                for _ in range(3):
+                    tag = utils.next_sibling_tag(tag)
+                    if tag is None:
+                        break
+                    if tag.name in ( 'pre', 'blockquote' ):
+                        s = ''
+                        for it in tag:
+                            s += it.string or it  # AtCoder uses <var>...</var> for math symbols
+                        return s
 
     def get_language_dict(self, session=None):
         session = session or utils.new_default_session()
@@ -274,7 +280,7 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
                 return cls(contest_id, submission_id, problem_id=problem_id)
 
         # example: https://beta.atcoder.jp/contests/abc073/submissions/1592381
-        m = re.match(r'^/contests/(\w+)/submissions/(\d+)$', utils.normpath(result.path))
+        m = re.match(r'^/contests/([\w\-_]+)/submissions/(\d+)$', utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'beta.atcoder.jp' \
                 and m:
