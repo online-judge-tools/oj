@@ -172,11 +172,17 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         for h3 in soup.find_all('h3'):
-            if h3.string == '入力':
-                s = ''
-                for it in h3.parent.find('pre'):
-                    s += it.string or it  # AtCoder uses <var>...</var> for math symbols
-                return s
+            if h3.string in ( '入力', 'Input' ):
+                tag = h3
+                for _ in range(3):
+                    tag = utils.next_sibling_tag(tag)
+                    if tag is None:
+                        break
+                    if tag.name in ( 'pre', 'blockquote' ):
+                        s = ''
+                        for it in tag:
+                            s += it.string or it  # AtCoder uses <var>...</var> for math symbols
+                        return s
 
     def get_language_dict(self, session=None):
         session = session or utils.new_default_session()
