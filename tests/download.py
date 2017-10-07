@@ -266,6 +266,14 @@ class DownloadTest(unittest.TestCase):
                 'sample-6.in':  '80ad60f95c32a3f6e413b5bb7c094e99',
                 'sample-6.out': '3ae2ea0c3867b219ef54d914437e76be',
             },
+            'https://beta.atcoder.jp/contests/ddcc2017-qual/tasks/ddcc2017_qual_a': {
+                'sample-1.in':  '79b0c0aac7451776e794095b2c596422',
+                'sample-1.out': '3ae2ea0c3867b219ef54d914437e76be',
+                'sample-2.in':  'ae5b468c7707a1f3d36c49b1fe2ef850',
+                'sample-2.out': 'e14b420b7266f69a2b2b457f3bbec804',
+                'sample-3.in':  'ed5d34c74e59d16bd6d5b3683db655c3',
+                'sample-3.out': 'e14b420b7266f69a2b2b457f3bbec804',
+            },
         }
         self.snippet_call_download(problems)
 
