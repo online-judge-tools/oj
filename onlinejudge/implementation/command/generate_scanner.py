@@ -198,7 +198,7 @@ def generate_scanner(args):
         it = export(it, use_scanf=args.scanf, repeat_macro=args.repeat_macro)
         log.debug('result: %s', repr(it))
     except:
-        log.error('somethin wrong')
+        log.error('something wrong')
         raise
     log.success('success:')
     print(log.bold(it.rstrip()))  # to stdout
