@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 from setuptools import setup, find_packages
-from onlinejudge.implementation.version import __author__, __email__, __license__, __url__, __version__
+
+import imp
+def load_module(module_path):
+    path = None
+    for name in module_path.split('.'):
+        file, path, description = imp.find_module(name, path)
+        path = [ path ]
+    return imp.load_module(name, file, path[0], description)
+version = load_module('onlinejudge.implementation.version')
 
 with open('readme.md') as fh:
     readme = fh.read()
 
 setup(
     name='online-judge-tools',
-    version=__version__,
+    version=version.__version__,
     description='Tools for online-judge services',
     install_requires=[
         'requests',
@@ -17,10 +25,10 @@ setup(
         'selenium',
     ],
     long_description=readme,
-    author=__author__,
-    author_email=__email__,
-    url=__url__,
-    license=__license__,
+    author=version.__author__,
+    author_email=version.__email__,
+    url=version.__url__,
+    license=version.__license__,
     packages=find_packages(exclude=( 'tests', 'docs' )),
     scripts=[ 'oj' ],
     classifiers=[
