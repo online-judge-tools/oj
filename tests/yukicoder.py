@@ -39,5 +39,10 @@ class YukicoderTest(unittest.TestCase):
         it = list(filter(lambda row: row['Wikiページ'] == 'decomposable_searching_problem', data))
         self.assertEqual(len(it), 1)
 
+    def test_get_submissions(self):
+        data = YukicoderService().get_submissions(page=3, status='TLE')
+        self.assertEqual(len(data), 50)
+        self.assertEqual(data[4]['結果'], 'TLE')
+
 if __name__ == '__main__':
     unittest.main()
