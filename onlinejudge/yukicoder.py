@@ -125,7 +125,7 @@ class YukicoderService(onlinejudge.service.Service):
                 elif column == 'タグ':
                     # NOTE: 現在(2017/11/01)の仕様だと 練習モード「ゆるふわ」 でないとACしててもタグが非表示
                     # NOTE: ログインしてないとタグが非表示の仕様
-                    # TODO: ログインしてるはずだけどrequestsからGETしてもタグが降ってこない
+                    # NOTE: ログインしてるはずだけどrequestsからGETしてもタグが降ってこない場合は適切な Session objectを指定してるか確認
                     row[column] = row[column].text.strip().split()
                 else:
                     row[column] = row[column].text.strip()
