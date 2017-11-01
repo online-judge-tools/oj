@@ -102,6 +102,8 @@ class YukicoderService(onlinejudge.service.Service):
         assert columns == [ '#', '提出時間', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]
         for row in rows:
             for column in columns:
+                if row[column].find('a'):
+                    row[column + '/url'] = row[column].find('a').attrs.get('href')
                 if column == '#':
                     row[column] = int(row[column].text)
                 else:
@@ -115,6 +117,8 @@ class YukicoderService(onlinejudge.service.Service):
         assert columns == [ 'ナンバー', '問題名', 'レベル', 'タグ', '時間制限', 'メモリ制限', '作問者' ]
         for row in rows:
             for column in columns:
+                if row[column].find('a'):
+                    row[column + '/url'] = row[column].find('a').attrs.get('href')
                 if column == 'ナンバー':
                     row[column] = int(row[column].text)
                 elif column == 'レベル':
@@ -138,6 +142,7 @@ class YukicoderService(onlinejudge.service.Service):
         assert columns == [ 'Wikiページ' ]
         for row in rows:
             for column in columns:
+                row[column + '/url'] = row[column].find('a').attrs.get('href')
                 row[column] = row[column].text.strip()
         return rows
 
@@ -154,6 +159,8 @@ class YukicoderService(onlinejudge.service.Service):
         assert columns == [ '#', '提出日時', '', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]  # 空白は「このユーザーの提出の表示」の虫眼鏡のため
         for row in rows:
             for column in columns:
+                if column and row[column].find('a'):
+                    row[column + '/url'] = row[column].find('a').attrs.get('href')
                 if column == '#':
                     row[column] = int(row[column].text)
                 elif column == '':
