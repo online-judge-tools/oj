@@ -85,6 +85,10 @@ class DownloadTest(unittest.TestCase):
                 'sample-5.in':  'b80447e0bc0c4ecc6fb3001b6a4e79f6',
                 'sample-5.out': 'c30f7472766d25af1dc80b3ffc9a58c7',
             },
+            'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=2511': {
+                'test/sample-1.in',  '0483a0080de977d5e1db1ab87eae3fa9',
+                'test/sample-1.out', '346ce6367eff6bb3c9915601f2ae1e75',
+            },
         }
         self.snippet_call_download(problems)
 
