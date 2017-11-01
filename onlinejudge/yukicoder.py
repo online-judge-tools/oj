@@ -1,4 +1,5 @@
 # Python Version: 3.x
+# -*- coding: utf-8 -*-
 import onlinejudge.service
 import onlinejudge.problem
 import onlinejudge.submission
@@ -10,6 +11,7 @@ import io
 import os.path
 import posixpath
 import bs4
+import json
 import requests
 import urllib.parse
 import zipfile
@@ -77,6 +79,21 @@ class YukicoderService(onlinejudge.service.Service):
                 and result.netloc == 'yukicoder.me':
             return cls()
 
+    # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
+    def get_user(self, id=None, name=None, session=None):
+        assert (id is not None) != (name is not None)
+        if id is not None:
+            assert isinstance(id, int)
+            url = 'https://yukicoder.me/api/v1/user/%d' % id
+        else:
+            url = 'https://yukicoder.me/api/v1/user/name/%s' % urllib.parse.quote(name)
+        session = session or utils.new_default_session()
+        try:
+            resp = utils.request('GET', url, session=session)
+        except requests.exceptions.HTTPError:
+            # {"Message":"指定したユーザーは存在しません"} がbodyに入っているはずだがNoneに潰す
+            return None
+        return json.loads(resp.content.decode(resp.encoding))
 
 class YukicoderProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_no=None, problem_id=None):
