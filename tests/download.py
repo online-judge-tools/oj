@@ -291,12 +291,6 @@ class DownloadTest(unittest.TestCase):
                 'sample-2.out': 'e14b420b7266f69a2b2b457f3bbec804',
                 'sample-3.in':  '80ad60f95c32a3f6e413b5bb7c094e99',
                 'sample-3.out': '3ae2ea0c3867b219ef54d914437e76be',
-                'sample-4.in':  '22cab69bca05d296a2d779a52cdee643',
-                'sample-4.out': '3ae2ea0c3867b219ef54d914437e76be',
-                'sample-5.in':  '8faff61bc1198cc6bdc19adafc27fc82',
-                'sample-5.out': 'e14b420b7266f69a2b2b457f3bbec804',
-                'sample-6.in':  '80ad60f95c32a3f6e413b5bb7c094e99',
-                'sample-6.out': '3ae2ea0c3867b219ef54d914437e76be',
             })
     def test_call_download_atcoder_ddcc2017_qual_a(self):
         self.snippet_call_download(
