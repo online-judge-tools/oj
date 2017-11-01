@@ -19,7 +19,7 @@ import time
 import selenium.webdriver
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
-html_parser = 'html.parser'  # TODO: this is NOT a utility.
+html_parser = 'lxml'
 
 def parcentformat(s, table):
     assert '%' not in table or table['%'] == '%'

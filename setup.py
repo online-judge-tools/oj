@@ -19,6 +19,7 @@ setup(
     description='Tools for online-judge services',
     install_requires=[
         'requests',
+        'lxml',
         'beautifulsoup4',
         'colorama',
         'sympy',
