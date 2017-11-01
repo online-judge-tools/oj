@@ -1,4 +1,5 @@
 # Python Version: 3.x
+# -*- coding: utf-8 -*-
 import onlinejudge.service
 import onlinejudge.problem
 import onlinejudge.submission
@@ -10,6 +11,7 @@ import io
 import os.path
 import posixpath
 import bs4
+import json
 import requests
 import urllib.parse
 import zipfile
@@ -77,6 +79,84 @@ class YukicoderService(onlinejudge.service.Service):
                 and result.netloc == 'yukicoder.me':
             return cls()
 
+    # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
+    def get_user(self, id=None, name=None, session=None):
+        assert (id is not None) != (name is not None)
+        if id is not None:
+            assert isinstance(id, int)
+            url = 'https://yukicoder.me/api/v1/user/%d' % id
+        else:
+            url = 'https://yukicoder.me/api/v1/user/name/%s' % urllib.parse.quote(name)
+        session = session or utils.new_default_session()
+        try:
+            resp = utils.request('GET', url, session=session)
+        except requests.exceptions.HTTPError:
+            # {"Message":"指定したユーザーは存在しません"} がbodyに入っているはずだがNoneに潰す
+            return None
+        return json.loads(resp.content.decode(resp.encoding))
+
+    # example: https://yukicoder.me/users/237/favorite
+    def get_user_favorite(self, id, session=None):
+        url = 'https://yukicoder.me/users/%d/favorite' % id
+        columns, rows = self._get_and_parse_the_table(url, session=session)
+        assert columns == [ '#', '提出時間', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]
+        for row in rows:
+            for column in columns:
+                if column == '#':
+                    row[column] = int(row[column].text)
+                else:
+                    row[column] = row[column].text.strip()
+        return rows
+
+    # example: https://yukicoder.me/users/504/favoriteProblem
+    def get_user_favorite_problem(self, id, session=None):
+        url = 'https://yukicoder.me/users/%d/favoriteProblem' % id
+        columns, rows = self._get_and_parse_the_table(url, session=session)
+        assert columns == [ 'ナンバー', '問題名', 'レベル', 'タグ', '時間制限', 'メモリ制限', '作問者' ]
+        for row in rows:
+            for column in columns:
+                if column == 'ナンバー':
+                    row[column] = int(row[column].text)
+                elif column == 'レベル':
+                    star = 0.0
+                    star += len(row[column].find_all(class_='fa-star'))
+                    star += 0.5 * len(row[column].find_all(class_='fa-star-half-full'))
+                    row[column] = star
+                elif column == 'タグ':
+                    # NOTE: 現在(2017/11/01)の仕様だと 練習モード「ゆるふわ」 でないとACしててもタグが非表示
+                    # NOTE: ログインしてないとタグが非表示の仕様
+                    # TODO: ログインしてるはずだけどrequestsからGETしてもタグが降ってこない
+                    row[column] = row[column].text.strip().split()
+                else:
+                    row[column] = row[column].text.strip()
+        return rows
+
+    # example: https://yukicoder.me/users/1786/favoriteWiki
+    def get_user_favorite_wiki(self, id, session=None):
+        url = 'https://yukicoder.me/users/%d/favoriteWiki' % id
+        columns, rows = self._get_and_parse_the_table(url, session=session)
+        assert columns == [ 'Wikiページ' ]
+        for row in rows:
+            for column in columns:
+                row[column] = row[column].text.strip()
+        return rows
+
+    # TODO: 複数ページになってる場合の対応ができてない そもそも複数になることあるのかすら不明
+    def _get_and_parse_the_table(self, url, session=None):
+        # get
+        session = session or utils.new_default_session()
+        resp = utils.request('GET', url, session=session)
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        assert len(soup.find_all('table')) == 1
+        table = soup.find('table')
+        columns = [ th.text.strip() for th in table.find('thead').find('tr') if th.name == 'th' ]
+        data = []
+        for row in table.find('tbody').find_all('tr'):
+            values = [ td for td in row if td.name == 'td' ]
+            assert len(columns) == len(values)
+            data += [ dict(zip(columns, values)) ]
+        return columns, data
 
 class YukicoderProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_no=None, problem_id=None):
