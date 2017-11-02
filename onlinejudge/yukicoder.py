@@ -102,6 +102,8 @@ class YukicoderService(onlinejudge.service.Service):
         assert columns == [ '#', '提出時間', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]
         for row in rows:
             for column in columns:
+                if row[column].find('a'):
+                    row[column + '/url'] = row[column].find('a').attrs.get('href')
                 if column == '#':
                     row[column] = int(row[column].text)
                 else:
@@ -115,6 +117,8 @@ class YukicoderService(onlinejudge.service.Service):
         assert columns == [ 'ナンバー', '問題名', 'レベル', 'タグ', '時間制限', 'メモリ制限', '作問者' ]
         for row in rows:
             for column in columns:
+                if row[column].find('a'):
+                    row[column + '/url'] = row[column].find('a').attrs.get('href')
                 if column == 'ナンバー':
                     row[column] = int(row[column].text)
                 elif column == 'レベル':
@@ -125,7 +129,7 @@ class YukicoderService(onlinejudge.service.Service):
                 elif column == 'タグ':
                     # NOTE: 現在(2017/11/01)の仕様だと 練習モード「ゆるふわ」 でないとACしててもタグが非表示
                     # NOTE: ログインしてないとタグが非表示の仕様
-                    # TODO: ログインしてるはずだけどrequestsからGETしてもタグが降ってこない
+                    # NOTE: ログインしてるはずだけどrequestsからGETしてもタグが降ってこない場合は適切な Session objectを指定してるか確認
                     row[column] = row[column].text.strip().split()
                 else:
                     row[column] = row[column].text.strip()
@@ -138,10 +142,33 @@ class YukicoderService(onlinejudge.service.Service):
         assert columns == [ 'Wikiページ' ]
         for row in rows:
             for column in columns:
+                row[column + '/url'] = row[column].find('a').attrs.get('href')
                 row[column] = row[column].text.strip()
         return rows
 
-    # TODO: 複数ページになってる場合の対応ができてない そもそも複数になることあるのかすら不明
+    # example: https://yukicoder.me/submissions?page=4220
+    # example: https://yukicoder.me/submissions?page=2192&status=AC
+    # NOTE: 1ページしか読まない 全部欲しい場合は呼び出し側で頑張る
+    def get_submissions(self, page, status=None, session=None):
+        assert isinstance(page, int) and page >= 1
+        url = 'https://yukicoder.me/submissions?page=%d' % page
+        if status is not None:
+            assert status in 'AC WA RE TLE MLE OLE J_TLE CE WJ Judge NoOut IE'.split()
+            url += '&status=' + status
+        columns, rows = self._get_and_parse_the_table(url, session=session)
+        assert columns == [ '#', '提出日時', '', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]  # 空白は「このユーザーの提出の表示」の虫眼鏡のため
+        for row in rows:
+            for column in columns:
+                if column and row[column].find('a'):
+                    row[column + '/url'] = row[column].find('a').attrs.get('href')
+                if column == '#':
+                    row[column] = int(row[column].text)
+                elif column == '':
+                    del row[column]
+                else:
+                    row[column] = row[column].text.strip()
+        return rows
+
     def _get_and_parse_the_table(self, url, session=None):
         # get
         session = session or utils.new_default_session()
