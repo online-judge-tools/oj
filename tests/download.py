@@ -94,8 +94,8 @@ class DownloadTest(unittest.TestCase):
     def test_call_download_aoj_2511(self):
         self.snippet_call_download(
             'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=2511', {
-                'test/sample-1.in':  '0483a0080de977d5e1db1ab87eae3fa9',
-                'test/sample-1.out': '346ce6367eff6bb3c9915601f2ae1e75',
+                'sample-1.in':  '0483a0080de977d5e1db1ab87eae3fa9',
+                'sample-1.out': '346ce6367eff6bb3c9915601f2ae1e75',
             })
 
     def test_call_download_aoj_system_ITP1_1_B(self):
