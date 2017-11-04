@@ -168,9 +168,12 @@ class YukicoderService(onlinejudge.service.Service):
 
     # example: https://yukicoder.me/problems?page=2
     # NOTE: loginしてると
-    def get_problems(self, page, comp_problem=True, sort=None, session=None):
+    def get_problems(self, page, comp_problem=True, other=False, sort=None, session=None):
         assert isinstance(page, int) and page >= 1
-        url = 'https://yukicoder.me/problems?page=%d' % page
+        url = 'https://yukicoder.me/problems'
+        if other:
+            url += '/other'
+        url += '?page=%d' % page
         if comp_problem:  # 未完成問題は(ログインしてても)デフォルトで除外
             url += '&comp_problem=on'
         if sort is not None:
