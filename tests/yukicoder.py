@@ -32,7 +32,7 @@ class YukicoderTest(unittest.TestCase):
         self.assertEqual(len(it), 1)
         it = it[0]
         self.assertEqual(it['問題名'], 'あばばばば')
-        self.assertAlmostEqual(it['レベル'], 1.5)
+        self.assertEqual(it['レベル'], '1.5')
 
     def test_get_user_favorite_wiki_10(self):
         data = YukicoderService().get_user_favorite_wiki(id=10)
@@ -43,6 +43,14 @@ class YukicoderTest(unittest.TestCase):
         data = YukicoderService().get_submissions(page=3, status='TLE')
         self.assertEqual(len(data), 50)
         self.assertEqual(data[4]['結果'], 'TLE')
+
+    def test_get_problems(self):
+        data = YukicoderService().get_problems(page=2, sort='no_asc')
+        self.assertEqual(len(data), 50)
+        self.assertEqual(data[3]['ナンバー'], 54)
+        self.assertEqual(data[3]['問題名'], "Happy Hallowe'en")
+        self.assertEqual(data[3]['レベル'], '4')
+        self.assertEqual(data[3]['作問者/url'], '/users/4')
 
 if __name__ == '__main__':
     unittest.main()
