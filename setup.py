@@ -10,7 +10,7 @@ def load_module(module_path):
     return imp.load_module(name, file, path[0], description)
 version = load_module('onlinejudge.implementation.version')
 
-with open('readme.md') as fh:
+with open('readme.md', encoding='utf-8') as fh:
     readme = fh.read()
 
 setup(
