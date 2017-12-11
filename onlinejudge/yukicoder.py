@@ -122,10 +122,7 @@ class YukicoderService(onlinejudge.service.Service):
                 if column == 'ナンバー':
                     row[column] = int(row[column].text)
                 elif column == 'レベル':
-                    star = 0.0
-                    star += len(row[column].find_all(class_='fa-star'))
-                    star += 0.5 * len(row[column].find_all(class_='fa-star-half-full'))
-                    row[column] = star
+                    row[column] = self._parse_star(row[column])
                 elif column == 'タグ':
                     # NOTE: 現在(2017/11/01)の仕様だと 練習モード「ゆるふわ」 でないとACしててもタグが非表示
                     # NOTE: ログインしてないとタグが非表示の仕様
@@ -169,6 +166,37 @@ class YukicoderService(onlinejudge.service.Service):
                     row[column] = row[column].text.strip()
         return rows
 
+    # example: https://yukicoder.me/problems?page=2
+    # NOTE: loginしてると
+    def get_problems(self, page, comp_problem=True, other=False, sort=None, session=None):
+        assert isinstance(page, int) and page >= 1
+        url = 'https://yukicoder.me/problems'
+        if other:
+            url += '/other'
+        url += '?page=%d' % page
+        if comp_problem:  # 未完成問題は(ログインしてても)デフォルトで除外
+            url += '&comp_problem=on'
+        if sort is not None:
+            assert sort in ( 'no_asc', 'level_asc', 'level_desc', 'solved_asc', 'solved_desc', 'fav_asc', 'fav_desc', )
+            url += '&sort=' + sort
+        columns, rows = self._get_and_parse_the_table(url, session=session)
+        assert columns == [ 'ナンバー', '問題名', 'レベル', 'タグ', '作問者', '解いた人数', 'Fav' ]
+        for row in rows:
+            for column in columns:
+                if column and row[column].find('a'):
+                    row[column + '/url'] = row[column].find('a').attrs.get('href')
+                if column in ( 'ナンバー', '解いた人数', 'Fav' ):
+                    row[column] = int(row[column].text)
+                elif column == 'レベル':
+                    row[column] = self._parse_star(row[column])
+                elif column == 'タグ':
+                    # NOTE: ログインしてないとタグが非表示の仕様
+                    # NOTE: ログインしてるはずだけどrequestsからGETしてもタグが降ってこない場合は適切な Session objectを指定してるか確認
+                    row[column] = row[column].text.strip().split()
+                else:
+                    row[column] = row[column].text.strip()
+        return rows
+
     def _get_and_parse_the_table(self, url, session=None):
         # get
         session = session or utils.new_default_session()
@@ -184,6 +212,12 @@ class YukicoderService(onlinejudge.service.Service):
             assert len(columns) == len(values)
             data += [ dict(zip(columns, values)) ]
         return columns, data
+
+    def _parse_star(self, tag):
+        star = str(len(tag.find_all(class_='fa-star')))
+        if tag.find_all(class_='fa-star-half-full'):
+            star += '.5'
+        return star  # str
 
 class YukicoderProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_no=None, problem_id=None):
