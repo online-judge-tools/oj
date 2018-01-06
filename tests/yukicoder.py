@@ -7,6 +7,13 @@ class YukicoderTest(unittest.TestCase):
 
     def test_get_user_10(self):
         data = YukicoderService().get_user(id=10)
+        self.assertIn('Id', data)
+        self.assertIn('Name', data)
+        self.assertIn('Solved', data)
+        self.assertIn('Level', data)
+        self.assertIn('Rank', data)
+        self.assertIn('Score', data)
+        self.assertIn('Points', data)
         self.assertEqual(data['Id'], 10)
         self.assertEqual(data['Name'], 'yuki2006')
     def test_get_user_yuki2006(self):
