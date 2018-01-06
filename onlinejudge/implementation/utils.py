@@ -141,7 +141,8 @@ class SampleZipper(object):
             self.dangling = { 'data': s, 'name': name }
         else:
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
-                log.warning('strange name for output string: %s', name)
+                if not (re.search('output', name, re.IGNORECASE) or re.search('出力', name)):  # to ignore titles like "Output for Sample Input 1"
+                    log.warning('strange name for output string: %s', name)
             self.data += [ {
                 'input': self.dangling,
                 'output': { 'data': s, 'name': name },
