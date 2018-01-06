@@ -35,6 +35,19 @@ def path_from_format(format, name, ext):
     table['e'] = ext
     return utils.parcentformat(format, table)
 
+def is_backup_or_hidden_file(path):
+    basename = os.path.basename(path)
+    return basename.endswith('~') or (basename.startswith('#') and basename.endswith('#')) or basename.startswith('.')
+
+def drop_backup_or_hidden_files(paths):
+    result = []
+    for path in paths:
+        if is_backup_or_hidden_file(path):
+            log.warning('ignore a backup file: %s', path)
+        else:
+            result += [ path ]
+    return result
+
 def construct_relationship_of_files(paths, format):
     tests = collections.defaultdict(dict)
     for path in paths:
@@ -82,6 +95,8 @@ def compare_as_floats(xs, ys, error):
 def test(args):
     if not args.test:
         args.test = glob_with_format(args.format) # by default
+    if args.ignore_backup:
+        args.test = drop_backup_or_hidden_files(args.test)
     tests = construct_relationship_of_files(args.test, args.format)
     # run tests
     if args.error: # float mode
@@ -163,6 +178,8 @@ def test(args):
 def generate_output(args):
     if not args.test:
         args.test = glob_with_format(args.format) # by default
+    if args.ignore_backup:
+        args.test = drop_backup_or_hidden_files(args.test)
     tests = construct_relationship_of_files(args.test, args.format)
     for name, it in sorted(tests.items()):
         log.emit('')
