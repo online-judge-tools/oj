@@ -79,14 +79,14 @@ class YukicoderService(onlinejudge.service.Service):
                 and result.netloc == 'yukicoder.me':
             return cls()
 
-    # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
-    def get_user(self, id=None, name=None, session=None):
+    def _issue_official_api(self, api, id=None, name=None, session=None):
         assert (id is not None) != (name is not None)
         if id is not None:
             assert isinstance(id, int)
-            url = 'https://yukicoder.me/api/v1/user/%d' % id
+            sometihng = { 'user': '', 'solved': 'id/' }[api]
+            url = 'https://yukicoder.me/api/v1/{}/{}{}'.format(api, sometihng, id)
         else:
-            url = 'https://yukicoder.me/api/v1/user/name/%s' % urllib.parse.quote(name)
+            url = 'https://yukicoder.me/api/v1/{}/name/{}'.format(api, urllib.parse.quote(name))
         session = session or utils.new_default_session()
         try:
             resp = utils.request('GET', url, session=session)
@@ -94,6 +94,15 @@ class YukicoderService(onlinejudge.service.Service):
             # {"Message":"指定したユーザーは存在しません"} がbodyに入っているはずだがNoneに潰す
             return None
         return json.loads(resp.content.decode(resp.encoding))
+
+    # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
+    def get_user(self, *args, **kwargs):
+        return self._issue_official_api('user', *args, **kwargs)
+
+    # https://twitter.com/yukicoder/status/935943170210258944
+    # example: [{"No":46,"ProblemId":43,"Title":"はじめのn歩","AuthorId":25,"TesterId":0,"Level":1,"ProblemType":0,"Tags":"実装"}]
+    def get_solved(self, *args, **kwargs):
+        return self._issue_official_api('solved', *args, **kwargs)
 
     # example: https://yukicoder.me/users/237/favorite
     def get_user_favorite(self, id, session=None):
@@ -306,74 +315,6 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 if dirname == '/problems':
                     return cls(problem_id=int(n))
             return cls()
-
-    # Fri Jan  6 16:49:14 JST 2017
-    _language_dict = {}
-    _language_dict['cpp']        = { 'description': 'C++11 (gcc 4.8.5)' }
-    _language_dict['cpp14' ]     = { 'description': 'C++14 (gcc 6.2.0)' }
-    _language_dict['c']          = { 'description': 'C (gcc 4.8.5)' }
-    _language_dict['java8']      = { 'description': 'Java8 (openjdk 1.8.0_111)' }
-    _language_dict['csharp']     = { 'description': 'C# (mono 4.6.1)' }
-    _language_dict['perl']       = { 'description': 'Perl (5.16.3)' }
-    _language_dict['perl6']      = { 'description': 'Perl6 (rakudo 2016.10-114-g8e79509)' }
-    _language_dict['php']        = { 'description': 'PHP (5.4.16)' }
-    _language_dict['python']     = { 'description': 'Python2 (2.7.11)' }
-    _language_dict['python3']    = { 'description': 'Python3 (3.5.1)' }
-    _language_dict['pypy2']      = { 'description': 'PyPy2 (4.0.0)' }
-    _language_dict['pypy3']      = { 'description': 'PyPy3 (2.4.0)' }
-    _language_dict['ruby']       = { 'description': 'Ruby (2.3.1p112)' }
-    _language_dict['d']          = { 'description': 'D (dmd 2.071.1)' }
-    _language_dict['go']         = { 'description': 'Go (1.7.3)' }
-    _language_dict['haskell']    = { 'description': 'Haskell (7.8.3)' }
-    _language_dict['scala']      = { 'description': 'Scala (2.11.8)' }
-    _language_dict['nim']        = { 'description': 'Nim (0.15.2)' }
-    _language_dict['rust']       = { 'description': 'Rust (1.12.1)' }
-    _language_dict['kotlin']     = { 'description': 'Kotlin (1.0.2)' }
-    _language_dict['scheme']     = { 'description': 'Scheme (Gauche-0.9.4)' }
-    _language_dict['crystal']    = { 'description': 'Crystal (0.19.4)' }
-    _language_dict['ocaml']      = { 'description': 'OCaml (4.01.1)' }
-    _language_dict['fsharp']     = { 'description': 'F# (4.0)' }
-    _language_dict['elixir']     = { 'description': 'Elixir (0.12.5)' }
-    _language_dict['lua']        = { 'description': 'Lua (LuaJit 2.0.4)' }
-    _language_dict['fortran']    = { 'description': 'Fortran (gFortran 4.8.5)' }
-    _language_dict['node']       = { 'description': 'JavaScript (node v7.0.0)' }
-    _language_dict['vim']        = { 'description': 'Vim script (v8.0.0124)' }
-    _language_dict['sh']         = { 'description': 'Bash (Bash 4.2.46)' }
-    _language_dict['text']       = { 'description': 'Text (cat 8.22)' }
-    _language_dict['nasm']       = { 'description': 'Assembler (nasm 2.10.07)' }
-    _language_dict['bf']         = { 'description': 'Brainfuck (BFI 1.1)' }
-    _language_dict['Whitespace'] = { 'description': 'Whitespace (0.3)' }
-    def get_language_dict(self, session=None):  # TODO: get dynamically
-        return self.__class__._language_dict
-
-    def submit(self, code, language, session=None):
-        assert language in self.get_language_dict(session=session)
-        session = session or utils.new_default_session()
-        # get
-        resp = utils.request('GET', self.get_url() + '/submit', session=session)
-        # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        form = soup.find('form', action=re.compile(r'/submit$'))
-        if not form:
-            log.error('form not found')
-            return None
-        log.debug('form: %s', str(form))
-        # post
-        form = utils.FormSender(form, url=resp.url)
-        if False:
-            form.set('source', code)
-        else:
-            form.set_file('file', ('source', code))
-        form.set('lang', language)
-        resp = form.request(session=session)
-        resp.raise_for_status()
-        # result
-        if '/submissions/' in resp.url:
-            log.success('success: result: %s', resp.url)
-            return onlinejudge.submission.CompatibilitySubmission(resp.url, problem=self)
-        else:
-            log.failure('failure')
-            return None
 
     def get_service(self):
         return YukicoderService()
