@@ -271,7 +271,7 @@ example:
     # code statistics
     subparser = subparsers.add_parser('code-statistics',
             aliases=[ 'c/s' ],
-            help='print the code statistics used in AnarchyGolf',
+            help='print the code statistics used in Anarchy Golf',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
 ''')
