@@ -144,8 +144,9 @@ tips:
             epilog='''\
 supported services:
   AtCoder
-  Yukicoder
   HackerRank
+
+  (Yukicoder has been removed)
 
 example:
   http://agc001.contest.atcoder.jp/tasks/agc001_a
