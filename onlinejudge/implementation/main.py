@@ -10,6 +10,7 @@ from onlinejudge.implementation.command.generate_scanner import generate_scanner
 from onlinejudge.implementation.command.test import test, generate_output
 from onlinejudge.implementation.command.split_input import split_input, split_input_auto_footer
 from onlinejudge.implementation.command.test_reactive import test_reactive
+from onlinejudge.implementation.command.code_statistics import code_statistics
 import argparse
 import sys
 import os
@@ -267,6 +268,15 @@ example:
     subparser.add_argument('--shell', action='store_true', help='use the judge  and --command as a shellscript instead of a path')
     subparser.add_argument('judge', help='judge program using standard I/O')
 
+    # code statistics
+    subparser = subparsers.add_parser('code-statistics',
+            aliases=[ 'c/s' ],
+            help='print the code statistics used in AnarchyGolf',
+            formatter_class=argparse.RawTextHelpFormatter,
+            epilog='''\
+''')
+    subparser.add_argument('file')
+
     args = parser.parse_args(args=args)
 
     # logging
@@ -296,6 +306,8 @@ example:
         generate_output(args)
     elif args.subcommand in [ 'split-input', 's/i' ]:
         split_input(args)
+    elif args.subcommand in [ 'code-statistics', 'c/s' ]:
+        code_statistics(args)
     else:
         parser.print_help(file=sys.stderr)
         sys.exit(1)
