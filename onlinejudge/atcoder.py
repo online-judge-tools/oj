@@ -204,7 +204,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
         # get
-        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
+        url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)  # TODO: use beta.atcoder.jp
         resp = utils.request('GET', url, session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
@@ -231,7 +231,9 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             # example: https://practice.contest.atcoder.jp/submissions/me#32174
             # CAUTION: this URL is not a URL of the submission
             log.success('success: result: %s', resp.url)
-            return onlinejudge.submission.CompatibilitySubmission(resp.url)
+            # NOTE: ignore the returned legacy URL and use beta.atcoder.jp's one
+            url = 'https://beta.atcoder.jp/contests/{}/submissions/me'.format(self.contest_id)
+            return onlinejudge.submission.CompatibilitySubmission(url)
         else:
             log.failure('failure')
             return None
