@@ -7,6 +7,13 @@ class YukicoderTest(unittest.TestCase):
 
     def test_get_user_10(self):
         data = YukicoderService().get_user(id=10)
+        self.assertIn('Id', data)
+        self.assertIn('Name', data)
+        self.assertIn('Solved', data)
+        self.assertIn('Level', data)
+        self.assertIn('Rank', data)
+        self.assertIn('Score', data)
+        self.assertIn('Points', data)
         self.assertEqual(data['Id'], 10)
         self.assertEqual(data['Name'], 'yuki2006')
     def test_get_user_yuki2006(self):
@@ -15,6 +22,24 @@ class YukicoderTest(unittest.TestCase):
         self.assertEqual(data['Name'], 'yuki2006')
     def test_get_user_0(self):
         data = YukicoderService().get_user(id=0)
+        self.assertIs(data, None)
+
+    def test_get_solved_10(self):
+        data = YukicoderService().get_solved(id=10)
+        self.assertGreater(len(data), 200)
+        self.assertIn('No', data[0])
+        self.assertIn('ProblemId', data[0])
+        self.assertIn('Title', data[0])
+        self.assertIn('AuthorId', data[0])
+        self.assertIn('TesterId', data[0])
+        self.assertIn('Level', data[0])
+        self.assertIn('ProblemType', data[0])
+        self.assertIn('Tags', data[0])
+    def test_get_solved_yuki2006(self):
+        data = YukicoderService().get_solved(name='yuki2006')
+        self.assertGreater(len(data), 200)
+    def test_get_solved_0(self):
+        data = YukicoderService().get_solved(id=0)
         self.assertIs(data, None)
 
     def test_get_user_favorite_10(self):

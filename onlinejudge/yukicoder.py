@@ -79,14 +79,14 @@ class YukicoderService(onlinejudge.service.Service):
                 and result.netloc == 'yukicoder.me':
             return cls()
 
-    # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
-    def get_user(self, id=None, name=None, session=None):
+    def _issue_official_api(self, api, id=None, name=None, session=None):
         assert (id is not None) != (name is not None)
         if id is not None:
             assert isinstance(id, int)
-            url = 'https://yukicoder.me/api/v1/user/%d' % id
+            sometihng = { 'user': '', 'solved': 'id/' }[api]
+            url = 'https://yukicoder.me/api/v1/{}/{}{}'.format(api, sometihng, id)
         else:
-            url = 'https://yukicoder.me/api/v1/user/name/%s' % urllib.parse.quote(name)
+            url = 'https://yukicoder.me/api/v1/{}/name/{}'.format(api, urllib.parse.quote(name))
         session = session or utils.new_default_session()
         try:
             resp = utils.request('GET', url, session=session)
@@ -94,6 +94,15 @@ class YukicoderService(onlinejudge.service.Service):
             # {"Message":"指定したユーザーは存在しません"} がbodyに入っているはずだがNoneに潰す
             return None
         return json.loads(resp.content.decode(resp.encoding))
+
+    # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
+    def get_user(self, *args, **kwargs):
+        return self._issue_official_api('user', *args, **kwargs)
+
+    # https://twitter.com/yukicoder/status/935943170210258944
+    # example: [{"No":46,"ProblemId":43,"Title":"はじめのn歩","AuthorId":25,"TesterId":0,"Level":1,"ProblemType":0,"Tags":"実装"}]
+    def get_solved(self, *args, **kwargs):
+        return self._issue_official_api('solved', *args, **kwargs)
 
     # example: https://yukicoder.me/users/237/favorite
     def get_user_favorite(self, id, session=None):
