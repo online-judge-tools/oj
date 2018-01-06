@@ -17,6 +17,24 @@ class YukicoderTest(unittest.TestCase):
         data = YukicoderService().get_user(id=0)
         self.assertIs(data, None)
 
+    def test_get_solved_10(self):
+        data = YukicoderService().get_solved(id=10)
+        self.assertGreater(len(data), 200)
+        self.assertIn('No', data[0])
+        self.assertIn('ProblemId', data[0])
+        self.assertIn('Title', data[0])
+        self.assertIn('AuthorId', data[0])
+        self.assertIn('TesterId', data[0])
+        self.assertIn('Level', data[0])
+        self.assertIn('ProblemType', data[0])
+        self.assertIn('Tags', data[0])
+    def test_get_solved_yuki2006(self):
+        data = YukicoderService().get_solved(name='yuki2006')
+        self.assertGreater(len(data), 200)
+    def test_get_solved_0(self):
+        data = YukicoderService().get_solved(id=0)
+        self.assertIs(data, None)
+
     def test_get_user_favorite_10(self):
         data = YukicoderService().get_user_favorite(id=10)
         it = list(filter(lambda row: row['#'] == 10000, data))
