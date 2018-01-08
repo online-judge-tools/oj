@@ -102,7 +102,13 @@ def test(args):
     if args.error: # float mode
         match = lambda a, b: compare_as_floats(a, b, args.error)
     else:
-        match = lambda a, b: a == b
+        def match(a, b):
+            if a == b:
+                return True
+            if args.rstrip and a.rstrip(rstrip_targets) == b.rstrip(rstrip_targets):
+                log.warning('WA if no rstrip')
+                return True
+            return False
     rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
     slowest, slowest_name = -1, ''
     ac_count = 0
@@ -125,8 +131,6 @@ def test(args):
             answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
             answer = answer.decode()
-            if args.rstrip:
-                answer = answer.rstrip(rstrip_targets)
             if slowest < end - begin:
                 slowest = end - begin
                 slowest_name = name
@@ -148,8 +152,6 @@ def test(args):
         if 'out' in it:
             with open(it['out']) as outf:
                 correct = outf.read()
-            if args.rstrip:
-                correct = correct.rstrip(rstrip_targets)
             # compare
             if args.mode == 'all':
                 if not match(answer, correct):
