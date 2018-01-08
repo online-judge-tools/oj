@@ -126,13 +126,13 @@ def test(args):
             proc.terminate()
 
         # check TLE, RE or not
-        is_ac = True
+        result = 'AC'
         if proc.returncode is None:
             log.failure(log.red('TLE'))
-            is_ac = False
+            result = 'TLE'
         elif proc.returncode != 0:
             log.failure(log.red('RE') + ': return code %d', proc.returncode)
-            is_ac = False
+            result = 'RE'
 
         # check WA or not
         if 'out' in it:
@@ -147,7 +147,7 @@ def test(args):
                     if not args.silent:
                         log.emit('output:\n%s', log.bold(answer))
                         log.emit('expected:\n%s', log.bold(correct))
-                    is_ac = False
+                    result = 'WA'
             elif args.mode == 'line':
                 answer  = answer .splitlines()
                 correct = correct.splitlines()
@@ -156,19 +156,19 @@ def test(args):
                         break
                     elif x is None:
                         log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i, log.bold(y))
-                        is_ac = False
+                        result = 'WA'
                     elif y is None:
                         log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i, log.bold(x))
-                        is_ac = False
+                        result = 'WA'
                     elif not match(x, y):
                         log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i, log.bold(x), log.bold(y))
-                        is_ac = False
+                        result = 'WA'
             else:
                 assert False
         else:
             if not args.silent:
                 log.emit(log.bold(answer))
-        if is_ac:
+        if result == 'AC':
             log.success(log.green('AC'))
             ac_count += 1
 
