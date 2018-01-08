@@ -108,6 +108,14 @@ def test(args):
     ac_count = 0
 
     for name, it in sorted(tests.items()):
+        is_printed_input = not args.print_input
+        def print_input():
+            nonlocal is_printed_input
+            if not is_printed_input:
+                is_printed_input = True
+                with open(it['in']) as inf:
+                    log.emit('input:\n%s', log.bold(inf.read()))
+
         log.emit('')
         log.info('%s', name)
 
@@ -130,9 +138,11 @@ def test(args):
         if proc.returncode is None:
             log.failure(log.red('TLE'))
             result = 'TLE'
+            print_input()
         elif proc.returncode != 0:
             log.failure(log.red('RE') + ': return code %d', proc.returncode)
             result = 'RE'
+            print_input()
 
         # check WA or not
         if 'out' in it:
@@ -144,6 +154,7 @@ def test(args):
             if args.mode == 'all':
                 if not match(answer, correct):
                     log.failure(log.red('WA'))
+                    print_input()
                     if not args.silent:
                         log.emit('output:\n%s', log.bold(answer))
                         log.emit('expected:\n%s', log.bold(correct))
@@ -155,12 +166,15 @@ def test(args):
                     if x is None and y is None:
                         break
                     elif x is None:
+                        print_input()
                         log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i, log.bold(y))
                         result = 'WA'
                     elif y is None:
+                        print_input()
                         log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i, log.bold(x))
                         result = 'WA'
                     elif not match(x, y):
+                        print_input()
                         log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i, log.bold(x), log.bold(y))
                         result = 'WA'
             else:
