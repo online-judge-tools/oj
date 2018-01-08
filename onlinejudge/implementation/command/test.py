@@ -93,12 +93,12 @@ def compare_as_floats(xs, ys, error):
     return True
 
 def test(args):
+    # prepare
     if not args.test:
         args.test = glob_with_format(args.format) # by default
     if args.ignore_backup:
         args.test = drop_backup_or_hidden_files(args.test)
     tests = construct_relationship_of_files(args.test, args.format)
-    # run tests
     if args.error: # float mode
         match = lambda a, b: compare_as_floats(a, b, args.error)
     else:
@@ -106,11 +106,21 @@ def test(args):
     rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
     slowest, slowest_name = -1, ''
     ac_count = 0
+
     for name, it in sorted(tests.items()):
+        is_printed_input = not args.print_input
+        def print_input():
+            nonlocal is_printed_input
+            if not is_printed_input:
+                is_printed_input = True
+                with open(it['in']) as inf:
+                    log.emit('input:\n%s', log.bold(inf.read()))
+
         log.emit('')
         log.info('%s', name)
+
+        # run the binary
         with open(it['in']) as inf:
-            # run
             begin = time.perf_counter()
             answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
@@ -122,50 +132,60 @@ def test(args):
                 slowest_name = name
             log.status('time: %f sec', end - begin)
             proc.terminate()
-            # check
-            is_ac = True
-            if proc.returncode is None:
-                log.failure(log.red('TLE'))
-                is_ac = False
-            elif proc.returncode != 0:
-                log.failure(log.red('RE') + ': return code %d', proc.returncode)
-                is_ac = False
-            if 'out' in it:
-                with open(it['out']) as outf:
-                    correct = outf.read()
-                if args.rstrip:
-                    correct = correct.rstrip(rstrip_targets)
-                # compare
-                if args.mode == 'all':
-                    if not match(answer, correct):
-                        log.failure(log.red('WA'))
-                        if not args.silent:
-                            log.emit('output:\n%s', log.bold(answer))
-                            log.emit('expected:\n%s', log.bold(correct))
-                        is_ac = False
-                elif args.mode == 'line':
-                    answer  = answer .splitlines()
-                    correct = correct.splitlines()
-                    for i, (x, y) in enumerate(zip(answer + [ None ] * len(correct), correct + [ None ] * len(answer))):
-                        if x is None and y is None:
-                            break
-                        elif x is None:
-                            log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i, log.bold(y))
-                            is_ac = False
-                        elif y is None:
-                            log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i, log.bold(x))
-                            is_ac = False
-                        elif not match(x, y):
-                            log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i, log.bold(x), log.bold(y))
-                            is_ac = False
-                else:
-                    assert False
+
+        # check TLE, RE or not
+        result = 'AC'
+        if proc.returncode is None:
+            log.failure(log.red('TLE'))
+            result = 'TLE'
+            print_input()
+        elif proc.returncode != 0:
+            log.failure(log.red('RE') + ': return code %d', proc.returncode)
+            result = 'RE'
+            print_input()
+
+        # check WA or not
+        if 'out' in it:
+            with open(it['out']) as outf:
+                correct = outf.read()
+            if args.rstrip:
+                correct = correct.rstrip(rstrip_targets)
+            # compare
+            if args.mode == 'all':
+                if not match(answer, correct):
+                    log.failure(log.red('WA'))
+                    print_input()
+                    if not args.silent:
+                        log.emit('output:\n%s', log.bold(answer))
+                        log.emit('expected:\n%s', log.bold(correct))
+                    result = 'WA'
+            elif args.mode == 'line':
+                answer  = answer .splitlines()
+                correct = correct.splitlines()
+                for i, (x, y) in enumerate(zip(answer + [ None ] * len(correct), correct + [ None ] * len(answer))):
+                    if x is None and y is None:
+                        break
+                    elif x is None:
+                        print_input()
+                        log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i, log.bold(y))
+                        result = 'WA'
+                    elif y is None:
+                        print_input()
+                        log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i, log.bold(x))
+                        result = 'WA'
+                    elif not match(x, y):
+                        print_input()
+                        log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i, log.bold(x), log.bold(y))
+                        result = 'WA'
             else:
-                if not args.silent:
-                    log.emit(log.bold(answer))
-            if is_ac:
-                log.success(log.green('AC'))
-                ac_count += 1
+                assert False
+        else:
+            if not args.silent:
+                log.emit(log.bold(answer))
+        if result == 'AC':
+            log.success(log.green('AC'))
+            ac_count += 1
+
     # summarize
     log.emit('')
     log.status('slowest: %f sec  (for %s)', slowest, slowest_name)
