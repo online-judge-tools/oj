@@ -8,6 +8,10 @@
 
 Tools for online judge services. Downloading sample cases, Testing/Submitting your code, and various utilities.
 
+## Screencast
+
+![screencast](https://user-images.githubusercontent.com/2203128/34708715-568b13c0-f557-11e7-97ef-9f6b646e4776.gif)
+
 ## Features
 
 -   Download sample cases
