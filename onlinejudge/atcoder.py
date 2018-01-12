@@ -92,6 +92,8 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         resp = utils.request('GET', self.get_url(), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
+            # example message: "message: You cannot see this page."
+            log.warning('are you logged in?')
             return []
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
@@ -192,6 +194,11 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return {}
+        # check whether logged in
+        path = utils.normpath(urllib.parse.urlparse(resp.url).path)
+        if path.startswith('/login'):
+            log.error('not logged in')
+            return {}
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         select = soup.find('select', class_='submit-language-selector')  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
@@ -208,6 +215,11 @@ class AtCoderProblem(onlinejudge.problem.Problem):
         resp = utils.request('GET', url, session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
+            return None
+        # check whether logged in
+        path = utils.normpath(urllib.parse.urlparse(resp.url).path)
+        if path.startswith('/login'):
+            log.error('not logged in')
             return None
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
