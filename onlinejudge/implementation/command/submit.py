@@ -34,13 +34,7 @@ def submit(args):
         else:
             kwargs['kind'] = 'example'
 
-    # make session
-    if problem.get_service().get_name() == 'topcoder':
-        sess = utils.run_webdriver(args.webdriver, target_url=problem.get_service().get_url(), headless=not args.verbose, cookie_path=args.cookie)
-    else:
-        sess = utils.with_cookiejar(utils.new_default_session(), path=args.cookie)
-
-    with sess as sess:
+    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # language
         langs = problem.get_language_dict(session=sess)
         if args.language not in langs:

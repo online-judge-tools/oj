@@ -22,7 +22,6 @@ def main(args=None):
     parser = argparse.ArgumentParser(description='Tools for online judge services')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-c', '--cookie', help='path to cookie. (default: {})'.format(utils.default_cookie_path))
-    parser.add_argument('--webdriver', help='path to webdriver. required in some services.')
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
@@ -74,14 +73,6 @@ supported services:
 strings for --method:
   github                for yukicoder, login via github (default)
   twitter               for yukicoder, login via twitter (not implementated yet)
-
-note for TopCoder:
-  Since TopCoder's web-interface it too complex, I implementated it using a Web Browser Automation technology, Selenium. You must install and specify a webdriver for this.
-  for example, in Ubuntu:
-    install:
-      $ apt get install chromium-chromedriver
-    login:
-      $ oj --verbose --webdriver /usr/lib/chromium-browser/chromedriver login https://www.topcoder.com/
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-u', '--username')
@@ -98,11 +89,6 @@ supported services:
   AtCoder
   Yukicoder
   TopCoder (Marathon Match)
-
-note for TopCoder:
-  A webdriver is required.
-  for example:
-    $ oj --webdriver /usr/lib/chromium-browser/chromedriver submit https://community.topcoder.com/tc?module=MatchDetails&rd=16997 --language C++ ConstrainedPermutation.cpp
 ''')
     subparser.add_argument('url')
     subparser.add_argument('file')

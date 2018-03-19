@@ -23,7 +23,6 @@ setup(
         'beautifulsoup4',
         'colorama',
         'sympy',
-        'selenium',
     ],
     long_description=readme,
     author=version.__author__,
