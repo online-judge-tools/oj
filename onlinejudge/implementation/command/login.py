@@ -24,10 +24,6 @@ def login(args):
         if args.method:
             log.failure('login for %s: invalid option: --method %s', service.get_name(), args.method)
             sys.exit(1)
-    if service.get_name() == 'topcoder':
-        sess = utils.run_webdriver(args.webdriver, target_url=service.get_url(), headless=not args.verbose, cookie_path=args.cookie)
-    else:
-        sess = utils.with_cookiejar(utils.new_default_session(), path=args.cookie)
 
     # login
     def get_credentials():
@@ -36,5 +32,5 @@ def login(args):
         if args.password is None:
             args.password = getpass.getpass()
         return args.username, args.password
-    with sess as sess:
+    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         service.login(get_credentials, session=sess, **kwargs)
