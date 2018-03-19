@@ -120,7 +120,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         try:
             link = driver.find_element_by_xpath('//a[text() = "Submit" and contains(@href, "rd=%d")]' % self.rd)
         except selenium.common.exceptions.NoSuchElementException:
-            log.error('link to submit not found:  Are you registered?  Is the contest running?')
+            log.error('link to submit not found:  Are you logged in?  Are you registered?  Is the contest running?')
             return None
         log.info('GET: %s', link.get_attribute('href'))
         link.click()
