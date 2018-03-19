@@ -11,7 +11,6 @@ import requests
 import urllib.parse
 import posixpath
 import json
-import selenium
 import time
 
 
