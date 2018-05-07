@@ -11,6 +11,8 @@ class Problem(object):
         raise NotImplementedError
     def get_service(self):
         raise NotImplementedError
+    def get_standings(self, session=None):  # => ( [ 'column1', 'column2', ... ], [ { 'column1': data1, ... } ... ] )
+        raise NotImplementedError
     @classmethod
     def from_url(self, s):
         pass

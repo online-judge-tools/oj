@@ -128,7 +128,7 @@ def test(args):
         # run the binary
         with open(it['in']) as inf:
             begin = time.perf_counter()
-            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf, timeout=args.tle)
+            answer, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
             answer = answer.decode()
             if slowest < end - begin:
@@ -169,15 +169,15 @@ def test(args):
                         break
                     elif x is None:
                         print_input()
-                        log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i, log.bold(y))
+                        log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i + 1, log.bold(y))
                         result = 'WA'
                     elif y is None:
                         print_input()
-                        log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i, log.bold(x))
+                        log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i + 1, log.bold(x))
                         result = 'WA'
                     elif not match(x, y):
                         print_input()
-                        log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i, log.bold(x), log.bold(y))
+                        log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i + 1, log.bold(x), log.bold(y))
                         result = 'WA'
             else:
                 assert False
@@ -212,7 +212,7 @@ def generate_output(args):
             continue
         with open(it['in']) as inf:
             begin = time.perf_counter()
-            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf)
+            answer, proc = utils.exec_command(args.command, shell=True, stdin=inf)
             end = time.perf_counter()
             log.status('time: %f sec', end - begin)
         if proc.returncode != 0:

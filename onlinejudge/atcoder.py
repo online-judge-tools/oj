@@ -1,4 +1,5 @@
 # Python Version: 3.x
+# -*- coding: utf-8 -*-
 import onlinejudge.service
 import onlinejudge.problem
 import onlinejudge.submission
