@@ -11,6 +11,7 @@ from onlinejudge.implementation.command.test import test, generate_output
 from onlinejudge.implementation.command.split_input import split_input, split_input_auto_footer
 from onlinejudge.implementation.command.test_reactive import test_reactive
 from onlinejudge.implementation.command.code_statistics import code_statistics
+from onlinejudge.implementation.command.get_standings import get_standings
 import argparse
 import sys
 import os
@@ -261,6 +262,17 @@ example:
 ''')
     subparser.add_argument('file')
 
+    # get standings
+    subparser = subparsers.add_parser('get-standings',
+            help='get and print the standings',
+            formatter_class=argparse.RawTextHelpFormatter,
+            epilog='''\
+supported services:
+  TopCoder (Marathon Match)
+''')
+    subparser.add_argument('url')
+    subparser.add_argument('-f', '--format', choices=[ 'csv', 'tsv', 'json' ], default='tsv', help='default: tsv')
+
     args = parser.parse_args(args=args)
 
     # logging
@@ -292,6 +304,8 @@ example:
         split_input(args)
     elif args.subcommand in [ 'code-statistics', 'c/s' ]:
         code_statistics(args)
+    elif args.subcommand == 'get-standings':
+        get_standings(args)
     else:
         parser.print_help(file=sys.stderr)
         sys.exit(1)

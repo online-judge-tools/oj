@@ -12,6 +12,8 @@ import urllib.parse
 import posixpath
 import json
 import time
+import itertools
+import collections
 
 
 @utils.singleton
@@ -101,7 +103,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         assert kind in [ 'example', 'full' ]
         session = session or utils.new_default_session()
 
-        # module=Submit
+        # module=MatchDetails
         url = 'https://community.topcoder.com/tc?module=MatchDetails&rd=%d' % self.rd
         resp = utils.request('GET', url, session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
@@ -155,6 +157,41 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
             messages = soup.find('textarea', { 'name': 'messages' }).text
             log.failure('%s', messages)
             return None
+
+    def get_standings(self, session=None):
+        session = session or utils.new_default_session()
+
+        header = None
+        rows = []
+        for start in itertools.count(1, 100):
+            # get
+            url = 'https://community.topcoder.com/longcontest/?sc=&sd=&nr=100&sr={}&rd={}&module=ViewStandings'.format(start, self.rd)
+            resp = utils.request('GET', url, session=session)
+
+            # parse
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            table = soup.find('table', class_='statTable')
+            trs = table.find_all('tr')
+            if header is None:
+                tr = trs[1]
+                header = [ td.text.strip() for td in tr.find_all('td') ]
+            for tr in trs[2 :]:
+                row = collections.OrderedDict()
+                for key, td in zip(header, tr.find_all('td')):
+                    value = td.text.strip()
+                    if not value:
+                        value = None
+                    elif value.isdigit():
+                        value = int(value)
+                    row[key] = value
+                rows += [ row ]
+
+            # check whether the next page exists
+            link = soup.find('a', text='next >>')
+            if link is None:
+                break
+
+        return header, rows
 
 onlinejudge.dispatch.services += [ TopCoderService ]
 onlinejudge.dispatch.problems += [ TopCoderLongContestProblem ]
