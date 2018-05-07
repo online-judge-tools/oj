@@ -101,7 +101,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         assert kind in [ 'example', 'full' ]
         session = session or utils.new_default_session()
 
-        # module=Submit
+        # module=MatchDetails
         url = 'https://community.topcoder.com/tc?module=MatchDetails&rd=%d' % self.rd
         resp = utils.request('GET', url, session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
