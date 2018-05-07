@@ -41,6 +41,8 @@ def split_input(args):
                 path = utils.parcentformat(args.output, { 'i': str(index) })
                 log.info('case found: %d', index)
                 if args.header:
+                    if args.header == args.header.strip():
+                        acc = '\n' + acc
                     acc = args.header + acc
                 if args.footer:
                     acc = acc + args.footer
