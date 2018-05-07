@@ -21,8 +21,8 @@ def fifo():
 def test_reactive(args):
     with fifo() as (fhr1, fhw1):
         with fifo() as (fhr2, fhw2):
-            with subprocess.Popen(args.command, shell=args.shell, stdin=fhr2, stdout=fhw1, stderr=sys.stderr) as proc1:
-                with subprocess.Popen(args.judge, shell=args.shell, stdin=fhr1, stdout=fhw2, stderr=sys.stderr) as proc2:
+            with subprocess.Popen(args.command, shell=True, stdin=fhr2, stdout=fhw1, stderr=sys.stderr) as proc1:
+                with subprocess.Popen(args.judge, shell=True, stdin=fhr1, stdout=fhw2, stderr=sys.stderr) as proc2:
                     proc1.communicate()
                     proc2.communicate()
                     if proc1.returncode != 0:

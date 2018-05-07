@@ -25,7 +25,7 @@ def split_input(args):
         inf = fh.read()
     if args.footer == split_input_auto_footer:
         args.footer = inf.splitlines(keepends=True)[-1]
-    with subprocess.Popen(args.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=sys.stderr) as proc:
+    with subprocess.Popen(args.command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=sys.stderr) as proc:
         index = 0
         acc = ''
         for line in inf.splitlines(keepends=True):

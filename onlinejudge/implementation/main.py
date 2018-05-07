@@ -113,7 +113,6 @@ tips:
   You can do similar things with shell: e.g. `for f in test/*.in ; do echo $f ; diff <(./a.out < $f) ${f/.in/.out} ; done`
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
-    subparser.add_argument('--shell', action='store_true', help='use the --command as a shellscript instead of a path')
     subparser.add_argument('-f', '--format', default='test/%s.%e', help='a format string to recognize the relationship of test cases. (default: "test/%%s.%%e")')
     subparser.add_argument('-m', '--mode', choices=[ 'all', 'line' ], default='all', help='mode to check an output with the correct answer. (default: all)')
     subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
@@ -174,7 +173,6 @@ tips:
   You can do similar things with shell: e.g. `for f in test/*.in ; do ./aout < $f > ${f/.in/.out} ; done`
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
-    subparser.add_argument('--shell', action='store_true', help='use the --command as a shellscript instead of a path')
     subparser.add_argument('-f', '--format', default='test/%s.%e', help='a format string to recognize the relationship of test cases. (default: "test/%%s.%%e")')
     subparser.add_argument('test', nargs='*', help='paths of input cases. (if empty: globbed from --format)')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
@@ -236,7 +234,6 @@ example:
     0 0
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
-    subparser.add_argument('--shell', action='store_true', help='use the --command as a shellscript instead of a path')
     subparser.add_argument('-i', '--input',  metavar='PATH', required=True, help='input file  (required)')
     subparser.add_argument('-o', '--output', metavar='FORMAT', required=True, help='output path  (required)')
     subparser.add_argument('-t', '--time', metavar='SECOND', default=0.1, type=float, help='the interval between two cases')
@@ -253,7 +250,6 @@ example:
             epilog='''\
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
-    subparser.add_argument('--shell', action='store_true', help='use the judge  and --command as a shellscript instead of a path')
     subparser.add_argument('judge', help='judge program using standard I/O')
 
     # code statistics
