@@ -128,7 +128,7 @@ def test(args):
         # run the binary
         with open(it['in']) as inf:
             begin = time.perf_counter()
-            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf, timeout=args.tle)
+            answer, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
             answer = answer.decode()
             if slowest < end - begin:
@@ -212,7 +212,7 @@ def generate_output(args):
             continue
         with open(it['in']) as inf:
             begin = time.perf_counter()
-            answer, proc = utils.exec_command(args.command, shell=args.shell, stdin=inf)
+            answer, proc = utils.exec_command(args.command, shell=True, stdin=inf)
             end = time.perf_counter()
             log.status('time: %f sec', end - begin)
         if proc.returncode != 0:
