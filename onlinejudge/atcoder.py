@@ -46,7 +46,7 @@ class AtCoderService(onlinejudge.service.Service):
         # example: http://agc012.contest.atcoder.jp/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
-                and (result.netloc == 'atcoder.jp' or result.netloc.endswith('.contest.atcoder.jp')):
+                and (result.netloc in ( 'atcoder.jp', 'beta.atcoder.jp' ) or result.netloc.endswith('.contest.atcoder.jp')):
             return cls()
 
     @classmethod
