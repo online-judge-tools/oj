@@ -294,7 +294,7 @@ supported services:
         submit(args)
     elif args.subcommand in [ 'test', 't' ]:
         test(args)
-    elif args.subcommand in [ 'test-reactiv', 't/r' ]:
+    elif args.subcommand in [ 'test-reactive', 't/r' ]:
         test_reactive(args)
     elif args.subcommand in [ 'generate-scanner', 'g/s' ]:
         generate_scanner(args)
