@@ -95,9 +95,9 @@ supported services:
     subparser.add_argument('file')
     subparser.add_argument('-l', '--language')
     subparser.add_argument('--open', nargs='?', const=True, help='open the result page after submission')
-    subparser.add_argument('-w', '--wait', metavar='SECCOND', type=float, default=3, help='sleep before submitting')
+    subparser.add_argument('-w', '--wait', metavar='SECOND', type=float, default=3, help='sleep before submitting')
     subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
-    subparser.add_argument('--full-submission', action='store_true', help='for TopCoder Marathon Match. use this to do "Submit", the default behavier is "Test Exampls".')
+    subparser.add_argument('--full-submission', action='store_true', help='for TopCoder Marathon Match. use this to do "Submit", the default behavier is "Test Examples".')
 
     # test
     subparser = subparsers.add_parser('test',
@@ -191,7 +191,7 @@ format string for --output:
 command for --command:
   Specify a command which outputs something after reading each case.
   It can be easily made from your solution for the problem.
-  exampe:
+  example:
     #include <iostream>
     using namespace std;
     int main() {
