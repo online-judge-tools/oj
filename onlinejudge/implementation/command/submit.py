@@ -90,6 +90,8 @@ def submit(args):
 
 def search_matched_language(language, language_dict):
     # Search partial matched language name (not case sensitive)
+    if language is None:
+        return []
 
     matched_language = []
     for supported_lang in language_dict.values():
