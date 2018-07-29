@@ -124,6 +124,19 @@ $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
 [+] saved to: test/sample-4.out
 ```
 
+## Related Tools
+
+conflicted:
+
+-   [dj3500/hightail](https://github.com/dj3500/hightail) (GUI-based; I have never used)
+-   [nodchip/OnlineJudgeHelper](https://github.com/nodchip/OnlineJudgeHelper) (buggy, not recommended)
+
+not conflicted:
+
+-   [shivawu/topcoder-greed](https://github.com/shivawu/topcoder-greed) for TopCoder Single Round Match
+-   [FakePsyho/mmstats](https://github.com/FakePsyho/mmstats) for TopCoder Marathon Match
+-   <https://community.topcoder.com/tc?module=Static&d1=applet&d2=plugins>
+
 ## License
 
 MIT License

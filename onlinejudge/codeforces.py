@@ -28,7 +28,7 @@ class CodeforcesService(onlinejudge.service.Service):
         log.debug('form: %s', str(form))
         username, password = get_credentials()
         form = utils.FormSender(form, url=resp.url)
-        form.set('handle', username)
+        form.set('handleOrEmail', username)
         form.set('password', password)
         form.set('remember', 'on')
         # post
