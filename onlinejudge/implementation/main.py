@@ -118,7 +118,7 @@ tips:
     subparser.add_argument('-m', '--mode', choices=[ 'all', 'line' ], default='all', help='mode to check an output with the correct answer. (default: all)')
     subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
     subparser.add_argument('--no-rstrip', action='store_false', dest='rstrip')
-    subparser.add_argument('--rstrip', action='store_true', help='rstrip output before comapre (default)')
+    subparser.add_argument('--rstrip', action='store_true', help='rstrip output before compare (default)')
     subparser.add_argument('-s', '--silent', action='store_true', help='don\'t report output and correct answer even if not AC  (for --mode all)')
     subparser.add_argument('-e', '--error', type=float, help='check as floating point number: correct if its absolute or relative error doesn\'t exceed it')
     subparser.add_argument('-t', '--tle', type=float)
@@ -171,7 +171,7 @@ format string for --format:
   (both %s and %e are required.)
 
 tips:
-  You can do similar things with shell: e.g. `for f in test/*.in ; do ./aout < $f > ${f/.in/.out} ; done`
+  You can do similar things with shell: e.g. `for f in test/*.in ; do ./a.out < $f > ${f/.in/.out} ; done`
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='test/%s.%e', help='a format string to recognize the relationship of test cases. (default: "test/%%s.%%e")')
