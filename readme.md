@@ -1,9 +1,9 @@
 # Online Judge Tools
 
 [![Travis](https://img.shields.io/travis/kmyk/online-judge-tools.svg)](https://travis-ci.org/kmyk/online-judge-tools)
-![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)
-![PyPI](https://img.shields.io/pypi/pyversions/online-judge-tools.svg)
-![PyPI](https://img.shields.io/pypi/status/online-judge-tools.svg)
+[![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)](#)
+[![PyPI](https://img.shields.io/pypi/pyversions/online-judge-tools.svg)](#)
+[![PyPI](https://img.shields.io/pypi/status/online-judge-tools.svg)](#)
 [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools)
 
 Tools for online judge services. Downloading sample cases, Testing/Submitting your code, and various utilities.
@@ -57,6 +57,7 @@ or
 
 ``` sh
 $ pip3 install requests
+$ pip3 install lxml
 $ pip3 install beautifulsoup4
 $ pip3 install colorama
 $ pip3 install sympy
