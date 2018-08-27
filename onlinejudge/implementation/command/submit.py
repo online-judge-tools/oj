@@ -35,13 +35,6 @@ def submit(args):
     log.info('code (%d byte):', len(code))
     log.emit(log.bold(s))
 
-    # prepare kwargs
-    kwargs = {}
-    if problem.get_service().get_name() == 'topcoder':
-        if args.full_submission:
-            kwargs['kind'] = 'full'
-        else:
-            kwargs['kind'] = 'example'
 
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # guess or select language ids
@@ -96,6 +89,12 @@ def submit(args):
                 return
 
         # submit
+        kwargs = {}
+        if problem.get_service().get_name() == 'topcoder':
+            if args.full_submission:
+                kwargs['kind'] = 'full'
+            else:
+                kwargs['kind'] = 'example'
         submission = problem.submit(code, language=args.language, session=sess, **kwargs)
 
         # show result
