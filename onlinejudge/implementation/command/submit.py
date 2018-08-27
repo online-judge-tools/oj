@@ -102,17 +102,18 @@ def submit(args):
             log.failure('submission failed')
         else:
             if args.open:
-                if not isinstance(args.open, str):
-                    args.open = None
-                    for browser in default_url_opener:
-                        args.open = shutil.which(browser)
-                        if args.open:
-                            break
-                if not args.open:
-                    log.failure('couldn\'t open the url. please specify a browser')
+                if args.open_browser:
+                    browser = args.open_browser
                 else:
-                    log.info('open the submission page with: %s', args.open)
-                    subprocess.check_call([ args.open, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                    for browser in default_url_opener:
+                        if shutil.which(browser):
+                            break
+                    else:
+                        browser = None
+                        log.failure('couldn\'t find browsers to open the url. please specify a browser')
+                if browser:
+                    log.info('open the submission page with: %s', browser)
+                    subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 def select_ids_of_matched_languages(words, lang_ids, language_dict, split=False, remove=False):
     assert isinstance(words, list)
