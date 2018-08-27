@@ -20,12 +20,19 @@ def submit(args):
     # read code
     with open(args.file) as fh:
         code = fh.buffer.read()
+    format_config = {
+        'dos2unix': args.format_dos2unix or args.golf,
+        'rstrip': args.format_dos2unix or args.golf,
+    }
+    code = format_code(code, **format_config)
+
+    # report code
     try:
-        s = code.decode() # for logging
+        s = code.decode()
     except UnicodeDecodeError as e:
         log.failure('%s: %s', e.__class__.__name__, str(e))
         s = repr(code)[ 1 : ]
-    log.info('code:')
+    log.info('code (%d byte):', len(code))
     log.emit(log.bold(s))
 
     # prepare kwargs
@@ -257,3 +264,13 @@ def guess_lang_ids_of_file(filename, code, language_dict, cxx_latest=False, cxx_
                 for name in data['names']:
                         lang_ids += select(name, language_dict.keys(), split=data.get('split', False))
         return list(set(lang_ids))
+
+
+def format_code(code, dos2unix=False, rstrip=False):
+    if dos2unix:
+        log.info('dos2unix...')
+        code = code.replace(b'\r\n', b'\n')
+    if rstrip:
+        log.info('rstrip...')
+        code = code.rstrip()
+    return code
