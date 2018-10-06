@@ -7,7 +7,8 @@ from onlinejudge.implementation.command.download import download
 from onlinejudge.implementation.command.login import login
 from onlinejudge.implementation.command.submit import submit
 from onlinejudge.implementation.command.generate_scanner import generate_scanner
-from onlinejudge.implementation.command.test import test, generate_output
+from onlinejudge.implementation.command.test import test
+from onlinejudge.implementation.command.generate_output import generate_output
 from onlinejudge.implementation.command.split_input import split_input, split_input_auto_footer
 from onlinejudge.implementation.command.test_reactive import test_reactive
 from onlinejudge.implementation.command.code_statistics import code_statistics
@@ -53,7 +54,8 @@ format string for --format:
   %%                    '%' itself
 ''')
     subparser.add_argument('url')
-    subparser.add_argument('-f', '--format', help='a format string to specify paths of cases')
+    subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (defaut: "sample-%%i.%%e" if not --system)')  # default must be None for --system
+    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
@@ -93,9 +95,9 @@ supported services:
 ''')
     subparser.add_argument('url')
     subparser.add_argument('file')
-    subparser.add_argument('-l', '--language')
+    subparser.add_argument('-l', '--language', help='narrow down language choices if ambiguous')
     subparser.add_argument('--no-guess', action='store_false', dest='guess')
-    subparser.add_argument('-g', '--guess', action='store_true', help='guess the language for your file. you can use "-l LANGUAGE" simultaneously')
+    subparser.add_argument('-g', '--guess', action='store_true', help='guess the language for your file (default)')
     subparser.add_argument('--no-guess-latest', action='store_false', dest='guess_cxx_latest')
     subparser.add_argument('--guess-cxx-latest', action='store_true', help='use the lasest version for C++ (default)')
     subparser.add_argument('--guess-cxx-compiler', choices=( 'gcc', 'clang', 'all' ), default='gcc', help='use the specified C++ compiler if both of GCC and Clang are available (default: gcc)')
@@ -126,7 +128,8 @@ tips:
   You can do similar things with shell: e.g. `for f in test/*.in ; do echo $f ; diff <(./a.out < $f) ${f/.in/.out} ; done`
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
-    subparser.add_argument('-f', '--format', default='test/%s.%e', help='a format string to recognize the relationship of test cases. (default: "test/%%s.%%e")')
+    subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
+    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
     subparser.add_argument('-m', '--mode', choices=[ 'all', 'line' ], default='all', help='mode to check an output with the correct answer. (default: all)')
     subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
     subparser.add_argument('--no-rstrip', action='store_false', dest='rstrip')
@@ -186,7 +189,8 @@ tips:
   You can do similar things with shell: e.g. `for f in test/*.in ; do ./a.out < $f > ${f/.in/.out} ; done`
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
-    subparser.add_argument('-f', '--format', default='test/%s.%e', help='a format string to recognize the relationship of test cases. (default: "test/%%s.%%e")')
+    subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
+    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
     subparser.add_argument('test', nargs='*', help='paths of input cases. (if empty: globbed from --format)')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
