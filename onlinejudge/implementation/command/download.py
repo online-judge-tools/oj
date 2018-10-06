@@ -21,11 +21,11 @@ def download(args):
     if args.format is None:
         if kwargs.get('is_system'):
             if problem.get_service().get_name() == 'yukicoder':
-                args.format = 'test/%b.%e'
+                args.format = '%b.%e'
             else:
-                args.format = 'test/%i.%e'
+                args.format = '%i.%e'
         else:
-            args.format = 'test/sample-%i.%e'
+            args.format = 'sample-%i.%e'
 
     # get samples from the server
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
@@ -45,7 +45,7 @@ def download(args):
             table['n'] = name
             table['b'] = os.path.basename(name)
             table['d'] = os.path.dirname(name)
-            path = utils.parcentformat(args.format, table)
+            path = os.path.join(args.directory, utils.parcentformat(args.format, table))
             log.status('%sput: %s', ext, name)
             log.emit(colorama.Style.BRIGHT + data.rstrip() + colorama.Style.RESET_ALL)
             if args.dry_run:
