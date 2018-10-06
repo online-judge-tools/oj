@@ -7,10 +7,10 @@ import time
 
 def generate_output(args):
     if not args.test:
-        args.test = cutils.glob_with_format(args.format) # by default
+        args.test = cutils.glob_with_format(args.directory, args.format) # by default
     if args.ignore_backup:
         args.test = cutils.drop_backup_or_hidden_files(args.test)
-    tests = cutils.construct_relationship_of_files(args.test, args.format)
+    tests = cutils.construct_relationship_of_files(args.test, args.directory, args.format)
     for name, it in sorted(tests.items()):
         log.emit('')
         log.info('%s', name)
@@ -28,7 +28,7 @@ def generate_output(args):
             log.info('skipped.')
             continue
         log.emit(log.bold(answer.decode().rstrip()))
-        path = cutils.path_from_format(args.format, cutils.match_with_format(args.format, it['in']).groupdict()['name'], 'out')
+        path = cutils.path_from_format(args.directory, args.format, name=cutils.match_with_format(args.directory, args.format, it['in']).groupdict()['name'], ext='out')
         with open(path, 'w') as fh:
             fh.buffer.write(answer)
         log.success('saved to: %s', path)
