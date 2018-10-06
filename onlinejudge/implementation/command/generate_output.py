@@ -1,0 +1,34 @@
+# Python Version: 3.x
+import onlinejudge
+import onlinejudge.implementation.utils as utils
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.command.utils as cutils
+import time
+
+def generate_output(args):
+    if not args.test:
+        args.test = cutils.glob_with_format(args.format) # by default
+    if args.ignore_backup:
+        args.test = cutils.drop_backup_or_hidden_files(args.test)
+    tests = cutils.construct_relationship_of_files(args.test, args.format)
+    for name, it in sorted(tests.items()):
+        log.emit('')
+        log.info('%s', name)
+        if 'out' in it:
+            log.info('output file already exists.')
+            log.info('skipped.')
+            continue
+        with open(it['in']) as inf:
+            begin = time.perf_counter()
+            answer, proc = utils.exec_command(args.command, shell=True, stdin=inf)
+            end = time.perf_counter()
+            log.status('time: %f sec', end - begin)
+        if proc.returncode != 0:
+            log.failure(log.red('RE') + ': return code %d', proc.returncode)
+            log.info('skipped.')
+            continue
+        log.emit(log.bold(answer.decode().rstrip()))
+        path = cutils.path_from_format(args.format, cutils.match_with_format(args.format, it['in']).groupdict()['name'], 'out')
+        with open(path, 'w') as fh:
+            fh.buffer.write(answer)
+        log.success('saved to: %s', path)

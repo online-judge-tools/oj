@@ -7,7 +7,8 @@ from onlinejudge.implementation.command.download import download
 from onlinejudge.implementation.command.login import login
 from onlinejudge.implementation.command.submit import submit
 from onlinejudge.implementation.command.generate_scanner import generate_scanner
-from onlinejudge.implementation.command.test import test, generate_output
+from onlinejudge.implementation.command.test import test
+from onlinejudge.implementation.command.generate_output import generate_output
 from onlinejudge.implementation.command.split_input import split_input, split_input_auto_footer
 from onlinejudge.implementation.command.test_reactive import test_reactive
 from onlinejudge.implementation.command.code_statistics import code_statistics
