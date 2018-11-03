@@ -8,8 +8,9 @@ import os.path
 import re
 import glob
 import collections
+from typing import Dict, List, Match, Optional
 
-def glob_with_format(directory, format):
+def glob_with_format(directory: str, format: str) -> List[str]:
     table = {}
     table['s'] = '*'
     table['e'] = '*'
@@ -19,7 +20,7 @@ def glob_with_format(directory, format):
         log.debug('testcase globbed: %s', path)
     return paths
 
-def match_with_format(directory, format, path):
+def match_with_format(directory: str, format: str, path: str) -> Optional[Match[str]]:
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
@@ -27,18 +28,18 @@ def match_with_format(directory, format, path):
     path = os.path.normpath(os.path.relpath(path, directory))
     return pattern.match(path)
 
-def path_from_format(directory, format, name, ext):
+def path_from_format(directory: str, format: str, name: str, ext: str) -> str:
     table = {}
     table['s'] = name
     table['e'] = ext
     return os.path.join(directory, utils.parcentformat(format, table))
 
-def is_backup_or_hidden_file(path):
+def is_backup_or_hidden_file(path: str) -> bool:
     basename = os.path.basename(path)
     return basename.endswith('~') or (basename.startswith('#') and basename.endswith('#')) or basename.startswith('.')
 
-def drop_backup_or_hidden_files(paths):
-    result = []
+def drop_backup_or_hidden_files(paths: List[str]) -> List[str]:
+    result: List[str] = []
     for path in paths:
         if is_backup_or_hidden_file(path):
             log.warning('ignore a backup file: %s', path)
@@ -46,8 +47,8 @@ def drop_backup_or_hidden_files(paths):
             result += [ path ]
     return result
 
-def construct_relationship_of_files(paths, directory, format):
-    tests = collections.defaultdict(dict)
+def construct_relationship_of_files(paths: List[str], directory: str, format: str) -> Dict[str, Dict[str, str]]:
+    tests: Dict[str, Dict[str, str]] = collections.defaultdict(dict)
     for path in paths:
         m = match_with_format(directory, format, os.path.normpath(path))
         if not m:
