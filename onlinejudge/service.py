@@ -1,14 +1,17 @@
 # Python Version: 3.x
-import requests
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    import requests
+
+CredentialsProvider = Callable[[], Tuple[str, str]]
 
 class Service(object):
-    def login(self, get_credentials: Callable[[], Tuple[str, str]], session: Optional[requests.Session] = None):
+    def login(self, get_credentials: CredentialsProvider, session: Optional['requests.Session'] = None):
         raise NotImplementedError
     def get_url(self) -> str:
         raise NotImplementedError
     def get_name(self) -> str:
         raise NotImplementedError
     @classmethod
-    def from_url(self, s: str) -> str:
+    def from_url(self, s: str) -> Optional['Service']:
         pass
