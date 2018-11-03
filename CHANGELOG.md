@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.41 / 2018-11-04
+
+-   [#186](https://github.com/kmyk/online-judge-tools/pull/186) fix a problem of sample cases of AOJ and lxml ([@hachi-88](https://github.com/hachi-88))
+
 ## 0.1.40 / 2018-11-03
 
 -   [#141](https://github.com/kmyk/online-judge-tools/issues/141) add a feature to check updating
