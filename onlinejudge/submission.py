@@ -8,7 +8,7 @@ class Submission(object):
     def get_problem(self):
         raise NotImplementedError
     def get_service(self):
-        raise self.get_problem().get_service()
+        return self.get_problem().get_service()
     @classmethod
     def from_url(cls, s):
         pass
