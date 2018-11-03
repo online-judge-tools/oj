@@ -50,7 +50,7 @@ class AOJProblem(onlinejudge.problem.Problem):
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'html.parser')
+        soup = bs4.BeautifulSoup(resp.content, utils.html_parser)  # NOTE: resp.content is not decoded for workaround, see https://github.com/kmyk/online-judge-tools/pull/186
         samples = utils.SampleZipper()
         for pre in soup.find_all('pre'):
             log.debug('pre: %s', str(pre))
