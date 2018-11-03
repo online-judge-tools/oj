@@ -1,8 +1,12 @@
 # Python Version: 3.x
 import onlinejudge.implementation.logging as log
+import onlinejudge.submissions as Submission
+import onlinejudge.problems as Problem
+import onlinejudge.services as Service
+from typing import List, Type
 
-submissions = []
-def submission_from_url(s):
+submissions: List[Type[Submission]] = []
+def submission_from_url(s: str) -> Submission:
     for cls in submissions:
         it = cls.from_url(s)
         if it is not None:
@@ -10,8 +14,8 @@ def submission_from_url(s):
             return it
     log.failure('unknown submission: %s', s)
 
-problems = []
-def problem_from_url(s):
+problems: List[Type[Problem]] = []
+def problem_from_url(s: str) -> Problem:
     for cls in problems:
         it = cls.from_url(s)
         if it is not None:
@@ -22,8 +26,8 @@ def problem_from_url(s):
         return it.get_problem()
     log.failure('unknown problem: %s', s)
 
-services = []
-def service_from_url(s):
+services: List[Type[Service]] = []
+def service_from_url(s: str) -> Service:
     for cls in services:
         it = cls.from_url(s)
         if it is not None:

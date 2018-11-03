@@ -17,10 +17,9 @@ import argparse
 import sys
 import os
 import os.path
+from typing import List, Optional
 
-def main(args=None):
-
-    # argparse
+def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Tools for online judge services')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-c', '--cookie', help='path to cookie. (default: {})'.format(utils.default_cookie_path))
@@ -289,8 +288,10 @@ supported services:
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', choices=[ 'csv', 'tsv', 'json' ], default='tsv', help='default: tsv')
 
-    args = parser.parse_args(args=args)
+    return parser
 
+
+def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
     # logging
     log_level = log.logging.INFO
     if args.verbose:
@@ -327,3 +328,7 @@ supported services:
         sys.exit(1)
 
 
+def main(args: Optional[List[str]] = None) -> None:
+    parser = get_parser()
+    namespace = parser.parse_args(args=args)
+    run_program(namespace, parser=parser)
