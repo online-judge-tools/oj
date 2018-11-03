@@ -50,7 +50,7 @@ class AOJProblem(onlinejudge.problem.Problem):
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), 'html.parser')
         samples = utils.SampleZipper()
         for pre in soup.find_all('pre'):
             log.debug('pre: %s', str(pre))
