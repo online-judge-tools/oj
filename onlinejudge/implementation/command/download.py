@@ -5,8 +5,11 @@ import onlinejudge.implementation.logging as log
 import os
 import colorama
 import sys
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
-def download(args):
+def download(args: 'argparse.Namespace') -> None:
     # prepare values
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
@@ -29,7 +32,7 @@ def download(args):
 
     # get samples from the server
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
-        samples = problem.download(session=sess, **kwargs)
+        samples = problem.download(session=sess, **kwargs)  # type: ignore
 
     # write samples to files
     for i, sample in enumerate(samples):
@@ -37,8 +40,8 @@ def download(args):
         log.info('sample %d', i)
         for kind in [ 'input', 'output' ]:
             ext = kind[: -3]
-            data = sample[kind]['data']
-            name = sample[kind]['name']
+            data = getattr(sample, kind).data
+            name = getattr(sample, kind).name
             table = {}
             table['i'] = str(i+1)
             table['e'] = ext

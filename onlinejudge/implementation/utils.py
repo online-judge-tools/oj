@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.version as version
+from onlinejudge.problem import LabeledString, TestCase
 import re
 import os
 import os.path
@@ -16,11 +17,12 @@ import posixpath
 import sys
 import ast
 import time
+from typing import *
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
 html_parser = 'lxml'
 
-def parcentformat(s, table):
+def parcentformat(s: str, table: Dict[str, str]) -> str:
     assert '%' not in table or table['%'] == '%'
     table['%'] = '%'
     result = ''
@@ -32,7 +34,7 @@ def parcentformat(s, table):
             result += m.group(0)
     return result
 
-def describe_status_code(status_code):
+def describe_status_code(status_code: int) -> str:
     return '{} {}'.format(status_code, http.client.responses[status_code])
 
 def previous_sibling_tag(tag):
@@ -47,7 +49,7 @@ def next_sibling_tag(tag):
         tag = tag.next_sibling
     return tag
 
-def new_default_session():  # without setting cookiejar
+def new_default_session() -> requests.Session:  # without setting cookiejar
     session = requests.Session()
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
     return session
@@ -55,17 +57,17 @@ def new_default_session():  # without setting cookiejar
 default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
 
 @contextlib.contextmanager
-def with_cookiejar(session, path):
+def with_cookiejar(session: requests.Session, path: str) -> Generator[requests.Session, None, None]:
     path = path or default_cookie_path
-    session.cookies = http.cookiejar.LWPCookieJar(path)
+    session.cookies = http.cookiejar.LWPCookieJar(path)  # type: ignore
     if os.path.exists(path):
         log.info('load cookie from: %s', path)
-        session.cookies.load()
+        session.cookies.load()  # type: ignore
     yield session
     log.info('save cookie to: %s', path)
     if os.path.dirname(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-    session.cookies.save()
+    session.cookies.save()  # type: ignore
     os.chmod(path, 0o600)  # NOTE: to make secure a little bit
 
 
@@ -74,22 +76,19 @@ class SampleZipper(object):
         self.data = []
         self.dangling = None
 
-    def add(self, s, name=''):
+    def add(self, s: str, name: str = '') -> None:
         if self.dangling is None:
             if re.search('output', name, re.IGNORECASE) or re.search('出力', name):
                 log.warning('strange name for input string: %s', name)
-            self.dangling = { 'data': s, 'name': name }
+            self.dangling = LabeledString(name, s)
         else:
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
                 if not (re.search('output', name, re.IGNORECASE) or re.search('出力', name)):  # to ignore titles like "Output for Sample Input 1"
                     log.warning('strange name for output string: %s', name)
-            self.data += [ {
-                'input': self.dangling,
-                'output': { 'data': s, 'name': name },
-                } ]
+            self.data += [ TestCase(self.dangling, LabeledString(name, s)) ]
             self.dangling = None
 
-    def get(self):
+    def get(self) -> List[TestCase]:
         if self.dangling is not None:
             log.error('dangling sample string: %s', self.dangling[1])
         return self.data
@@ -128,9 +127,9 @@ class FormSender(object):
         log.status(describe_status_code(resp.status_code))
         return resp
 
-def dos2unix(s):
+def dos2unix(s: str) -> str:
     return s.replace('\r\n', '\n')
-def textfile(s): # should have trailing newline
+def textfile(s: str) -> str:  # should have trailing newline
     if s.endswith('\n'):
         return s
     elif '\r\n' in s:
@@ -150,7 +149,7 @@ def singleton(cls):
         pass
     return cls
 
-def exec_command(command, timeout=None, **kwargs):
+def exec_command(command: List[str], timeout: float = None, **kwargs) -> Tuple[str, subprocess.Popen]:
     try:
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
     except FileNotFoundError:
@@ -167,14 +166,14 @@ def exec_command(command, timeout=None, **kwargs):
 
 # We should use this instead of posixpath.normpath
 # posixpath.normpath doesn't collapse a leading duplicated slashes. see: https://stackoverflow.com/questions/7816818/why-doesnt-os-normpath-collapse-a-leading-double-slash
-def normpath(path):
+def normpath(path: str) -> str:
     path = posixpath.normpath(path)
     if path.startswith('//'):
         path = '/' + path.lstrip('/')
     return path
 
 
-def request(method, url, session=None, raise_for_status=True, **kwargs):
+def request(method: str, url: str, session: requests.Session, raise_for_status: bool = True, **kwargs) -> requests.Response:
     assert method in [ 'GET', 'POST' ]
     kwargs.setdefault('allow_redirects', True)
     log.status('%s: %s', method, url)

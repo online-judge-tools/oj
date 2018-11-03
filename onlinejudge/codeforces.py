@@ -4,17 +4,19 @@ import onlinejudge.problem
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
+import requests
 import re
 import urllib.parse
 import posixpath
 import bs4
 import string
+from typing import *
 
 
 @utils.singleton
 class CodeforcesService(onlinejudge.service.Service):
 
-    def login(self, get_credentials, session=None):
+    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'http://codeforces.com/enter'
         # get
@@ -41,36 +43,38 @@ class CodeforcesService(onlinejudge.service.Service):
             log.failure('Invalid handle or password.')
             return False
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'http://codeforces.com/'
 
-    def get_name(self):
+    def get_name(self) -> str:
         return 'codeforces'
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['CodeforcesService']:
         # example: http://codeforces.com/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'codeforces.com':
             return cls()
+        return None
 
 
 # NOTE: Codeforces has its API: http://codeforces.com/api/help
 class CodeforcesProblem(onlinejudge.problem.Problem):
-    def __init__(self, contest_id, index, kind=None):
+    def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
         assert index in string.ascii_uppercase
+        assert kind in ( None, 'contest', 'gym', 'problemset' )
         self.contest_id = contest_id
         self.index = index
-        self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
         if kind is None:
             if self.contest_id < 100000:
-                self.kind = 'contest'
+                kind = 'contest'
             else:
-                self.kind = 'gym'
+                kind = 'gym'
+        self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
 
-    def download(self, session=None):
+    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.problem.TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -92,18 +96,18 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
             samples.add(s, title.string)
         return samples.get()
 
-    def get_url(self):
+    def get_url(self) -> str:
         table = {}
         table['contest']    = 'http://codeforces.com/contest/{}/problem/{}'
         table['problemset'] = 'http://codeforces.com/problemset/problem/{}/{}'
         table['gym']        = 'http://codeforces.com/gym/{}/problem/{}'
         return table[self.kind].format(self.contest_id, self.index)
 
-    def get_service(self):
+    def get_service(self) -> CodeforcesService:
         return CodeforcesService()
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['CodeforcesProblem']:
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'codeforces.com':
@@ -116,6 +120,7 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
                 m = re.match(expr, utils.normpath(result.path))
                 if m:
                     return cls(int(m.group(1)), normalize(m.group(2)), kind=kind)
+        return None
 
 
 onlinejudge.dispatch.services += [ CodeforcesService ]

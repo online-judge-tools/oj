@@ -8,31 +8,33 @@ import urllib.parse
 import posixpath
 import bs4
 import requests
+from typing import *
 
 
 @utils.singleton
 class AnarchyGolfService(onlinejudge.service.Service):
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'http://golf.shinh.org/'
 
-    def get_name(self):
+    def get_name(self) -> str:
         return 'anarchygolf'
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['AnarchyGolfService']:
         # example: http://golf.shinh.org/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'golf.shinh.org':
             return cls()
+        return None
 
 
 class AnarchyGolfProblem(onlinejudge.problem.Problem):
-    def __init__(self, problem_id):
+    def __init__(self, problem_id: str):
         self.problem_id = problem_id
 
-    def download(self, session=None):
+    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.problem.TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -46,7 +48,7 @@ class AnarchyGolfProblem(onlinejudge.problem.Problem):
                 samples.add(s, name)
         return samples.get()
 
-    def _parse_sample_tag(self, tag):
+    def _parse_sample_tag(self, tag: bs4.Tag) -> Optional[Tuple[str, str]]:
         assert isinstance(tag, bs4.Tag)
         assert tag.name == 'h2'
         name = tag.contents[0]
@@ -61,15 +63,16 @@ class AnarchyGolfProblem(onlinejudge.problem.Problem):
             else:
                 s = ''
             return s, name
+        return None
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'http://golf.shinh.org/p.rb?{}'.format(self.problem_id)
 
-    def get_service(self):
+    def get_service(self) -> AnarchyGolfService:
         return AnarchyGolfService()
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['AnarchyGolfProblem']:
         # example: http://golf.shinh.org/p.rb?The+B+Programming+Language
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
@@ -77,6 +80,7 @@ class AnarchyGolfProblem(onlinejudge.problem.Problem):
                 and utils.normpath(result.path) == '/p.rb' \
                 and result.query:
             return cls(result.query)
+        return None
 
 
 onlinejudge.dispatch.services += [ AnarchyGolfService ]

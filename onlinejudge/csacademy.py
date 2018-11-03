@@ -1,6 +1,7 @@
 # Python Version: 3.x
 import onlinejudge.service
 import onlinejudge.problem
+from onlinejudge.problem import LabeledString, TestCase
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -9,32 +10,34 @@ import requests
 import urllib.parse
 import posixpath
 import json
+from typing import *
 
 
 @utils.singleton
 class CSAcademyService(onlinejudge.service.Service):
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'https://csacademy.com/'
 
-    def get_name(self):
+    def get_name(self) -> str:
         return 'csacademy'
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['CSAcademyService']:
         # example: https://csacademy.com/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('csacademy.com', 'www.csacademy.com'):
             return cls()
+        return None
 
 
 class CSAcademyProblem(onlinejudge.problem.Problem):
-    def __init__(self, contest_name, task_name):
+    def __init__(self, contest_name: str, task_name: str):
         self.contest_name = contest_name
         self.task_name = task_name
 
-    def download(self, session=None):
+    def download(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         base_url = self.get_url()
 
@@ -42,8 +45,8 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
         resp = utils.request('GET', base_url, session=session)
         csrftoken = None
         for cookie in session.cookies:
-            if cookie.name == 'csrftoken' and cookie.domain == 'csacademy.com':
-                csrftoken = cookie.value
+            if cookie.name == 'csrftoken' and cookie.domain == 'csacademy.com':  # type: ignore
+                csrftoken = cookie.value  # type: ignore
         if csrftoken is None:
             log.error('csrftoken is not found')
             return []
@@ -85,21 +88,21 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
         for test_number, example_test in enumerate(contest_task['state']['EvalTask'][0]['exampleTests']):
             inname  = 'Input {}'.format(test_number)
             outname = 'Output {}'.format(test_number)
-            samples += [ {
-                'input': { 'data': example_test['input'], 'name': inname },
-                'output': { 'data': example_test['output'], 'name': outname },
-                } ]
+            samples += [ TestCase(
+                LabeledString( inname, example_test[ 'input']),
+                LabeledString(outname, example_test['output']),
+                ) ]
         return samples
 
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'https://csacademy.com/content/{}/task/{}/'.format(self.contest_name, self.task_name)
 
-    def get_service(self):
+    def get_service(self) -> CSAcademyService:
         return CSAcademyService()
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['CSAcademyProblem']:
         # example: https://csacademy.com/contest/round-38/task/path-union/
         # example: https://csacademy.com/contest/round-38/task/path-union/discussion/
         # example: https://csacademy.com/contest/archive/task/swap_permutation/
@@ -110,6 +113,7 @@ class CSAcademyProblem(onlinejudge.problem.Problem):
             m = re.match(r'^/contest/([0-9A-Za-z_-]+)/task/([0-9A-Za-z_-]+)(|/statement|/solution|/discussion|/statistics|/submissions)/?$', utils.normpath(result.path))
             if m:
                 return cls(m.group(1), m.group(2))
+        return None
 
 onlinejudge.dispatch.services += [ CSAcademyService ]
 onlinejudge.dispatch.problems += [ CSAcademyProblem ]

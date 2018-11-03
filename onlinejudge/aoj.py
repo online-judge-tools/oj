@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import onlinejudge.service
 import onlinejudge.problem
+from onlinejudge.problem import LabeledString, TestCase
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -13,6 +14,7 @@ import urllib.parse
 import zipfile
 import collections
 import itertools
+from typing import *
 
 
 @utils.singleton
@@ -25,24 +27,25 @@ class AOJService(onlinejudge.service.Service):
         return 'aoj'
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['AOJService']:
         # example: http://judge.u-aizu.ac.jp/onlinejudge/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'judge.u-aizu.ac.jp':
             return cls()
+        return None
 
 
 class AOJProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_id):
         self.problem_id = problem_id
 
-    def download(self, session=None, is_system=False):
+    def download(self, session: Optional[requests.Session] = None, is_system: bool = False) -> List[TestCase]:
         if is_system:
             return self.download_system(session=session)
         else:
             return self.download_samples(session=session)
-    def download_samples(self, session=None):
+    def download_samples(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -65,10 +68,10 @@ class AOJProblem(onlinejudge.problem.Problem):
                 name = hn.string
                 samples.add(s, name)
         return samples.get()
-    def download_system(self, session=None):
+    def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         get_url = lambda case, type: 'http://analytic.u-aizu.ac.jp:8080/aoj/testcase.jsp?id={}&case={}&type={}'.format(self.problem_id, case, type)
-        testcases = []
+        testcases: List[TestCase] = []
         for case in itertools.count(1):
             # input
             # get
@@ -76,23 +79,23 @@ class AOJProblem(onlinejudge.problem.Problem):
             if resp.status_code != 200:
                 break
             in_txt = resp.text
-            if case == 2 and testcases[0]['input']['data'] == in_txt:
+            if case == 2 and testcases[0].input.data == in_txt:
                 break # if the querystring case=??? is ignored
             # output
             # get
             resp = utils.request('GET', get_url(case, 'out'), session=session)
             out_txt = resp.text
-            testcases += [ {
-                'input': { 'data': in_txt, 'name': 'in%d.txt' % case },
-                'output': { 'data': out_txt, 'name': 'out%d.txt' % case },
-                } ]
+            testcases += [ TestCase(
+                LabeledString('in%d.txt' % case, in_txt),
+                LabeledString('out%d.txt' % case, out_txt),
+                ) ]
         return testcases
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id={}'.format(self.problem_id)
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['AOJProblem']:
         # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1169
         # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A&lang=jp
         result = urllib.parse.urlparse(s)
@@ -104,8 +107,9 @@ class AOJProblem(onlinejudge.problem.Problem):
                 and len(querystring['id']) == 1:
             n, = querystring['id']
             return cls(n)
+        return None
 
-    def get_service(self):
+    def get_service(self) -> AOJService:
         return AOJService()
 
 
