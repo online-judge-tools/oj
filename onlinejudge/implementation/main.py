@@ -3,6 +3,7 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.version as version
 from onlinejudge.implementation.command.download import download
 from onlinejudge.implementation.command.login import login
 from onlinejudge.implementation.command.submit import submit
@@ -13,11 +14,18 @@ from onlinejudge.implementation.command.split_input import split_input, split_in
 from onlinejudge.implementation.command.test_reactive import test_reactive
 from onlinejudge.implementation.command.code_statistics import code_statistics
 from onlinejudge.implementation.command.get_standings import get_standings
+import pipdate
 import argparse
 import sys
 import os
 import os.path
 from typing import List, Optional
+
+
+def version_check() -> None:
+    if pipdate.needs_checking(version.name):
+        print(pipdate.check(version.name, version.__version__), end='')
+
 
 def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Tools for online judge services')
@@ -329,6 +337,7 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
 
 
 def main(args: Optional[List[str]] = None) -> None:
+    version_check()
     parser = get_parser()
     namespace = parser.parse_args(args=args)
     run_program(namespace, parser=parser)

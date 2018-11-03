@@ -14,7 +14,7 @@ with open('readme.md', encoding='utf-8') as fh:
     readme = fh.read()
 
 setup(
-    name='online-judge-tools',
+    name=version.name,
     version=version.__version__,
     description='Tools for online-judge services',
     install_requires=[
@@ -23,6 +23,7 @@ setup(
         'beautifulsoup4',
         'colorama',
         'sympy',
+        'pipdate',
     ],
     long_description=readme,
     author=version.__author__,
