@@ -8,10 +8,13 @@ import shutil
 import subprocess
 import os
 import re
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
 default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
 
-def submit(args):
+def submit(args: 'argparse.Namespace') -> None:
     # parse url
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
@@ -39,6 +42,7 @@ def submit(args):
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # guess or select language ids
         langs = problem.get_language_dict(session=sess)
+        matched_lang_ids: Optional[List[str]] = None
         if args.guess:
             kwargs = {
                 'language_dict': langs,
@@ -56,7 +60,7 @@ def submit(args):
             elif args.language in langs:
                 matched_lang_ids = [ args.language ]
             else:
-                matched_lang_ids = select_ids_of_matched_languages(args.language.split(), langs.keys(), language_dict=langs)
+                matched_lang_ids = select_ids_of_matched_languages(args.language.split(), list(langs.keys()), language_dict=langs)
 
         # report selected language ids
         if matched_lang_ids is not None and len(matched_lang_ids) == 1:
@@ -95,7 +99,7 @@ def submit(args):
                 kwargs['kind'] = 'full'
             else:
                 kwargs['kind'] = 'example'
-        submission = problem.submit(code, language=args.language, session=sess, **kwargs)
+        submission = problem.submit(code, language=args.language, session=sess, **kwargs)  # type: ignore
 
         # show result
         if submission is None:
@@ -115,8 +119,7 @@ def submit(args):
                     log.info('open the submission page with: %s', browser)
                     subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
-def select_ids_of_matched_languages(words, lang_ids, language_dict, split=False, remove=False):
-    assert isinstance(words, list)
+def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
     result = []
     for lang_id in lang_ids:
         desc = language_dict[lang_id]['description'].lower()
@@ -129,12 +132,12 @@ def select_ids_of_matched_languages(words, lang_ids, language_dict, split=False,
             result.append(lang_id)
     return result
 
-def guess_lang_ids_of_file(filename, code, language_dict, cxx_latest=False, cxx_compiler='all', python_version='all', python_interpreter='all'):
+def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
     assert cxx_compiler.lower() in ( 'gcc', 'clang', 'all' )
     assert python_version.lower() in ( '2', '3', 'auto', 'all' )
     assert python_interpreter.lower() in ( 'cpython', 'pypy', 'all' )
 
-    select = lambda word, lang_ids, **kwargs: select_ids_of_matched_languages([ word ], lang_ids, **kwargs, language_dict=language_dict)
+    select = lambda word, lang_ids, **kwargs: select_ids_of_matched_languages([ word ], lang_ids, language_dict=language_dict, **kwargs)
     _, ext = os.path.splitext(filename)
     lang_ids = language_dict.keys()
 
@@ -225,7 +228,7 @@ def guess_lang_ids_of_file(filename, code, language_dict, cxx_latest=False, cxx_
 
     else:
         log.debug('language guessing: othres')
-        table = [
+        table: List[Dict[str, Any]] = [
              { 'names': [ 'awk'                   ], 'exts': [ 'awk'       ] },
              { 'names': [ 'bash'                  ], 'exts': [ 'sh'        ] },
              { 'names': [ 'brainfuck'             ], 'exts': [ 'bf'        ] },
@@ -266,7 +269,7 @@ def guess_lang_ids_of_file(filename, code, language_dict, cxx_latest=False, cxx_
         return list(set(lang_ids))
 
 
-def format_code(code, dos2unix=False, rstrip=False):
+def format_code(code: bytes, dos2unix: bool = False, rstrip: bool = False) -> bytes:
     if dos2unix:
         log.info('dos2unix...')
         code = code.replace(b'\r\n', b'\n')

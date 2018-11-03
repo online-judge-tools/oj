@@ -4,8 +4,11 @@ import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import sys
 import getpass
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
-def login(args):
+def login(args: 'argparse.Namespace') -> None:
     # get service
     service = onlinejudge.dispatch.service_from_url(args.url)
     if service is None:
@@ -26,11 +29,11 @@ def login(args):
             sys.exit(1)
 
     # login
-    def get_credentials():
+    def get_credentials() -> Tuple[str, str]:
         if args.username is None:
             args.username = input('Username: ')
         if args.password is None:
             args.password = getpass.getpass()
         return args.username, args.password
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
-        service.login(get_credentials, session=sess, **kwargs)
+        service.login(get_credentials, session=sess, **kwargs)  # type: ignore

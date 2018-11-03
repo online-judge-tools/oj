@@ -9,14 +9,17 @@ import sympy.parsing.sympy_parser as sympy_parser
 import colorama
 import collections
 import sys
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
-def tokenize(pre):  # => [ [ dict ] ]
+def tokenize(pre: str) -> Generator[List[Dict[str, str]], None, None]:
     for y, line in enumerate(pre.splitlines()):
         # remove mathjax tokens
         line = line.replace('$', '').replace('\\(', '').replace('\\)', '')
         line = line.replace('\\ ', ' ').replace('\\quad', ' ')
         # tokenize each line
-        tokens = []
+        tokens: List[Dict[str, str]] = []
         for x, s in enumerate(line.split()):
             if s in [ '..', '...', '\\dots', '…', '⋯' ]:
                 tokens += [ { 'kind': 'dots', 'dir': ['hr', 'vr'][x == 0] } ]
@@ -36,13 +39,13 @@ def tokenize(pre):  # => [ [ dict ] ]
                 tokens += [ { 'kind': 'fixed', 'name': s } ]
         yield tokens
 
-def simplify_expr(s):
+def simplify_expr(s: str) -> str:
     transformations = sympy_parser.standard_transformations + ( sympy_parser.implicit_multiplication_application ,)
     local_dict = { 'N': sympy.Symbol('N') }
     return str(sympy_parser.parse_expr(s, local_dict=local_dict, transformations=transformations))
 
-def parse(tokens):
-    env = collections.defaultdict(dict)
+def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None, None]:
+    env: Dict[str, Any] = collections.defaultdict(dict)
     for y, line in enumerate(tokens):
         for x, item in enumerate(line):
             if item['kind'] == 'indexed':
@@ -55,7 +58,7 @@ def parse(tokens):
                     f['r'] = item['index']
     for name in env:
         env[name]['n'] = simplify_expr('{}-{}+1'.format(env[name]['r'], env[name]['l']))
-    used = set()
+    used: Set[Any] = set()
     for y, line in enumerate(tokens):
         for x, item in enumerate(line):
             if item['kind'] == 'fixed':
@@ -74,7 +77,7 @@ def parse(tokens):
                     yield { 'kind': 'loop', 'length': n, 'body': [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ] }
                     used.add(name)
                 elif item['dir'] == 'vr':
-                    names = []
+                    names: List[str] = []
                     for item in tokens[y-1]:
                         if item['kind'] != 'indexed':
                             raise NotImplementedError
@@ -85,25 +88,22 @@ def parse(tokens):
                         used.add(name)
                     if not names:
                         continue
-                    acc = []
                     n = env[names[0]]['n']
-                    body = []
+                    body: List[Dict[str, Any]] = []
                     for name in names:
                         assert env[name]['n'] == n
                         yield { 'kind': 'decl-vector',  'targets': [ { 'name': name, 'length': n } ] } 
                         body += [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ]
                     yield { 'kind': 'loop', 'length': n, 'body': body }
-                    decls = []
-                    reads = []
                 else:
                     assert False
             else:
                 assert False
 
-def get_names(targets):
+def get_names(targets: List[Dict[str, str]]) -> List[str]:
     return list(map(lambda target: target['name'], targets))
 
-def postprocess(it):
+def postprocess(it: Any) -> Any:
     def go(it):
         i = 0
         while i < len(it):
@@ -125,14 +125,14 @@ def postprocess(it):
     it = go(it)
     return it
 
-def paren_if(n, lr):
+def paren_if(n: str, lr: Iterable[str]) -> str:
     l, r = lr
     if n:
         return l + n + r
     else:
         return n
 
-def export(it, repeat_macro=None, use_scanf=False):
+def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> str:
     def go(it, nest):
         if it['kind'] == 'decl':
             if it['names']:
@@ -173,7 +173,7 @@ def export(it, repeat_macro=None, use_scanf=False):
         s += go(line, 0)
     return s
 
-def generate_scanner(args):
+def generate_scanner(args: 'argparse.Namespace') -> None:
     if not args.silent:
         log.warning('This feature is ' + log.red('experimental') + '.')
     if args.silent:
@@ -183,7 +183,7 @@ def generate_scanner(args):
     if problem is None:
         sys.exit(1)
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
-        it = problem.get_input_format(session=sess)
+        it: Any = problem.get_input_format(session=sess)
     if not it:
         log.error('input format not found')
         sys.exit(1)

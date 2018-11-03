@@ -4,9 +4,12 @@ import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import json
 import sys
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
 
-def get_standings(args):
+def get_standings(args: 'argparse.Namespace') -> None:
     # parse url
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:

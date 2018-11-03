@@ -18,7 +18,7 @@ class CodeforcesService(onlinejudge.service.Service):
 
     def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
-        url = 'http://codeforces.com/enter'
+        url = 'https://codeforces.com/enter'
         # get
         resp = utils.request('GET', url, session=session)
         if resp.url != url:  # redirected
@@ -44,13 +44,14 @@ class CodeforcesService(onlinejudge.service.Service):
             return False
 
     def get_url(self) -> str:
-        return 'http://codeforces.com/'
+        return 'https://codeforces.com/'
 
     def get_name(self) -> str:
         return 'codeforces'
 
     @classmethod
     def from_url(cls, s: str) -> Optional['CodeforcesService']:
+        # example: https://codeforces.com/
         # example: http://codeforces.com/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
@@ -59,7 +60,7 @@ class CodeforcesService(onlinejudge.service.Service):
         return None
 
 
-# NOTE: Codeforces has its API: http://codeforces.com/api/help
+# NOTE: Codeforces has its API: https://codeforces.com/api/help
 class CodeforcesProblem(onlinejudge.problem.Problem):
     def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
@@ -98,9 +99,9 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
 
     def get_url(self) -> str:
         table = {}
-        table['contest']    = 'http://codeforces.com/contest/{}/problem/{}'
-        table['problemset'] = 'http://codeforces.com/problemset/problem/{}/{}'
-        table['gym']        = 'http://codeforces.com/gym/{}/problem/{}'
+        table['contest']    = 'https://codeforces.com/contest/{}/problem/{}'
+        table['problemset'] = 'https://codeforces.com/problemset/problem/{}/{}'
+        table['gym']        = 'https://codeforces.com/gym/{}/problem/{}'
         return table[self.kind].format(self.contest_id, self.index)
 
     def get_service(self) -> CodeforcesService:
@@ -112,9 +113,9 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'codeforces.com':
             table = {}
-            table['contest']    = r'^/contest/([0-9]+)/problem/([0A-Za-z])$'  # example: http://codeforces.com/contest/538/problem/H
-            table['problemset'] = r'^/problemset/problem/([0-9]+)/([0A-Za-z])$'  # example: http://codeforces.com/problemset/problem/700/B
-            table['gym']        = r'^/gym/([0-9]+)/problem/([0A-Za-z])$'  # example: http://codeforces.com/gym/101021/problem/A
+            table['contest']    = r'^/contest/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/contest/538/problem/H
+            table['problemset'] = r'^/problemset/problem/([0-9]+)/([0A-Za-z])$'  # example: https://codeforces.com/problemset/problem/700/B
+            table['gym']        = r'^/gym/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/gym/101021/problem/A
             normalize = lambda c: c == '0' and 'A' or c.upper()
             for kind, expr in table.items():
                 m = re.match(expr, utils.normpath(result.path))

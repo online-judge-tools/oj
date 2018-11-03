@@ -5,8 +5,12 @@ import onlinejudge.implementation.logging as log
 import sys
 import subprocess
 import time
+from typing import *
+from typing.io import *
+if TYPE_CHECKING:
+    import argparse
 
-def non_block_read(fh):
+def non_block_read(fh: IO[Any]) -> str:
     # workaround
     import fcntl
     import os
@@ -20,7 +24,7 @@ def non_block_read(fh):
 
 split_input_auto_footer = ('__AUTO_FOOTER__', )  # this shouldn't be a string, so a tuple
 
-def split_input(args):
+def split_input(args: 'argparse.Namespace') -> None:
     with open(args.input) as fh:
         inf = fh.read()
     if args.footer == split_input_auto_footer:
