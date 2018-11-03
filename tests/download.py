@@ -35,7 +35,7 @@ class DownloadOthersTest(unittest.TestCase):
         snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_hackerrank_beautiful_array(self):
-        if 'CI' not in os.environ:
+        if 'CI' in os.environ:
             print('NOTE: this test is skipped since login is required')
             return
         self.snippet_call_download(
