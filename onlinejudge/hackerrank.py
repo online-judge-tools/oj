@@ -1,6 +1,7 @@
 # Python Version: 3.x
 import onlinejudge.service
 import onlinejudge.problem
+from onlinejudge.problem import LabeledString, TestCase
 import onlinejudge.submission
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
@@ -13,12 +14,13 @@ import posixpath
 import json
 import datetime
 import time
+from typing import *
 
 
 @utils.singleton
 class HackerRankService(onlinejudge.service.Service):
 
-    def login(self, get_credentials, session=None):
+    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://www.hackerrank.com/login'
         # get
@@ -50,35 +52,36 @@ class HackerRankService(onlinejudge.service.Service):
             log.failure('You failed to sign in. Wrong user ID or password.')
             return False
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'https://www.hackerrank.com/'
 
-    def get_name(self):
+    def get_name(self) -> str:
         return 'hackerrank'
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['HackerRankService']:
         # example: https://www.hackerrank.com/dashboard
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('hackerrank.com', 'www.hackerrank.com'):
             return cls()
+        return None
 
 
 class HackerRankProblem(onlinejudge.problem.Problem):
-    def __init__(self, contest_slug, challenge_slug):
+    def __init__(self, contest_slug: str, challenge_slug: str):
         self.contest_slug = contest_slug
         self.challenge_slug = challenge_slug
 
-    def download(self, session=None, method='run_code'):
+    def download(self, session: Optional[requests.Session] = None, method: str = 'run_code') -> List[TestCase]:
         if method == 'run_code':
             return self.download_with_running_code(session=session)
         elif method == 'parse_html':
             return self.download_with_parsing_html(session=session)
         else:
-            assert False
+            raise ValueError
 
-    def download_with_running_code(self, session=None):
+    def download_with_running_code(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -111,33 +114,33 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         if not it['status']:
             log.error('Run Code: failed')
             return []
-        samples = []
+        samples: List[TestCase] = []
         for i, (inf, outf) in enumerate(zip(it['model']['stdin'], it['model']['expected_output'])):
             inname  = 'Testcase {} Input'.format(i)
             outname = 'Testcase {} Expected Output'.format(i)
-            samples += [ {
-                'input': { 'data': utils.textfile(inf), 'name': inname },
-                'output': { 'data': utils.textfile(outf), 'name': outname },
-                } ]
+            samples += [ TestCase(
+                LabeledString( inname, utils.textfile(inf)),
+                LabeledString(outname, utils.textfile(outf)),
+                ) ]
         return samples
 
 
-    def download_with_parsing_html(self, session=None):
+    def download_with_parsing_html(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
         raise NotImplementedError
 
-    def get_url(self):
+    def get_url(self) -> str:
         if self.contest_slug == 'master':
             return 'https://www.hackerrank.com/challenges/{}'.format(self.challenge_slug)
         else:
             return 'https://www.hackerrank.com/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
 
-    def get_service(self):
+    def get_service(self) -> HackerRankService:
         return HackerRankService()
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['HackerRankProblem']:
         # example: https://www.hackerrank.com/contests/university-codesprint-2/challenges/the-story-of-a-tree
         # example: https://www.hackerrank.com/challenges/fp-hello-world
         result = urllib.parse.urlparse(s)
@@ -149,8 +152,9 @@ class HackerRankProblem(onlinejudge.problem.Problem):
             m = re.match(r'^/challenges/([0-9A-Za-z-]+)$', utils.normpath(result.path))
             if m:
                 return cls('master', m.group(1))
+        return None
 
-    def _get_model(self, session=None):
+    def _get_model(self, session: Optional[requests.Session] = None) -> Dict[str, Any]:
         session = session or utils.new_default_session()
         # get
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
@@ -160,10 +164,10 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         log.debug('json: %s', it)
         if not it['status']:
             log.error('get model: failed')
-            return None
+            raise onlinejudge.problem.SubmissionError
         return it['model']
 
-    def get_language_dict(self, session=None):
+    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Dict[str, str]]:
         session = session or utils.new_default_session()
         info = self._get_model(session=session)
         # lang_display_mapping from https://hrcdn.net/hackerrank/assets/codeshell/dist/codeshell-449bb296b091277fedc42b23f7c9c447.js, Sun Feb 19 02:25:36 JST 2017
@@ -177,7 +181,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
             result[lang] = { 'description': descr }
         return result
 
-    def submit(self, code, language, session=None):
+    def submit(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.submission.Submission:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -194,7 +198,7 @@ class HackerRankProblem(onlinejudge.problem.Problem):
         log.debug('json: %s', it)
         if not it['status']:
             log.failure('Submit Code: failed')
-            return None
+            raise onlinejudge.problem.SubmissionError
         model_id = it['model']['id']
         url = self.get_url().rstrip('/') + '/submissions/code/{}'.format(model_id)
         log.success('success: result: %s', url)

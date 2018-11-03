@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import onlinejudge.service
 import onlinejudge.problem
+from onlinejudge.problem import LabeledString, TestCase
 import onlinejudge.submission
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
@@ -16,12 +17,13 @@ import requests
 import urllib.parse
 import zipfile
 import collections
+from typing import *
 
 
 @utils.singleton
 class YukicoderService(onlinejudge.service.Service):
 
-    def login(self, get_credentials, session=None, method=None):
+    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
         if method == 'github':
             return self.login_with_github(get_credentials, session=session)
         elif method == 'twitter':
@@ -29,7 +31,7 @@ class YukicoderService(onlinejudge.service.Service):
         else:
             assert False
 
-    def login_with_github(self, get_credentials, session=None):
+    def login_with_github(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/github'
         # get
@@ -60,32 +62,34 @@ class YukicoderService(onlinejudge.service.Service):
             log.failure('You failed to sign in. Wrong user ID or password.')
             return False
 
-    def login_with_twitter(self, get_credentials, session=None):
+    def login_with_twitter(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'https://yukicoder.me/'
 
-    def get_name(self):
+    def get_name(self) -> str:
         return 'yukicoder'
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['YukicoderService']:
         # example: http://yukicoder.me/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'yukicoder.me':
             return cls()
+        return None
 
-    def _issue_official_api(self, api, id=None, name=None, session=None):
+    def _issue_official_api(self, api: str, id: Optional[int] = None, name: Optional[str] = None, session: Optional[requests.Session] = None) -> Any:
         assert (id is not None) != (name is not None)
         if id is not None:
             assert isinstance(id, int)
             sometihng = { 'user': '', 'solved': 'id/' }[api]
             url = 'https://yukicoder.me/api/v1/{}/{}{}'.format(api, sometihng, id)
         else:
+            assert name is not None
             url = 'https://yukicoder.me/api/v1/{}/name/{}'.format(api, urllib.parse.quote(name))
         session = session or utils.new_default_session()
         try:
@@ -96,16 +100,16 @@ class YukicoderService(onlinejudge.service.Service):
         return json.loads(resp.content.decode(resp.encoding))
 
     # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
-    def get_user(self, *args, **kwargs):
+    def get_user(self, *args, **kwargs) -> Dict[str, Any]:
         return self._issue_official_api('user', *args, **kwargs)
 
     # https://twitter.com/yukicoder/status/935943170210258944
     # example: [{"No":46,"ProblemId":43,"Title":"はじめのn歩","AuthorId":25,"TesterId":0,"Level":1,"ProblemType":0,"Tags":"実装"}]
-    def get_solved(self, *args, **kwargs):
+    def get_solved(self, *args, **kwargs) -> List[Dict[str, Any]]:
         return self._issue_official_api('solved', *args, **kwargs)
 
     # example: https://yukicoder.me/users/237/favorite
-    def get_user_favorite(self, id, session=None):
+    def get_user_favorite(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
         url = 'https://yukicoder.me/users/%d/favorite' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
         assert columns == [ '#', '提出時間', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]
@@ -120,7 +124,7 @@ class YukicoderService(onlinejudge.service.Service):
         return rows
 
     # example: https://yukicoder.me/users/504/favoriteProblem
-    def get_user_favorite_problem(self, id, session=None):
+    def get_user_favorite_problem(self, id, session: Optional[requests.Session] = None) -> List[Any]:
         url = 'https://yukicoder.me/users/%d/favoriteProblem' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
         assert columns == [ 'ナンバー', '問題名', 'レベル', 'タグ', '時間制限', 'メモリ制限', '作問者' ]
@@ -142,7 +146,7 @@ class YukicoderService(onlinejudge.service.Service):
         return rows
 
     # example: https://yukicoder.me/users/1786/favoriteWiki
-    def get_user_favorite_wiki(self, id, session=None):
+    def get_user_favorite_wiki(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
         url = 'https://yukicoder.me/users/%d/favoriteWiki' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
         assert columns == [ 'Wikiページ' ]
@@ -155,7 +159,7 @@ class YukicoderService(onlinejudge.service.Service):
     # example: https://yukicoder.me/submissions?page=4220
     # example: https://yukicoder.me/submissions?page=2192&status=AC
     # NOTE: 1ページしか読まない 全部欲しい場合は呼び出し側で頑張る
-    def get_submissions(self, page, status=None, session=None):
+    def get_submissions(self, page: int, status: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
         assert isinstance(page, int) and page >= 1
         url = 'https://yukicoder.me/submissions?page=%d' % page
         if status is not None:
@@ -177,7 +181,7 @@ class YukicoderService(onlinejudge.service.Service):
 
     # example: https://yukicoder.me/problems?page=2
     # NOTE: loginしてると
-    def get_problems(self, page, comp_problem=True, other=False, sort=None, session=None):
+    def get_problems(self, page: int, comp_problem: bool = True, other: bool = False, sort: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
         assert isinstance(page, int) and page >= 1
         url = 'https://yukicoder.me/problems'
         if other:
@@ -206,7 +210,7 @@ class YukicoderService(onlinejudge.service.Service):
                     row[column] = row[column].text.strip()
         return rows
 
-    def _get_and_parse_the_table(self, url, session=None):
+    def _get_and_parse_the_table(self, url: str, session: Optional[requests.Session] = None) -> Tuple[List[Any], List[Dict[str, bs4.Tag]]]:
         # get
         session = session or utils.new_default_session()
         resp = utils.request('GET', url, session=session)
@@ -215,18 +219,18 @@ class YukicoderService(onlinejudge.service.Service):
         assert len(soup.find_all('table')) == 1
         table = soup.find('table')
         columns = [ th.text.strip() for th in table.find('thead').find('tr') if th.name == 'th' ]
-        data = []
+        data: List[Dict[str, List[str]]] = []
         for row in table.find('tbody').find_all('tr'):
             values = [ td for td in row if td.name == 'td' ]
             assert len(columns) == len(values)
             data += [ dict(zip(columns, values)) ]
         return columns, data
 
-    def _parse_star(self, tag):
+    def _parse_star(self, tag: bs4.Tag) -> str:
         star = str(len(tag.find_all(class_='fa-star')))
         if tag.find_all(class_='fa-star-half-full'):
             star += '.5'
-        return star  # str
+        return star
 
 class YukicoderProblem(onlinejudge.problem.Problem):
     def __init__(self, problem_no=None, problem_id=None):
@@ -236,12 +240,12 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         self.problem_no = problem_no
         self.problem_id = problem_id
 
-    def download(self, session=None, is_system=False):
+    def download(self, session: Optional[requests.Session] = None, is_system: bool = False) -> List[TestCase]:
         if is_system:
             return self.download_system(session=session)
         else:
             return self.download_samples(session=session)
-    def download_samples(self, session=None):
+    def download_samples(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -255,30 +259,34 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 data, name = it
                 samples.add(data, name)
         return samples.get()
-    def download_system(self, session=None):
+    def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         resp = utils.request('GET', url, session=session)
         # parse
-        samples = collections.defaultdict(dict)
+        basenames: Dict[str, Dict[str, LabeledString]] = collections.defaultdict(dict)
         with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
             for filename in sorted(fh.namelist()):  # "test_in" < "test_out"
                 dirname = os.path.dirname(filename)
                 basename = os.path.basename(filename)
                 kind = { 'test_in': 'input', 'test_out': 'output' }[dirname]
-                data = fh.read(filename).decode()
+                content = fh.read(filename).decode()
                 name = basename
                 if os.path.splitext(name)[1] == '.in':  # ".in" extension is confusing
                     name = os.path.splitext(name)[0]
-                print(filename, name)
-                samples[basename][kind] = { 'data': data, 'name': name }
-        for sample in samples.values():
-            if 'input' not in sample or 'output' not in sample:
-                log.error('dangling sample found: %s', str(sample))
-        return list(map(lambda it: it[1], sorted(samples.items())))
+                print(filename, name)  # TODO: what is this?
+                basenames[basename][kind] = LabeledString(name, content)
+        samples: List[TestCase] = []
+        for basename in sorted(basenames.keys()):
+            data = basenames[basename]
+            if 'input' not in data or 'output' not in data or len(data) != 2:
+                log.error('dangling sample found: %s', str(data))
+            else:
+                samples += [ TestCase(data['input'], data['output']) ]
+        return samples
 
-    def _parse_sample_tag(self, tag):
+    def _parse_sample_tag(self, tag: bs4.Tag) -> Optional[Tuple[str, str]]:
         assert isinstance(tag, bs4.Tag)
         assert tag.name == 'pre'
         prv = utils.previous_sibling_tag(tag)
@@ -288,38 +296,41 @@ class YukicoderProblem(onlinejudge.problem.Problem):
             log.debug('name.encode(): %s', prv.string.encode())
             s = tag.string or ''  # tag.string for the tag "<pre></pre>" returns None
             return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
+        return None
 
-    def get_url(self):
+    def get_url(self) -> str:
         if self.problem_no:
             return 'https://yukicoder.me/problems/no/{}'.format(self.problem_no)
         elif self.problem_id:
             return 'https://yukicoder.me/problems/{}'.format(self.problem_id)
         else:
-            assert False
+            raise ValueError
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['YukicoderProblem']:
         # example: https://yukicoder.me/problems/no/499
         # example: http://yukicoder.me/problems/1476
         result = urllib.parse.urlparse(s)
         dirname, basename = posixpath.split(utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'yukicoder.me':
+            n: Optional[int] = None
             try:
                 n = int(basename)
             except ValueError:
-                n = None
+                pass
             if n is not None:
                 if dirname == '/problems/no':
                     return cls(problem_no=int(n))
                 if dirname == '/problems':
                     return cls(problem_id=int(n))
             return cls()
+        return None
 
-    def get_service(self):
+    def get_service(self) -> YukicoderService:
         return YukicoderService()
 
-    def get_input_format(self, session=None):
+    def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -328,6 +339,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         for h4 in soup.find_all('h4'):
             if h4.string == '入力':
                 return h4.parent.find('pre').string
+        return None
 
 
 onlinejudge.dispatch.services += [ YukicoderService ]

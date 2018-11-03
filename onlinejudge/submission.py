@@ -5,11 +5,8 @@ if TYPE_CHECKING:
     from onlinejudge.problem import Problem
     from onlinejudge.service import Service
 
-# LabeledString = NamedTuple('LabeledString', [ ('name', str), ('data', str) ])
-# TestCase = NamedTuple('TestCase', [ ('input', LabeledString), ('output': LabeledString) ])
-
 class Submission(object):
-    def download(self, session: Optional['requests.Session'] = None):  # -> List[TestCase]:
+    def download(self, session: Optional['requests.Session'] = None) -> str:
         raise NotImplementedError
     def get_url(self) -> str:
         raise NotImplementedError

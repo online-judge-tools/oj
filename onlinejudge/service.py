@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 CredentialsProvider = Callable[[], Tuple[str, str]]
 
 class Service(object):
-    def login(self, get_credentials: CredentialsProvider, session: Optional['requests.Session'] = None):
+    def login(self, get_credentials: CredentialsProvider, session: Optional['requests.Session'] = None) -> bool:
         raise NotImplementedError
     def get_url(self) -> str:
         raise NotImplementedError

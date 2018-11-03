@@ -14,12 +14,13 @@ import json
 import time
 import itertools
 import collections
+from typing import *
 
 
 @utils.singleton
 class TopCoderService(onlinejudge.service.Service):
 
-    def login(self, get_credentials, session=None):
+    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
 
         # NOTE: you can see this login page with https://community.topcoder.com/longcontest/?module=Submit
@@ -41,19 +42,20 @@ class TopCoderService(onlinejudge.service.Service):
             log.failure('Failure')
             return False
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'https://www.topcoder.com/'
 
-    def get_name(self):
+    def get_name(self) -> str:
         return 'topcoder'
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['TopCoderService']:
         # example: https://www.topcoder.com/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in [ 'www.topcoder.com', 'community.topcoder.com' ]:
             return cls()
+        return None
 
 
 class TopCoderLongContestProblem(onlinejudge.problem.Problem):
@@ -63,14 +65,14 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         self.compid = compid
         self.pm = pm
 
-    def get_url(self):
+    def get_url(self) -> str:
         return 'https://community.topcoder.com/tc?module=MatchDetails&rd=' + str(self.rd)
 
-    def get_service(self):
+    def get_service(self) -> TopCoderService:
         return TopCoderService()
 
     @classmethod
-    def from_url(cls, s):
+    def from_url(cls, s: str) -> Optional['TopCoderLongContestProblem']:
         # example: https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16997&pm=14690
         # example: https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16997&compid=57374
         # example: https://community.topcoder.com/longcontest/?module=ViewStandings&rd=16997
@@ -86,8 +88,9 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
                     if name in querystring:
                         kwargs[name] = int(querystring[name])
                 return cls(**kwargs)
+        return None
 
-    def get_language_dict(self, session=None):
+    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Dict[str, str]]:
         session = session or utils.new_default_session()
 
         # at 2017/09/21
@@ -99,7 +102,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
                 'Python': { 'value': '6', 'description': 'Pyhton 2' },
             }
 
-    def submit(self, code, language, kind='example', session=None):
+    def submit(self, code: str, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.submission.Submission:
         assert kind in [ 'example', 'full' ]
         session = session or utils.new_default_session()
 
@@ -117,7 +120,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         path = [ tag.attrs['href'] for tag in soup.find_all('a', text='Submit') if ('rd=%d' % self.rd) in tag.attrs['href'] ]
         if len(path) == 0:
             log.error('link to submit not found:  Are you logged in?  Are you registered?  Is the contest running?')
-            return None
+            raise onlinejudge.problem.SubmissionError
         assert len(path) == 1
         path = path[0]
         assert path.startswith('/') and 'module=Submit' in path
@@ -149,20 +152,20 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         if 'module=SubmitSuccess' in resp.content.decode(resp.encoding):
             url = 'http://community.topcoder.com/longcontest/?module=SubmitSuccess&rd={}&cd={}&compid={}'.format(self.rd, self.cd, self.compid)
             log.success('success: result: %s', url)
-            return onlinejudge.submission.CompatibilitySubmission(url)
+            return onlinejudge.submission.CompatibilitySubmission(url, self)
         else:
             # module=Submit to get error messages
             resp = utils.request('GET', submit_url, session=session)
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             messages = soup.find('textarea', { 'name': 'messages' }).text
             log.failure('%s', messages)
-            return None
+            raise onlinejudge.problem.SubmissionError
 
-    def get_standings(self, session=None):
+    def get_standings(self, session: Optional[requests.Session] = None) -> onlinejudge.problem.Standings:
         session = session or utils.new_default_session()
 
-        header = None
-        rows = []
+        header: Optional[List[str]] = None
+        rows: List[Dict[str, str]] = []
         for start in itertools.count(1, 100):
             # get
             url = 'https://community.topcoder.com/longcontest/?sc=&sd=&nr=100&sr={}&rd={}&module=ViewStandings'.format(start, self.rd)
@@ -176,7 +179,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
                 tr = trs[1]
                 header = [ td.text.strip() for td in tr.find_all('td') ]
             for tr in trs[2 :]:
-                row = collections.OrderedDict()
+                row: Dict[str, str] = collections.OrderedDict()
                 for key, td in zip(header, tr.find_all('td')):
                     value = td.text.strip()
                     if not value:
@@ -191,6 +194,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
             if link is None:
                 break
 
+        assert header is not None
         return header, rows
 
 onlinejudge.dispatch.services += [ TopCoderService ]

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.version as version
+from onlinejudge.problem import LabeledString, TestCase
 import re
 import os
 import os.path
@@ -75,22 +76,19 @@ class SampleZipper(object):
         self.data = []
         self.dangling = None
 
-    def add(self, s, name=''):
+    def add(self, s: str, name: str = '') -> None:
         if self.dangling is None:
             if re.search('output', name, re.IGNORECASE) or re.search('出力', name):
                 log.warning('strange name for input string: %s', name)
-            self.dangling = { 'data': s, 'name': name }
+            self.dangling = LabeledString(name, s)
         else:
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
                 if not (re.search('output', name, re.IGNORECASE) or re.search('出力', name)):  # to ignore titles like "Output for Sample Input 1"
                     log.warning('strange name for output string: %s', name)
-            self.data += [ {
-                'input': self.dangling,
-                'output': { 'data': s, 'name': name },
-                } ]
+            self.data += [ TestCase(self.dangling, LabeledString(name, s)) ]
             self.dangling = None
 
-    def get(self):
+    def get(self) -> List[TestCase]:
         if self.dangling is not None:
             log.error('dangling sample string: %s', self.dangling[1])
         return self.data
