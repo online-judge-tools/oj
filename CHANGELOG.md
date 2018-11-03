@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.40 / 2018-11-03
+
+-   [#141](https://github.com/kmyk/online-judge-tools/issues/141) add a feature to check updating
+-   [#168](https://github.com/kmyk/online-judge-tools/issues/168) use HTTPS for codeforces.com
+-   [#183](https://github.com/kmyk/online-judge-tools/issues/183) add type hints
+
 ## 0.1.39 / 2018-10-06
 
 -   [#180](https://github.com/kmyk/online-judge-tools/issues/180) add `-d DIRECTORY` option to `download` `test` `generate-output` commands
