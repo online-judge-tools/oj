@@ -12,8 +12,11 @@ import colorama
 import collections
 import time
 import math
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
-def compare_as_floats(xs, ys, error):
+def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
     def f(x):
         try:
             y = float(x)
@@ -22,8 +25,8 @@ def compare_as_floats(xs, ys, error):
             return y
         except ValueError:
             return x
-    xs = list(map(f, xs.split()))
-    ys = list(map(f, ys.split()))
+    xs = list(map(f, xs_.split()))
+    ys = list(map(f, ys_.split()))
     if len(xs) != len(ys):
         return False
     for x, y in zip(xs, ys):
@@ -35,7 +38,7 @@ def compare_as_floats(xs, ys, error):
                 return False
     return True
 
-def test(args):
+def test(args: 'argparse.Namespace') -> None:
     # prepare
     if not args.test:
         args.test = cutils.glob_with_format(args.directory, args.format)  # by default
@@ -53,7 +56,8 @@ def test(args):
                 return True
             return False
     rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
-    slowest, slowest_name = -1, ''
+    slowest: Union[int, float] = -1
+    slowest_name = ''
     ac_count = 0
 
     for name, it in sorted(tests.items()):
@@ -71,9 +75,9 @@ def test(args):
         # run the binary
         with open(it['in']) as inf:
             begin = time.perf_counter()
-            answer, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
+            answer_byte, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
-            answer = answer.decode()
+            answer = answer_byte.decode()
             if slowest < end - begin:
                 slowest = end - begin
                 slowest_name = name
@@ -105,9 +109,9 @@ def test(args):
                         log.emit('expected:\n%s', log.bold(correct))
                     result = 'WA'
             elif args.mode == 'line':
-                answer  = answer .splitlines()
-                correct = correct.splitlines()
-                for i, (x, y) in enumerate(zip(answer + [ None ] * len(correct), correct + [ None ] * len(answer))):
+                answer_words  = answer .splitlines()
+                correct_words = correct.splitlines()
+                for i, (x, y) in enumerate(zip(answer_words + [ None ] * len(correct_words), correct_words + [ None ] * len(answer_words))):  # type: ignore
                     if x is None and y is None:
                         break
                     elif x is None:

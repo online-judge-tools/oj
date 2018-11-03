@@ -7,9 +7,12 @@ import os
 import os.path
 import subprocess
 import contextlib
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
 @contextlib.contextmanager
-def fifo():
+def fifo() -> Generator[Tuple[Any, Any], None, None]:
     fdr, fdw = os.pipe()
     fhr = os.fdopen(fdr, 'r')
     fhw = os.fdopen(fdw, 'w')
@@ -18,7 +21,7 @@ def fifo():
     fhr.close()
     # os.close(fdw), os.close(fdr) are unnecessary
 
-def test_reactive(args):
+def test_reactive(args: 'argparse.Namespace') -> None:
     with fifo() as (fhr1, fhw1):
         with fifo() as (fhr2, fhw2):
             with subprocess.Popen(args.command, shell=True, stdin=fhr2, stdout=fhw1, stderr=sys.stderr) as proc1:

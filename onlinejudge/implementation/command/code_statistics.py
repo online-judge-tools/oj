@@ -7,10 +7,12 @@ import os
 import os.path
 import subprocess
 import contextlib
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
 
-def get_char_class(c):
-    assert isinstance(c, int)
+def get_char_class(c: int) -> str:
     assert 0 <= c < 256
     if chr(c) in string.ascii_letters + string.digits:
         return 'alnum'
@@ -21,8 +23,7 @@ def get_char_class(c):
     else:
         return 'binary'
 
-def get_statistics(s):
-    assert isinstance(s, bytes)
+def get_statistics(s: bytes) -> Dict[str, int]:
     stat = {
         'binary': 0,
         'alnum': 0,
@@ -33,7 +34,7 @@ def get_statistics(s):
         stat[get_char_class(c)] += 1
     return stat
 
-def code_statistics(args):
+def code_statistics(args: 'argparse.Namespace') -> None:
     with open(args.file, 'rb') as fh:
         code = fh.read()
     stat = get_statistics(code)

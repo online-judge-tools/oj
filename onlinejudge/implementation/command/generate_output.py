@@ -4,8 +4,11 @@ import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.command.utils as cutils
 import time
+from typing import *
+if TYPE_CHECKING:
+    import argparse
 
-def generate_output(args):
+def generate_output(args: 'argparse.Namespace') -> None:
     if not args.test:
         args.test = cutils.glob_with_format(args.directory, args.format) # by default
     if args.ignore_backup:
@@ -28,7 +31,8 @@ def generate_output(args):
             log.info('skipped.')
             continue
         log.emit(log.bold(answer.decode().rstrip()))
-        path = cutils.path_from_format(args.directory, args.format, name=cutils.match_with_format(args.directory, args.format, it['in']).groupdict()['name'], ext='out')
+        name = cutils.match_with_format(args.directory, args.format, it['in']).groupdict()['name']  # type: ignore
+        path = cutils.path_from_format(args.directory, args.format, name=name, ext='out')
         with open(path, 'w') as fh:
             fh.buffer.write(answer)
         log.success('saved to: %s', path)

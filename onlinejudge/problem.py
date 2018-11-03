@@ -25,6 +25,8 @@ class Problem(object):
         raise NotImplementedError
     def get_service(self) -> 'Service':
         raise NotImplementedError
+    def get_input_format(self, session: Optional['requests.Session'] = None) -> Optional[str]:
+        raise NotImplementedError
     def get_standings(self, session: Optional['requests.Session'] = None) -> Standings:
         raise NotImplementedError
     @classmethod

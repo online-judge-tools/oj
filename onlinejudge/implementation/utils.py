@@ -149,7 +149,7 @@ def singleton(cls):
         pass
     return cls
 
-def exec_command(command: List[str], timeout: float = None, **kwargs) -> Tuple[str, subprocess.Popen]:
+def exec_command(command: List[str], timeout: float = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
     try:
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
     except FileNotFoundError:
