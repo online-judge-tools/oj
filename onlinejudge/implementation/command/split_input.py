@@ -6,6 +6,7 @@ import sys
 import subprocess
 import time
 from typing import *
+from typing.io import *
 if TYPE_CHECKING:
     import argparse
 
