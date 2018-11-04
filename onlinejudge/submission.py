@@ -26,3 +26,11 @@ class CompatibilitySubmission(Submission):
         return self.url
     def get_problem(self) -> 'Problem':
         return self.problem
+
+class DummySubmission(Submission):
+    def __init__(self, url: str):
+        self.url = url
+    def get_url(self) -> str:
+        return self.url
+    def get_problem(self) -> 'Problem':
+        raise Exception
