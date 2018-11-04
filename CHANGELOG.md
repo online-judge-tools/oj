@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.42 / 2018-11-04
+
+-   [#189](https://github.com/kmyk/online-judge-tools/issues/189) fix a degression of `submit` to AtCoder
+
 ## 0.1.41 / 2018-11-04
 
 -   [#186](https://github.com/kmyk/online-judge-tools/pull/186) fix a problem of sample cases of AOJ and lxml ([@hachi-88](https://github.com/hachi-88))
