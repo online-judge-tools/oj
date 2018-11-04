@@ -18,6 +18,7 @@ import sys
 import ast
 import time
 from typing import *
+from typing.io import *
 
 default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
 html_parser = 'lxml'
@@ -37,13 +38,13 @@ def parcentformat(s: str, table: Dict[str, str]) -> str:
 def describe_status_code(status_code: int) -> str:
     return '{} {}'.format(status_code, http.client.responses[status_code])
 
-def previous_sibling_tag(tag):
+def previous_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
     tag = tag.previous_sibling
     while tag and not isinstance(tag, bs4.Tag):
         tag = tag.previous_sibling
     return tag
 
-def next_sibling_tag(tag):
+def next_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
     tag = tag.next_sibling
     while tag and not isinstance(tag, bs4.Tag):
         tag = tag.next_sibling
@@ -94,13 +95,13 @@ class SampleZipper(object):
         return self.data
 
 class FormSender(object):
-    def __init__(self, form, url):
+    def __init__(self, form: bs4.Tag, url: str):
         assert isinstance(form, bs4.Tag)
         assert form.name == 'form'
         self.form = form
         self.url = url
-        self.payload = {}
-        self.files = {}
+        self.payload: Dict[str, str] = {}
+        self.files: Dict[str, IO[Any]] = {}
         for input in self.form.find_all('input'):
             log.debug('input: %s', str(input))
             if input.attrs.get('type') in [ 'checkbox', 'radio' ]:
@@ -108,16 +109,16 @@ class FormSender(object):
             if 'name' in input.attrs and 'value' in input.attrs:
                 self.payload[input['name']] = input['value']
 
-    def set(self, key, value):
+    def set(self, key: str, value: str) -> None:
         self.payload[key] = value
 
-    def get(self):
+    def get(self) -> Dict[str, str]:
         return self.payload
 
-    def set_file(self, key, value):
+    def set_file(self, key: str, value: IO[Any]) -> None:
         self.files[key] = value
 
-    def request(self, session, action=None, **kwargs):
+    def request(self, session: requests.Session, action: Optional[str] = None, **kwargs) -> requests.Response:
         action = action or self.form['action']
         url = urllib.parse.urljoin(self.url, action)
         method = self.form['method'].upper()

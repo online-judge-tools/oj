@@ -214,7 +214,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             language_dict[option.attrs['value']] = { 'description': option.string }
         return language_dict
 
-    def submit(self, code: str, language: str, session: Optional[requests.Session] = None) -> 'AtCoderSubmission':
+    def submit(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.submission.DummySubmission:
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
         # get
@@ -252,12 +252,10 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             log.success('success: result: %s', resp.url)
             # NOTE: ignore the returned legacy URL and use beta.atcoder.jp's one
             url = 'https://beta.atcoder.jp/contests/{}/submissions/me'.format(self.contest_id)
-            submission = AtCoderSubmission.from_url(url, problem_id=self.problem_id)
-            if not submission:
-                raise SubmissionError
-            return submission
+            return onlinejudge.submission.DummySubmission(url)
         else:
             log.failure('failure')
+            log.debug('redirected to %s', resp.url)
             raise SubmissionError
 
     def _get_task_id(self, session: Optional[requests.Session] = None) -> int:

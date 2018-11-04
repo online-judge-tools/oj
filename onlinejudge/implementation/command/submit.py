@@ -99,25 +99,26 @@ def submit(args: 'argparse.Namespace') -> None:
                 kwargs['kind'] = 'full'
             else:
                 kwargs['kind'] = 'example'
-        submission = problem.submit(code, language=args.language, session=sess, **kwargs)  # type: ignore
+        try:
+            submission = problem.submit(code, language=args.language, session=sess, **kwargs)  # type: ignore
+        except onlinejudge.problem.SubmissionError:
+            log.failure('submission failed')
+            return
 
         # show result
-        if submission is None:
-            log.failure('submission failed')
-        else:
-            if args.open:
-                if args.open_browser:
-                    browser = args.open_browser
+        if args.open:
+            if args.open_browser:
+                browser = args.open_browser
+            else:
+                for browser in default_url_opener:
+                    if shutil.which(browser):
+                        break
                 else:
-                    for browser in default_url_opener:
-                        if shutil.which(browser):
-                            break
-                    else:
-                        browser = None
-                        log.failure('couldn\'t find browsers to open the url. please specify a browser')
-                if browser:
-                    log.info('open the submission page with: %s', browser)
-                    subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                    browser = None
+                    log.failure('couldn\'t find browsers to open the url. please specify a browser')
+            if browser:
+                log.info('open the submission page with: %s', browser)
+                subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
     result = []
