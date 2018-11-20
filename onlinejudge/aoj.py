@@ -70,21 +70,20 @@ class AOJProblem(onlinejudge.problem.Problem):
         return samples.get()
     def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
-        get_url = lambda case, type: 'http://analytic.u-aizu.ac.jp:8080/aoj/testcase.jsp?id={}&case={}&type={}'.format(self.problem_id, case, type)
+        get_url = lambda case, type: 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}/{}'.format(self.problem_id, case, type)
         testcases: List[TestCase] = []
         for case in itertools.count(1):
             # input
-            # get
-            resp = utils.request('GET', get_url(case, 'in'), session=session, raise_for_status=False)
-            if resp.status_code != 200:
-                break
+            resp = utils.request('GET', get_url(case, 'in'), session=session)
             in_txt = resp.text
-            if case == 2 and testcases[0].input.data == in_txt:
-                break # if the querystring case=??? is ignored
+            if in_txt.strip() == '/* This is a single file for multiple testcases. serial should be 1. */':
+                break
+            if in_txt.strip() == '/* Test case #{} for problem {} is not available. */'.format(case, self.problem_id):
+                break
             # output
-            # get
             resp = utils.request('GET', get_url(case, 'out'), session=session)
             out_txt = resp.text
+            assert out_txt.strip() != '/* This is a single file for multiple testcases. serial should be 1. */'
             testcases += [ TestCase(
                 LabeledString('in%d.txt' % case, in_txt),
                 LabeledString('out%d.txt' % case, out_txt),

@@ -6,9 +6,6 @@ import os
 class DownloadAOJTest(unittest.TestCase):
 
     def snippet_call_download(self, *args, **kwargs):
-        if kwargs.get('is_system'):
-            print('NOTE: this test is skipped since analytic.u-aizu.ac.jp:8080 is closed')
-            return
         tests.download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_aoj_DSL_1_A(self):
