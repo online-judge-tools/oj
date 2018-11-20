@@ -21,9 +21,10 @@ def snippet_call_download(self, url, files, is_system=False):
             cmd += [ '--system' ]
         subprocess.check_call(cmd, stdout=sys.stdout, stderr=sys.stderr)
         result = {}
-        for name in os.listdir('test'):
-            with open(os.path.join('test', name)) as fh:
-                result[name] = hashlib.md5(fh.buffer.read()).hexdigest()
+        if os.path.exists('test'):
+            for name in os.listdir('test'):
+                with open(os.path.join('test', name)) as fh:
+                    result[name] = hashlib.md5(fh.buffer.read()).hexdigest()
         self.assertEqual(files, result)
     finally:
         os.chdir(cwd)

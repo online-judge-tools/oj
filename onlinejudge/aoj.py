@@ -7,8 +7,9 @@ import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import io
+import re
 import posixpath
-import bs4
+import json
 import requests
 import urllib.parse
 import zipfile
@@ -29,9 +30,10 @@ class AOJService(onlinejudge.service.Service):
     @classmethod
     def from_url(cls, s: str) -> Optional['AOJService']:
         # example: http://judge.u-aizu.ac.jp/onlinejudge/
+        # example: https://onlinejudge.u-aizu.ac.jp/home
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc == 'judge.u-aizu.ac.jp':
+                and result.netloc in ('judge.u-aizu.ac.jp', 'onlinejudge.u-aizu.ac.jp'):
             return cls()
         return None
 
@@ -45,49 +47,48 @@ class AOJProblem(onlinejudge.problem.Problem):
             return self.download_system(session=session)
         else:
             return self.download_samples(session=session)
+
     def download_samples(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
-        # get
-        resp = utils.request('GET', self.get_url(), session=session)
-        # parse
-        soup = bs4.BeautifulSoup(resp.content, utils.html_parser)  # NOTE: resp.content is not decoded for workaround, see https://github.com/kmyk/online-judge-tools/pull/186
-        samples = utils.SampleZipper()
-        for pre in soup.find_all('pre'):
-            log.debug('pre: %s', str(pre))
-            hn = utils.previous_sibling_tag(pre)
-            if hn is None:
-                div = pre.parent
-                if div is not None:
-                    log.debug('div: %s', str(hn))
-                    hn = utils.previous_sibling_tag(div)
-            log.debug('hN: %s', str(hn))
-            log.debug(hn)
-            keywords = [ 'sample', 'example', '入力例', '出力例' ]
-            if hn and hn.name in [ 'h2', 'h3' ] and hn.string and any(filter(lambda keyword: keyword in hn.string.lower(), keywords)):
-                s = utils.textfile(pre.string.lstrip())
-                name = hn.string
-                samples.add(s, name)
-        return samples.get()
+        # get samples via the official API
+        # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2Fsamples%2F%7BproblemId%7D_GET
+        url = 'https://judgedat.u-aizu.ac.jp/testcases/samples/{}'.format(self.problem_id)
+        resp = utils.request('GET', url, session=session)
+        samples: List[TestCase] = []
+        for sample in json.loads(resp.content):
+            samples += [ TestCase(
+                LabeledString(str(sample['serial']), sample['in']),
+                LabeledString(str(sample['serial']), sample['out']),
+                ) ]
+        return samples
+
     def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
-        get_url = lambda case, type: 'http://analytic.u-aizu.ac.jp:8080/aoj/testcase.jsp?id={}&case={}&type={}'.format(self.problem_id, case, type)
+
+        # get header
+        # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2Fheader_GET
+        url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/header'.format(self.problem_id)
+        resp = utils.request('GET', url, session=session)
+        header = json.loads(resp.content)
+
+        # get testcases via the official API
         testcases: List[TestCase] = []
-        for case in itertools.count(1):
-            # input
-            # get
-            resp = utils.request('GET', get_url(case, 'in'), session=session, raise_for_status=False)
-            if resp.status_code != 200:
-                break
-            in_txt = resp.text
-            if case == 2 and testcases[0].input.data == in_txt:
-                break # if the querystring case=??? is ignored
-            # output
-            # get
-            resp = utils.request('GET', get_url(case, 'out'), session=session)
-            out_txt = resp.text
+        for header in header['headers']:
+            # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2F%7Bserial%7D_GET
+            url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}'.format(self.problem_id, header['serial'])
+            resp = utils.request('GET', url, session=session)
+            testcase = json.loads(resp.content)
+            skipped = False
+            for type in ('in', 'out'):
+                if testcase[type].endswith('..... (terminated because of the limitation)\n'):
+                    log.error('AOJ API says: terminated because of the limitation')
+                    skipped = True
+            if skipped:
+                log.warning("skipped due to the limitation of AOJ API")
+                continue
             testcases += [ TestCase(
-                LabeledString('in%d.txt' % case, in_txt),
-                LabeledString('out%d.txt' % case, out_txt),
+                LabeledString(header['name'],  testcase['in']),
+                LabeledString(header['name'], testcase['out']),
                 ) ]
         return testcases
 
@@ -96,9 +97,10 @@ class AOJProblem(onlinejudge.problem.Problem):
 
     @classmethod
     def from_url(cls, s: str) -> Optional['AOJProblem']:
+        result = urllib.parse.urlparse(s)
+
         # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1169
         # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A&lang=jp
-        result = urllib.parse.urlparse(s)
         querystring = urllib.parse.parse_qs(result.query)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'judge.u-aizu.ac.jp' \
@@ -107,6 +109,19 @@ class AOJProblem(onlinejudge.problem.Problem):
                 and len(querystring['id']) == 1:
             n, = querystring['id']
             return cls(n)
+
+        # example: https://onlinejudge.u-aizu.ac.jp/challenges/sources/JAG/Prelim/2881
+        # example: https://onlinejudge.u-aizu.ac.jp/courses/library/4/CGL/3/CGL_3_B
+        m = re.match(r'^/(challenges|courses)/(sources|library/\d+|lesson/\d+)/(\w+)/(\w+)/(\w+)$', utils.normpath(result.path))
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'onlinejudge.u-aizu.ac.jp' \
+                and m:
+            n = m.group(5)
+            return cls(n)
+
+        # example: https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp18Day3/problems/B
+        # NOTE: I don't know how to retrieve the problem id
+
         return None
 
     def get_service(self) -> AOJService:

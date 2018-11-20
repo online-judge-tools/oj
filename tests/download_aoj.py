@@ -6,9 +6,6 @@ import os
 class DownloadAOJTest(unittest.TestCase):
 
     def snippet_call_download(self, *args, **kwargs):
-        if kwargs.get('is_system'):
-            print('NOTE: this test is skipped since analytic.u-aizu.ac.jp:8080 is closed')
-            return
         tests.download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_aoj_DSL_1_A(self):
@@ -67,6 +64,22 @@ class DownloadAOJTest(unittest.TestCase):
                 'sample-1.in':  '0483a0080de977d5e1db1ab87eae3fa9',
                 'sample-1.out': '346ce6367eff6bb3c9915601f2ae1e75',
             })
+    def test_call_download_aoj_DSL_3_B(self):
+        self.snippet_call_download(
+            'https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/3/DSL_3_B', {
+                'sample-1.in':  '36adbcbb268e04ef7667fb2d965eed2c',
+                'sample-1.out': '26ab0db90d72e28ad0ba1e22ee510510',
+                'sample-2.in':  '89a4280a03ec0001ec91f3fedbafadc1',
+                'sample-2.out': '6d7fce9fee471194aa8b5b6e47267f03',
+                'sample-3.in':  '22d823cf994ebee157a0cdc8219a600d',
+                'sample-3.out': '897316929176464ebc9ad085f31e7284',
+            })
+    def test_call_download_aoj_2394(self):
+        self.snippet_call_download(
+            'https://onlinejudge.u-aizu.ac.jp/challenges/sources/JAG/Spring/2394?year=2011', {
+                'sample-1.in':  '05dfaf25ae93e601a10cfb278db7679c',
+                'sample-1.out': '80982df7f6dac58f828e2e8b12e87a0a',
+            })
 
     def test_call_download_aoj_system_ITP1_1_B(self):
         self.snippet_call_download(
@@ -81,8 +94,9 @@ class DownloadAOJTest(unittest.TestCase):
                 '4.out': 'b39ffd5aa5029d696193c8362dcb1d19',
             }, is_system=True)
     def test_call_download_aoj_system_1169(self):
+        # NOTE: the data exists, but AOJ says "..... (terminated because of the limitation)"
         self.snippet_call_download(
             'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1169&lang=jp', {
-                '1.in':  'f0ecaede832a038d0e940c2c4d0ab5e5',
-                '1.out': '8d2f7846dc2fc10ef37dcb548635c788',
+                # '1.in':  'f0ecaede832a038d0e940c2c4d0ab5e5',
+                # '1.out': '8d2f7846dc2fc10ef37dcb548635c788',
             }, is_system=True)
