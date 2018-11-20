@@ -76,6 +76,14 @@ class AOJProblem(onlinejudge.problem.Problem):
             url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}'.format(self.problem_id, header['serial'])
             resp = utils.request('GET', url, session=session)
             testcase = json.loads(resp.content)
+            skipped = False
+            for type in ('in', 'out'):
+                if testcase[type].endswith('..... (terminated because of the limitation)\n'):
+                    log.error('AOJ API says: terminated because of the limitation')
+                    skipped = True
+            if skipped:
+                log.warning("skipped due to the limitation of AOJ API")
+                continue
             testcases += [ TestCase(
                 LabeledString(header['name'],  testcase['in']),
                 LabeledString(header['name'], testcase['out']),
