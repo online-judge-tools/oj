@@ -62,23 +62,23 @@ class AOJProblem(onlinejudge.problem.Problem):
 
     def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
-        get_url = lambda case, type: 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}/{}'.format(self.problem_id, case, type)
+
+        # get header
+        # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2Fheader_GET
+        url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/header'.format(self.problem_id)
+        resp = utils.request('GET', url, session=session)
+        header = json.loads(resp.content)
+
+        # get testcases via the official API
         testcases: List[TestCase] = []
-        for case in itertools.count(1):
-            # input
-            resp = utils.request('GET', get_url(case, 'in'), session=session)
-            in_txt = resp.text
-            if in_txt.strip() == '/* This is a single file for multiple testcases. serial should be 1. */':
-                break
-            if in_txt.strip() == '/* Test case #{} for problem {} is not available. */'.format(case, self.problem_id):
-                break
-            # output
-            resp = utils.request('GET', get_url(case, 'out'), session=session)
-            out_txt = resp.text
-            assert out_txt.strip() != '/* This is a single file for multiple testcases. serial should be 1. */'
+        for header in header['headers']:
+            # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2F%7Bserial%7D_GET
+            url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}'.format(self.problem_id, header['serial'])
+            resp = utils.request('GET', url, session=session)
+            testcase = json.loads(resp.content)
             testcases += [ TestCase(
-                LabeledString('in%d.txt' % case, in_txt),
-                LabeledString('out%d.txt' % case, out_txt),
+                LabeledString(header['name'],  testcase['in']),
+                LabeledString(header['name'], testcase['out']),
                 ) ]
         return testcases
 
