@@ -8,7 +8,7 @@ import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import io
 import posixpath
-import bs4
+import json
 import requests
 import urllib.parse
 import zipfile
@@ -45,29 +45,21 @@ class AOJProblem(onlinejudge.problem.Problem):
             return self.download_system(session=session)
         else:
             return self.download_samples(session=session)
+
     def download_samples(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
-        # get
-        resp = utils.request('GET', self.get_url(), session=session)
-        # parse
-        soup = bs4.BeautifulSoup(resp.content, utils.html_parser)  # NOTE: resp.content is not decoded for workaround, see https://github.com/kmyk/online-judge-tools/pull/186
-        samples = utils.SampleZipper()
-        for pre in soup.find_all('pre'):
-            log.debug('pre: %s', str(pre))
-            hn = utils.previous_sibling_tag(pre)
-            if hn is None:
-                div = pre.parent
-                if div is not None:
-                    log.debug('div: %s', str(hn))
-                    hn = utils.previous_sibling_tag(div)
-            log.debug('hN: %s', str(hn))
-            log.debug(hn)
-            keywords = [ 'sample', 'example', '入力例', '出力例' ]
-            if hn and hn.name in [ 'h2', 'h3' ] and hn.string and any(filter(lambda keyword: keyword in hn.string.lower(), keywords)):
-                s = utils.textfile(pre.string.lstrip())
-                name = hn.string
-                samples.add(s, name)
-        return samples.get()
+        # get samples via the official API
+        # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2Fsamples%2F%7BproblemId%7D_GET
+        url = 'https://judgedat.u-aizu.ac.jp/testcases/samples/{}'.format(self.problem_id)
+        resp = utils.request('GET', url, session=session)
+        samples: List[TestCase] = []
+        for sample in json.loads(resp.content):
+            samples += [ TestCase(
+                LabeledString(str(sample['serial']), sample['in']),
+                LabeledString(str(sample['serial']), sample['out']),
+                ) ]
+        return samples
+
     def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         get_url = lambda case, type: 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}/{}'.format(self.problem_id, case, type)
