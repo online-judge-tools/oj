@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.44 / 2018-11-21
+
+-   [#193](https://github.com/kmyk/online-judge-tools/issues/193) fix an unintended behaviour of `--language` option of `submit` with `--guess` option; add some file extensions for Perl and Perl 6
+
 ## 0.1.43 / 2018-11-21
 
 -   [#188](https://github.com/kmyk/online-judge-tools/issues/188) fix a degression of `download` system cases of AOJ
