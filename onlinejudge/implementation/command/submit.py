@@ -122,7 +122,7 @@ def submit(args: 'argparse.Namespace') -> None:
                     browser = None
                     log.failure('couldn\'t find browsers to open the url. please specify a browser')
             if browser:
-                log.info('open the submission page with: %s', browser)
+                log.status('open the submission page with: %s', browser)
                 subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
@@ -277,9 +277,9 @@ def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest
 
 def format_code(code: bytes, dos2unix: bool = False, rstrip: bool = False) -> bytes:
     if dos2unix:
-        log.info('dos2unix...')
+        log.status('dos2unix...')
         code = code.replace(b'\r\n', b'\n')
     if rstrip:
-        log.info('rstrip...')
+        log.status('rstrip...')
         code = code.rstrip()
     return code

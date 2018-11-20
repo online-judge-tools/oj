@@ -62,10 +62,10 @@ def with_cookiejar(session: requests.Session, path: str) -> Generator[requests.S
     path = path or default_cookie_path
     session.cookies = http.cookiejar.LWPCookieJar(path)  # type: ignore
     if os.path.exists(path):
-        log.info('load cookie from: %s', path)
+        log.status('load cookie from: %s', path)
         session.cookies.load()  # type: ignore
     yield session
-    log.info('save cookie to: %s', path)
+    log.status('save cookie to: %s', path)
     if os.path.dirname(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
     session.cookies.save()  # type: ignore
