@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.43 / 2018-11-21
+
+-   [#188](https://github.com/kmyk/online-judge-tools/issues/188) fix a degression of `download` system cases of AOJ
+-   [#194](https://github.com/kmyk/online-judge-tools/issues/194) use the official API of AOJ
+-   [#196](https://github.com/kmyk/online-judge-tools/issues/196) support the beta version of AOJ
+
 ## 0.1.42 / 2018-11-04
 
 -   [#189](https://github.com/kmyk/online-judge-tools/issues/189) fix a degression of `submit` to AtCoder
