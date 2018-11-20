@@ -52,6 +52,8 @@ def submit(args: 'argparse.Namespace') -> None:
                 'python_interpreter': args.guess_python_interpreter,
             }
             matched_lang_ids = guess_lang_ids_of_file(args.file, code, **kwargs)
+            if not matched_lang_ids:
+                matched_lang_ids = list(langs.keys())
             if args.language is not None:
                 matched_lang_ids = select_ids_of_matched_languages(args.language.split(), matched_lang_ids, language_dict=langs)
         else:
