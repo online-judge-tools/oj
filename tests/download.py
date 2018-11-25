@@ -104,6 +104,15 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-2.in':  'dcfe1f14721a0e141c2e31adeebe7a53',
                 'sample-1.out': '45778e8e2d350841cf68711ece5cb9e1',
             })
+    def test_call_download_codeforces_contest_1080_a(self):
+        self.snippet_call_download(
+            'https://codeforces.com/contest/1080/problem/A', {
+                'sample-1.in':  '54d3363c78b5001b1a6f382f47e08b60',
+                'sample-1.out': '31d30eea8d0968d6458e0ad0027c9f80',
+                'sample-2.in':  'd33b56dd139d846a5df6eab7cfaf83e8',
+                'sample-2.out': 'bda81ba88c634b46394ead43aff31ad5',
+            })
+
 
     def test_call_download_csacademy_k_swap(self):
         self.snippet_call_download(
