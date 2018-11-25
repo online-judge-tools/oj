@@ -94,6 +94,7 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
                     s += '\n'
                 else:
                     s += it.string
+            s = s.lstrip()
             samples.add(s, title.string)
         return samples.get()
 
