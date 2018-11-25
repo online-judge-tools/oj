@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.45
+
+-   [#193](https://github.com/kmyk/online-judge-tools/issues/193) make languages selectable with their IDs with
+-   [#198](https://github.com/kmyk/online-judge-tools/issues/198) suppress leading spaces of samples at Codeforces
+
 ## 0.1.44 / 2018-11-21
 
 -   [#193](https://github.com/kmyk/online-judge-tools/issues/193) fix an unintended behaviour of `--language` option of `submit` with `--guess` option; add some file extensions for Perl and Perl 6

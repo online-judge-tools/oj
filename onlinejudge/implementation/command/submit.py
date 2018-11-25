@@ -43,26 +43,29 @@ def submit(args: 'argparse.Namespace') -> None:
         # guess or select language ids
         langs = problem.get_language_dict(session=sess)
         matched_lang_ids: Optional[List[str]] = None
-        if args.guess:
-            kwargs = {
-                'language_dict': langs,
-                'cxx_latest': args.guess_cxx_latest,
-                'cxx_compiler': args.guess_cxx_compiler,
-                'python_version': args.guess_python_version,
-                'python_interpreter': args.guess_python_interpreter,
-            }
-            matched_lang_ids = guess_lang_ids_of_file(args.file, code, **kwargs)
-            if not matched_lang_ids:
-                matched_lang_ids = list(langs.keys())
-            if args.language is not None:
-                matched_lang_ids = select_ids_of_matched_languages(args.language.split(), matched_lang_ids, language_dict=langs)
+        if args.language in langs:
+            matched_lang_ids = [ args.language ]
         else:
-            if args.language is None:
-                matched_lang_ids = None
-            elif args.language in langs:
-                matched_lang_ids = [ args.language ]
+            if args.guess:
+                kwargs = {
+                    'language_dict': langs,
+                    'cxx_latest': args.guess_cxx_latest,
+                    'cxx_compiler': args.guess_cxx_compiler,
+                    'python_version': args.guess_python_version,
+                    'python_interpreter': args.guess_python_interpreter,
+                }
+                matched_lang_ids = guess_lang_ids_of_file(args.file, code, **kwargs)
+                if not matched_lang_ids:
+                    log.info('failed to guess languages from the file name')
+                    matched_lang_ids = list(langs.keys())
+                if args.language is not None:
+                    log.info('you can use `--no-guess` option if you want to do an unusual submission')
+                    matched_lang_ids = select_ids_of_matched_languages(args.language.split(), matched_lang_ids, language_dict=langs)
             else:
-                matched_lang_ids = select_ids_of_matched_languages(args.language.split(), list(langs.keys()), language_dict=langs)
+                if args.language is None:
+                    matched_lang_ids = None
+                else:
+                    matched_lang_ids = select_ids_of_matched_languages(args.language.split(), list(langs.keys()), language_dict=langs)
 
         # report selected language ids
         if matched_lang_ids is not None and len(matched_lang_ids) == 1:
@@ -119,7 +122,7 @@ def submit(args: 'argparse.Namespace') -> None:
                     browser = None
                     log.failure('couldn\'t find browsers to open the url. please specify a browser')
             if browser:
-                log.info('open the submission page with: %s', browser)
+                log.status('open the submission page with: %s', browser)
                 subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
@@ -274,9 +277,9 @@ def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest
 
 def format_code(code: bytes, dos2unix: bool = False, rstrip: bool = False) -> bytes:
     if dos2unix:
-        log.info('dos2unix...')
+        log.status('dos2unix...')
         code = code.replace(b'\r\n', b'\n')
     if rstrip:
-        log.info('rstrip...')
+        log.status('rstrip...')
         code = code.rstrip()
     return code
