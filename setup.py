@@ -13,18 +13,14 @@ version = load_module('onlinejudge.implementation.version')
 with open('readme.md', encoding='utf-8') as fh:
     readme = fh.read()
 
+with open('requirements.txt') as fh:
+    install_requires = fh.read().split()
+
 setup(
     name=version.name,
     version=version.__version__,
     description='Tools for online-judge services',
-    install_requires=[
-        'requests',
-        'lxml',
-        'beautifulsoup4',
-        'colorama',
-        'sympy',
-        'pipdate',
-    ],
+    install_requires=install_requires,
     long_description=readme,
     author=version.__author__,
     author_email=version.__email__,

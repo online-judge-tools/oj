@@ -1,0 +1,6 @@
+requests
+lxml
+beautifulsoup4
+colorama
+sympy
+pipdate
