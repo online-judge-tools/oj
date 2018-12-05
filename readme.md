@@ -5,6 +5,7 @@
 [![PyPI](https://img.shields.io/pypi/pyversions/online-judge-tools.svg)](#)
 [![PyPI](https://img.shields.io/pypi/status/online-judge-tools.svg)](#)
 [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools)
+[![Documentation Status](https://readthedocs.org/projects/online-judge-tools/badge/?version=master)](https://online-judge-tools.readthedocs.io/en/master/?badge=master)
 
 Tools for online judge services. Downloading sample cases, Testing/Submitting your code, and various utilities.
 
