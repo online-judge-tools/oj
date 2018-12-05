@@ -1,0 +1,8 @@
+build:
+    image: latest
+
+python:
+    version: 3.6  # https://github.com/rtfd/readthedocs.org/issues/4434
+    pip_install: true
+    extra_requirements:
+        - docs
