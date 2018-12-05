@@ -25,6 +25,13 @@ setup(
         'sympy',
         'pipdate',
     ],
+    extras_require={
+        'docs': [
+            'sphinx',
+            'sphinx_rtd_theme',
+            'sphinx-autodoc-typehints',
+        ],
+    },
     long_description=readme,
     author=version.__author__,
     author_email=version.__email__,
