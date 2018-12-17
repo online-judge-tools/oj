@@ -20,7 +20,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Yukicoder
     -   Anarchy Golf
     -   Codeforces
-    -   HackerRank (using `Run Code`)
+    -   ~~HackerRank~~ (removed)
     -   Aizu Online Judge
     -   CS Academy
 -   Download system test cases
@@ -30,12 +30,12 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   AtCoder
     -   Yukicoder (via github.com)
     -   Codeforces
-    -   HackerRank
+    -   ~~HackerRank~~ (removed)
     -   TopCoder
 -   Submit your solution
     -   AtCoder
     -   ~~Yukicoder~~ (removed)
-    -   HackerRank
+    -   ~~HackerRank~~ (removed)
     -   TopCoder (Marathon Match)
 -   Generate scanner for input  (experimental)
     -   AtCoder

@@ -59,14 +59,6 @@ onlinejudge\.dispatch module
     :undoc-members:
     :show-inheritance:
 
-onlinejudge\.hackerrank module
-------------------------------
-
-.. automodule:: onlinejudge.hackerrank
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 onlinejudge\.problem module
 ---------------------------
 
