@@ -88,3 +88,9 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-2.in':  '5bdcc020d84b69530288143e38b643b9',
                 'sample-2.out': '9ae0ea9e3c9c6e1b9b6252c8395efdc1',
             })
+    def test_call_download_atcoder_abc114_c(self):
+        self.snippet_call_download('https://atcoder.jp/contests/abc114/tasks/abc114_c', [
+                {"input": "575\n", "output": "4\n"},
+                {"input": "3600\n", "output": "13\n"},
+                {"input": "999999999\n", "output": "26484\n"},
+            ], type='json')

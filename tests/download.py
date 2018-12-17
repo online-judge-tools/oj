@@ -8,7 +8,22 @@ import subprocess
 import sys
 import tempfile
 
-def snippet_call_download(self, url, files, is_system=False):
+def get_files_from_json(samples):
+    files = {}
+    for i, sample in enumerate(samples):
+        for ext in ('in', 'out'):
+            if 'name' in sample:
+                name = sample['name'] + '.' + ext
+            else:
+                name = 'sample-{}.{}'.format(i + 1, ext)
+            files[name] = sample[ext + 'put']
+    return files
+
+def snippet_call_download(self, url, files, is_system=False, type='files'):
+    assert type in 'files' or 'json'
+    if type == 'json':
+        files = get_files_from_json(files)
+
     cwd = os.getcwd()
     ojtools = os.path.join( cwd, 'oj' )
     try:
