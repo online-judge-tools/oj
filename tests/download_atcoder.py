@@ -80,3 +80,11 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-3.in':  'ed5d34c74e59d16bd6d5b3683db655c3',
                 'sample-3.out': 'e14b420b7266f69a2b2b457f3bbec804',
             })
+    def test_call_download_atcoder_agc029_a(self):
+        self.snippet_call_download(
+            'https://atcoder.jp/contests/agc029/tasks/agc029_a', {
+                'sample-1.in':  '13152b3514c161917e9a771d51b77699',
+                'sample-1.out': '26ab0db90d72e28ad0ba1e22ee510510',
+                'sample-2.in':  '5bdcc020d84b69530288143e38b643b9',
+                'sample-2.out': '9ae0ea9e3c9c6e1b9b6252c8395efdc1',
+            })
