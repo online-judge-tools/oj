@@ -1,13 +1,23 @@
 # Python Version: 3.x
 import onlinejudge
+import onlinejudge.problem
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import os
 import colorama
 import sys
+import json
 from typing import *
 if TYPE_CHECKING:
     import argparse
+
+def convert_sample_to_dict(sample: onlinejudge.problem.TestCase) -> dict:
+    data = {}
+    data["input"] = sample.input.data
+    data["output"] = sample.output.data
+    if sample.input.name == sample.output.name:
+        data["name"] = sample.input.name
+    return data
 
 def download(args: 'argparse.Namespace') -> None:
     # prepare values
@@ -62,3 +72,7 @@ def download(args: 'argparse.Namespace') -> None:
             with open(path, 'w') as fh:
                 fh.write(data)
             log.success('saved to: %s', path)
+
+    # print json
+    if args.json:
+        print(json.dumps(list(map(convert_sample_to_dict, samples))))

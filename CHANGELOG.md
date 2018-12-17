@@ -1,6 +1,13 @@
 # Change Log
 
-## 0.1.45
+## 0.1.46 / 2018-12-17
+
+-   [#208](https://github.com/kmyk/online-judge-tools/issues/208) features for HackerRank are removed
+-   [#206](https://github.com/kmyk/online-judge-tools/issues/206) support the new `atcoder.jp` domain
+-   [#202](https://github.com/kmyk/online-judge-tools/issues/202) write document
+-   [#201](https://github.com/kmyk/online-judge-tools/issues/201) add `--json` option to `download` command
+
+## 0.1.45 / 2018-11-26
 
 -   [#193](https://github.com/kmyk/online-judge-tools/issues/193) make languages selectable with their IDs with
 -   [#198](https://github.com/kmyk/online-judge-tools/issues/198) suppress leading spaces of samples at Codeforces

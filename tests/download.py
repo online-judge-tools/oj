@@ -8,7 +8,22 @@ import subprocess
 import sys
 import tempfile
 
-def snippet_call_download(self, url, files, is_system=False):
+def get_files_from_json(samples):
+    files = {}
+    for i, sample in enumerate(samples):
+        for ext in ('in', 'out'):
+            if 'name' in sample:
+                name = sample['name'] + '.' + ext
+            else:
+                name = 'sample-{}.{}'.format(i + 1, ext)
+            files[name] = hashlib.md5(sample[ext + 'put'].encode()).hexdigest()
+    return files
+
+def snippet_call_download(self, url, files, is_system=False, type='files'):
+    assert type in 'files' or 'json'
+    if type == 'json':
+        files = get_files_from_json(files)
+
     cwd = os.getcwd()
     ojtools = os.path.join( cwd, 'oj' )
     try:
@@ -34,18 +49,6 @@ class DownloadOthersTest(unittest.TestCase):
 
     def snippet_call_download(self, *args, **kwargs):
         snippet_call_download(self, *args, **kwargs)
-
-    def test_call_download_hackerrank_beautiful_array(self):
-        if 'CI' in os.environ:
-            print('NOTE: this test is skipped since login is required')
-            return
-        self.snippet_call_download(
-            'https://www.hackerrank.com/contests/hourrank-1/challenges/beautiful-array', {
-                'sample-1.in':  'fb3f7e56dac548ce73f9d8e485e5336b',
-                'sample-2.out': '897316929176464ebc9ad085f31e7284',
-                'sample-2.in':  '6047a07c8defde4d696513d26e871b20',
-                'sample-1.out': '6d7fce9fee471194aa8b5b6e47267f03',
-            })
 
     def test_call_download_anarchygolf_the_b_programming_language(self):
         self.snippet_call_download(

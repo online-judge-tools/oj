@@ -44,9 +44,10 @@ supported services:
   Aizu Online Judge
   AtCoder
   Codeforces
-  HackerRank
   Yukicoder
   CS Academy
+
+  (HackerRank has been removed)
 
 supported services with --system:
   Aizu Online Judge
@@ -66,6 +67,7 @@ format string for --format:
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
+    subparser.add_argument('--json', action='store_true')
 
     # login
     subparser = subparsers.add_parser('login',
@@ -76,9 +78,10 @@ format string for --format:
 supported services:
   AtCoder
   Codeforces
-  HackerRank
   Yukicoder
   TopCoder
+
+  (HackerRank has been removed)
 
 strings for --method:
   github                for yukicoder, login via github (default)
@@ -157,9 +160,9 @@ tips:
             epilog='''\
 supported services:
   AtCoder
-  HackerRank
 
   (Yukicoder has been removed)
+  (HackerRank has been removed)
 
 example:
   http://agc001.contest.atcoder.jp/tasks/agc001_a

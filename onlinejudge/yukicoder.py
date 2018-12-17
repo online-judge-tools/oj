@@ -275,7 +275,6 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 name = basename
                 if os.path.splitext(name)[1] == '.in':  # ".in" extension is confusing
                     name = os.path.splitext(name)[0]
-                print(filename, name)  # TODO: what is this?
                 basenames[basename][kind] = LabeledString(name, content)
         samples: List[TestCase] = []
         for basename in sorted(basenames.keys()):
