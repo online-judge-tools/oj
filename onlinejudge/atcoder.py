@@ -128,9 +128,22 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             if not pre.string:
                 continue
             prv = utils.previous_sibling_tag(pre)
+
+            # the first format: h3+pre
             if prv and prv.name == 'h3' and prv.string:
                 yield ( pre, prv )
+
             else:
+                # ignore tags which are not samples
+                # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
+                while prv is not None:
+                    if prv.name == 'pre':
+                        break
+                    prv = utils.previous_sibling_tag(prv)
+                if prv is not None:
+                    continue
+
+                # the second format: h3+section pre
                 if pre.parent and pre.parent.name == 'section':
                     prv = pre.parent and utils.previous_sibling_tag(pre.parent)
                     if prv and prv.name == 'h3' and prv.string:
