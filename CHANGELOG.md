@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.47 / 2018-12-28
+
+-   [#210](https://github.com/kmyk/online-judge-tools/issues/210) fix a bug of `download` from AtCoder
+
 ## 0.1.46 / 2018-12-17
 
 -   [#208](https://github.com/kmyk/online-judge-tools/issues/208) features for HackerRank are removed
