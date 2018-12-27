@@ -122,21 +122,32 @@ class AtCoderProblem(onlinejudge.problem.Problem):
                 if cls.startswith('lang-'):
                     return cls
 
-    def _find_sample_tags(self, soup):
-        result = []
+    def _find_sample_tags(self, soup) -> Generator[Tuple[bs4.Tag, bs4.Tag], None, None]:
         for pre in soup.find_all('pre'):
             log.debug('pre tag: %s', str(pre))
             if not pre.string:
                 continue
             prv = utils.previous_sibling_tag(pre)
-            if prv and prv.name == 'h3' and prv.string:  # AtCoder's javascript recognizes `h3+pre' as a sample input/output
-                result += [( pre, prv )]
+
+            # the first format: h3+pre
+            if prv and prv.name == 'h3' and prv.string:
+                yield ( pre, prv )
+
             else:
-                if pre.parent and pre.parent.name == 'section':  # AtCoder's javascript sometimes fails. e.g. http://abc001.contest.atcoder.jp/tasks/abc001_1
+                # ignore tags which are not samples
+                # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
+                while prv is not None:
+                    if prv.name == 'pre':
+                        break
+                    prv = utils.previous_sibling_tag(prv)
+                if prv is not None:
+                    continue
+
+                # the second format: h3+section pre
+                if pre.parent and pre.parent.name == 'section':
                     prv = pre.parent and utils.previous_sibling_tag(pre.parent)
                     if prv and prv.name == 'h3' and prv.string:
-                        result += [( pre, prv )]
-        return result
+                        yield ( pre, prv )
 
     def get_url(self) -> str:
         return 'http://{}.contest.atcoder.jp/tasks/{}'.format(self.contest_id, self.problem_id)

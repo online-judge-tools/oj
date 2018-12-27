@@ -94,3 +94,10 @@ class DownloadAtCoderTest(unittest.TestCase):
                 {"input": "3600\n", "output": "13\n"},
                 {"input": "999999999\n", "output": "26484\n"},
             ], type='json')
+    def test_call_download_atcoder_abc114_c(self):
+        self.snippet_call_download('https://atcoder.jp/contests/abc003/tasks/abc003_4', [
+                {"input": "3 2\n2 2\n2 2\n", "output": "12\n"},
+                {"input": "4 5\n3 1\n3 0\n", "output": "10\n"},
+                {"input": "23 18\n15 13\n100 95\n", "output": "364527243\n"},
+                {"input": "30 30\n24 22\n145 132\n", "output": "976668549\n"},
+            ], type='json')
