@@ -54,14 +54,14 @@ class AtCoderService(onlinejudge.service.Service):
 
     @classmethod
     def _get_messages_from_cookie(cls, cookies) -> List[str]:
-        msgtags: List[str] = []
+        msgtags = []  # type: List[str]
         for cookie in cookies:
             log.debug('cookie: %s', str(cookie))
             if cookie.name.startswith('__message_'):
                 msg = json.loads(urllib.parse.unquote_plus(cookie.value))
                 msgtags += [ msg['c'] ]
                 log.debug('message: %s: %s', cookie.name, str(msg))
-        msgs: List[str] = []
+        msgs = []  # type: List[str]
         for msgtag in msgtags:
             soup = bs4.BeautifulSoup(msgtag, utils.html_parser)
             msg = None
@@ -88,7 +88,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
     def __init__(self, contest_id: str, problem_id: str):
         self.contest_id = contest_id
         self.problem_id = problem_id
-        self._task_id: Optional[int] = None
+        self._task_id = None  # type: Optional[int]
 
     def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.problem.TestCase]:
         session = session or utils.new_default_session()
@@ -296,7 +296,7 @@ class AtCoderSubmission(onlinejudge.submission.Submission):
 
     @classmethod
     def from_url(cls, s: str, problem_id: Optional[str] = None) -> Optional['AtCoderSubmission']:
-        submission_id: Optional[int] = None
+        submission_id = None  # type: Optional[int]
 
         # example: http://agc001.contest.atcoder.jp/submissions/1246803
         result = urllib.parse.urlparse(s)

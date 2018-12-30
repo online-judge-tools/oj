@@ -19,7 +19,7 @@ def tokenize(pre: str) -> Generator[List[Dict[str, str]], None, None]:
         line = line.replace('$', '').replace('\\(', '').replace('\\)', '')
         line = line.replace('\\ ', ' ').replace('\\quad', ' ')
         # tokenize each line
-        tokens: List[Dict[str, str]] = []
+        tokens = []  # type: List[Dict[str, str]]
         for x, s in enumerate(line.split()):
             if s in [ '..', '...', '\\dots', '…', '⋯' ]:
                 tokens += [ { 'kind': 'dots', 'dir': ['hr', 'vr'][x == 0] } ]
@@ -45,7 +45,7 @@ def simplify_expr(s: str) -> str:
     return str(sympy_parser.parse_expr(s, local_dict=local_dict, transformations=transformations))
 
 def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None, None]:
-    env: Dict[str, Any] = collections.defaultdict(dict)
+    env = collections.defaultdict(dict)  # type: Dict[str, Any]
     for y, line in enumerate(tokens):
         for x, item in enumerate(line):
             if item['kind'] == 'indexed':
@@ -58,7 +58,7 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                     f['r'] = item['index']
     for name in env:
         env[name]['n'] = simplify_expr('{}-{}+1'.format(env[name]['r'], env[name]['l']))
-    used: Set[Any] = set()
+    used = set()  # type: Set[Any]
     for y, line in enumerate(tokens):
         for x, item in enumerate(line):
             if item['kind'] == 'fixed':
@@ -77,7 +77,7 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                     yield { 'kind': 'loop', 'length': n, 'body': [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ] }
                     used.add(name)
                 elif item['dir'] == 'vr':
-                    names: List[str] = []
+                    names = []  # type: List[str]
                     for item in tokens[y-1]:
                         if item['kind'] != 'indexed':
                             raise NotImplementedError
@@ -89,7 +89,7 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                     if not names:
                         continue
                     n = env[names[0]]['n']
-                    body: List[Dict[str, Any]] = []
+                    body = []  # type: List[Dict[str, Any]]
                     for name in names:
                         assert env[name]['n'] == n
                         yield { 'kind': 'decl-vector',  'targets': [ { 'name': name, 'length': n } ] } 
@@ -183,7 +183,7 @@ def generate_scanner(args: 'argparse.Namespace') -> None:
     if problem is None:
         sys.exit(1)
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
-        it: Any = problem.get_input_format(session=sess)
+        it = problem.get_input_format(session=sess)  # type: Any
     if not it:
         log.error('input format not found')
         sys.exit(1)
