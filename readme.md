@@ -71,6 +71,8 @@ EOF
 $ chmod +x ~/bin/oj
 ```
 
+It requires Python 3.6 or later now (see [#212](https://github.com/kmyk/online-judge-tools/issues/212) (in Japanese)).
+
 ## How to use
 
 ``` sh
