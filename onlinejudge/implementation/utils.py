@@ -100,8 +100,8 @@ class FormSender(object):
         assert form.name == 'form'
         self.form = form
         self.url = url
-        self.payload: Dict[str, str] = {}
-        self.files: Dict[str, IO[Any]] = {}
+        self.payload = {}  # type: Dict[str, str]
+        self.files = {}  # type: Dict[str, IO[Any]]
         for input in self.form.find_all('input'):
             log.debug('input: %s', str(input))
             if input.attrs.get('type') in [ 'checkbox', 'radio' ]:

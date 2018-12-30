@@ -56,7 +56,7 @@ def test(args: 'argparse.Namespace') -> None:
                 return True
             return False
     rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
-    slowest: Union[int, float] = -1
+    slowest = -1  # type: Union[int, float]
     slowest_name = ''
     ac_count = 0
 

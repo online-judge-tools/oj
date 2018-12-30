@@ -54,7 +54,7 @@ class AOJProblem(onlinejudge.problem.Problem):
         # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2Fsamples%2F%7BproblemId%7D_GET
         url = 'https://judgedat.u-aizu.ac.jp/testcases/samples/{}'.format(self.problem_id)
         resp = utils.request('GET', url, session=session)
-        samples: List[TestCase] = []
+        samples = []  # type: List[TestCase]
         for sample in json.loads(resp.content):
             samples += [ TestCase(
                 LabeledString(str(sample['serial']), sample['in']),
@@ -72,7 +72,7 @@ class AOJProblem(onlinejudge.problem.Problem):
         header = json.loads(resp.content)
 
         # get testcases via the official API
-        testcases: List[TestCase] = []
+        testcases = []  # type: List[TestCase]
         for header in header['headers']:
             # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2F%7Bserial%7D_GET
             url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}'.format(self.problem_id, header['serial'])

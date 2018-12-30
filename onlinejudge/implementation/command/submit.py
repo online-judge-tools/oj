@@ -42,7 +42,7 @@ def submit(args: 'argparse.Namespace') -> None:
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # guess or select language ids
         langs = problem.get_language_dict(session=sess)
-        matched_lang_ids: Optional[List[str]] = None
+        matched_lang_ids = None  # type: Optional[List[str]]
         if args.language in langs:
             matched_lang_ids = [ args.language ]
         else:
@@ -143,7 +143,7 @@ def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest
     assert python_version.lower() in ( '2', '3', 'auto', 'all' )
     assert python_interpreter.lower() in ( 'cpython', 'pypy', 'all' )
 
-    select = lambda word, lang_ids, **kwargs: select_ids_of_matched_languages([ word ], lang_ids, language_dict=language_dict, **kwargs)
+    select = (lambda word, lang_ids, **kwargs: select_ids_of_matched_languages([ word ], lang_ids, language_dict=language_dict, **kwargs))
     _, ext = os.path.splitext(filename)
     lang_ids = language_dict.keys()
 
@@ -234,7 +234,7 @@ def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest
 
     else:
         log.debug('language guessing: othres')
-        table: List[Dict[str, Any]] = [
+        table = [
              { 'names': [ 'awk'                   ], 'exts': [ 'awk'       ] },
              { 'names': [ 'bash'                  ], 'exts': [ 'sh'        ] },
              { 'names': [ 'brainfuck'             ], 'exts': [ 'bf'        ] },
@@ -265,7 +265,7 @@ def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest
              { 'names': [ 'text'                  ], 'exts': [ 'txt'       ] },
              { 'names': [ 'typescript'            ], 'exts': [ 'ts'        ] },
              { 'names': [ 'vim script'            ], 'exts': [ 'vim'       ] },
-        ]
+        ]  # type: List[Dict[str, Any]]
 
         lang_ids = []
         for data in table:

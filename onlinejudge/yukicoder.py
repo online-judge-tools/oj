@@ -219,7 +219,7 @@ class YukicoderService(onlinejudge.service.Service):
         assert len(soup.find_all('table')) == 1
         table = soup.find('table')
         columns = [ th.text.strip() for th in table.find('thead').find('tr') if th.name == 'th' ]
-        data: List[Dict[str, List[str]]] = []
+        data = []  # type: List[Dict[str, List[str]]]
         for row in table.find('tbody').find_all('tr'):
             values = [ td for td in row if td.name == 'td' ]
             assert len(columns) == len(values)
@@ -265,7 +265,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         resp = utils.request('GET', url, session=session)
         # parse
-        basenames: Dict[str, Dict[str, LabeledString]] = collections.defaultdict(dict)
+        basenames = collections.defaultdict(dict)  # type: Dict[str, Dict[str, LabeledString]]
         with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
             for filename in sorted(fh.namelist()):  # "test_in" < "test_out"
                 dirname = os.path.dirname(filename)
@@ -276,7 +276,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 if os.path.splitext(name)[1] == '.in':  # ".in" extension is confusing
                     name = os.path.splitext(name)[0]
                 basenames[basename][kind] = LabeledString(name, content)
-        samples: List[TestCase] = []
+        samples = []  # type: List[TestCase]
         for basename in sorted(basenames.keys()):
             data = basenames[basename]
             if 'input' not in data or 'output' not in data or len(data) != 2:
@@ -313,7 +313,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         dirname, basename = posixpath.split(utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'yukicoder.me':
-            n: Optional[int] = None
+            n = None  # type: Optional[int]
             try:
                 n = int(basename)
             except ValueError:
