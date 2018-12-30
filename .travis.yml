@@ -11,3 +11,12 @@ script:
 branches:
     only:
         - master
+        - develop
+deploy:
+    provider: pypi
+    user: kimiyuki
+    password:
+        secure: fYhZ5KkZhON03vOsf1m/ifz0irO7BuJt6GiNtEuLzoDpO/ufzFfc02BDmfkVy53c44T6DCB2Z2fem0zX2nYOHcuLkGDhBgwyvCq5Kly7i5uRZ4Y1InRfiCuiblzkeS+D6vwoWCBiUKkpEzDW2lBy9pvsAqOEYjmWKE3Sy2NQexYjVu88KPUPu7P+XuvP2EFANqoCIv8wjgMs9Z0c2EMyonUYRhoWhPaK60KPAPWCHLCyAHQZADcxp6LxJzsdKhPEdMeWu8whZNLazBRT8aE+TG51ThAYgKSf/pEjjp4IE++1XFgJX6IkOsXhx6a6B1TPQ++KuoqpNuNaOBHTIMbN3Q7WVWkRnqHRChr3rS9t8wkviTQgWaGuehEUmDPjD/eL+p9wKtA4pFSEOyAgWIayQlvmWZzqL2upVrSw0ZK5l6Vb9hYpmz3j7QaH3WM69BqkbXbbbujLdTyLWZKdoSvkiYLHYAgB8RgeJJDbTczaySULQb6FjQ9Nz1Fm8rkySjCYY+Tdc8D19dpXNVbOiLzcA18wRgYA+4unF7xGjfv8iOFfpqmpWwWTvBYUhyjC5JrRPCLSUR/m6Bd0ZTK7svTFbz0kUZCrbRKr1uI/Tt4R1U3Y+D04YE4i4j8YE9BluXkHxxOGGM3esDyp3gL0k2O3nSZJvQWYhtGQ3IX1CzQ5ZoI=
+    skip_existing: true
+    on:
+        branch: master
