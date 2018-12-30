@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.48 / 2018-12-30
+
+-   [#213](https://github.com/kmyk/online-judge-tools/issues/213) update the package on PyPI via Travis CI
+
 ## 0.1.47 / 2018-12-28
 
 -   [#210](https://github.com/kmyk/online-judge-tools/issues/210) fix a bug of `download` from AtCoder
