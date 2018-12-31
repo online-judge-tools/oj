@@ -344,3 +344,5 @@ def main(args: Optional[List[str]] = None) -> None:
     parser = get_parser()
     namespace = parser.parse_args(args=args)
     run_program(namespace, parser=parser)
+
+foo: int = 'hoge'
