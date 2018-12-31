@@ -5,7 +5,8 @@
 [![PyPI](https://img.shields.io/pypi/pyversions/online-judge-tools.svg)](#)
 [![PyPI](https://img.shields.io/pypi/status/online-judge-tools.svg)](#)
 [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools)
-[![Documentation Status](https://readthedocs.org/projects/online-judge-tools/badge/?version=master)](https://online-judge-tools.readthedocs.io/en/master/?badge=master) [![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Documentation Status](https://readthedocs.org/projects/online-judge-tools/badge/?version=master)](https://online-judge-tools.readthedocs.io/en/master/?badge=master)
+[![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Tools for online judge services. Downloading sample cases, Testing/Submitting your code, and various utilities.
 
@@ -138,6 +139,8 @@ $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
     -   Yes. You can use `--directory` (`-d`) option. However, I recommend to make one directory per one problem.
 -   Can I specify problems by their IDs or names, instead of URLs?
     -   No. I have tried it once, but it is actually not so convenient and only increases the maintenance cost.
+
+For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) or other SNSs.
 
 ## Related Tools
 
