@@ -1,0 +1,3 @@
+*.pyc
+.eggs/*
+ online_judge_tools.egg-info/*
