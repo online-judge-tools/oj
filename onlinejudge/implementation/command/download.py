@@ -25,11 +25,6 @@ def download(args: 'argparse.Namespace') -> None:
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
-    if args.system:
-        supported_service_names = [ 'aoj', 'yukicoder' ]
-        if problem.get_service().get_name() not in supported_service_names:
-            log.error('--system for %s is not supported', problem.get_service().get_name())
-            sys.exit(1)
     if args.format is None:
         if args.system:
             if problem.get_service().get_name() == 'yukicoder':

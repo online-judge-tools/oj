@@ -16,6 +16,7 @@ from onlinejudge.implementation.command.code_statistics import code_statistics
 from onlinejudge.implementation.command.get_standings import get_standings
 import argparse
 import sys
+import traceback
 import pathlib
 from typing import List, Optional
 
@@ -340,4 +341,9 @@ def main(args: Optional[List[str]] = None) -> None:
     version_check()
     parser = get_parser()
     namespace = parser.parse_args(args=args)
-    run_program(namespace, parser=parser)
+    try:
+        run_program(namespace, parser=parser)
+    except NotImplementedError as e:
+        log.debug('\n' + traceback.format_exc())
+        log.error('NotImplementedError')
+        log.info('The operation you specified is not supported yet. Pull requests are welcome.')
