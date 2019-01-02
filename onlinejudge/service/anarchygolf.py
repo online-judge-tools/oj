@@ -1,6 +1,5 @@
 # Python Version: 3.x
-import onlinejudge.service
-import onlinejudge.problem
+import onlinejudge.type
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -12,7 +11,7 @@ from typing import *
 
 
 @utils.singleton
-class AnarchyGolfService(onlinejudge.service.Service):
+class AnarchyGolfService(onlinejudge.type.Service):
 
     def get_url(self) -> str:
         return 'http://golf.shinh.org/'
@@ -30,11 +29,11 @@ class AnarchyGolfService(onlinejudge.service.Service):
         return None
 
 
-class AnarchyGolfProblem(onlinejudge.problem.Problem):
+class AnarchyGolfProblem(onlinejudge.type.Problem):
     def __init__(self, problem_id: str):
         self.problem_id = problem_id
 
-    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.problem.TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)

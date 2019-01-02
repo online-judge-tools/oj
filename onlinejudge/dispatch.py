@@ -2,9 +2,7 @@
 import onlinejudge.implementation.logging as log
 from typing import List, Optional, Type, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onlinejudge.submission import Submission
-    from onlinejudge.problem import Problem
-    from onlinejudge.service import Service
+    from onlinejudge.type import Service, Problem, Submission
 
 submissions = []  # type: List[Type['Submission']]
 def submission_from_url(s: str) -> Optional['Submission']:

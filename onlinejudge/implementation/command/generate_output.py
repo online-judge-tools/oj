@@ -21,7 +21,7 @@ def generate_output(args: 'argparse.Namespace') -> None:
             log.info('output file already exists.')
             log.info('skipped.')
             continue
-        with open(it['in']) as inf:
+        with it['in'].open() as inf:
             begin = time.perf_counter()
             answer, proc = utils.exec_command(args.command, shell=True, stdin=inf)
             end = time.perf_counter()
@@ -33,6 +33,6 @@ def generate_output(args: 'argparse.Namespace') -> None:
         log.emit(log.bold(answer.decode().rstrip()))
         name = cutils.match_with_format(args.directory, args.format, it['in']).groupdict()['name']  # type: ignore
         path = cutils.path_from_format(args.directory, args.format, name=name, ext='out')
-        with open(path, 'w') as fh:
-            fh.buffer.write(answer)
+        with path.open('wb') as fh:
+            fh.write(answer)
         log.success('saved to: %s', path)

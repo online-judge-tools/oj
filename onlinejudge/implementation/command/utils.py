@@ -2,44 +2,43 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import sys
-import os
-import os.path
-import re
-import glob
 import collections
+import glob
+import pathlib
+import re
+import sys
 from typing import Dict, List, Match, Optional
 
-def glob_with_format(directory: str, format: str) -> List[str]:
+def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]:
     table = {}
     table['s'] = '*'
     table['e'] = '*'
-    pattern = os.path.join(directory, utils.parcentformat(format, table))
-    paths = glob.glob(pattern)
+    pattern = str(directory / utils.parcentformat(format, table))
+    paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
         log.debug('testcase globbed: %s', path)
     return paths
 
-def match_with_format(directory: str, format: str, path: str) -> Optional[Match[str]]:
+def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) -> Optional[Match[str]]:
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
     pattern = re.compile('^' + utils.parcentformat(format, table) + '$')
-    path = os.path.normpath(os.path.relpath(path, directory))
-    return pattern.match(path)
+    path = path.absolute().relative_to(directory.absolute()).resolve()
+    return pattern.match(str(path))
 
-def path_from_format(directory: str, format: str, name: str, ext: str) -> str:
+def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) -> pathlib.Path:
     table = {}
     table['s'] = name
     table['e'] = ext
-    return os.path.join(directory, utils.parcentformat(format, table))
+    return directory / utils.parcentformat(format, table)
 
-def is_backup_or_hidden_file(path: str) -> bool:
-    basename = os.path.basename(path)
+def is_backup_or_hidden_file(path: pathlib.Path) -> bool:
+    basename = path.stem
     return basename.endswith('~') or (basename.startswith('#') and basename.endswith('#')) or basename.startswith('.')
 
-def drop_backup_or_hidden_files(paths: List[str]) -> List[str]:
-    result = []  # type: List[str]
+def drop_backup_or_hidden_files(paths: List[pathlib.Path]) -> List[pathlib.Path]:
+    result = []  # type: List[pathlib.Path]
     for path in paths:
         if is_backup_or_hidden_file(path):
             log.warning('ignore a backup file: %s', path)
@@ -47,10 +46,10 @@ def drop_backup_or_hidden_files(paths: List[str]) -> List[str]:
             result += [ path ]
     return result
 
-def construct_relationship_of_files(paths: List[str], directory: str, format: str) -> Dict[str, Dict[str, str]]:
-    tests = collections.defaultdict(dict)  # type: Dict[str, Dict[str, str]]
+def construct_relationship_of_files(paths: List[pathlib.Path], directory: pathlib.Path, format: str) -> Dict[str, Dict[str, pathlib.Path]]:
+    tests = collections.defaultdict(dict)  # type: Dict[str, Dict[str, pathlib.Path]]
     for path in paths:
-        m = match_with_format(directory, format, os.path.normpath(path))
+        m = match_with_format(directory, format, path.resolve())
         if not m:
             log.error('unrecognizable file found: %s', path)
             sys.exit(1)
