@@ -181,7 +181,7 @@ def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest
                 for lang_id in ids:
                     m = re.search(r'c\+\+\w\w', language_dict[lang_id]['description'].lower())
                     if m:
-                        version_of[lang_id] = m[0]
+                        version_of[lang_id] = m.group(0)
                 ids.sort(key=lambda lang_id: version_of.get(lang_id, ''))
                 lang_ids += [ ids[-1] ]  # since C++11 < C++1y < ... as strings
             lang_ids = list(set(lang_ids))
