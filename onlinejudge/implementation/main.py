@@ -1,9 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
 import onlinejudge
+import onlinejudge.__about__ as version
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.version as version
 from onlinejudge.implementation.command.download import download
 from onlinejudge.implementation.command.login import login
 from onlinejudge.implementation.command.submit import submit

@@ -1,7 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
 import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.version as version
+import onlinejudge.__about__ as version
 from onlinejudge.problem import LabeledString, TestCase
 import re
 import os
