@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from onlinejudge.problem import Problem
     from onlinejudge.service import Service
 
-submissions: List[Type['Submission']] = []
+submissions = []  # type: List[Type['Submission']]
 def submission_from_url(s: str) -> Optional['Submission']:
     for cls in submissions:
         submission = cls.from_url(s)
@@ -16,7 +16,7 @@ def submission_from_url(s: str) -> Optional['Submission']:
     log.failure('unknown submission: %s', s)
     return None
 
-problems: List[Type['Problem']] = []
+problems = []  # type: List[Type['Problem']]
 def problem_from_url(s: str) -> Optional['Problem']:
     for cls in problems:
         problem = cls.from_url(s)
@@ -29,7 +29,7 @@ def problem_from_url(s: str) -> Optional['Problem']:
     log.failure('unknown problem: %s', s)
     return None
 
-services: List[Type['Service']] = []
+services = []  # type: List[Type['Service']]
 def service_from_url(s: str) -> Optional['Service']:
     for cls in services:
         service = cls.from_url(s)

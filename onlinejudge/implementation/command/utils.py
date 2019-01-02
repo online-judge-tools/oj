@@ -39,7 +39,7 @@ def is_backup_or_hidden_file(path: str) -> bool:
     return basename.endswith('~') or (basename.startswith('#') and basename.endswith('#')) or basename.startswith('.')
 
 def drop_backup_or_hidden_files(paths: List[str]) -> List[str]:
-    result: List[str] = []
+    result = []  # type: List[str]
     for path in paths:
         if is_backup_or_hidden_file(path):
             log.warning('ignore a backup file: %s', path)
@@ -48,7 +48,7 @@ def drop_backup_or_hidden_files(paths: List[str]) -> List[str]:
     return result
 
 def construct_relationship_of_files(paths: List[str], directory: str, format: str) -> Dict[str, Dict[str, str]]:
-    tests: Dict[str, Dict[str, str]] = collections.defaultdict(dict)
+    tests = collections.defaultdict(dict)  # type: Dict[str, Dict[str, str]]
     for path in paths:
         m = match_with_format(directory, format, os.path.normpath(path))
         if not m:

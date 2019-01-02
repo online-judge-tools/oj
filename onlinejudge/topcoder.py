@@ -164,8 +164,8 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
     def get_standings(self, session: Optional[requests.Session] = None) -> onlinejudge.problem.Standings:
         session = session or utils.new_default_session()
 
-        header: Optional[List[str]] = None
-        rows: List[Dict[str, str]] = []
+        header = None  # type: Optional[List[str]]
+        rows = []  # type: List[Dict[str, str]]
         for start in itertools.count(1, 100):
             # get
             url = 'https://community.topcoder.com/longcontest/?sc=&sd=&nr=100&sr={}&rd={}&module=ViewStandings'.format(start, self.rd)
@@ -179,7 +179,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
                 tr = trs[1]
                 header = [ td.text.strip() for td in tr.find_all('td') ]
             for tr in trs[2 :]:
-                row: Dict[str, str] = collections.OrderedDict()
+                row = collections.OrderedDict()  # type: Dict[str, str]
                 for key, td in zip(header, tr.find_all('td')):
                     value = td.text.strip()
                     if not value:
