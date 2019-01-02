@@ -24,6 +24,7 @@ setup(
         'colorama',
         'sympy',
         'pipdate',
+        'appdirs',
     ],
     extras_require={
         'docs': [

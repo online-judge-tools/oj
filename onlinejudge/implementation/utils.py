@@ -17,10 +17,13 @@ import posixpath
 import sys
 import ast
 import time
+import appdirs
 from typing import *
 from typing.io import *
 
-default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
+config_dir = appdirs.user_config_dir(version.name)
+data_dir = appdirs.user_data_dir(version.name)
+cache_dir = appdirs.user_cache_dir(version.name)
 html_parser = 'lxml'
 
 def parcentformat(s: str, table: Dict[str, str]) -> str:
@@ -55,7 +58,7 @@ def new_default_session() -> requests.Session:  # without setting cookiejar
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
     return session
 
-default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
+default_cookie_path = os.path.join(data_dir, 'cookie.jar')
 
 @contextlib.contextmanager
 def with_cookiejar(session: requests.Session, path: str) -> Generator[requests.Session, None, None]:
