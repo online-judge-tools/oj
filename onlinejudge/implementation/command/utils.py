@@ -2,13 +2,11 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import sys
-import os
-import os.path
+import collections
+import glob
 import pathlib
 import re
-import glob
-import collections
+import sys
 from typing import Dict, List, Match, Optional
 
 def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]:

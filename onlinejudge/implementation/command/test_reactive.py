@@ -2,11 +2,10 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import sys
-import os
-import os.path
-import subprocess
 import contextlib
+import os
+import subprocess
+import sys
 from typing import *
 if TYPE_CHECKING:
     import argparse

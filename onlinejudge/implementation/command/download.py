@@ -3,10 +3,10 @@ import onlinejudge
 import onlinejudge.type
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import os
 import colorama
-import sys
 import json
+import os
+import sys
 from typing import *
 if TYPE_CHECKING:
     import argparse

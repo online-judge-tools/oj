@@ -3,15 +3,9 @@ import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.command.utils as cutils
-import sys
-import os
-import os.path
-import re
-import glob
-import colorama
-import collections
-import time
 import math
+import sys
+import time
 from typing import *
 if TYPE_CHECKING:
     import argparse

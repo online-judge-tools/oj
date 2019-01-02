@@ -16,8 +16,6 @@ from onlinejudge.implementation.command.code_statistics import code_statistics
 from onlinejudge.implementation.command.get_standings import get_standings
 import argparse
 import sys
-import os
-import os.path
 import pathlib
 from typing import List, Optional
 

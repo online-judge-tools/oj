@@ -2,13 +2,12 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import sys
-import time
+import pathlib
+import re
 import shutil
 import subprocess
-import os
-import re
-import pathlib
+import sys
+import time
 from typing import *
 if TYPE_CHECKING:
     import argparse

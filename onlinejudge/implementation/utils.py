@@ -3,24 +3,23 @@
 import onlinejudge.implementation.logging as log
 import onlinejudge.__about__ as version
 from onlinejudge.type import LabeledString, TestCase
-import re
-import os
-import os.path
-import requests
-import bs4
-import contextlib
-import urllib.parse
-import http.cookiejar
-import http.client
-import subprocess
-import posixpath
-import sys
-import ast
-import time
-import json
+
 import appdirs
-import pathlib
+import bs4
+import requests
+
+import contextlib
 import distutils.version
+import http.client
+import http.cookiejar
+import json
+import pathlib
+import posixpath
+import re
+import subprocess
+import sys
+import time
+import urllib.parse
 from typing import *
 from typing.io import *
 
