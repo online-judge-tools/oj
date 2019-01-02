@@ -1,6 +1,5 @@
 # Python Version: 3.x
-import onlinejudge.service
-import onlinejudge.problem
+import onlinejudge.type
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -14,9 +13,9 @@ from typing import *
 
 
 @utils.singleton
-class CodeforcesService(onlinejudge.service.Service):
+class CodeforcesService(onlinejudge.type.Service):
 
-    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://codeforces.com/enter'
         # get
@@ -61,7 +60,7 @@ class CodeforcesService(onlinejudge.service.Service):
 
 
 # NOTE: Codeforces has its API: https://codeforces.com/api/help
-class CodeforcesProblem(onlinejudge.problem.Problem):
+class CodeforcesProblem(onlinejudge.type.Problem):
     def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
         assert index in string.ascii_uppercase
@@ -75,7 +74,7 @@ class CodeforcesProblem(onlinejudge.problem.Problem):
                 kind = 'gym'
         self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
 
-    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.problem.TestCase]:
+    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)

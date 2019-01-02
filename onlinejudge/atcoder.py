@@ -1,9 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge.service
-import onlinejudge.problem
-from onlinejudge.problem import SubmissionError
-import onlinejudge.submission
+import onlinejudge.type
+from onlinejudge.type import SubmissionError
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -17,9 +15,9 @@ from typing import *
 
 
 @utils.singleton
-class AtCoderService(onlinejudge.service.Service):
+class AtCoderService(onlinejudge.type.Service):
 
-    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://practice.contest.atcoder.jp/login'
         # get
@@ -84,13 +82,13 @@ class AtCoderService(onlinejudge.service.Service):
         return bool(msgs)
 
 
-class AtCoderProblem(onlinejudge.problem.Problem):
+class AtCoderProblem(onlinejudge.type.Problem):
     def __init__(self, contest_id: str, problem_id: str):
         self.contest_id = contest_id
         self.problem_id = problem_id
         self._task_id = None  # type: Optional[int]
 
-    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.problem.TestCase]:
+    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -225,7 +223,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             language_dict[option.attrs['value']] = { 'description': option.string }
         return language_dict
 
-    def submit(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.submission.DummySubmission:
+    def submit(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
         # get
@@ -263,7 +261,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             log.success('success: result: %s', resp.url)
             # NOTE: ignore the returned legacy URL and use beta.atcoder.jp's one
             url = 'https://beta.atcoder.jp/contests/{}/submissions/me'.format(self.contest_id)
-            return onlinejudge.submission.DummySubmission(url)
+            return onlinejudge.type.DummySubmission(url)
         else:
             log.failure('failure')
             log.debug('redirected to %s', resp.url)
@@ -288,7 +286,7 @@ class AtCoderProblem(onlinejudge.problem.Problem):
             self._task_id = int(m.group(1))
         return self._task_id
 
-class AtCoderSubmission(onlinejudge.submission.Submission):
+class AtCoderSubmission(onlinejudge.type.Submission):
     def __init__(self, contest_id: str, submission_id: int, problem_id: Optional[str] = None):
         self.contest_id = contest_id
         self.submission_id = submission_id

@@ -1,7 +1,7 @@
 # Python Version: 3.x
-import onlinejudge.service
-import onlinejudge.problem
-import onlinejudge.submission
+import onlinejudge.type
+import onlinejudge.type
+import onlinejudge.type
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -18,9 +18,9 @@ from typing import *
 
 
 @utils.singleton
-class TopCoderService(onlinejudge.service.Service):
+class TopCoderService(onlinejudge.type.Service):
 
-    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
 
         # NOTE: you can see this login page with https://community.topcoder.com/longcontest/?module=Submit
@@ -58,7 +58,7 @@ class TopCoderService(onlinejudge.service.Service):
         return None
 
 
-class TopCoderLongContestProblem(onlinejudge.problem.Problem):
+class TopCoderLongContestProblem(onlinejudge.type.Problem):
     def __init__(self, rd, cd=None, compid=None, pm=None):
         self.rd = rd
         self.cd = cd
@@ -102,7 +102,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
                 'Python': { 'value': '6', 'description': 'Pyhton 2' },
             }
 
-    def submit(self, code: str, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.submission.Submission:
+    def submit(self, code: str, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
         assert kind in [ 'example', 'full' ]
         session = session or utils.new_default_session()
 
@@ -120,7 +120,7 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         path = [ tag.attrs['href'] for tag in soup.find_all('a', text='Submit') if ('rd=%d' % self.rd) in tag.attrs['href'] ]
         if len(path) == 0:
             log.error('link to submit not found:  Are you logged in?  Are you registered?  Is the contest running?')
-            raise onlinejudge.problem.SubmissionError
+            raise onlinejudge.type.SubmissionError
         assert len(path) == 1
         path = path[0]
         assert path.startswith('/') and 'module=Submit' in path
@@ -152,16 +152,16 @@ class TopCoderLongContestProblem(onlinejudge.problem.Problem):
         if 'module=SubmitSuccess' in resp.content.decode(resp.encoding):
             url = 'http://community.topcoder.com/longcontest/?module=SubmitSuccess&rd={}&cd={}&compid={}'.format(self.rd, self.cd, self.compid)
             log.success('success: result: %s', url)
-            return onlinejudge.submission.CompatibilitySubmission(url, self)
+            return onlinejudge.type.CompatibilitySubmission(url, self)
         else:
             # module=Submit to get error messages
             resp = utils.request('GET', submit_url, session=session)
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             messages = soup.find('textarea', { 'name': 'messages' }).text
             log.failure('%s', messages)
-            raise onlinejudge.problem.SubmissionError
+            raise onlinejudge.type.SubmissionError
 
-    def get_standings(self, session: Optional[requests.Session] = None) -> onlinejudge.problem.Standings:
+    def get_standings(self, session: Optional[requests.Session] = None) -> onlinejudge.type.Standings:
         session = session or utils.new_default_session()
 
         header = None  # type: Optional[List[str]]

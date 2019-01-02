@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import onlinejudge.implementation.logging as log
 import onlinejudge.__about__ as version
-from onlinejudge.problem import LabeledString, TestCase
+from onlinejudge.type import LabeledString, TestCase
 import re
 import os
 import os.path

@@ -1,7 +1,6 @@
 # Python Version: 3.x
-import onlinejudge.service
-import onlinejudge.problem
-from onlinejudge.problem import LabeledString, TestCase
+import onlinejudge.type
+from onlinejudge.type import LabeledString, TestCase
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -14,7 +13,7 @@ from typing import *
 
 
 @utils.singleton
-class CSAcademyService(onlinejudge.service.Service):
+class CSAcademyService(onlinejudge.type.Service):
 
     def get_url(self) -> str:
         return 'https://csacademy.com/'
@@ -32,7 +31,7 @@ class CSAcademyService(onlinejudge.service.Service):
         return None
 
 
-class CSAcademyProblem(onlinejudge.problem.Problem):
+class CSAcademyProblem(onlinejudge.type.Problem):
     def __init__(self, contest_name: str, task_name: str):
         self.contest_name = contest_name
         self.task_name = task_name

@@ -1,6 +1,6 @@
 # Python Version: 3.x
 import onlinejudge
-import onlinejudge.problem
+import onlinejudge.type
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import os
@@ -11,7 +11,7 @@ from typing import *
 if TYPE_CHECKING:
     import argparse
 
-def convert_sample_to_dict(sample: onlinejudge.problem.TestCase) -> dict:
+def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> dict:
     data = {}
     data["input"] = sample.input.data
     data["output"] = sample.output.data

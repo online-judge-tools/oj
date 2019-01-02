@@ -1,8 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge.service
-import onlinejudge.problem
-from onlinejudge.problem import LabeledString, TestCase
+import onlinejudge.type
+from onlinejudge.type import LabeledString, TestCase
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -19,7 +18,7 @@ from typing import *
 
 
 @utils.singleton
-class AOJService(onlinejudge.service.Service):
+class AOJService(onlinejudge.type.Service):
 
     def get_url(self):
         return 'http://judge.u-aizu.ac.jp/onlinejudge/'
@@ -38,7 +37,7 @@ class AOJService(onlinejudge.service.Service):
         return None
 
 
-class AOJProblem(onlinejudge.problem.Problem):
+class AOJProblem(onlinejudge.type.Problem):
     def __init__(self, problem_id):
         self.problem_id = problem_id
 
