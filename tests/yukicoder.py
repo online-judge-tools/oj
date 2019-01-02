@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from onlinejudge.yukicoder import YukicoderService
+from onlinejudge.service.yukicoder import YukicoderService
 
 class YukicoderTest(unittest.TestCase):
 
