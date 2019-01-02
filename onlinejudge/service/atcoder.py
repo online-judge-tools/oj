@@ -14,6 +14,14 @@ import json
 from typing import *
 
 
+# This is a workaround. AtCoder's servers sometime fail to send "Content-Type" field.
+# see https://github.com/kmyk/online-judge-tools/issues/28 and https://github.com/kmyk/online-judge-tools/issues/232
+def _request(*args, **kwargs):
+    resp = utils.request(*args, **kwargs)
+    log.status('AtCoder\'s server said "Content-Type: %s"', resp.headers.get('Content-Type', '(not sent)'))
+    resp.encoding = 'UTF-8'
+    return resp
+
 @utils.singleton
 class AtCoderService(onlinejudge.type.Service):
 
@@ -21,7 +29,7 @@ class AtCoderService(onlinejudge.type.Service):
         session = session or utils.new_default_session()
         url = 'https://practice.contest.atcoder.jp/login'
         # get
-        resp = utils.request('GET', url, session=session, allow_redirects=False)
+        resp = _request('GET', url, session=session, allow_redirects=False)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         for msg in msgs:
             log.status('message: %s', msg)
@@ -29,7 +37,7 @@ class AtCoderService(onlinejudge.type.Service):
             return 'login' not in resp.url
         # post
         username, password = get_credentials()
-        resp = utils.request('POST', url, session=session, data={ 'name': username, 'password': password }, allow_redirects=False)
+        resp = _request('POST', url, session=session, data={ 'name': username, 'password': password }, allow_redirects=False)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         AtCoderService._report_messages(msgs)
         return 'login' not in resp.url  # AtCoder redirects to the top page if success
@@ -91,7 +99,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
         # get
-        resp = utils.request('GET', self.get_url(), session=session)
+        resp = _request('GET', self.get_url(), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             # example message: "message: You cannot see this page."
@@ -182,7 +190,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def get_input_format(self, session: Optional[requests.Session] = None) -> str:
         session = session or utils.new_default_session()
         # get
-        resp = utils.request('GET', self.get_url(), session=session)
+        resp = _request('GET', self.get_url(), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return ''
@@ -206,7 +214,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         # get
         url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
-        resp = utils.request('GET', url, session=session)
+        resp = _request('GET', url, session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return {}
@@ -228,7 +236,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         # get
         url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)  # TODO: use beta.atcoder.jp
-        resp = utils.request('GET', url, session=session)
+        resp = _request('GET', url, session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             raise SubmissionError
@@ -271,7 +279,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         if self._task_id is None:
             session = session or utils.new_default_session()
             # get
-            resp = utils.request('GET', self.get_url(), session=session)
+            resp = _request('GET', self.get_url(), session=session)
             msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
             if AtCoderService._report_messages(msgs, unexpected=True):
                 raise SubmissionError
@@ -342,7 +350,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
     def download(self, session: Optional[requests.Session] = None) -> str:
         session = session or utils.new_default_session()
         # get
-        resp = utils.request('GET', self.get_url(), session=session)
+        resp = _request('GET', self.get_url(), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             raise RuntimeError
