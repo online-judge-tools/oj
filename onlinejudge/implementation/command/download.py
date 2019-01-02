@@ -10,6 +10,7 @@ import json
 from typing import *
 if TYPE_CHECKING:
     import argparse
+    import pathlib
 
 def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> dict:
     data = {}
@@ -59,18 +60,18 @@ def download(args: 'argparse.Namespace') -> None:
             table['n'] = name
             table['b'] = os.path.basename(name)
             table['d'] = os.path.dirname(name)
-            path = os.path.join(args.directory, utils.parcentformat(args.format, table))
+            path = args.directory / utils.parcentformat(args.format, table)  # type: pathlib.Path
             log.status('%sput: %s', ext, name)
             log.emit(colorama.Style.BRIGHT + data.rstrip() + colorama.Style.RESET_ALL)
             if args.dry_run:
                 continue
-            if os.path.exists(path):
+            if path.exists():
                 log.warning('file already exists: %s', path)
                 if not args.overwrite:
                     log.warning('skipped')
                     continue
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'w') as fh:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open('w') as fh:
                 fh.write(data)
             log.success('saved to: %s', path)
 

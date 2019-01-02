@@ -67,7 +67,7 @@ format string for --format:
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (defaut: "sample-%%i.%%e" if not --system)')  # default must be None for --system
-    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
@@ -108,7 +108,7 @@ supported services:
   TopCoder (Marathon Match)
 ''')
     subparser.add_argument('url')
-    subparser.add_argument('file')
+    subparser.add_argument('file', type=pathlib.Path)
     subparser.add_argument('-l', '--language', help='narrow down language choices if ambiguous')
     subparser.add_argument('--no-guess', action='store_false', dest='guess')
     subparser.add_argument('-g', '--guess', action='store_true', help='guess the language for your file (default)')
@@ -143,7 +143,7 @@ tips:
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
-    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
     subparser.add_argument('-m', '--mode', choices=[ 'all', 'line' ], default='all', help='mode to check an output with the correct answer. (default: all)')
     subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
     subparser.add_argument('--no-rstrip', action='store_false', dest='rstrip')
@@ -154,7 +154,7 @@ tips:
     subparser.add_argument('-i', '--print-input', action='store_true', help='print input cases if not AC')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
-    subparser.add_argument('test', nargs='*', help='paths of test cases. (if empty: globbed from --format)')
+    subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
 
     # generate scanner
     subparser = subparsers.add_parser('generate-scanner',
@@ -204,8 +204,8 @@ tips:
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
-    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
-    subparser.add_argument('test', nargs='*', help='paths of input cases. (if empty: globbed from --format)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of input cases. (if empty: globbed from --format)')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
 

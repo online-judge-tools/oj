@@ -73,7 +73,7 @@ def test(args: 'argparse.Namespace') -> None:
         log.info('%s', name)
 
         # run the binary
-        with open(it['in']) as inf:
+        with it['in'].open() as inf:
             begin = time.perf_counter()
             answer_byte, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
@@ -97,7 +97,7 @@ def test(args: 'argparse.Namespace') -> None:
 
         # check WA or not
         if 'out' in it:
-            with open(it['out']) as outf:
+            with it['out'].open() as outf:
                 correct = outf.read()
             # compare
             if args.mode == 'all':

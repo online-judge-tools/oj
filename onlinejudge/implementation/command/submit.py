@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import os
 import re
+import pathlib
 from typing import *
 if TYPE_CHECKING:
     import argparse
@@ -21,8 +22,8 @@ def submit(args: 'argparse.Namespace') -> None:
         sys.exit(1)
 
     # read code
-    with open(args.file) as fh:
-        code = fh.buffer.read()
+    with args.file.open('rb') as fh:
+        code = fh.read()
     format_config = {
         'dos2unix': args.format_dos2unix or args.golf,
         'rstrip': args.format_dos2unix or args.golf,
@@ -138,13 +139,13 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
             result.append(lang_id)
     return result
 
-def guess_lang_ids_of_file(filename: str, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
+def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
     assert cxx_compiler.lower() in ( 'gcc', 'clang', 'all' )
     assert python_version.lower() in ( '2', '3', 'auto', 'all' )
     assert python_interpreter.lower() in ( 'cpython', 'pypy', 'all' )
 
     select = (lambda word, lang_ids, **kwargs: select_ids_of_matched_languages([ word ], lang_ids, language_dict=language_dict, **kwargs))
-    _, ext = os.path.splitext(filename)
+    ext = filename.suffix
     lang_ids = language_dict.keys()
 
     log.debug('file extension: %s', ext)
