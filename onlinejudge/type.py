@@ -27,9 +27,11 @@ class SubmissionError(RuntimeError):
     pass
 
 class Problem(object):
-    def download(self, session: Optional['requests.Session'] = None) -> List[TestCase]:
+    def download_sample_cases(self, session: Optional['requests.Session'] = None) -> List[TestCase]:
         raise NotImplementedError
-    def submit(self, code: str, language: str, session: Optional['requests.Session'] = None) -> 'Submission':  # or SubmissionError
+    def download_system_cases(self, session: Optional['requests.Session'] = None) -> List[TestCase]:
+        raise NotImplementedError
+    def submit_code(self, code: str, language: str, session: Optional['requests.Session'] = None) -> 'Submission':  # or SubmissionError
         raise NotImplementedError
     def get_language_dict(self, session: Optional['requests.Session'] = None) -> Dict[str, Language]:
         raise NotImplementedError
@@ -47,7 +49,7 @@ class Problem(object):
 
 
 class Submission(object):
-    def download(self, session: Optional['requests.Session'] = None) -> str:
+    def download_code(self, session: Optional['requests.Session'] = None) -> str:
         raise NotImplementedError
     def get_url(self) -> str:
         raise NotImplementedError

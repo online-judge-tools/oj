@@ -102,7 +102,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
                 'Python': { 'value': '6', 'description': 'Pyhton 2' },
             }
 
-    def submit(self, code: str, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
+    def submit_code(self, code: str, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
         assert kind in [ 'example', 'full' ]
         session = session or utils.new_default_session()
 

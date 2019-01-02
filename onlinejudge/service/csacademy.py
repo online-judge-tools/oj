@@ -36,7 +36,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
         self.contest_name = contest_name
         self.task_name = task_name
 
-    def download(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         base_url = self.get_url()
 

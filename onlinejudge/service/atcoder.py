@@ -88,7 +88,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         self.problem_id = problem_id
         self._task_id = None  # type: Optional[int]
 
-    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -223,7 +223,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             language_dict[option.attrs['value']] = { 'description': option.string }
         return language_dict
 
-    def submit(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
+    def submit_code(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
         # get

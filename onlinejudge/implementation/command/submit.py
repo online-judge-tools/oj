@@ -105,7 +105,7 @@ def submit(args: 'argparse.Namespace') -> None:
             else:
                 kwargs['kind'] = 'example'
         try:
-            submission = problem.submit(code, language=args.language, session=sess, **kwargs)  # type: ignore
+            submission = problem.submit_code(code, language=args.language, session=sess, **kwargs)  # type: ignore
         except onlinejudge.type.SubmissionError:
             log.failure('submission failed')
             return
