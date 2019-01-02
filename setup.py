@@ -23,7 +23,6 @@ setup(
         'beautifulsoup4',
         'colorama',
         'sympy',
-        'pipdate',
         'appdirs',
     ],
     extras_require={

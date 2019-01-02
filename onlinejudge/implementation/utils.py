@@ -17,8 +17,10 @@ import posixpath
 import sys
 import ast
 import time
+import json
 import appdirs
 import pathlib
+import distutils.version
 from typing import *
 from typing.io import *
 
@@ -185,3 +187,41 @@ def request(method: str, url: str, session: requests.Session, raise_for_status: 
     if raise_for_status:
         resp.raise_for_status()
     return resp
+
+
+def get_latest_version_from_pypi() -> str:
+    pypi_url = 'https://pypi.org/pypi/{}/json'.format(version.name)
+    version_cache_path = cache_dir / "pypi.json"
+    update_interval = 60 * 60 * 8  # 8 hours
+
+    # load cache
+    if version_cache_path.exists():
+        with version_cache_path.open() as fh:
+            cache = json.load(fh)
+        if time.time() < cache['time'] + update_interval:
+            return cache['version']
+
+    # get
+    try:
+        resp = request('GET', pypi_url, session=requests.Session())
+        data = json.loads(resp.content.decode())
+        value = data['info']['version']
+    except requests.RequestException as e:
+        log.error(str(e))
+        value = '0.0.0'  # ignore since this failure is not important
+    cache = {
+        'time': int(time.time()),  # use timestamp because Python's standard datetime library is too weak to parse strings
+        'version': value,
+    }
+
+    # store cache
+    version_cache_path.parent.mkdir(parents=True, exist_ok=True)
+    with version_cache_path.open('w') as fh:
+        json.dump(cache, fh)
+
+    return value
+
+def is_update_available_on_pypi() -> bool:
+    a = distutils.version.StrictVersion(version.__version__)
+    b = distutils.version.StrictVersion(get_latest_version_from_pypi())
+    return a < b

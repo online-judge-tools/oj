@@ -14,7 +14,6 @@ from onlinejudge.implementation.command.split_input import split_input, split_in
 from onlinejudge.implementation.command.test_reactive import test_reactive
 from onlinejudge.implementation.command.code_statistics import code_statistics
 from onlinejudge.implementation.command.get_standings import get_standings
-import pipdate
 import argparse
 import sys
 import os
@@ -24,8 +23,9 @@ from typing import List, Optional
 
 
 def version_check() -> None:
-    if pipdate.needs_checking(version.name):
-        print(pipdate.check(version.name, version.__version__), end='')
+    if utils.is_update_available_on_pypi():
+        log.warning('update available: %s -> %s', version.__version__, utils.get_latest_version_from_pypi())
+        log.info('run: $ pip3 install -U %s', version.name)
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -307,15 +307,8 @@ supported services:
 
 
 def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
-    # logging
-    log_level = log.logging.INFO
     if args.verbose:
-        log_level = log.logging.DEBUG
-    log.setLevel(log_level)
-    handler = log.logging.StreamHandler(sys.stderr)
-    handler.setLevel(log_level)
-    log.addHandler(handler)
-
+        log.setLevel(log.logging.DEBUG)
     log.debug('args: %s', str(args))
 
     if args.subcommand in [ 'download', 'd', 'dl' ]:
@@ -344,6 +337,8 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
 
 
 def main(args: Optional[List[str]] = None) -> None:
+    log.addHandler(log.logging.StreamHandler(sys.stderr))
+    log.setLevel(log.logging.INFO)
     version_check()
     parser = get_parser()
     namespace = parser.parse_args(args=args)
