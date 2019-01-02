@@ -21,3 +21,4 @@ deploy:
     skip_existing: true
     on:
         branch: master
+        python: 3.6
