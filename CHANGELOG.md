@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.50 / 2019-01-02
+
+-   [#225](https://github.com/kmyk/online-judge-tools/pull/225) heavy refactoring
+-   [#224](https://github.com/kmyk/online-judge-tools/pull/224) improve auto update-checking
+-   [#223](https://github.com/kmyk/online-judge-tools/pull/223) start using tags to make release
+
 ## 0.1.49 / 2019-01-02
 
 -   [#222](https://github.com/kmyk/online-judge-tools/pull/222) created [the Gitter room](https://gitter.im/online-judge-tools/community)
