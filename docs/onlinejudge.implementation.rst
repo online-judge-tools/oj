@@ -1,5 +1,5 @@
-onlinejudge\.implementation package
-===================================
+onlinejudge.implementation package
+==================================
 
 Subpackages
 -----------
@@ -11,34 +11,26 @@ Subpackages
 Submodules
 ----------
 
-onlinejudge\.implementation\.logging module
--------------------------------------------
+onlinejudge.implementation.logging module
+-----------------------------------------
 
 .. automodule:: onlinejudge.implementation.logging
     :members:
     :undoc-members:
     :show-inheritance:
 
-onlinejudge\.implementation\.main module
-----------------------------------------
+onlinejudge.implementation.main module
+--------------------------------------
 
 .. automodule:: onlinejudge.implementation.main
     :members:
     :undoc-members:
     :show-inheritance:
 
-onlinejudge\.implementation\.utils module
------------------------------------------
+onlinejudge.implementation.utils module
+---------------------------------------
 
 .. automodule:: onlinejudge.implementation.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge\.implementation\.version module
--------------------------------------------
-
-.. automodule:: onlinejudge.implementation.version
     :members:
     :undoc-members:
     :show-inheritance:
