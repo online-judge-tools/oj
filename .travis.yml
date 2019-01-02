@@ -13,7 +13,7 @@ branches:
     only:
         - master
         - develop
-        - "/^v\\d\\.\\d\\.\\d$/"
+        - "/^v\\d+\\.\\d+\\.\\d+$/"
 deploy:
     provider: pypi
     user: kimiyuki
