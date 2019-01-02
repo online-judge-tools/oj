@@ -74,7 +74,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                 kind = 'gym'
         self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
 
-    def download(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)

@@ -24,15 +24,13 @@ def download(args: 'argparse.Namespace') -> None:
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
-    kwargs = {}
     if args.system:
         supported_service_names = [ 'aoj', 'yukicoder' ]
         if problem.get_service().get_name() not in supported_service_names:
             log.error('--system for %s is not supported', problem.get_service().get_name())
             sys.exit(1)
-        kwargs['is_system'] = True
     if args.format is None:
-        if kwargs.get('is_system'):
+        if args.system:
             if problem.get_service().get_name() == 'yukicoder':
                 args.format = '%b.%e'
             else:
@@ -42,7 +40,10 @@ def download(args: 'argparse.Namespace') -> None:
 
     # get samples from the server
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
-        samples = problem.download(session=sess, **kwargs)  # type: ignore
+        if args.system:
+            samples = problem.download_system_cases(session=sess)  # type: ignore
+        else:
+            samples = problem.download_sample_cases(session=sess)  # type: ignore
 
     # write samples to files
     for i, sample in enumerate(samples):

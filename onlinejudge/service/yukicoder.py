@@ -240,12 +240,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         self.problem_no = problem_no
         self.problem_id = problem_id
 
-    def download(self, session: Optional[requests.Session] = None, is_system: bool = False) -> List[TestCase]:
-        if is_system:
-            return self.download_system(session=session)
-        else:
-            return self.download_samples(session=session)
-    def download_samples(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -259,7 +254,8 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 data, name = it
                 samples.add(data, name)
         return samples.get()
-    def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+
+    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
