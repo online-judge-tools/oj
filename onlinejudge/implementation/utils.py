@@ -1,7 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
 import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.version as version
+import onlinejudge.__about__ as version
 from onlinejudge.problem import LabeledString, TestCase
 import re
 import os
@@ -24,9 +24,9 @@ import distutils.version
 from typing import *
 from typing.io import *
 
-config_dir = pathlib.Path(appdirs.user_config_dir(version.name))
-data_dir = pathlib.Path(appdirs.user_data_dir(version.name))
-cache_dir = pathlib.Path(appdirs.user_cache_dir(version.name))
+config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
+data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
+cache_dir = pathlib.Path(appdirs.user_cache_dir(version.__package_name__))
 html_parser = 'lxml'
 
 def parcentformat(s: str, table: Dict[str, str]) -> str:
@@ -190,7 +190,7 @@ def request(method: str, url: str, session: requests.Session, raise_for_status: 
 
 
 def get_latest_version_from_pypi() -> str:
-    pypi_url = 'https://pypi.org/pypi/{}/json'.format(version.name)
+    pypi_url = 'https://pypi.org/pypi/{}/json'.format(version.__package_name__)
     version_cache_path = cache_dir / "pypi.json"
     update_interval = 60 * 60 * 8  # 8 hours
 

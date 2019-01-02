@@ -8,13 +8,13 @@ def load_module(module_path):
         file, path, description = imp.find_module(name, path)
         path = [ path ]
     return imp.load_module(name, file, path[0], description)
-version = load_module('onlinejudge.implementation.version')
+version = load_module('onlinejudge.__about__')
 
 with open('readme.md', encoding='utf-8') as fh:
     readme = fh.read()
 
 setup(
-    name=version.name,
+    name=version.__package_name__,
     version=version.__version__,
     description='Tools for online-judge services',
     install_requires=[

@@ -1,9 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
 import onlinejudge
+import onlinejudge.__about__ as version
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.version as version
 from onlinejudge.implementation.command.download import download
 from onlinejudge.implementation.command.login import login
 from onlinejudge.implementation.command.submit import submit
@@ -25,7 +25,7 @@ from typing import List, Optional
 def version_check() -> None:
     if utils.is_update_available_on_pypi():
         log.warning('update available: %s -> %s', version.__version__, utils.get_latest_version_from_pypi())
-        log.info('run: $ pip3 install -U %s', version.name)
+        log.info('run: $ pip3 install -U %s', version.__package_name__)
 
 
 def get_parser() -> argparse.ArgumentParser:
