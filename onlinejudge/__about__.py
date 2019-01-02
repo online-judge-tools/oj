@@ -1,5 +1,5 @@
 # Python Version: 3.x
-name = 'online-judge-tools'
+__package_name__ = 'online-judge-tools'
 __author__  = 'Kimiyuki Onaka'
 __email__ = 'kimiyuki95@gmail.com'
 __license__ = 'MIT License'

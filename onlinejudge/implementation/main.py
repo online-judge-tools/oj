@@ -23,8 +23,8 @@ from typing import List, Optional
 
 
 def version_check() -> None:
-    if pipdate.needs_checking(version.name):
-        print(pipdate.check(version.name, version.__version__), end='')
+    if pipdate.needs_checking(version.__package_name__):
+        print(pipdate.check(version.__package_name__, version.__version__), end='')
 
 
 def get_parser() -> argparse.ArgumentParser:
