@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.49 / 2019-01-02
+
+-   [#222](https://github.com/kmyk/online-judge-tools/pull/222) created [the Gitter room](https://gitter.im/online-judge-tools/community)
+-   [#219](https://github.com/kmyk/online-judge-tools/issues/219) fix a bug that type checking doesn't work on CI
+-   [#218](https://github.com/kmyk/online-judge-tools/pull/218) add support for Python 3.5 ([@fukatani](https://github.com/fukatani))
+
 ## 0.1.48 / 2018-12-30
 
 -   [#213](https://github.com/kmyk/online-judge-tools/issues/213) update the package on PyPI via Travis CI
