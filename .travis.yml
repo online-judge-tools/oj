@@ -6,7 +6,7 @@ install:
     - pip install mypy
     - pip install -e .[docs]
 script:
-    - mypy --ignore-missing-imports oj onlinejudge/**/*.py
+    - mypy --verbose --ignore-missing-imports oj onlinejudge/**/*.py
     - make -C docs html
     - python setup.py test
 branches:
