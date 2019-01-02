@@ -18,12 +18,13 @@ import sys
 import ast
 import time
 import appdirs
+import pathlib
 from typing import *
 from typing.io import *
 
-config_dir = appdirs.user_config_dir(version.name)
-data_dir = appdirs.user_data_dir(version.name)
-cache_dir = appdirs.user_cache_dir(version.name)
+config_dir = pathlib.Path(appdirs.user_config_dir(version.name))
+data_dir = pathlib.Path(appdirs.user_data_dir(version.name))
+cache_dir = pathlib.Path(appdirs.user_cache_dir(version.name))
 html_parser = 'lxml'
 
 def parcentformat(s: str, table: Dict[str, str]) -> str:
@@ -58,21 +59,19 @@ def new_default_session() -> requests.Session:  # without setting cookiejar
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
     return session
 
-default_cookie_path = os.path.join(data_dir, 'cookie.jar')
+default_cookie_path = data_dir / 'cookie.jar'
 
 @contextlib.contextmanager
-def with_cookiejar(session: requests.Session, path: str) -> Generator[requests.Session, None, None]:
-    path = path or default_cookie_path
-    session.cookies = http.cookiejar.LWPCookieJar(path)  # type: ignore
-    if os.path.exists(path):
+def with_cookiejar(session: requests.Session, path: pathlib.Path = default_cookie_path) -> Generator[requests.Session, None, None]:
+    session.cookies = http.cookiejar.LWPCookieJar(str(path))  # type: ignore
+    if path.exists():
         log.status('load cookie from: %s', path)
         session.cookies.load()  # type: ignore
     yield session
     log.status('save cookie to: %s', path)
-    if os.path.dirname(path):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
     session.cookies.save()  # type: ignore
-    os.chmod(path, 0o600)  # NOTE: to make secure a little bit
+    path.chmod(0o600)  # NOTE: to make secure a little bit
 
 
 class SampleZipper(object):
