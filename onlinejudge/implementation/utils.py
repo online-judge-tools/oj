@@ -1,26 +1,31 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
 import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.version as version
-from onlinejudge.problem import LabeledString, TestCase
-import re
-import os
-import os.path
-import requests
+import onlinejudge.__about__ as version
+from onlinejudge.type import LabeledString, TestCase
+
+import appdirs
 import bs4
+import requests
+
 import contextlib
-import urllib.parse
-import http.cookiejar
+import distutils.version
 import http.client
-import subprocess
+import http.cookiejar
+import json
+import pathlib
 import posixpath
+import re
+import subprocess
 import sys
-import ast
 import time
+import urllib.parse
 from typing import *
 from typing.io import *
 
-default_data_dir = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'), 'onlinejudge')
+config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
+data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
+cache_dir = pathlib.Path(appdirs.user_cache_dir(version.__package_name__))
 html_parser = 'lxml'
 
 def parcentformat(s: str, table: Dict[str, str]) -> str:
@@ -55,21 +60,19 @@ def new_default_session() -> requests.Session:  # without setting cookiejar
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
     return session
 
-default_cookie_path = os.path.join(default_data_dir, 'cookie.jar')
+default_cookie_path = data_dir / 'cookie.jar'
 
 @contextlib.contextmanager
-def with_cookiejar(session: requests.Session, path: str) -> Generator[requests.Session, None, None]:
-    path = path or default_cookie_path
-    session.cookies = http.cookiejar.LWPCookieJar(path)  # type: ignore
-    if os.path.exists(path):
+def with_cookiejar(session: requests.Session, path: pathlib.Path = default_cookie_path) -> Generator[requests.Session, None, None]:
+    session.cookies = http.cookiejar.LWPCookieJar(str(path))  # type: ignore
+    if path.exists():
         log.status('load cookie from: %s', path)
         session.cookies.load()  # type: ignore
     yield session
     log.status('save cookie to: %s', path)
-    if os.path.dirname(path):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
     session.cookies.save()  # type: ignore
-    os.chmod(path, 0o600)  # NOTE: to make secure a little bit
+    path.chmod(0o600)  # NOTE: to make secure a little bit
 
 
 class SampleZipper(object):
@@ -183,3 +186,41 @@ def request(method: str, url: str, session: requests.Session, raise_for_status: 
     if raise_for_status:
         resp.raise_for_status()
     return resp
+
+
+def get_latest_version_from_pypi() -> str:
+    pypi_url = 'https://pypi.org/pypi/{}/json'.format(version.__package_name__)
+    version_cache_path = cache_dir / "pypi.json"
+    update_interval = 60 * 60 * 8  # 8 hours
+
+    # load cache
+    if version_cache_path.exists():
+        with version_cache_path.open() as fh:
+            cache = json.load(fh)
+        if time.time() < cache['time'] + update_interval:
+            return cache['version']
+
+    # get
+    try:
+        resp = request('GET', pypi_url, session=requests.Session())
+        data = json.loads(resp.content.decode())
+        value = data['info']['version']
+    except requests.RequestException as e:
+        log.error(str(e))
+        value = '0.0.0'  # ignore since this failure is not important
+    cache = {
+        'time': int(time.time()),  # use timestamp because Python's standard datetime library is too weak to parse strings
+        'version': value,
+    }
+
+    # store cache
+    version_cache_path.parent.mkdir(parents=True, exist_ok=True)
+    with version_cache_path.open('w') as fh:
+        json.dump(cache, fh)
+
+    return value
+
+def is_update_available_on_pypi() -> bool:
+    a = distutils.version.StrictVersion(version.__version__)
+    b = distutils.version.StrictVersion(get_latest_version_from_pypi())
+    return a < b

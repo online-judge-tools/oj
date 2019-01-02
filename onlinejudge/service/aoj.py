@@ -1,8 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge.service
-import onlinejudge.problem
-from onlinejudge.problem import LabeledString, TestCase
+import onlinejudge.type
+from onlinejudge.type import LabeledString, TestCase
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -19,7 +18,7 @@ from typing import *
 
 
 @utils.singleton
-class AOJService(onlinejudge.service.Service):
+class AOJService(onlinejudge.type.Service):
 
     def get_url(self):
         return 'http://judge.u-aizu.ac.jp/onlinejudge/'
@@ -38,17 +37,11 @@ class AOJService(onlinejudge.service.Service):
         return None
 
 
-class AOJProblem(onlinejudge.problem.Problem):
+class AOJProblem(onlinejudge.type.Problem):
     def __init__(self, problem_id):
         self.problem_id = problem_id
 
-    def download(self, session: Optional[requests.Session] = None, is_system: bool = False) -> List[TestCase]:
-        if is_system:
-            return self.download_system(session=session)
-        else:
-            return self.download_samples(session=session)
-
-    def download_samples(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get samples via the official API
         # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2Fsamples%2F%7BproblemId%7D_GET
@@ -62,7 +55,7 @@ class AOJProblem(onlinejudge.problem.Problem):
                 ) ]
         return samples
 
-    def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
 
         # get header

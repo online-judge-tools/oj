@@ -1,9 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
 import onlinejudge
+import onlinejudge.__about__ as version
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.version as version
 from onlinejudge.implementation.command.download import download
 from onlinejudge.implementation.command.login import login
 from onlinejudge.implementation.command.submit import submit
@@ -14,23 +14,26 @@ from onlinejudge.implementation.command.split_input import split_input, split_in
 from onlinejudge.implementation.command.test_reactive import test_reactive
 from onlinejudge.implementation.command.code_statistics import code_statistics
 from onlinejudge.implementation.command.get_standings import get_standings
-import pipdate
 import argparse
 import sys
-import os
-import os.path
+import traceback
+import pathlib
 from typing import List, Optional
 
 
 def version_check() -> None:
-    if pipdate.needs_checking(version.name):
-        print(pipdate.check(version.name, version.__version__), end='')
+    if utils.is_update_available_on_pypi():
+        log.warning('update available: %s -> %s', version.__version__, utils.get_latest_version_from_pypi())
+        log.info('run: $ pip3 install -U %s', version.__package_name__)
 
 
 def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Tools for online judge services')
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-c', '--cookie', help='path to cookie. (default: {})'.format(utils.default_cookie_path))
+    parser.add_argument('-c', '--cookie',
+            type=pathlib.Path,
+            default=utils.default_cookie_path,
+            help='path to cookie. (default: {})'.format(utils.default_cookie_path))
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
@@ -63,7 +66,7 @@ format string for --format:
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (defaut: "sample-%%i.%%e" if not --system)')  # default must be None for --system
-    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
@@ -104,7 +107,7 @@ supported services:
   TopCoder (Marathon Match)
 ''')
     subparser.add_argument('url')
-    subparser.add_argument('file')
+    subparser.add_argument('file', type=pathlib.Path)
     subparser.add_argument('-l', '--language', help='narrow down language choices if ambiguous')
     subparser.add_argument('--no-guess', action='store_false', dest='guess')
     subparser.add_argument('-g', '--guess', action='store_true', help='guess the language for your file (default)')
@@ -139,7 +142,7 @@ tips:
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
-    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
     subparser.add_argument('-m', '--mode', choices=[ 'all', 'line' ], default='all', help='mode to check an output with the correct answer. (default: all)')
     subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
     subparser.add_argument('--no-rstrip', action='store_false', dest='rstrip')
@@ -150,7 +153,7 @@ tips:
     subparser.add_argument('-i', '--print-input', action='store_true', help='print input cases if not AC')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
-    subparser.add_argument('test', nargs='*', help='paths of test cases. (if empty: globbed from --format)')
+    subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
 
     # generate scanner
     subparser = subparsers.add_parser('generate-scanner',
@@ -200,8 +203,8 @@ tips:
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
-    subparser.add_argument('-d', '--directory', default='test', help='a directory name for test cases (default: test/)')
-    subparser.add_argument('test', nargs='*', help='paths of input cases. (if empty: globbed from --format)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of input cases. (if empty: globbed from --format)')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
 
@@ -303,15 +306,8 @@ supported services:
 
 
 def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
-    # logging
-    log_level = log.logging.INFO
     if args.verbose:
-        log_level = log.logging.DEBUG
-    log.setLevel(log_level)
-    handler = log.logging.StreamHandler(sys.stderr)
-    handler.setLevel(log_level)
-    log.addHandler(handler)
-
+        log.setLevel(log.logging.DEBUG)
     log.debug('args: %s', str(args))
 
     if args.subcommand in [ 'download', 'd', 'dl' ]:
@@ -340,7 +336,14 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
 
 
 def main(args: Optional[List[str]] = None) -> None:
+    log.addHandler(log.logging.StreamHandler(sys.stderr))
+    log.setLevel(log.logging.INFO)
     version_check()
     parser = get_parser()
     namespace = parser.parse_args(args=args)
-    run_program(namespace, parser=parser)
+    try:
+        run_program(namespace, parser=parser)
+    except NotImplementedError as e:
+        log.debug('\n' + traceback.format_exc())
+        log.error('NotImplementedError')
+        log.info('The operation you specified is not supported yet. Pull requests are welcome.')

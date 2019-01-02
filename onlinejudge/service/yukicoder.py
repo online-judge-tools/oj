@@ -1,9 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge.service
-import onlinejudge.problem
-from onlinejudge.problem import LabeledString, TestCase
-import onlinejudge.submission
+import onlinejudge.type
+import onlinejudge.type
+from onlinejudge.type import LabeledString, TestCase
+import onlinejudge.type
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -21,9 +21,9 @@ from typing import *
 
 
 @utils.singleton
-class YukicoderService(onlinejudge.service.Service):
+class YukicoderService(onlinejudge.type.Service):
 
-    def login(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
         if method == 'github':
             return self.login_with_github(get_credentials, session=session)
         elif method == 'twitter':
@@ -31,7 +31,7 @@ class YukicoderService(onlinejudge.service.Service):
         else:
             assert False
 
-    def login_with_github(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login_with_github(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/github'
         # get
@@ -62,7 +62,7 @@ class YukicoderService(onlinejudge.service.Service):
             log.failure('You failed to sign in. Wrong user ID or password.')
             return False
 
-    def login_with_twitter(self, get_credentials: onlinejudge.service.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login_with_twitter(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
@@ -232,7 +232,7 @@ class YukicoderService(onlinejudge.service.Service):
             star += '.5'
         return star
 
-class YukicoderProblem(onlinejudge.problem.Problem):
+class YukicoderProblem(onlinejudge.type.Problem):
     def __init__(self, problem_no=None, problem_id=None):
         assert problem_no or problem_id
         assert not problem_no or isinstance(problem_no, int)
@@ -240,12 +240,7 @@ class YukicoderProblem(onlinejudge.problem.Problem):
         self.problem_no = problem_no
         self.problem_id = problem_id
 
-    def download(self, session: Optional[requests.Session] = None, is_system: bool = False) -> List[TestCase]:
-        if is_system:
-            return self.download_system(session=session)
-        else:
-            return self.download_samples(session=session)
-    def download_samples(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -259,7 +254,8 @@ class YukicoderProblem(onlinejudge.problem.Problem):
                 data, name = it
                 samples.add(data, name)
         return samples.get()
-    def download_system(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+
+    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.new_default_session()
         # get
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
