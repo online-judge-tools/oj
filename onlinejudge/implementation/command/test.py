@@ -3,6 +3,7 @@ import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.command.utils as cutils
+import json
 import math
 import sys
 import time
@@ -54,6 +55,7 @@ def test(args: 'argparse.Namespace') -> None:
     slowest_name = ''
     ac_count = 0
 
+    history = []
     for name, it in sorted(tests.items()):
         is_printed_input = not args.print_input
         def print_input():
@@ -71,11 +73,12 @@ def test(args: 'argparse.Namespace') -> None:
             begin = time.perf_counter()
             answer_byte, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
+            elapsed = end - begin
             answer = answer_byte.decode()
-            if slowest < end - begin:
-                slowest = end - begin
+            if slowest < elapsed:
+                slowest = elapsed
                 slowest_name = name
-            log.status('time: %f sec', end - begin)
+            log.status('time: %f sec', elapsed)
             proc.terminate()
 
         # check TLE, RE or not
@@ -129,6 +132,21 @@ def test(args: 'argparse.Namespace') -> None:
             log.success(log.green('AC'))
             ac_count += 1
 
+        # push the result
+        testcase = {
+            'name': name,
+            'input': str(it['in'].resolve()),
+        }
+        if 'out' in it:
+            testcase['output'] = str(it['out'].resolve())
+        history += [ {
+            'result': result,
+            'testcase': testcase,
+            'output': answer,
+            'exitcode': proc.returncode,
+            'elapsed': elapsed,
+        } ]
+
     # summarize
     log.emit('')
     log.status('slowest: %f sec  (for %s)', slowest, slowest_name)
@@ -136,4 +154,9 @@ def test(args: 'argparse.Namespace') -> None:
         log.success('test ' + log.green('success') + ': %d cases', len(tests))
     else:
         log.failure('test ' + log.red('failed') + ': %d AC / %d cases', ac_count, len(tests))
+
+    if args.json:
+        print(json.dumps(history))
+
+    if ac_count != len(tests):
         sys.exit(1)
