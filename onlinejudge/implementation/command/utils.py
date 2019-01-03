@@ -19,12 +19,11 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
         log.debug('testcase globbed: %s', path)
     return paths
 
-def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) -> Optional[Match[str]]:
+def match_with_format(format: str, path: pathlib.Path) -> Optional[Match[str]]:
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
     pattern = re.compile('^' + utils.parcentformat(format, table) + '$')
-    path = path.absolute().relative_to(directory.absolute()).resolve()
     return pattern.match(str(path))
 
 def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) -> pathlib.Path:
@@ -46,10 +45,10 @@ def drop_backup_or_hidden_files(paths: List[pathlib.Path]) -> List[pathlib.Path]
             result += [ path ]
     return result
 
-def construct_relationship_of_files(paths: List[pathlib.Path], directory: pathlib.Path, format: str) -> Dict[str, Dict[str, pathlib.Path]]:
+def construct_relationship_of_files(paths: List[pathlib.Path], format: str) -> Dict[str, Dict[str, pathlib.Path]]:
     tests = collections.defaultdict(dict)  # type: Dict[str, Dict[str, pathlib.Path]]
     for path in paths:
-        m = match_with_format(directory, format, path.resolve())
+        m = match_with_format(format, path.resolve())
         if not m:
             log.error('unrecognizable file found: %s', path)
             sys.exit(1)
