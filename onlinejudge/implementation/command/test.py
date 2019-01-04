@@ -2,7 +2,7 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.command.utils as cutils
+import onlinejudge.implementation.format_utils as cutils
 import json
 import math
 import sys
