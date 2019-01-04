@@ -39,7 +39,7 @@ def test(args: 'argparse.Namespace') -> None:
         args.test = cutils.glob_with_format(args.directory, args.format)  # by default
     if args.ignore_backup:
         args.test = cutils.drop_backup_or_hidden_files(args.test)
-    tests = cutils.construct_relationship_of_files(args.test, args.format)
+    tests = cutils.construct_relationship_of_files(args.test, args.directory, args.format)
     if args.error: # float mode
         match = lambda a, b: compare_as_floats(a, b, args.error)
     else:
