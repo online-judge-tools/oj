@@ -31,7 +31,7 @@ def generate_output(args: 'argparse.Namespace') -> None:
             log.info('skipped.')
             continue
         log.emit(log.bold(answer.decode().rstrip()))
-        name = cutils.match_with_format(args.format, it['in']).groupdict()['name']  # type: ignore
+        name = cutils.match_with_format(args.directory, args.format, it['in']).groupdict()['name']  # type: ignore
         path = cutils.path_from_format(args.directory, args.format, name=name, ext='out')
         with path.open('wb') as fh:
             fh.write(answer)
