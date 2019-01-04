@@ -155,7 +155,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_dir(self):
         self.snippet_call_test(
-            args=[ '-c', 'cat', '-d', 'path/to/../../p/o/y/o' ],
+            args=[ '-c', 'cat', '-d', 'p/o/../../p/o/y/o' ],
             files=[
                 { 'path': 'p/o/y/o/sample-1.in', 'data': 'foo\n' },
                 { 'path': 'p/o/y/o/sample-1.out', 'data': 'foo\n' },
