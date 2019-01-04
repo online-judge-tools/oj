@@ -19,12 +19,22 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
         log.debug('testcase globbed: %s', path)
     return paths
 
+def counts_included_dirname(format: str) -> int:
+    count = 0  # type: int
+    for dirname in format.split('/'):
+        if dirname:
+            count += 1
+    return count
+
 def match_with_format(format: str, path: pathlib.Path) -> Optional[Match[str]]:
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
-    pattern = re.compile('^' + utils.parcentformat(format, table) + '$')
-    return pattern.match(path.name)
+    format_root_path = path  # type: str
+    for i in range(counts_included_dirname(format)):
+        format_root_path = format_root_path.parent
+    pattern = re.compile('^' + str(format_root_path) + '/' + utils.parcentformat(format, table) + '$')
+    return pattern.match(str(path))
 
 def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) -> pathlib.Path:
     table = {}
