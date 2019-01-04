@@ -1,10 +1,10 @@
 import unittest
-import tests.download
+import tests.command_download
 
 class DownloadAtCoderTest(unittest.TestCase):
 
     def snippet_call_download(self, *args, **kwargs):
-        tests.download.snippet_call_download(self, *args, **kwargs)
+        tests.command_download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_atcoder_abc001_1(self):
         self.snippet_call_download(

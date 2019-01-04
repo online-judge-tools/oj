@@ -1,12 +1,12 @@
 import unittest
-import tests.download
+import tests.command_download
 
 import os
 
 class DownloadOthersTest(unittest.TestCase):
 
     def snippet_call_download(self, *args, **kwargs):
-        tests.download.snippet_call_download(self, *args, **kwargs)
+        tests.command_download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_anarchygolf_the_b_programming_language(self):
         self.snippet_call_download(

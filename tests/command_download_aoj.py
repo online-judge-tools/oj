@@ -1,12 +1,12 @@
 import unittest
-import tests.download
+import tests.command_download
 
 import os
 
 class DownloadAOJTest(unittest.TestCase):
 
     def snippet_call_download(self, *args, **kwargs):
-        tests.download.snippet_call_download(self, *args, **kwargs)
+        tests.command_download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_aoj_DSL_1_A(self):
         self.snippet_call_download(
