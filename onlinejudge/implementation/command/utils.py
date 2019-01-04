@@ -19,13 +19,22 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
         log.debug('testcase globbed: %s', path)
     return paths
 
-def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) -> Optional[Match[str]]:
+def counts_included_dirname(format: str) -> int:
+    count = 0  # type: int
+    for dirname in format.split('/'):
+        if dirname:
+            count += 1
+    return count
+
+def match_with_format(format: str, path: pathlib.Path) -> Optional[Match[str]]:
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
-    pattern = re.compile('^' + utils.parcentformat(format, table) + '$')
-    path = path.absolute().relative_to(directory.absolute()).resolve()
-    return pattern.match(str(path))
+    format_root_path = path  # type: pathlib.Path
+    for i in range(counts_included_dirname(format)):
+        format_root_path = format_root_path.parent
+    pattern = re.compile('^' + str(format_root_path) + '/' + utils.parcentformat(format, table) + '$')
+    return pattern.match(str(path.resolve()))
 
 def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) -> pathlib.Path:
     table = {}
@@ -46,10 +55,10 @@ def drop_backup_or_hidden_files(paths: List[pathlib.Path]) -> List[pathlib.Path]
             result += [ path ]
     return result
 
-def construct_relationship_of_files(paths: List[pathlib.Path], directory: pathlib.Path, format: str) -> Dict[str, Dict[str, pathlib.Path]]:
+def construct_relationship_of_files(paths: List[pathlib.Path], format: str) -> Dict[str, Dict[str, pathlib.Path]]:
     tests = collections.defaultdict(dict)  # type: Dict[str, Dict[str, pathlib.Path]]
     for path in paths:
-        m = match_with_format(directory, format, path.resolve())
+        m = match_with_format(format, path.resolve())
         if not m:
             log.error('unrecognizable file found: %s', path)
             sys.exit(1)

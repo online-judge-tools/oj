@@ -13,7 +13,7 @@ def generate_output(args: 'argparse.Namespace') -> None:
         args.test = cutils.glob_with_format(args.directory, args.format) # by default
     if args.ignore_backup:
         args.test = cutils.drop_backup_or_hidden_files(args.test)
-    tests = cutils.construct_relationship_of_files(args.test, args.directory, args.format)
+    tests = cutils.construct_relationship_of_files(args.test, args.format)
     for name, it in sorted(tests.items()):
         log.emit('')
         log.info('%s', name)
@@ -31,7 +31,7 @@ def generate_output(args: 'argparse.Namespace') -> None:
             log.info('skipped.')
             continue
         log.emit(log.bold(answer.decode().rstrip()))
-        name = cutils.match_with_format(args.directory, args.format, it['in']).groupdict()['name']  # type: ignore
+        name = cutils.match_with_format(args.format, it['in']).groupdict()['name']  # type: ignore
         path = cutils.path_from_format(args.directory, args.format, name=name, ext='out')
         with path.open('wb') as fh:
             fh.write(answer)
