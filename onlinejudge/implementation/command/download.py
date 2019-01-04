@@ -55,7 +55,7 @@ def download(args: 'argparse.Namespace') -> None:
             table['n'] = name
             table['b'] = os.path.basename(name)
             table['d'] = os.path.dirname(name)
-            path = args.directory / utils.parcentformat(args.format, table)  # type: pathlib.Path
+            path = args.directory / utils.percentformat(args.format, table)  # type: pathlib.Path
             log.status('%sput: %s', ext, name)
             log.emit(colorama.Style.BRIGHT + data.rstrip() + colorama.Style.RESET_ALL)
             if args.dry_run:

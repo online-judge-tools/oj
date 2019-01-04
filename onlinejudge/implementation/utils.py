@@ -28,7 +28,7 @@ data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
 cache_dir = pathlib.Path(appdirs.user_cache_dir(version.__package_name__))
 html_parser = 'lxml'
 
-def parcentformat(s: str, table: Dict[str, str]) -> str:
+def percentformat(s: str, table: Dict[str, str]) -> str:
     assert '%' not in table or table['%'] == '%'
     table['%'] = '%'
     result = ''
