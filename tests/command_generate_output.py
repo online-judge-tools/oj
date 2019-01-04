@@ -34,7 +34,7 @@ class TestGenerateOutput(unittest.TestCase):
     def snippet_call_test(self, args, input_files, expected_values):
         ojtools = os.path.abspath('oj')
         with tempfile.TemporaryDirectory() as tempdir:
-            with chdir("/tmp/aaa"):
+            with chdir(tempdir):
                 prepare_files(input_files)
                 _ = subprocess.check_output([ojtools, 'generate-output'] + args, stderr=sys.stderr)
                 for expect in expected_values:
@@ -97,12 +97,10 @@ class TestGenerateOutput(unittest.TestCase):
         self.snippet_call_test(
             args=[ '-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s', 'yuki/coder/test_in/sample-2.txt', 'yuki/coder/test_in/sample-3.txt' ],
             input_files=[
-                { 'path': 'yuki/coder/test_in/sample-1.txt', 'data': 'foo\n' },
                 { 'path': 'yuki/coder/test_in/sample-2.txt', 'data': 'bar\n' },
                 { 'path': 'yuki/coder/test_in/sample-3.txt', 'data': 'baz\n' },
             ],
             expected_values=[
-                { 'path': 'yuki/coder/test_out/sample-1.txt', 'data': 'foo\n' },
                 { 'path': 'yuki/coder/test_out/sample-2.txt', 'data': 'bar\n' },
                 { 'path': 'yuki/coder/test_out/sample-3.txt', 'data': 'baz\n' },
             ],
