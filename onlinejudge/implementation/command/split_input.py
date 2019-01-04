@@ -42,7 +42,7 @@ def split_input(args: 'argparse.Namespace') -> None:
             time.sleep(args.time)
             if non_block_read(proc.stdout): # if output exists
                 index += 1
-                path = utils.parcentformat(args.output, { 'i': str(index) })
+                path = utils.percentformat(args.output, { 'i': str(index) })
                 log.info('case found: %d', index)
                 if args.header:
                     if args.header == args.header.strip():

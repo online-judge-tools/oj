@@ -13,7 +13,7 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
     table = {}
     table['s'] = '*'
     table['e'] = '*'
-    pattern = str(directory / utils.parcentformat(format, table))
+    pattern = str(directory / utils.percentformat(format, table))
     paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
         log.debug('testcase globbed: %s', path)
@@ -23,14 +23,14 @@ def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) 
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
-    pattern = re.compile('^' + str(directory.resolve()) + '/' + utils.parcentformat(format, table) + '$')
+    pattern = re.compile('^' + str(directory.resolve()) + '/' + utils.percentformat(format, table) + '$')
     return pattern.match(str(path.resolve()))
 
 def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) -> pathlib.Path:
     table = {}
     table['s'] = name
     table['e'] = ext
-    return directory / utils.parcentformat(format, table)
+    return directory / utils.percentformat(format, table)
 
 def is_backup_or_hidden_file(path: pathlib.Path) -> bool:
     basename = path.stem
