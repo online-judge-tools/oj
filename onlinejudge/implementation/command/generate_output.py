@@ -3,6 +3,7 @@ import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.format_utils as cutils
+import os
 import time
 from typing import *
 if TYPE_CHECKING:
@@ -37,6 +38,8 @@ def generate_output(args: 'argparse.Namespace') -> None:
         else:
             assert False
         path = cutils.path_from_format(args.directory, args.format, name=matched_name, ext='out')
+        if not path.parent.is_dir():
+            os.makedirs(str(path.parent), exist_ok=True)
         with path.open('wb') as fh:
             fh.write(answer)
         log.success('saved to: %s', path)
