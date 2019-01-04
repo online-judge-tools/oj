@@ -24,7 +24,7 @@ def match_with_format(format: str, path: pathlib.Path) -> Optional[Match[str]]:
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
     pattern = re.compile('^' + utils.parcentformat(format, table) + '$')
-    return pattern.match(str(path))
+    return pattern.match(path.name)
 
 def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) -> pathlib.Path:
     table = {}
