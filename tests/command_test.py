@@ -225,3 +225,33 @@ class TestTest(unittest.TestCase):
                 'exitcode': 0,
             } ],
         )
+
+    def test_call_test_format_hack(self):
+        self.snippet_call_test(
+            args=[ '-c', 'cat', '-d', 'a/b', '-f', 'c/test_%e/d/%s/e.case.txt' ],
+            files=[
+                { 'path': 'a/b/c/test_in/d/sample.case.1/e.case.txt', 'data': 'foo\n' },
+                { 'path': 'a/b/c/test_out/d/sample.case.1/e.case.txt', 'data': 'foo\n' },
+                { 'path': 'a/b/c/test_in/d/sample.case.2/e.case.txt', 'data': 'bar\n' },
+                { 'path': 'a/b/c/test_out/d/sample.case.2/e.case.txt', 'data': 'bar\n' },
+            ],
+            expected=[ {
+                'result': 'AC',
+                'testcase': {
+                    'name': 'sample.case.1',
+                    'input': '%s/a/b/c/test_in/d/sample.case.1/e.case.txt',
+                    'output': '%s/a/b/c/test_out/d/sample.case.1/e.case.txt',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'result': 'AC',
+                'testcase': {
+                    'name': 'sample.case.2',
+                    'input': '%s/a/b/c/test_in/d/sample.case.2/e.case.txt',
+                    'output': '%s/a/b/c/test_out/d/sample.case.2/e.case.txt',
+                },
+                'output': 'bar\n',
+                'exitcode': 0,
+            } ],
+        )
