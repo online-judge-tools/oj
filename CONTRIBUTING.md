@@ -61,10 +61,26 @@ Web scraping をする性質により動作は必然的に不安定であり、�
         -   ...
 -   `tests/`: テストが置かれる
 
+## tests
+
+静的型検査と通常のテストをしています。
+手元ではそれぞれ次のコマンドで実行できます。
+
+``` sh
+$ mypy --verbose --ignore-missing-imports --python-version 3.5 --no-site-packages oj onlinejudge/**/*.py
+$ python3 setup.py test
+```
+
+テストは開発の際には機能ごとに単体で実行すると楽です。
+例えば `download` コマンドの AtCoder に関してのテストの実行は次でできます。
+
+```
+$ python3 setup.py test -s tests.command_download_atcoder.DownloadAtCoderTest
+```
+
 ## CI
 
 `master` `develop` に関する commit や pull request について CI が走ります。
-型検査とテストの実行を Python 3.5 と 3.6 のふたつについて確認しています。
 
 実行される内容は次の3行なので、これを手元で試せばだいたい同じ結果が得られます。
 あるいは `[WIP]` などと書いて pull request をするのでもよいでしょう。
