@@ -1,5 +1,5 @@
 import unittest
-import tests.download
+import tests.command_download
 
 import os
 
@@ -9,7 +9,7 @@ class DownloadYukicoderTest(unittest.TestCase):
         if kwargs.get('is_system') and 'CI' in os.environ:
             print('NOTE: this test is skipped since login is required')
             return
-        tests.download.snippet_call_download(self, *args, **kwargs)
+        tests.command_download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_yukicoder_no_9002(self):
         self.snippet_call_download(
