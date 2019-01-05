@@ -30,7 +30,7 @@ def prepare_files(input_files):
 
 class GenerateOutputTest(unittest.TestCase):
 
-    def snippet_call_test(self, args, input_files, expected_values, disallowed_files=None):
+    def snippet_call_generate_output(self, args, input_files, expected_values, disallowed_files=None):
         ojtools = os.path.abspath('oj')
         with tempfile.TemporaryDirectory() as tempdir:
             with chdir(tempdir):
@@ -44,7 +44,7 @@ class GenerateOutputTest(unittest.TestCase):
                         self.assertFalse(os.path.exists(file))
 
     def test_call_generate_output_simple(self):
-        self.snippet_call_test(
+        self.snippet_call_generate_output(
             args=[ '-c', 'cat' ],
             input_files=[
                 { 'path': 'test/sample-1.in', 'data': 'foo\n' },
@@ -57,7 +57,7 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_select(self):
-        self.snippet_call_test(
+        self.snippet_call_generate_output(
             args=[ '-c', 'cat', 'test/sample-1.in', 'test/sample-2.in' ],
             input_files=[
                 { 'path': 'test/sample-1.in', 'data': 'foo\n' },
@@ -73,7 +73,7 @@ class GenerateOutputTest(unittest.TestCase):
 
     def test_call_generate_output_already_exists(self):
         # Since sample-1.out already exists, sample-1.out will not be updated.
-        self.snippet_call_test(
+        self.snippet_call_generate_output(
             args=[ '-c', 'cat' ],
             input_files=[
                 { 'path': 'test/sample-1.in', 'data': 'foo\n' },
@@ -85,7 +85,7 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_dir(self):
-        self.snippet_call_test(
+        self.snippet_call_generate_output(
             args=[ '-c', 'cat', '-d', 'p/o/../../p/o/y/o' ],
             input_files=[
                 { 'path': 'p/o/y/o/sample-1.in', 'data': 'foo\n' },
@@ -98,7 +98,7 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_format(self):
-        self.snippet_call_test(
+        self.snippet_call_generate_output(
             args=[ '-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s' ],
             input_files=[
                 { 'path': 'yuki/coder/test_in/sample-1.txt', 'data': 'foo\n' },
@@ -111,7 +111,7 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_format_select(self):
-        self.snippet_call_test(
+        self.snippet_call_generate_output(
             args=[ '-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s', 'yuki/coder/test_in/sample-2.txt', 'yuki/coder/test_in/sample-3.txt' ],
             input_files=[
                 { 'path': 'yuki/coder/test_in/sample-2.txt', 'data': 'bar\n' },
@@ -124,7 +124,7 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_format_hack(self):
-        self.snippet_call_test(
+        self.snippet_call_generate_output(
             args=[ '-c', 'cat', '-d', 'a/b', '-f', 'c/test_%e/d/%s/e.case.txt' ],
             input_files=[
                 { 'path': 'a/b/c/test_in/d/sample.case.1/e.case.txt', 'data': 'foo\n' },
