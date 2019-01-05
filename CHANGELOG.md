@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.1.51 / 2019-01-06
+
+-   [#239](https://github.com/kmyk/online-judge-tools/pull/239) fix bugs of `generate-output` and add tests ([@fukatani](https://github.com/fukatani))
+-   [#234](https://github.com/kmyk/online-judge-tools/issues/234) add tests for `test` command
+-   [#233](https://github.com/kmyk/online-judge-tools/pull/233) fix bugs of `test` ([@fukatani](https://github.com/fukatani))
+-   [#28](https://github.com/kmyk/online-judge-tools/issues/28), [#232](https://github.com/kmyk/online-judge-tools/issues/232): fix a problem on encodings on AtCoder
+-   [b8a961](https://github.com/kmyk/online-judge-tools/commit/b8a9617e0e9f8256e85a30830fa30ddc284d744f) add [CONTRIBUTING.md](https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md)
+
 ## 0.1.50 / 2019-01-02
 
 -   [#225](https://github.com/kmyk/online-judge-tools/pull/225) heavy refactoring
