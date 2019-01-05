@@ -3,6 +3,7 @@ import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.format_utils as cutils
+import os
 import time
 from typing import *
 if TYPE_CHECKING:
@@ -31,8 +32,14 @@ def generate_output(args: 'argparse.Namespace') -> None:
             log.info('skipped.')
             continue
         log.emit(log.bold(answer.decode().rstrip()))
-        name = cutils.match_with_format(args.format, it['in']).groupdict()['name']  # type: ignore
-        path = cutils.path_from_format(args.directory, args.format, name=name, ext='out')
+        match_result = cutils.match_with_format(args.directory, args.format, it['in'])  # type: Optional[Match[Any]]
+        if match_result is not None:
+            matched_name = match_result.groupdict()['name']  # type: str
+        else:
+            assert False
+        path = cutils.path_from_format(args.directory, args.format, name=matched_name, ext='out')
+        if not path.parent.is_dir():
+            os.makedirs(str(path.parent), exist_ok=True)
         with path.open('wb') as fh:
             fh.write(answer)
         log.success('saved to: %s', path)
