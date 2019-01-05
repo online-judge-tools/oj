@@ -1,7 +1,6 @@
 import unittest
 
 import contextlib
-import filecmp
 import glob
 import os
 import subprocess
@@ -29,9 +28,9 @@ def prepare_files(input_files):
         if f.get('executable', False):
             os.chmod(f['path'], 0o755)
 
-class TestGenerateOutput(unittest.TestCase):
+class GenerateOutputTest(unittest.TestCase):
 
-    def snippet_call_test(self, args, input_files, expected_values):
+    def snippet_call_test(self, args, input_files, expected_values, disallowed_files=None):
         ojtools = os.path.abspath('oj')
         with tempfile.TemporaryDirectory() as tempdir:
             with chdir(tempdir):
@@ -40,6 +39,9 @@ class TestGenerateOutput(unittest.TestCase):
                 for expect in expected_values:
                     with open(expect['path']) as f:
                         self.assertEqual(''.join(f.readlines()), expect['data'])
+                if disallowed_files is not None:
+                    for file in disallowed_files:
+                        self.assertFalse(os.path.exists(file))
 
     def test_call_generate_output_simple(self):
         self.snippet_call_test(
@@ -60,10 +62,25 @@ class TestGenerateOutput(unittest.TestCase):
             input_files=[
                 { 'path': 'test/sample-1.in', 'data': 'foo\n' },
                 { 'path': 'test/sample-2.in', 'data': 'bar\n' },
+                { 'path': 'test/sample-3.in', 'data': 'baz\n' },
             ],
             expected_values=[
                 { 'path': 'test/sample-1.out', 'data': 'foo\n' },
                 { 'path': 'test/sample-2.out', 'data': 'bar\n' },
+            ],
+            disallowed_files=['test/sample-3.out']
+        )
+
+    def test_call_generate_output_already_exists(self):
+        # Since sample-1.out already exists, sample-1.out will not be updated.
+        self.snippet_call_test(
+            args=[ '-c', 'cat' ],
+            input_files=[
+                { 'path': 'test/sample-1.in', 'data': 'foo\n' },
+                { 'path': 'test/sample-1.out', 'data': 'bar\n' },
+            ],
+            expected_values=[
+                { 'path': 'test/sample-1.out', 'data': 'bar\n' },
             ],
         )
 
