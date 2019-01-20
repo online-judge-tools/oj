@@ -18,7 +18,7 @@ from typing import *
 # see https://github.com/kmyk/online-judge-tools/issues/28 and https://github.com/kmyk/online-judge-tools/issues/232
 def _request(*args, **kwargs):
     resp = utils.request(*args, **kwargs)
-    log.status('AtCoder\'s server said "Content-Type: %s"', resp.headers.get('Content-Type', '(not sent)'))
+    log.debug('AtCoder\'s server said "Content-Type: %s"', resp.headers.get('Content-Type', '(not sent)'))
     resp.encoding = 'UTF-8'
     return resp
 
