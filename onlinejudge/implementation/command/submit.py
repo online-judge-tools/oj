@@ -108,7 +108,7 @@ def submit(args: 'argparse.Namespace') -> None:
             submission = problem.submit_code(code, language=args.language, session=sess, **kwargs)  # type: ignore
         except onlinejudge.type.SubmissionError:
             log.failure('submission failed')
-            return
+            sys.exit(1)
 
         # show result
         if args.open:
