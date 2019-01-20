@@ -22,6 +22,7 @@ def submit(args: 'argparse.Namespace') -> None:
     if args.url is None:
         if len(guessed_urls) == 1:
             args.url = guessed_urls[0]
+            log.info('guessed problem: %s', args.url)
         else:
             log.error('failed to guess the URL to submit')
             log.info('please manually specify URL as: $ oj submit URL FILE')
@@ -48,7 +49,13 @@ def submit(args: 'argparse.Namespace') -> None:
         log.failure('%s: %s', e.__class__.__name__, str(e))
         s = repr(code)[ 1 : ]
     log.info('code (%d byte):', len(code))
-    log.emit(log.bold(s))
+    lines = s.splitlines(keepends=True)
+    if len(lines) < 30:
+        log.emit(log.bold(s))
+    else:
+        log.emit(log.bold(''.join(lines[: 10])))
+        log.emit('... (%s lines) ...', len(lines[10 : -10]))
+        log.emit(log.bold(''.join(lines[-10 :])))
 
 
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
@@ -82,7 +89,7 @@ def submit(args: 'argparse.Namespace') -> None:
         # report selected language ids
         if matched_lang_ids is not None and len(matched_lang_ids) == 1:
             args.language = matched_lang_ids[0]
-            log.info('choosed language: %s (%s)', args.language, langs[args.language]['description'])
+            log.info('chosen language: %s (%s)', args.language, langs[args.language]['description'])
         else:
             if matched_lang_ids is None:
                 log.error('language is unknown')
@@ -118,7 +125,7 @@ def submit(args: 'argparse.Namespace') -> None:
                 sys.stdout.write('Are you sure? [y/N] ')
                 sys.stdout.flush()
                 c = sys.stdin.read(1)
-                if c != 'y':
+                if c.lower() != 'y':
                     log.info('terminated.')
                     return
 
@@ -184,12 +191,12 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
 
         # compiler
         if select('gcc', lang_ids) and select('clang', lang_ids):
-            log.info('both GCC and Clang are available for C++ compiler')
+            log.status('both GCC and Clang are available for C++ compiler')
             if cxx_compiler.lower() == 'gcc':
-                log.info('use: GCC')
+                log.status('use: GCC')
                 lang_ids = select('gcc', lang_ids)
             elif cxx_compiler.lower() == 'clang':
-                log.info('use: Clang')
+                log.status('use: Clang')
                 lang_ids = select('clang', lang_ids)
             else:
                 assert cxx_compiler.lower() == 'all'
@@ -217,7 +224,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
     elif ext == 'py':
         log.debug('language guessing: Python')
         if select('pypy', language_dict.keys()):
-            log.info('PyPy is available for Python interpreter')
+            log.status('PyPy is available for Python interpreter')
 
         # interpreter
         lang_ids = []
@@ -228,7 +235,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
 
         # version
         if select('python2', lang_ids) and select('python3', lang_ids):
-            log.info('both Python2 and Python3 are available for version of Python')
+            log.status('both Python2 and Python3 are available for version of Python')
             if python_version in ( '2', '3' ):
                 versions = [ int(python_version) ]
             elif python_version == 'all':
@@ -239,14 +246,15 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                 if code.startswith(b'#!'):
                     s = lines[0]  # use shebang
                 else:
-                    s = b'\n'.join(lines[: 5] + lines[-5 :])  # use modelines
+                    s = b'\n'.join(lines[: 10] + lines[-5 :])  # use modelines
                 versions = []
                 for version in ( 2, 3 ):
-                    if re.search(r'python ?%d'.encode() % version, s.lower()):
+                    if re.search(r'python *(version:? *)?%d'.encode() % version, s.lower()):
                         versions += [ version ]
                 if not versions:
+                    log.status('no version info in code')
                     versions = [ 2, 3 ]
-            log.info('use: %s', ', '.join(map(str, versions)))
+            log.status('use: %s', ', '.join(map(str, versions)))
 
             saved_ids = lang_ids
             lang_ids = []

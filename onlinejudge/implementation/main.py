@@ -106,7 +106,7 @@ supported services:
   Yukicoder
   TopCoder (Marathon Match)
 ''')
-    subparser.add_argument('url', nargs='?')
+    subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')
     subparser.add_argument('file', type=pathlib.Path)
     subparser.add_argument('-l', '--language', help='narrow down language choices if ambiguous')
     subparser.add_argument('--no-guess', action='store_false', dest='guess')
