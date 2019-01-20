@@ -119,7 +119,7 @@ class FormSender(object):
         return self.payload
 
     def set_file(self, key: str, filename: str, content: bytes) -> None:
-        self.files[key] = ( filename, content )
+        self.files[key] = ( filename, content )  # type: ignore
 
     def request(self, session: requests.Session, action: Optional[str] = None, **kwargs) -> requests.Response:
         action = action or self.form['action']

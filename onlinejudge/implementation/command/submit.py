@@ -39,7 +39,7 @@ def submit(args: 'argparse.Namespace') -> None:
 
     # read code
     with args.file.open('rb') as fh:
-        code = fh.read()
+        code = fh.read()  # type: bytes
     format_config = {
         'dos2unix': args.format_dos2unix or args.golf,
         'rstrip': args.format_dos2unix or args.golf,

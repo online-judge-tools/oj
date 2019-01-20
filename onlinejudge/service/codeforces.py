@@ -113,7 +113,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             language_dict[option.attrs['value']] = { 'description': option.string }
         return language_dict
 
-    def submit_code(self, code: str, language: str, session: Optional['requests.Session'] = None) -> onlinejudge.type.Submission:  # or SubmissionError
+    def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> onlinejudge.type.Submission:  # or SubmissionError
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -127,7 +127,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         # make data
         form = utils.FormSender(form, url=resp.url)
         form.set('programTypeId', language)
-        form.set_file('sourceFile', 'code', code.decode())
+        form.set_file('sourceFile', 'code', code)
         resp = form.request(session=session)
         resp.raise_for_status()
         # result
