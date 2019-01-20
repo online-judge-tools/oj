@@ -32,3 +32,18 @@ int main() {
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
             subprocess.check_call([ ojtools, 'submit', '-y', '--no-open', url, 'main.cpp' ], stdout=sys.stdout, stderr=sys.stderr)
+
+
+    def test_call_submit_practice_with_history(self, *args, **kwargs):
+        if 'CI' in os.environ:
+            print('NOTE: this test is skipped since login is required')
+            return
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
+        files = [
+            { 'path': 'a.pl', 'data': 'print<>+(<>=~$",$`+$\'),$",<>' },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ ojtools, 'dl', url ], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call([ ojtools, 's', '-y', '--no-open', 'a.pl' ], stdout=sys.stdout, stderr=sys.stderr)
