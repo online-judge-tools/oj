@@ -118,8 +118,8 @@ class FormSender(object):
     def get(self) -> Dict[str, str]:
         return self.payload
 
-    def set_file(self, key: str, value: IO[Any]) -> None:
-        self.files[key] = value
+    def set_file(self, key: str, filename: str, content: bytes) -> None:
+        self.files[key] = ( filename, content )
 
     def request(self, session: requests.Session, action: Optional[str] = None, **kwargs) -> requests.Response:
         action = action or self.form['action']

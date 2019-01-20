@@ -180,7 +180,8 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
     assert python_version.lower() in ( '2', '3', 'auto', 'all' )
     assert python_interpreter.lower() in ( 'cpython', 'pypy', 'all' )
 
-    select = (lambda word, lang_ids, **kwargs: select_ids_of_matched_languages([ word ], lang_ids, language_dict=language_dict, **kwargs))
+    select_words = (lambda words, lang_ids, **kwargs: select_ids_of_matched_languages(words, lang_ids, language_dict=language_dict, **kwargs))
+    select = (lambda word, lang_ids, **kwargs: select_words([ word ], lang_ids, **kwargs))
     ext = filename.suffix
     lang_ids = language_dict.keys()
 
@@ -239,7 +240,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             lang_ids += select('pypy', language_dict.keys())
 
         # version
-        if select('python2', lang_ids) and select('python3', lang_ids):
+        if select_words([ 'python', '2' ], lang_ids) and select_words([ 'python', '3' ], lang_ids):
             log.status('both Python2 and Python3 are available for version of Python')
             if python_version in ( '2', '3' ):
                 versions = [ int(python_version) ]
