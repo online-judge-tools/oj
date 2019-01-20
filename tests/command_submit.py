@@ -6,9 +6,10 @@ import os
 import subprocess
 import sys
 
+
 class SubmitAtCoderTest(unittest.TestCase):
 
-    def test_call_submit_practice(self, *args, **kwargs):
+    def test_call_submit_practice(self):
         if 'CI' in os.environ:
             print('NOTE: this test is skipped since login is required')
             return
@@ -33,8 +34,7 @@ int main() {
         with tests.utils.sandbox(files):
             subprocess.check_call([ ojtools, 'submit', '-y', '--no-open', url, 'main.cpp' ], stdout=sys.stdout, stderr=sys.stderr)
 
-
-    def test_call_submit_practice_with_history(self, *args, **kwargs):
+    def test_call_submit_practice_with_history(self):
         if 'CI' in os.environ:
             print('NOTE: this test is skipped since login is required')
             return
