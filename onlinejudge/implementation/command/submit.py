@@ -18,7 +18,11 @@ default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
 def submit(args: 'argparse.Namespace') -> None:
     # guess url
     history = onlinejudge.implementation.download_history.DownloadHistory()
-    guessed_urls = history.get()
+    if args.file.parent.resolve() == pathlib.Path.cwd():
+        guessed_urls = history.get()
+    else:
+        log.warning('cannot guess URL since the given file is not in the current directory')
+        guessed_urls = []
     if args.url is None:
         if len(guessed_urls) == 1:
             args.url = guessed_urls[0]
@@ -107,7 +111,8 @@ def submit(args: 'argparse.Namespace') -> None:
         # confirm
         guessed_unmatch = ([ problem.get_url() ] != guessed_urls)
         if guessed_unmatch:
-            log.warning('the problem "%s" is specified to submit, but samples of "%s" were downloaded in this directory. this may be mis-operation', problem.get_url(), '", "'.join(guessed_urls))
+            samples_text = ('samples of "{}'.format('", "'.join(guessed_urls)) if guessed_urls else 'no samples')
+            log.warning('the problem "%s" is specified to submit, but %s were downloaded in this directory. this may be mis-operation', problem.get_url(), samples_text)
         if args.wait:
             log.status('sleep(%.2f)', args.wait)
             time.sleep(args.wait)
