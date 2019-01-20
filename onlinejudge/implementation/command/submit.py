@@ -17,10 +17,12 @@ default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
 
 def submit(args: 'argparse.Namespace') -> None:
     # guess url
+    history = onlinejudge.implementation.download_history.DownloadHistory()
+    guessed_urls = history.get()
     if args.url is None:
-        history = onlinejudge.implementation.download_history.DownloadHistory()
-        args.url = history.get()
-        if args.url is None:
+        if len(guessed_urls) == 1:
+            args.url = guessed_urls[0]
+        else:
             log.error('failed to guess the URL to submit')
             log.info('please manually specify URL as: $ oj submit URL FILE')
             sys.exit(1)
@@ -96,16 +98,29 @@ def submit(args: 'argparse.Namespace') -> None:
             sys.exit(1)
 
         # confirm
+        guessed_unmatch = ([ problem.get_url() ] != guessed_urls)
+        if guessed_unmatch:
+            log.warning('the problem "%s" is specified to submit, but samples of "%s" were downloaded in this directory. this may be mis-operation', problem.get_url(), '", "'.join(guessed_urls))
         if args.wait:
             log.status('sleep(%.2f)', args.wait)
             time.sleep(args.wait)
         if not args.yes:
-            sys.stdout.write('Are you sure? [y/N] ')
-            sys.stdout.flush()
-            c = sys.stdin.read(1)
-            if c != 'y':
-                log.info('terminated.')
-                return
+            if guessed_unmatch:
+                problem_id = problem.get_url().rstrip('/').split('/')[-1].split('?')[-1]  # this is too ad-hoc
+                key = problem_id[: 3] + (problem_id[-1] if len(problem_id) >= 4 else '')
+                sys.stdout.write('Are you sure? Please type "{}" '.format(key))
+                sys.stdout.flush()
+                c = sys.stdin.readline().rstrip()
+                if c != key:
+                    log.info('terminated.')
+                    return
+            else:
+                sys.stdout.write('Are you sure? [y/N] ')
+                sys.stdout.flush()
+                c = sys.stdin.read(1)
+                if c != 'y':
+                    log.info('terminated.')
+                    return
 
         # submit
         kwargs = {}

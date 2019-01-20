@@ -35,9 +35,9 @@ class DownloadHistory(object):
                 fh.write(''.join(history_lines[: - len(history_lines) // 2]))
             log.status('halve history at: %s', self.path)
 
-    def get(self, directory: pathlib.Path = pathlib.Path.cwd()) -> Optional[str]:
+    def get(self, directory: pathlib.Path = pathlib.Path.cwd()) -> List[str]:
         if not self.path.exists():
-            return None
+            return []
 
         log.status('read history from: %s', self.path)
         found = set()
@@ -51,8 +51,5 @@ class DownloadHistory(object):
                     continue
                 if pathlib.Path(data['directory']) == directory:
                     found.add(data['url'])
-        log.status('found urls in history: %s', ' '.join(found))
-        if len(found) == 1:
-            return next(iter(found))
-        else:
-            return None
+        log.status('found urls in history:\n%s', '\n'.join(found))
+        return list(found)
