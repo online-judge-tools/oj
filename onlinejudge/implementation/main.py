@@ -25,6 +25,7 @@ def version_check() -> None:
     if utils.is_update_available_on_pypi():
         log.warning('update available: %s -> %s', version.__version__, utils.get_latest_version_from_pypi())
         log.info('run: $ pip3 install -U %s', version.__package_name__)
+        log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CHANGELOG.md')
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -348,3 +349,4 @@ def main(args: Optional[List[str]] = None) -> None:
         log.debug('\n' + traceback.format_exc())
         log.error('NotImplementedError')
         log.info('The operation you specified is not supported yet. Pull requests are welcome.')
+        log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md')
