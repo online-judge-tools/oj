@@ -1,47 +1,24 @@
 import unittest
 
-import contextlib
-import glob
+import tests.utils
+
 import os
 import subprocess
 import sys
-import tempfile
 
-
-@contextlib.contextmanager
-def chdir(path):
-    cwd = os.getcwd()
-    try:
-        os.chdir(path)
-        yield
-    finally:
-        for file in glob.glob('*/*.out'):
-            os.remove(file)
-        os.chdir(cwd)
-
-def prepare_files(input_files):
-    for f in input_files:
-        if os.path.dirname(f['path']):
-            os.makedirs(os.path.dirname(f['path']), exist_ok=True)
-        with open(f['path'], 'w') as fh:
-            fh.write(f['data'])
-        if f.get('executable', False):
-            os.chmod(f['path'], 0o755)
 
 class GenerateOutputTest(unittest.TestCase):
 
     def snippet_call_generate_output(self, args, input_files, expected_values, disallowed_files=None):
         ojtools = os.path.abspath('oj')
-        with tempfile.TemporaryDirectory() as tempdir:
-            with chdir(tempdir):
-                prepare_files(input_files)
-                _ = subprocess.check_output([ojtools, 'generate-output'] + args, stderr=sys.stderr)
-                for expect in expected_values:
-                    with open(expect['path']) as f:
-                        self.assertEqual(''.join(f.readlines()), expect['data'])
-                if disallowed_files is not None:
-                    for file in disallowed_files:
-                        self.assertFalse(os.path.exists(file))
+        with tests.utils.sandbox(input_files) as tempdir:
+            _ = subprocess.check_output([ojtools, 'generate-output'] + args, stderr=sys.stderr)
+            for expect in expected_values:
+                with open(expect['path']) as f:
+                    self.assertEqual(''.join(f.readlines()), expect['data'])
+            if disallowed_files is not None:
+                for file in disallowed_files:
+                    self.assertFalse(os.path.exists(file))
 
     def test_call_generate_output_simple(self):
         self.snippet_call_generate_output(

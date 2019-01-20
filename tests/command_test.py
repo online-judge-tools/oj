@@ -1,44 +1,13 @@
 import unittest
+import tests.utils
 
-import contextlib
 import json
-import os
-import subprocess
-import sys
-import tempfile
-
-
-@contextlib.contextmanager
-def chdir(path):
-    cwd = os.getcwd()
-    try:
-        os.chdir(path)
-        yield
-    finally:
-        os.chdir(cwd)
-
-def run_in_sandbox(args, files):
-    ojtools = os.path.abspath('oj')
-    with tempfile.TemporaryDirectory() as tempdir:
-        with chdir(tempdir):
-            for f in files:
-                if os.path.dirname(f['path']):
-                    os.makedirs(os.path.dirname(f['path']), exist_ok=True)
-                with open(f['path'], 'w') as fh:
-                    fh.write(f['data'])
-                if f.get('executable', False):
-                    os.chmod(f['path'], 0o755)
-            proc = subprocess.run([ ojtools ] + args, stdout=subprocess.PIPE, stderr=sys.stderr)
-            return {
-                'proc': proc,
-                'tempdir': tempdir,
-            }
 
 
 class TestTest(unittest.TestCase):
 
     def snippet_call_test(self, args, files, expected):
-        result = run_in_sandbox(args=[ '-v', 'test', '--json' ] + args, files=files)
+        result = tests.utils.run_in_sandbox(args=[ '-v', 'test', '--json' ] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(result['proc'].stdout.decode())
         self.assertEqual(len(data), len(expected))
