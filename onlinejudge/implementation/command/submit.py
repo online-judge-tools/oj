@@ -2,6 +2,7 @@
 import onlinejudge
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.download_history
 import pathlib
 import re
 import shutil
@@ -15,6 +16,15 @@ if TYPE_CHECKING:
 default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
 
 def submit(args: 'argparse.Namespace') -> None:
+    # guess url
+    if args.url is None:
+        history = onlinejudge.implementation.download_history.DownloadHistory()
+        args.url = history.get()
+        if args.url is None:
+            log.error('failed to guess the URL to submit')
+            log.info('please manually specify URL as: $ oj submit URL FILE')
+            sys.exit(1)
+
     # parse url
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:

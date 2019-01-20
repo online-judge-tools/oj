@@ -66,7 +66,7 @@ format string for --format:
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (defaut: "sample-%%i.%%e" if not --system)')  # default must be None for --system
-    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, help='a directory name for test cases (default: test/)')  # default must be None for guessing in submit command
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
@@ -106,7 +106,7 @@ supported services:
   Yukicoder
   TopCoder (Marathon Match)
 ''')
-    subparser.add_argument('url')
+    subparser.add_argument('url', nargs='?')
     subparser.add_argument('file', type=pathlib.Path)
     subparser.add_argument('-l', '--language', help='narrow down language choices if ambiguous')
     subparser.add_argument('--no-guess', action='store_false', dest='guess')
