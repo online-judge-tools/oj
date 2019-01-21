@@ -138,6 +138,10 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         else:
             log.failure('failure')
             log.debug('redirected to %s', resp.url)
+            # parse error messages
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            for span in soup.findAll('span', class_='error'):
+                log.warning('Codeforces says: "%s"', span.string)
             raise SubmissionError
 
     def get_url(self) -> str:
