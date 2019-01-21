@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.1.52 / 2019-01-22
+
+-   [#251](https://github.com/kmyk/online-judge-tools/issues/251) support `submit` to Codeforces
+-   [#245](https://github.com/kmyk/online-judge-tools/issues/245) guess/check problems to `submit` from the history of `download` command
+-   [#247](https://github.com/kmyk/online-judge-tools/issues/247) add tests for `submit` command
+-   [#246](https://github.com/kmyk/online-judge-tools/pull/246) add the help message for `--tle` option ([@fukatani](https://github.com/fukatani))
+
 ## 0.1.51 / 2019-01-06
 
 -   [#239](https://github.com/kmyk/online-judge-tools/pull/239) fix bugs of `generate-output` and add tests ([@fukatani](https://github.com/fukatani))
