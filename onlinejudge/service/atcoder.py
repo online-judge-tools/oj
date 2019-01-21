@@ -210,7 +210,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
                         return s
         return ''
 
-    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Any]:
+    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
         session = session or utils.new_default_session()
         # get
         url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
@@ -231,7 +231,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             language_dict[option.attrs['value']] = { 'description': option.string }
         return language_dict
 
-    def submit_code(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
         # get

@@ -39,7 +39,7 @@ def submit(args: 'argparse.Namespace') -> None:
 
     # read code
     with args.file.open('rb') as fh:
-        code = fh.read()
+        code = fh.read()  # type: bytes
     format_config = {
         'dos2unix': args.format_dos2unix or args.golf,
         'rstrip': args.format_dos2unix or args.golf,
@@ -180,7 +180,8 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
     assert python_version.lower() in ( '2', '3', 'auto', 'all' )
     assert python_interpreter.lower() in ( 'cpython', 'pypy', 'all' )
 
-    select = (lambda word, lang_ids, **kwargs: select_ids_of_matched_languages([ word ], lang_ids, language_dict=language_dict, **kwargs))
+    select_words = (lambda words, lang_ids, **kwargs: select_ids_of_matched_languages(words, lang_ids, language_dict=language_dict, **kwargs))
+    select = (lambda word, lang_ids, **kwargs: select_words([ word ], lang_ids, **kwargs))
     ext = filename.suffix
     lang_ids = language_dict.keys()
 
@@ -190,21 +191,24 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
     if ext in ( 'cpp', 'cxx', 'cc', 'C' ):
         log.debug('language guessing: C++')
         # memo: https://stackoverflow.com/questions/1545080/c-code-file-extension-cc-vs-cpp
-        lang_ids = select('c++', lang_ids)
+        lang_ids = list(set(select('c++', lang_ids) + select('g++', lang_ids)))
         if not lang_ids:
             return []
+        log.debug('all lang ids for C++: %s', lang_ids)
 
         # compiler
-        if select('gcc', lang_ids) and select('clang', lang_ids):
+        select_gcc = lambda ids: list(set(select('gcc', ids) + select('clang', select('g++', ids), remove=True)))
+        if select_gcc(lang_ids) and select('clang', lang_ids):
             log.status('both GCC and Clang are available for C++ compiler')
             if cxx_compiler.lower() == 'gcc':
                 log.status('use: GCC')
-                lang_ids = select('gcc', lang_ids)
+                lang_ids = select_gcc(lang_ids)
             elif cxx_compiler.lower() == 'clang':
                 log.status('use: Clang')
                 lang_ids = select('clang', lang_ids)
             else:
                 assert cxx_compiler.lower() == 'all'
+        log.debug('lang ids after compiler filter: %s', lang_ids)
 
         # version
         if cxx_latest:
@@ -212,16 +216,22 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             lang_ids = []
             for compiler in ( None, 'gcc', 'clang' ):  # use the latest for each compiler
                 version_of = {}
-                ids = select(compiler, saved_ids) if compiler else saved_ids
+                if compiler == 'gcc':
+                    ids = select_gcc(saved_ids)
+                elif compiler == 'clang':
+                    ids = select('clang', saved_ids)
+                else:
+                    ids = saved_ids
                 if not ids:
                     continue
                 for lang_id in ids:
-                    m = re.search(r'c\+\+\w\w', language_dict[lang_id]['description'].lower())
+                    m = re.search(r'[cg]\+\+\w\w', language_dict[lang_id]['description'].lower())
                     if m:
                         version_of[lang_id] = m.group(0)
                 ids.sort(key=lambda lang_id: version_of.get(lang_id, ''))
                 lang_ids += [ ids[-1] ]  # since C++11 < C++1y < ... as strings
             lang_ids = list(set(lang_ids))
+        log.debug('lang ids after version filter: %s', lang_ids)
 
         assert lang_ids
         return lang_ids
@@ -239,7 +249,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             lang_ids += select('pypy', language_dict.keys())
 
         # version
-        if select('python2', lang_ids) and select('python3', lang_ids):
+        if select_words([ 'python', '2' ], lang_ids) and select_words([ 'python', '3' ], lang_ids):
             log.status('both Python2 and Python3 are available for version of Python')
             if python_version in ( '2', '3' ):
                 versions = [ int(python_version) ]

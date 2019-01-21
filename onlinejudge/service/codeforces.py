@@ -1,5 +1,6 @@
 # Python Version: 3.x
 import onlinejudge.type
+from onlinejudge.type import SubmissionError
 import onlinejudge.dispatch
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
@@ -96,6 +97,52 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             s = s.lstrip()
             samples.add(s, title.string)
         return samples.get()
+
+    def get_language_dict(self, session: Optional['requests.Session'] = None) -> Dict[str, onlinejudge.type.Language]:
+        session = session or utils.new_default_session()
+        # get
+        resp = utils.request('GET', self.get_url(), session=session)
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        select = soup.find('select', attrs={ 'name': 'programTypeId' })
+        if select is None:
+            log.error('not logged in')
+            return {}
+        language_dict = {}
+        for option in select.findAll('option'):
+            language_dict[option.attrs['value']] = { 'description': option.string }
+        return language_dict
+
+    def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> onlinejudge.type.Submission:  # or SubmissionError
+        session = session or utils.new_default_session()
+        # get
+        resp = utils.request('GET', self.get_url(), session=session)
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        form = soup.find('form', class_='submitForm')
+        if form is None:
+            log.error('not logged in')
+            raise SubmissionError
+        log.debug('form: %s', str(form))
+        # make data
+        form = utils.FormSender(form, url=resp.url)
+        form.set('programTypeId', language)
+        form.set_file('sourceFile', 'code', code)
+        resp = form.request(session=session)
+        resp.raise_for_status()
+        # result
+        if resp.url.endswith('/my'):
+            # example: https://codeforces.com/contest/598/my
+            log.success('success: result: %s', resp.url)
+            return onlinejudge.type.DummySubmission(resp.url)
+        else:
+            log.failure('failure')
+            log.debug('redirected to %s', resp.url)
+            # parse error messages
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            for span in soup.findAll('span', class_='error'):
+                log.warning('Codeforces says: "%s"', span.string)
+            raise SubmissionError
 
     def get_url(self) -> str:
         table = {}
