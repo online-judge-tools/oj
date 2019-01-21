@@ -25,6 +25,7 @@ def version_check() -> None:
     if utils.is_update_available_on_pypi():
         log.warning('update available: %s -> %s', version.__version__, utils.get_latest_version_from_pypi())
         log.info('run: $ pip3 install -U %s', version.__package_name__)
+        log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CHANGELOG.md')
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -66,7 +67,7 @@ format string for --format:
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (defaut: "sample-%%i.%%e" if not --system)')  # default must be None for --system
-    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, help='a directory name for test cases (default: test/)')  # default must be None for guessing in submit command
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
@@ -103,10 +104,12 @@ strings for --method:
             epilog='''\
 supported services:
   AtCoder
-  Yukicoder
+  Codeforces
   TopCoder (Marathon Match)
+
+  (Yukicoder has been removed)
 ''')
-    subparser.add_argument('url')
+    subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')
     subparser.add_argument('file', type=pathlib.Path)
     subparser.add_argument('-l', '--language', help='narrow down language choices if ambiguous')
     subparser.add_argument('--no-guess', action='store_false', dest='guess')
@@ -348,3 +351,4 @@ def main(args: Optional[List[str]] = None) -> None:
         log.debug('\n' + traceback.format_exc())
         log.error('NotImplementedError')
         log.info('The operation you specified is not supported yet. Pull requests are welcome.')
+        log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md')

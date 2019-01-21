@@ -27,6 +27,7 @@ For other place, both English and Japanese are acceptable.
 -   commit は適切に分割する
 -   機能追加をする場合は事前に確認をする
     -   「そういう機能は入れません」で弾かれてせっかくの実装が無駄になるとお互いに不幸なためです
+    -    Issues に書いてあることをやるのなら確認は不要です
 
 
 # Internal Structure / 内部構造

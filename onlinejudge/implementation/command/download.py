@@ -3,14 +3,17 @@ import onlinejudge
 import onlinejudge.type
 import onlinejudge.implementation.utils as utils
 import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.download_history
 import colorama
+import datetime
 import json
 import os
+import pathlib
+import random
 import sys
 from typing import *
 if TYPE_CHECKING:
     import argparse
-    import pathlib
 
 def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> dict:
     data = {}
@@ -25,6 +28,9 @@ def download(args: 'argparse.Namespace') -> None:
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
+    is_default_format = args.format is None and args.directory is None  # must be here since args.directory and args.format are overwritten
+    if args.directory is None:
+        args.directory = pathlib.Path('test')
     if args.format is None:
         if args.system:
             if problem.get_service().get_name() == 'yukicoder':
@@ -40,6 +46,11 @@ def download(args: 'argparse.Namespace') -> None:
             samples = problem.download_system_cases(session=sess)  # type: ignore
         else:
             samples = problem.download_sample_cases(session=sess)  # type: ignore
+
+    # append the history for submit command
+    if not args.dry_run and is_default_format:
+        history = onlinejudge.implementation.download_history.DownloadHistory()
+        history.add(problem)
 
     # write samples to files
     for i, sample in enumerate(samples):
