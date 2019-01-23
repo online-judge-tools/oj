@@ -14,8 +14,8 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
     table = {}
     table['s'] = '*'
     table['e'] = '*'
-    pattern = glob.escape(str(directory)) + '/' + \
-        utils.percentformat(glob.escape(format), table)
+    pattern = (glob.escape(str(directory)) + '/' +
+               utils.percentformat(glob.escape(format).replace('\\%', '%'), table))
     paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
         log.debug('testcase globbed: %s', path)
@@ -27,7 +27,7 @@ def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) 
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
     pattern = re.compile('^' + re.escape(str(directory.resolve())) +
-                         '/' + utils.percentformat(re.escape(format), table) + '$')
+                         '/' + utils.percentformat(re.escape(format).replace('\\%', '%'), table) + '$')
     return pattern.match(str(path.resolve()))
 
 
@@ -54,8 +54,7 @@ def drop_backup_or_hidden_files(paths: List[pathlib.Path]) -> List[pathlib.Path]
 
 
 def construct_relationship_of_files(paths: List[pathlib.Path], directory: pathlib.Path, format: str) -> Dict[str, Dict[str, pathlib.Path]]:
-    # type: Dict[str, Dict[str, pathlib.Path]]
-    tests = collections.defaultdict(dict)
+    tests = collections.defaultdict(dict)  # type: Dict[str, Dict[str, pathlib.Path]]
     for path in paths:
         m = match_with_format(directory, format, path.resolve())
         if not m:
