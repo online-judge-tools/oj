@@ -14,7 +14,8 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
     table = {}
     table['s'] = '*'
     table['e'] = '*'
-    pattern = str(directory / utils.percentformat(format, table))
+    pattern = glob.escape(str(directory)) + '/' + \
+        utils.percentformat(glob.escape(format), table)
     paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
         log.debug('testcase globbed: %s', path)
