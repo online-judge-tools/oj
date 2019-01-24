@@ -20,7 +20,7 @@ def login(args: 'argparse.Namespace') -> None:
     if service.get_name() == 'yukicoder':
         if not args.method:
             args.method = 'github'
-        if args.method not in [ 'github', 'twitter' ]:
+        if args.method not in ['github', 'twitter']:
             log.failure('login for yukicoder: invalid option: --method %s', args.method)
             sys.exit(1)
         kwargs['method'] = args.method

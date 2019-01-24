@@ -22,10 +22,10 @@ def tokenize(pre: str) -> Generator[List[Dict[str, str]], None, None]:
         # tokenize each line
         tokens = []  # type: List[Dict[str, str]]
         for x, s in enumerate(line.split()):
-            if s in [ '..', '...', '\\dots', '…', '⋯' ]:
-                tokens += [ { 'kind': 'dots', 'dir': ['hr', 'vr'][x == 0] } ]
-            elif s in [ ':', '\\vdots', '⋮' ]:
-                tokens += [ { 'kind': 'dots', 'dir': 'vr' } ]
+            if s in ['..', '...', '\\dots', '…', '⋯']:
+                tokens += [{'kind': 'dots', 'dir': ['hr', 'vr'][x == 0]}]
+            elif s in [':', '\\vdots', '⋮']:
+                tokens += [{'kind': 'dots', 'dir': 'vr'}]
             elif '\\' in s:
                 assert False
             elif '_' in s:
@@ -35,15 +35,15 @@ def tokenize(pre: str) -> Generator[List[Dict[str, str]], None, None]:
                     ix = ix[1:-1]
                 if ',' in ix:
                     raise NotImplementedError
-                tokens += [ { 'kind': 'indexed', 'name': s, 'index': ix } ]
+                tokens += [{'kind': 'indexed', 'name': s, 'index': ix}]
             else:
-                tokens += [ { 'kind': 'fixed', 'name': s } ]
+                tokens += [{'kind': 'fixed', 'name': s}]
         yield tokens
 
 
 def simplify_expr(s: str) -> str:
-    transformations = sympy_parser.standard_transformations + ( sympy_parser.implicit_multiplication_application ,)
-    local_dict = { 'N': sympy.Symbol('N') }
+    transformations = sympy_parser.standard_transformations + (sympy_parser.implicit_multiplication_application,)
+    local_dict = {'N': sympy.Symbol('N')}
     return str(sympy_parser.parse_expr(s, local_dict=local_dict, transformations=transformations))
 
 
@@ -65,8 +65,8 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
     for y, line in enumerate(tokens):
         for x, item in enumerate(line):
             if item['kind'] == 'fixed':
-                yield { 'kind': 'decl', 'names': [ item['name'] ] }
-                yield { 'kind': 'read', 'names': [ item['name'] ] }
+                yield {'kind': 'decl', 'names': [item['name']]}
+                yield {'kind': 'read', 'names': [item['name']]}
             elif item['kind'] == 'indexed':
                 pass
             elif item['kind'] == 'dots':
@@ -76,8 +76,8 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                     if name in used:
                         continue
                     n = env[name]['n']
-                    yield { 'kind': 'decl-vector', 'targets': [ { 'name': name, 'length': n } ] }
-                    yield { 'kind': 'loop', 'length': n, 'body': [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ] }
+                    yield {'kind': 'decl-vector', 'targets': [{'name': name, 'length': n}]}
+                    yield {'kind': 'loop', 'length': n, 'body': [{'kind': 'read-indexed', 'targets': [{'name': name, 'index': 0}]}]}
                     used.add(name)
                 elif item['dir'] == 'vr':
                     names = []  # type: List[str]
@@ -87,7 +87,7 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                         name = item['name']
                         if name in used:
                             continue
-                        names += [ name ]
+                        names += [name]
                         used.add(name)
                     if not names:
                         continue
@@ -95,9 +95,9 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                     body = []  # type: List[Dict[str, Any]]
                     for name in names:
                         assert env[name]['n'] == n
-                        yield { 'kind': 'decl-vector',  'targets': [ { 'name': name, 'length': n } ] } 
-                        body += [ { 'kind': 'read-indexed', 'targets': [ { 'name': name, 'index': 0 } ] } ]
-                    yield { 'kind': 'loop', 'length': n, 'body': body }
+                        yield {'kind': 'decl-vector',  'targets': [{'name': name, 'length': n}]}
+                        body += [{'kind': 'read-indexed', 'targets': [{'name': name, 'index': 0}]}]
+                    yield {'kind': 'loop', 'length': n, 'body': body}
                 else:
                     assert False
             else:
@@ -116,8 +116,8 @@ def postprocess(it: Any) -> Any:
                 if not set(it[i - 1]['names']).intersection(it[i]['names']):
                     it[i - 1], it[i] = it[i], it[i - 1]
                     i -= 2
-            elif i - 1 >= 0 and it[i - 1]['kind'] == it[i]['kind'] and it[i]['kind'] in [ 'decl', 'decl-vector', 'read', 'read-indexed' ]:
-                if it[i]['kind'] in [ 'read', 'decl' ]:
+            elif i - 1 >= 0 and it[i - 1]['kind'] == it[i]['kind'] and it[i]['kind'] in ['decl', 'decl-vector', 'read', 'read-indexed']:
+                if it[i]['kind'] in ['read', 'decl']:
                     it[i - 1]['names'] += it[i]['names']
                 else:
                     it[i - 1]['targets'] += it[i]['targets']
@@ -147,7 +147,7 @@ def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> s
         elif it['kind'] == 'decl-vector':
             if it['targets']:
                 return 'vector<int> {}; '.format(', '.join(map(lambda x: x['name'] + paren_if(x['length'], '()'), it['targets'])))
-        elif it['kind'] in [ 'read', 'read-indexed' ]:
+        elif it['kind'] in ['read', 'read-indexed']:
             if it['kind'] == 'read':
                 items = it['names']
             elif it['kind'] == 'read-indexed':

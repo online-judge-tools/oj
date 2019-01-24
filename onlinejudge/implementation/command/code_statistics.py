@@ -41,5 +41,5 @@ def code_statistics(args: 'argparse.Namespace') -> None:
         code = fh.read()
     stat = get_statistics(code)
     stat['size'] = len(code)
-    for key in ( 'size', 'binary', 'alnum', 'symbol', 'whitespace' ):
+    for key in ('size', 'binary', 'alnum', 'symbol', 'whitespace'):
         log.info('%s = %d', key, stat[key])

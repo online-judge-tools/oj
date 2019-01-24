@@ -96,7 +96,7 @@ class SampleZipper(object):
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
                 if not (re.search('output', name, re.IGNORECASE) or re.search('出力', name)):  # to ignore titles like "Output for Sample Input 1"
                     log.warning('strange name for output string: %s', name)
-            self.data += [ TestCase(self.dangling, LabeledString(name, s)) ]
+            self.data += [TestCase(self.dangling, LabeledString(name, s))]
             self.dangling = None
 
     def get(self) -> List[TestCase]:
@@ -115,7 +115,7 @@ class FormSender(object):
         self.files = {}  # type: Dict[str, IO[Any]]
         for input in self.form.find_all('input'):
             log.debug('input: %s', str(input))
-            if input.attrs.get('type') in [ 'checkbox', 'radio' ]:
+            if input.attrs.get('type') in ['checkbox', 'radio']:
                 continue
             if 'name' in input.attrs and 'value' in input.attrs:
                 self.payload[input['name']] = input['value']
@@ -127,7 +127,7 @@ class FormSender(object):
         return self.payload
 
     def set_file(self, key: str, filename: str, content: bytes) -> None:
-        self.files[key] = ( filename, content )  # type: ignore
+        self.files[key] = (filename, content)  # type: ignore
 
     def request(self, session: requests.Session, action: Optional[str] = None, **kwargs) -> requests.Response:
         action = action or self.form['action']
@@ -194,7 +194,7 @@ def normpath(path: str) -> str:
 
 
 def request(method: str, url: str, session: requests.Session, raise_for_status: bool = True, **kwargs) -> requests.Response:
-    assert method in [ 'GET', 'POST' ]
+    assert method in ['GET', 'POST']
     kwargs.setdefault('allow_redirects', True)
     log.status('%s: %s', method, url)
     resp = session.request(method, url, **kwargs)

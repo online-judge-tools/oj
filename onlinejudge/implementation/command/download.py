@@ -58,7 +58,7 @@ def download(args: 'argparse.Namespace') -> None:
     for i, sample in enumerate(samples):
         log.emit('')
         log.info('sample %d', i)
-        for kind in [ 'input', 'output' ]:
+        for kind in ['input', 'output']:
             ext = kind[: -3]
             data = getattr(sample, kind).data
             name = getattr(sample, kind).name

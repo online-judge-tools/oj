@@ -38,7 +38,7 @@ class AtCoderService(onlinejudge.type.Service):
             return 'login' not in resp.url
         # post
         username, password = get_credentials()
-        resp = _request('POST', url, session=session, data={ 'name': username, 'password': password }, allow_redirects=False)
+        resp = _request('POST', url, session=session, data={'name': username, 'password': password}, allow_redirects=False)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         AtCoderService._report_messages(msgs)
         return 'login' not in resp.url  # AtCoder redirects to the top page if success
@@ -55,7 +55,7 @@ class AtCoderService(onlinejudge.type.Service):
         # example: http://agc012.contest.atcoder.jp/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
-                and (result.netloc in ( 'atcoder.jp', 'beta.atcoder.jp' ) or result.netloc.endswith('.contest.atcoder.jp')):
+                and (result.netloc in ('atcoder.jp', 'beta.atcoder.jp') or result.netloc.endswith('.contest.atcoder.jp')):
             return cls()
         return None
 
@@ -66,7 +66,7 @@ class AtCoderService(onlinejudge.type.Service):
             log.debug('cookie: %s', str(cookie))
             if cookie.name.startswith('__message_'):
                 msg = json.loads(urllib.parse.unquote_plus(cookie.value))
-                msgtags += [ msg['c'] ]
+                msgtags += [msg['c']]
                 log.debug('message: %s: %s', cookie.name, str(msg))
         msgs = []  # type: List[str]
         for msgtag in msgtags:
@@ -79,7 +79,7 @@ class AtCoderService(onlinejudge.type.Service):
             if msg is None:
                 log.error('failed to parse message')
             else:
-                msgs += [ msg ]
+                msgs += [msg]
         return msgs
 
     @classmethod
@@ -138,7 +138,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
             # the first format: h3+pre
             if prv and prv.name == 'h3' and prv.string:
-                yield ( pre, prv )
+                yield (pre, prv)
 
             else:
                 # ignore tags which are not samples
@@ -154,7 +154,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
                 if pre.parent and pre.parent.name == 'section':
                     prv = pre.parent and utils.previous_sibling_tag(pre.parent)
                     if prv and prv.name == 'h3' and prv.string:
-                        yield ( pre, prv )
+                        yield (pre, prv)
 
     def get_url(self) -> str:
         return 'http://{}.contest.atcoder.jp/tasks/{}'.format(self.contest_id, self.problem_id)
@@ -198,13 +198,13 @@ class AtCoderProblem(onlinejudge.type.Problem):
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         for h3 in soup.find_all('h3'):
-            if h3.string in ( '入力', 'Input' ):
+            if h3.string in ('入力', 'Input'):
                 tag = h3
                 for _ in range(3):
                     tag = utils.next_sibling_tag(tag)
                     if tag is None:
                         break
-                    if tag.name in ( 'pre', 'blockquote' ):
+                    if tag.name in ('pre', 'blockquote'):
                         s = ''
                         for it in tag:
                             s += it.string or it  # AtCoder uses <var>...</var> for math symbols
@@ -229,7 +229,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         select = soup.find('select', class_='submit-language-selector')  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
         language_dict = {}
         for option in select.find_all('option'):
-            language_dict[option.attrs['value']] = { 'description': option.string }
+            language_dict[option.attrs['value']] = {'description': option.string}
         return language_dict
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
@@ -371,6 +371,6 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         return code
 
 
-onlinejudge.dispatch.services += [ AtCoderService ]
-onlinejudge.dispatch.problems += [ AtCoderProblem ]
-onlinejudge.dispatch.submissions += [ AtCoderSubmission ]
+onlinejudge.dispatch.services += [AtCoderService]
+onlinejudge.dispatch.problems += [AtCoderProblem]
+onlinejudge.dispatch.submissions += [AtCoderSubmission]

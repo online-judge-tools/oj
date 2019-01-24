@@ -59,7 +59,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', contest_url, session=session, headers=headers)
         # parse config
         assert resp.encoding is None
-        config = json.loads( resp.content.decode() )  # NOTE: Should I memoize this? Is the CSAcademyRound class required?
+        config = json.loads(resp.content.decode())  # NOTE: Should I memoize this? Is the CSAcademyRound class required?
         task_config = None
         for it in config['state']['contesttask']:
             if it['name'] == self.task_name:
@@ -70,7 +70,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
 
         # get
         get_contest_task_url = 'https://csacademy.com/contest/get_contest_task/'
-        payload = { 'contestTaskId': ( None, str(task_config['id']))  }
+        payload = {'contestTaskId': (None, str(task_config['id']))}
         headers = {
                 'x-csrftoken': csrftoken,
                 'x-requested-with': 'XMLHttpRequest',
@@ -79,7 +79,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
         resp = utils.request('POST', get_contest_task_url, session=session, files=payload, headers=headers)
         # parse
         assert resp.encoding is None
-        contest_task = json.loads( resp.content.decode() )  # NOTE: Should I memoize this?
+        contest_task = json.loads(resp.content.decode())  # NOTE: Should I memoize this?
         if contest_task.get('title') == 'Page not found':
             log.error('something wrong')
             return []
@@ -87,10 +87,10 @@ class CSAcademyProblem(onlinejudge.type.Problem):
         for test_number, example_test in enumerate(contest_task['state']['EvalTask'][0]['exampleTests']):
             inname = 'Input {}'.format(test_number)
             outname = 'Output {}'.format(test_number)
-            samples += [ TestCase(
-                LabeledString( inname, example_test[ 'input']),
+            samples += [TestCase(
+                LabeledString(inname, example_test['input']),
                 LabeledString(outname, example_test['output']),
-                ) ]
+                )]
         return samples
 
     def get_url(self) -> str:
@@ -114,5 +114,5 @@ class CSAcademyProblem(onlinejudge.type.Problem):
         return None
 
 
-onlinejudge.dispatch.services += [ CSAcademyService ]
-onlinejudge.dispatch.problems += [ CSAcademyProblem ]
+onlinejudge.dispatch.services += [CSAcademyService]
+onlinejudge.dispatch.problems += [CSAcademyProblem]

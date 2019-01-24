@@ -21,8 +21,8 @@ class Service(object):
         pass
 
 
-LabeledString = NamedTuple('LabeledString', [ ('name', str), ('data', str) ])
-TestCase = NamedTuple('TestCase', [ ('input', LabeledString), ('output', LabeledString) ])
+LabeledString = NamedTuple('LabeledString', [('name', str), ('data', str)])
+TestCase = NamedTuple('TestCase', [('input', LabeledString), ('output', LabeledString)])
 # Language = NamedTuple('Language', [ ('id', str), ('name', str), ('description': str) ])
 Language = Dict[str, Any]
 Standings = Tuple[List[str], List[Dict[str, Any]]]  # ( [ 'column1', 'column2', ... ], [ { 'column1': data1, ... } ... ] )

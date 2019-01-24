@@ -52,8 +52,8 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         assert tag.name == 'h2'
         name = tag.contents[0]
         if ':' in name:
-            name = name[:  name.find(':') ]
-        if name in [ 'Sample input', 'Sample output' ]:
+            name = name[:  name.find(':')]
+        if name in ['Sample input', 'Sample output']:
             nxt = tag.next_sibling
             while nxt and nxt.string.strip() == '':
                 nxt = nxt.next_sibling
@@ -82,5 +82,5 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         return None
 
 
-onlinejudge.dispatch.services += [ AnarchyGolfService ]
-onlinejudge.dispatch.problems += [ AnarchyGolfProblem ]
+onlinejudge.dispatch.services += [AnarchyGolfService]
+onlinejudge.dispatch.problems += [AnarchyGolfProblem]

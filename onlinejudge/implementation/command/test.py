@@ -111,7 +111,7 @@ def test(args: 'argparse.Namespace') -> None:
             elif args.mode == 'line':
                 answer_words = answer .splitlines()
                 correct_words = correct.splitlines()
-                for i, (x, y) in enumerate(zip(answer_words + [ None ] * len(correct_words), correct_words + [ None ] * len(answer_words))):  # type: ignore
+                for i, (x, y) in enumerate(zip(answer_words + [None] * len(correct_words), correct_words + [None] * len(answer_words))):  # type: ignore
                     if x is None and y is None:
                         break
                     elif x is None:
@@ -142,13 +142,13 @@ def test(args: 'argparse.Namespace') -> None:
         }
         if 'out' in it:
             testcase['output'] = str(it['out'].resolve())
-        history += [ {
+        history += [{
             'result': result,
             'testcase': testcase,
             'output': answer,
             'exitcode': proc.returncode,
             'elapsed': elapsed,
-        } ]
+        }]
 
     # summarize
     log.emit('')

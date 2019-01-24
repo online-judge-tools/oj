@@ -53,7 +53,7 @@ class TopCoderService(onlinejudge.type.Service):
         # example: https://www.topcoder.com/
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc in [ 'www.topcoder.com', 'community.topcoder.com' ]:
+                and result.netloc in ['www.topcoder.com', 'community.topcoder.com']:
             return cls()
         return None
 
@@ -80,11 +80,11 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         result = urllib.parse.urlparse(s)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'community.topcoder.com' \
-                and utils.normpath(result.path) in [ '/longcontest', '/tc' ]:
+                and utils.normpath(result.path) in ['/longcontest', '/tc']:
             querystring = dict(urllib.parse.parse_qsl(result.query))
             if 'rd' in querystring:
                 kwargs = {}
-                for name in [ 'rd', 'cd', 'compid', 'pm' ]:
+                for name in ['rd', 'cd', 'compid', 'pm']:
                     if name in querystring:
                         kwargs[name] = int(querystring[name])
                 return cls(**kwargs)
@@ -103,7 +103,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         }  # yapf: disable
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
-        assert kind in [ 'example', 'full' ]
+        assert kind in ['example', 'full']
         session = session or utils.new_default_session()
 
         # module=MatchDetails
@@ -117,7 +117,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         url = 'https://community.topcoder.com' + path
         resp = utils.request('GET', url, session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        path = [ tag.attrs['href'] for tag in soup.find_all('a', text='Submit') if ('rd=%d' % self.rd) in tag.attrs['href'] ]
+        path = [tag.attrs['href'] for tag in soup.find_all('a', text='Submit') if ('rd=%d' % self.rd) in tag.attrs['href']]
         if len(path) == 0:
             log.error('link to submit not found:  Are you logged in?  Are you registered?  Is the contest running?')
             raise onlinejudge.type.SubmissionError
@@ -142,7 +142,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
             'cd': self.cd,
             'compid': self.compid,
             'Action': 'submit',
-            'exOn': { 'example': 'true', 'full': 'false' }[kind],
+            'exOn': {'example': 'true', 'full': 'false'}[kind],
             'lid': language_id,
             'code': code,
         }
@@ -157,7 +157,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
             # module=Submit to get error messages
             resp = utils.request('GET', submit_url, session=session)
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-            messages = soup.find('textarea', { 'name': 'messages' }).text
+            messages = soup.find('textarea', {'name': 'messages'}).text
             log.failure('%s', messages)
             raise onlinejudge.type.SubmissionError
 
@@ -177,8 +177,8 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
             trs = table.find_all('tr')
             if header is None:
                 tr = trs[1]
-                header = [ td.text.strip() for td in tr.find_all('td') ]
-            for tr in trs[2 :]:
+                header = [td.text.strip() for td in tr.find_all('td')]
+            for tr in trs[2:]:
                 row = collections.OrderedDict()  # type: Dict[str, str]
                 for key, td in zip(header, tr.find_all('td')):
                     value = td.text.strip()
@@ -187,7 +187,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
                     elif value.isdigit():
                         value = int(value)
                     row[key] = value
-                rows += [ row ]
+                rows += [row]
 
             # check whether the next page exists
             link = soup.find('a', text='next >>')
@@ -198,5 +198,5 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         return header, rows
 
 
-onlinejudge.dispatch.services += [ TopCoderService ]
-onlinejudge.dispatch.problems += [ TopCoderLongContestProblem ]
+onlinejudge.dispatch.services += [TopCoderService]
+onlinejudge.dispatch.problems += [TopCoderLongContestProblem]

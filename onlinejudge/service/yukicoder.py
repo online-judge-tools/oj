@@ -86,7 +86,7 @@ class YukicoderService(onlinejudge.type.Service):
         assert (id is not None) != (name is not None)
         if id is not None:
             assert isinstance(id, int)
-            sometihng = { 'user': '', 'solved': 'id/' }[api]
+            sometihng = {'user': '', 'solved': 'id/'}[api]
             url = 'https://yukicoder.me/api/v1/{}/{}{}'.format(api, sometihng, id)
         else:
             assert name is not None
@@ -112,7 +112,7 @@ class YukicoderService(onlinejudge.type.Service):
     def get_user_favorite(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
         url = 'https://yukicoder.me/users/%d/favorite' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
-        assert columns == [ '#', '提出時間', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]
+        assert columns == ['#', '提出時間', '提出者', '問題', '言語', '結果', '実行時間', 'コード長']
         for row in rows:
             for column in columns:
                 if row[column].find('a'):
@@ -127,7 +127,7 @@ class YukicoderService(onlinejudge.type.Service):
     def get_user_favorite_problem(self, id, session: Optional[requests.Session] = None) -> List[Any]:
         url = 'https://yukicoder.me/users/%d/favoriteProblem' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
-        assert columns == [ 'ナンバー', '問題名', 'レベル', 'タグ', '時間制限', 'メモリ制限', '作問者' ]
+        assert columns == ['ナンバー', '問題名', 'レベル', 'タグ', '時間制限', 'メモリ制限', '作問者']
         for row in rows:
             for column in columns:
                 if row[column].find('a'):
@@ -149,7 +149,7 @@ class YukicoderService(onlinejudge.type.Service):
     def get_user_favorite_wiki(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
         url = 'https://yukicoder.me/users/%d/favoriteWiki' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
-        assert columns == [ 'Wikiページ' ]
+        assert columns == ['Wikiページ']
         for row in rows:
             for column in columns:
                 row[column + '/url'] = row[column].find('a').attrs.get('href')
@@ -166,7 +166,7 @@ class YukicoderService(onlinejudge.type.Service):
             assert status in 'AC WA RE TLE MLE OLE J_TLE CE WJ Judge NoOut IE'.split()
             url += '&status=' + status
         columns, rows = self._get_and_parse_the_table(url, session=session)
-        assert columns == [ '#', '提出日時', '', '提出者', '問題', '言語', '結果', '実行時間', 'コード長' ]  # 空白は「このユーザーの提出の表示」の虫眼鏡のため
+        assert columns == ['#', '提出日時', '', '提出者', '問題', '言語', '結果', '実行時間', 'コード長']  # 空白は「このユーザーの提出の表示」の虫眼鏡のため
         for row in rows:
             for column in columns:
                 if column and row[column].find('a'):
@@ -190,15 +190,15 @@ class YukicoderService(onlinejudge.type.Service):
         if comp_problem:  # 未完成問題は(ログインしてても)デフォルトで除外
             url += '&comp_problem=on'
         if sort is not None:
-            assert sort in ( 'no_asc', 'level_asc', 'level_desc', 'solved_asc', 'solved_desc', 'fav_asc', 'fav_desc', )
+            assert sort in ('no_asc', 'level_asc', 'level_desc', 'solved_asc', 'solved_desc', 'fav_asc', 'fav_desc', )
             url += '&sort=' + sort
         columns, rows = self._get_and_parse_the_table(url, session=session)
-        assert columns == [ 'ナンバー', '問題名', 'レベル', 'タグ', '作問者', '解いた人数', 'Fav' ]
+        assert columns == ['ナンバー', '問題名', 'レベル', 'タグ', '作問者', '解いた人数', 'Fav']
         for row in rows:
             for column in columns:
                 if column and row[column].find('a'):
                     row[column + '/url'] = row[column].find('a').attrs.get('href')
-                if column in ( 'ナンバー', '解いた人数', 'Fav' ):
+                if column in ('ナンバー', '解いた人数', 'Fav'):
                     row[column] = int(row[column].text)
                 elif column == 'レベル':
                     row[column] = self._parse_star(row[column])
@@ -218,12 +218,12 @@ class YukicoderService(onlinejudge.type.Service):
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         assert len(soup.find_all('table')) == 1
         table = soup.find('table')
-        columns = [ th.text.strip() for th in table.find('thead').find('tr') if th.name == 'th' ]
+        columns = [th.text.strip() for th in table.find('thead').find('tr') if th.name == 'th']
         data = []  # type: List[Dict[str, List[str]]]
         for row in table.find('tbody').find_all('tr'):
-            values = [ td for td in row if td.name == 'td' ]
+            values = [td for td in row if td.name == 'td']
             assert len(columns) == len(values)
-            data += [ dict(zip(columns, values)) ]
+            data += [dict(zip(columns, values))]
         return columns, data
 
     def _parse_star(self, tag: bs4.Tag) -> str:
@@ -267,7 +267,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             for filename in sorted(fh.namelist()):  # "test_in" < "test_out"
                 dirname = os.path.dirname(filename)
                 basename = os.path.basename(filename)
-                kind = { 'test_in': 'input', 'test_out': 'output' }[dirname]
+                kind = {'test_in': 'input', 'test_out': 'output'}[dirname]
                 content = fh.read(filename).decode()
                 name = basename
                 if os.path.splitext(name)[1] == '.in':  # ".in" extension is confusing
@@ -279,7 +279,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             if 'input' not in data or 'output' not in data or len(data) != 2:
                 log.error('dangling sample found: %s', str(data))
             else:
-                samples += [ TestCase(data['input'], data['output']) ]
+                samples += [TestCase(data['input'], data['output'])]
         return samples
 
     def _parse_sample_tag(self, tag: bs4.Tag) -> Optional[Tuple[str, str]]:
@@ -338,5 +338,5 @@ class YukicoderProblem(onlinejudge.type.Problem):
         return None
 
 
-onlinejudge.dispatch.services += [ YukicoderService ]
-onlinejudge.dispatch.problems += [ YukicoderProblem ]
+onlinejudge.dispatch.services += [YukicoderService]
+onlinejudge.dispatch.problems += [YukicoderProblem]

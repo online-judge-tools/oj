@@ -65,7 +65,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
         assert index in string.ascii_uppercase
-        assert kind in ( None, 'contest', 'gym', 'problemset' )
+        assert kind in (None, 'contest', 'gym', 'problemset')
         self.contest_id = contest_id
         self.index = index
         if kind is None:
@@ -104,13 +104,13 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        select = soup.find('select', attrs={ 'name': 'programTypeId' })
+        select = soup.find('select', attrs={'name': 'programTypeId'})
         if select is None:
             log.error('not logged in')
             return {}
         language_dict = {}
         for option in select.findAll('option'):
-            language_dict[option.attrs['value']] = { 'description': option.string }
+            language_dict[option.attrs['value']] = {'description': option.string}
         return language_dict
 
     def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> onlinejudge.type.Submission:  # or SubmissionError
@@ -171,5 +171,5 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         return None
 
 
-onlinejudge.dispatch.services += [ CodeforcesService ]
-onlinejudge.dispatch.problems += [ CodeforcesProblem ]
+onlinejudge.dispatch.services += [CodeforcesService]
+onlinejudge.dispatch.problems += [CodeforcesProblem]

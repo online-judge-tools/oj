@@ -39,7 +39,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     # download
     subparser = subparsers.add_parser('download',
-            aliases=[ 'd', 'dl' ],
+            aliases=['d', 'dl'],
             help='download sample cases',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -75,7 +75,7 @@ format string for --format:
 
     # login
     subparser = subparsers.add_parser('login',
-            aliases=[ 'l' ],
+            aliases=['l'],
             help='login to a service',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -98,7 +98,7 @@ strings for --method:
 
     # submit
     subparser = subparsers.add_parser('submit',
-            aliases=[ 's' ],
+            aliases=['s'],
             help='submit your solution',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -116,9 +116,9 @@ supported services:
     subparser.add_argument('-g', '--guess', action='store_true', help='guess the language for your file (default)')
     subparser.add_argument('--no-guess-latest', action='store_false', dest='guess_cxx_latest')
     subparser.add_argument('--guess-cxx-latest', action='store_true', help='use the lasest version for C++ (default)')
-    subparser.add_argument('--guess-cxx-compiler', choices=( 'gcc', 'clang', 'all' ), default='gcc', help='use the specified C++ compiler if both of GCC and Clang are available (default: gcc)')
-    subparser.add_argument('--guess-python-version', choices=( '2', '3', 'auto', 'all' ), default='auto', help='shebang or modelines are used by default. write something like "#!/usr/bin/env python3". (default: auto)')
-    subparser.add_argument('--guess-python-interpreter', choices=( 'cpython', 'pypy', 'all' ), default='cpython', help='use the specified Python interpreter if both of CPython and PyPy are available (default: cpython)')
+    subparser.add_argument('--guess-cxx-compiler', choices=('gcc', 'clang', 'all'), default='gcc', help='use the specified C++ compiler if both of GCC and Clang are available (default: gcc)')
+    subparser.add_argument('--guess-python-version', choices=('2', '3', 'auto', 'all'), default='auto', help='shebang or modelines are used by default. write something like "#!/usr/bin/env python3". (default: auto)')
+    subparser.add_argument('--guess-python-interpreter', choices=('cpython', 'pypy', 'all'), default='cpython', help='use the specified Python interpreter if both of CPython and PyPy are available (default: cpython)')
     subparser.add_argument('--format-dos2unix', action='store_true', help='replace CRLF with LF for given file')
     subparser.add_argument('--format-rstrip', action='store_true', help='remove trailing newlines from given file')
     subparser.add_argument('-G', '--golf', action='store_true', help='now equivalent to --format-dos2unix --format-rstrip')
@@ -131,7 +131,7 @@ supported services:
 
     # test
     subparser = subparsers.add_parser('test',
-            aliases=[ 't' ],
+            aliases=['t'],
             help='test your code',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -146,7 +146,7 @@ tips:
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
     subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
-    subparser.add_argument('-m', '--mode', choices=[ 'all', 'line' ], default='all', help='mode to check an output with the correct answer. (default: all)')
+    subparser.add_argument('-m', '--mode', choices=['all', 'line'], default='all', help='mode to check an output with the correct answer. (default: all)')
     subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
     subparser.add_argument('--no-rstrip', action='store_false', dest='rstrip')
     subparser.add_argument('--rstrip', action='store_true', help='rstrip output before compare (default)')
@@ -161,7 +161,7 @@ tips:
 
     # generate scanner
     subparser = subparsers.add_parser('generate-scanner',
-            aliases=[ 'g/s' ],
+            aliases=['g/s'],
             help='generate input scanner  (experimental)',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -193,7 +193,7 @@ tips:
 
     # generate output
     subparser = subparsers.add_parser('generate-output',
-            aliases=[ 'g/o' ],
+            aliases=['g/o'],
             help='generate output files form input and reference implementation',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -214,7 +214,7 @@ tips:
 
     # split input
     subparser = subparsers.add_parser('split-input',
-            aliases=[ 's/i' ],
+            aliases=['s/i'],
             help='split a input file which contains many cases, using your implementation',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -278,7 +278,7 @@ example:
 
     # test reactive
     subparser = subparsers.add_parser('test-reactive',
-            aliases=[ 't/r' ],
+            aliases=['t/r'],
             help='test for reactive problem',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -288,7 +288,7 @@ example:
 
     # code statistics
     subparser = subparsers.add_parser('code-statistics',
-            aliases=[ 'c/s' ],
+            aliases=['c/s'],
             help='print the code statistics used in Anarchy Golf',
             formatter_class=argparse.RawTextHelpFormatter,
             epilog='''\
@@ -304,7 +304,7 @@ supported services:
   TopCoder (Marathon Match)
 ''')
     subparser.add_argument('url')
-    subparser.add_argument('-f', '--format', choices=[ 'csv', 'tsv', 'json' ], default='tsv', help='default: tsv')
+    subparser.add_argument('-f', '--format', choices=['csv', 'tsv', 'json'], default='tsv', help='default: tsv')
 
     return parser
 
@@ -314,23 +314,23 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         log.setLevel(log.logging.DEBUG)
     log.debug('args: %s', str(args))
 
-    if args.subcommand in [ 'download', 'd', 'dl' ]:
+    if args.subcommand in ['download', 'd', 'dl']:
         download(args)
-    elif args.subcommand in [ 'login', 'l' ]:
+    elif args.subcommand in ['login', 'l']:
         login(args)
-    elif args.subcommand in [ 'submit', 's' ]:
+    elif args.subcommand in ['submit', 's']:
         submit(args)
-    elif args.subcommand in [ 'test', 't' ]:
+    elif args.subcommand in ['test', 't']:
         test(args)
-    elif args.subcommand in [ 'test-reactive', 't/r' ]:
+    elif args.subcommand in ['test-reactive', 't/r']:
         test_reactive(args)
-    elif args.subcommand in [ 'generate-scanner', 'g/s' ]:
+    elif args.subcommand in ['generate-scanner', 'g/s']:
         generate_scanner(args)
-    elif args.subcommand in [ 'generate-output', 'g/o' ]:
+    elif args.subcommand in ['generate-output', 'g/o']:
         generate_output(args)
-    elif args.subcommand in [ 'split-input', 's/i' ]:
+    elif args.subcommand in ['split-input', 's/i']:
         split_input(args)
-    elif args.subcommand in [ 'code-statistics', 'c/s' ]:
+    elif args.subcommand in ['code-statistics', 'c/s']:
         code_statistics(args)
     elif args.subcommand == 'get-standings':
         get_standings(args)

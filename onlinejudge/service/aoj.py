@@ -49,10 +49,10 @@ class AOJProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', url, session=session)
         samples = []  # type: List[TestCase]
         for sample in json.loads(resp.content.decode(resp.encoding)):
-            samples += [ TestCase(
+            samples += [TestCase(
                 LabeledString(str(sample['serial']), sample['in']),
                 LabeledString(str(sample['serial']), sample['out']),
-                ) ]
+                )]
         return samples
 
     def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
@@ -79,10 +79,10 @@ class AOJProblem(onlinejudge.type.Problem):
             if skipped:
                 log.warning("skipped due to the limitation of AOJ API")
                 continue
-            testcases += [ TestCase(
+            testcases += [TestCase(
                 LabeledString(header['name'],  testcase['in']),
                 LabeledString(header['name'], testcase['out']),
-                ) ]
+                )]
         return testcases
 
     def get_url(self) -> str:
@@ -121,5 +121,5 @@ class AOJProblem(onlinejudge.type.Problem):
         return AOJService()
 
 
-onlinejudge.dispatch.services += [ AOJService ]
-onlinejudge.dispatch.problems += [ AOJProblem ]
+onlinejudge.dispatch.services += [AOJService]
+onlinejudge.dispatch.problems += [AOJProblem]
