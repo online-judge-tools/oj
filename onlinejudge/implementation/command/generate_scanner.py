@@ -53,7 +53,7 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
         for x, item in enumerate(line):
             if item['kind'] == 'indexed':
                 f = env[item['name']]
-                if item['index'] in 'ijk': # for A_1 \dots A_i \dots A_N
+                if item['index'] in 'ijk':  # for A_1 \dots A_i \dots A_N
                     continue
                 if 'l' not in f or item['index'] < f['l']:
                     f['l'] = item['index']

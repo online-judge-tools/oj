@@ -43,7 +43,7 @@ def split_input(args: 'argparse.Namespace') -> None:
             proc.stdin.write(line.encode())
             proc.stdin.flush()
             time.sleep(args.time)
-            if non_block_read(proc.stdout): # if output exists
+            if non_block_read(proc.stdout):  # if output exists
                 index += 1
                 path = utils.percentformat(args.output, { 'i': str(index) })
                 log.info('case found: %d', index)
@@ -58,5 +58,5 @@ def split_input(args: 'argparse.Namespace') -> None:
                     fh.write(acc)
                 log.success('saved to: %s', path)
                 acc = ''
-                while non_block_read(proc.stdout): # consume all
+                while non_block_read(proc.stdout):  # consume all
                     pass
