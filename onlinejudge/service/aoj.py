@@ -1,20 +1,21 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge.type
-from onlinejudge.type import LabeledString, TestCase
-import onlinejudge.dispatch
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
+import collections
 import io
-import re
-import posixpath
+import itertools
 import json
-import requests
+import posixpath
+import re
 import urllib.parse
 import zipfile
-import collections
-import itertools
 from typing import *
+
+import onlinejudge.dispatch
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
+import requests
+from onlinejudge.type import LabeledString, TestCase
 
 
 @utils.singleton

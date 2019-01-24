@@ -1,11 +1,13 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.format_utils as cutils
 import os
 import time
 from typing import *
+
+import onlinejudge
+import onlinejudge.implementation.format_utils as cutils
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 if TYPE_CHECKING:
     import argparse
 

@@ -1,13 +1,5 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge.implementation.logging as log
-import onlinejudge.__about__ as version
-from onlinejudge.type import LabeledString, TestCase
-
-import appdirs
-import bs4
-import requests
-
 import contextlib
 import distutils.version
 import http.client
@@ -22,6 +14,13 @@ import time
 import urllib.parse
 from typing import *
 from typing.io import *
+
+import appdirs
+import bs4
+import onlinejudge.__about__ as version
+import onlinejudge.implementation.logging as log
+import requests
+from onlinejudge.type import LabeledString, TestCase
 
 config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
 data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))

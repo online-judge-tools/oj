@@ -1,17 +1,18 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge.type
-from onlinejudge.type import SubmissionError
-import onlinejudge.dispatch
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import re
-import bs4
-import requests
-import urllib.parse
-import posixpath
 import json
+import posixpath
+import re
+import urllib.parse
 from typing import *
+
+import bs4
+import onlinejudge.dispatch
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
+import requests
+from onlinejudge.type import SubmissionError
 
 
 # This is a workaround. AtCoder's servers sometime fail to send "Content-Type" field.

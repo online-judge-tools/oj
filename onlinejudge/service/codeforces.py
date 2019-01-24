@@ -1,16 +1,17 @@
 # Python Version: 3.x
-import onlinejudge.type
-from onlinejudge.type import SubmissionError
-import onlinejudge.dispatch
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import requests
-import re
-import urllib.parse
 import posixpath
-import bs4
+import re
 import string
+import urllib.parse
 from typing import *
+
+import bs4
+import onlinejudge.dispatch
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
+import requests
+from onlinejudge.type import SubmissionError
 
 
 @utils.singleton

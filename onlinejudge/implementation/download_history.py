@@ -1,14 +1,15 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.type
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
 import datetime
 import json
 import pathlib
 import time
 import traceback
 from typing import *
+
+import onlinejudge
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
 
 
 class DownloadHistory(object):

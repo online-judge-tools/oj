@@ -1,15 +1,16 @@
 # Python Version: 3.x
-import onlinejudge.type
-from onlinejudge.type import LabeledString, TestCase
-import onlinejudge.dispatch
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import re
-import requests
-import urllib.parse
-import posixpath
 import json
+import posixpath
+import re
+import urllib.parse
 from typing import *
+
+import onlinejudge.dispatch
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
+import requests
+from onlinejudge.type import LabeledString, TestCase
 
 
 @utils.singleton

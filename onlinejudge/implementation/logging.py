@@ -1,5 +1,9 @@
 # Python Version: 3.x
 import logging
+
+import colorama
+from colorama import Back, Fore, Style
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,8 +19,6 @@ def removeHandler(handler):
     logger.removeHandler(handler)
 
 
-import colorama
-from colorama import Fore, Back, Style
 colorama.init()
 # thanks to https://github.com/Gallopsled/pwntools/pwnlib/log.py
 prefix = {

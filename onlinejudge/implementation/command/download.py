@@ -1,10 +1,4 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.type
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.download_history
-import colorama
 import datetime
 import json
 import os
@@ -12,6 +6,14 @@ import pathlib
 import random
 import sys
 from typing import *
+
+import colorama
+import onlinejudge
+import onlinejudge.implementation.download_history
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
+
 if TYPE_CHECKING:
     import argparse
 

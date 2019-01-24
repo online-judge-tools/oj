@@ -1,6 +1,8 @@
 # Python Version: 3.x
+from typing import TYPE_CHECKING, List, Optional, Type
+
 import onlinejudge.implementation.logging as log
-from typing import List, Optional, Type, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onlinejudge.type import Service, Problem, Submission
 

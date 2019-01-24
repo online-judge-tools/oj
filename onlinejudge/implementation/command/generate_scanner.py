@@ -1,15 +1,17 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import bs4
-import sympy
-import sympy.parsing.sympy_parser as sympy_parser
-import colorama
 import collections
 import sys
 from typing import *
+
+import bs4
+import colorama
+import onlinejudge
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import sympy
+import sympy.parsing.sympy_parser as sympy_parser
+
 if TYPE_CHECKING:
     import argparse
 

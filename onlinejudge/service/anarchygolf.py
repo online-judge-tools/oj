@@ -1,13 +1,14 @@
 # Python Version: 3.x
-import onlinejudge.type
-import onlinejudge.dispatch
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import urllib.parse
 import posixpath
-import bs4
-import requests
+import urllib.parse
 from typing import *
+
+import bs4
+import onlinejudge.dispatch
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
+import requests
 
 
 @utils.singleton

@@ -1,5 +1,6 @@
 # Python Version: 3.x
 from typing import *
+
 if TYPE_CHECKING:
     import requests
 
