@@ -20,14 +20,14 @@ For other place, both English and Japanese are acceptable.
 ただし常にそのまま merge されるとは限らないので注意してください。
 なにかまずいところがあっても修正を要求するだけなので質は問いません (なにか分からないところがあればとりあえずできたところまでで投げてくれてもよいです) が、以下に従っておくと merge されるまでの時間は短くなるでしょう。
 
--   手元でテストをする
+-   手元でテストをする (`python3 setup.py test` を実行する)
     -   CI が通らない限りは merge はできません
--   コーディングスタイルを周囲のコードと合わせる
--   変更箇所は必要最低限にする
--   commit は適切に分割する
+-   レビュアーにやさしいコードを書く
+    -   変更箇所は必要最低限にする
+    -   commit は適切に分割する
+    -   怪しげなところにはコメントを書いておく
 -   機能追加をする場合は事前に確認をする
     -   「そういう機能は入れません」で弾かれてせっかくの実装が無駄になるとお互いに不幸なためです
-    -    Issues に書いてあることをやるのなら確認は不要です
 
 
 # Internal Structure / 内部構造
@@ -47,7 +47,7 @@ Web scraping をする性質により動作は必然的に不安定であり、�
 
 主に以下のような構造です。
 
--   `onlinejudge/`
+t-   `onlinejudge/`
     -   `type.py`: 型はすべてここ
     -   `dispatch.py`: URL から object を解決する仕組み
     -   `implementation/`
@@ -62,13 +62,24 @@ Web scraping をする性質により動作は必然的に不安定であり、�
         -   ...
 -   `tests/`: テストが置かれる
 
+## formatter
+
+isort と yapf を運用しています。
+行幅は実質無限に設定されています。
+それぞれ次のコマンドで実行できます。
+
+``` sh
+$ isort oj onlinejudge/**/*.py
+$ yapf --in-place oj onlinejudge/**/*.py
+```
+
 ## tests
 
 静的型検査と通常のテストをしています。
 手元ではそれぞれ次のコマンドで実行できます。
 
 ``` sh
-$ mypy --verbose --ignore-missing-imports --python-version 3.5 --no-site-packages oj onlinejudge/**/*.py
+$ mypy oj onlinejudge/**/*.py
 $ python3 setup.py test
 ```
 
@@ -79,18 +90,12 @@ $ python3 setup.py test
 $ python3 setup.py test -s tests.command_download_atcoder.DownloadAtCoderTest
 ```
 
+なお `python3 setup.py test` は formatter が利用されているかの確認もするように設定されています。
+
 ## CI
 
 `master` `develop` に関する commit や pull request について CI が走ります。
-
-実行される内容は次の3行なので、これを手元で試せばだいたい同じ結果が得られます。
-あるいは `[WIP]` などと書いて pull request をするのでもよいでしょう。
-
-``` sh
-$ mypy --verbose --ignore-missing-imports oj onlinejudge/**/*.py
-$ make -C docs html
-$ python setup.py test
-```
+`python3 setup.py test` の実行でも同等の処理が行われるように設定されているので、手元でこれを実行しているなら気にする必要はありません。
 
 ## deployment
 
