@@ -26,6 +26,11 @@ setup(
         'appdirs',
     ],
     extras_require={
+        'dev': [
+            'mypy',
+            'yapf',
+            'isort',
+        ],
         'docs': [
             'sphinx',
             'sphinx_rtd_theme',

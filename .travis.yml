@@ -3,9 +3,10 @@ python:
     - 3.5
     - 3.6
 install:
-    - pip install mypy
-    - pip install -e .[docs]
+    - pip install -e .[dev,docs]
 script:
+    - isort --line-width 9999 --check-only --diff oj onlinejudge/**/*.py
+    - yapf --style='{ COLUMN_LIMIT: 9999 }' --diff oj onlinejudge/**/*.py | tee yapf.patch && test ! -s yapf.patch
     - mypy --verbose --ignore-missing-imports oj onlinejudge/**/*.py
     - make -C docs html
     - python setup.py test
