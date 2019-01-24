@@ -276,7 +276,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             saved_ids = lang_ids
             lang_ids = []
             for version in versions:
-                lang_ids += select('python%d'  % version, saved_ids)
+                lang_ids += select('python%d' % version, saved_ids)
                 lang_ids += select('python %d' % version, saved_ids)
 
         lang_ids = list(set(lang_ids))

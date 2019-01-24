@@ -63,7 +63,7 @@ def download(args: 'argparse.Namespace') -> None:
             data = getattr(sample, kind).data
             name = getattr(sample, kind).name
             table = {}
-            table['i'] = str(i+1)
+            table['i'] = str(i + 1)
             table['e'] = ext
             table['n'] = name
             table['b'] = os.path.basename(name)

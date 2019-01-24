@@ -71,8 +71,8 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                 pass
             elif item['kind'] == 'dots':
                 if item['dir'] == 'hr':
-                    assert line[x-1]['kind'] == 'indexed'
-                    name = line[x-1]['name']
+                    assert line[x - 1]['kind'] == 'indexed'
+                    name = line[x - 1]['name']
                     if name in used:
                         continue
                     n = env[name]['n']
@@ -81,7 +81,7 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                     used.add(name)
                 elif item['dir'] == 'vr':
                     names = []  # type: List[str]
-                    for item in tokens[y-1]:
+                    for item in tokens[y - 1]:
                         if item['kind'] != 'indexed':
                             raise NotImplementedError
                         name = item['name']
@@ -153,7 +153,7 @@ def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> s
             elif it['kind'] == 'read-indexed':
                 items = list(map(lambda x: x['name'] + '[' + 'ijk'[nest - x['index'] - 1] + ']', it['targets']))
             if use_scanf:
-                return 'scanf("{}", {});\n'.format('%d' * len(items), ', '.join(map(lambda s: '&'+s, items)))
+                return 'scanf("{}", {});\n'.format('%d' * len(items), ', '.join(map(lambda s: '&' + s, items)))
             else:
                 return 'cin >> {};\n'.format(' >> '.join(items))
         elif it['kind'] == 'loop':
@@ -166,11 +166,11 @@ def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> s
             if len(it['body']) == 0:
                 s += ';'
             elif len(it['body']) == 1:
-                s += go(it['body'][0], nest+1)
+                s += go(it['body'][0], nest + 1)
             else:
                 s += '{ '
                 for line in it['body']:
-                    s += go(line, nest+1).rstrip() + ' '
+                    s += go(line, nest + 1).rstrip() + ' '
                 s += '}\n'
             return s
         else:

@@ -85,7 +85,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
             return []
         samples = []
         for test_number, example_test in enumerate(contest_task['state']['EvalTask'][0]['exampleTests']):
-            inname  = 'Input {}'.format(test_number)
+            inname = 'Input {}'.format(test_number)
             outname = 'Output {}'.format(test_number)
             samples += [ TestCase(
                 LabeledString( inname, example_test[ 'input']),

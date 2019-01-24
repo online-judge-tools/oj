@@ -1,6 +1,6 @@
 # Python Version: 3.x
 __package_name__ = 'online-judge-tools'
-__author__  = 'Kimiyuki Onaka'
+__author__ = 'Kimiyuki Onaka'
 __email__ = 'kimiyuki95@gmail.com'
 __license__ = 'MIT License'
 __url__ = 'https://github.com/kmyk/online-judge-tools'

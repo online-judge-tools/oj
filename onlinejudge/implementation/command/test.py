@@ -109,7 +109,7 @@ def test(args: 'argparse.Namespace') -> None:
                         log.emit('expected:\n%s', log.bold(correct))
                     result = 'WA'
             elif args.mode == 'line':
-                answer_words  = answer .splitlines()
+                answer_words = answer .splitlines()
                 correct_words = correct.splitlines()
                 for i, (x, y) in enumerate(zip(answer_words + [ None ] * len(correct_words), correct_words + [ None ] * len(answer_words))):  # type: ignore
                     if x is None and y is None:

@@ -125,7 +125,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         path = path[0]
         assert path.startswith('/') and 'module=Submit' in path
         query = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(path).query))
-        self.cd     = query['cd']
+        self.cd = query['cd']
         self.compid = query['compid']
 
         # module=Submit
