@@ -15,6 +15,7 @@ from typing import *
 if TYPE_CHECKING:
     import argparse
 
+
 def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> dict:
     data = {}
     data["input"] = sample.input.data
@@ -22,6 +23,7 @@ def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> dict:
     if sample.input.name == sample.output.name:
         data["name"] = sample.input.name
     return data
+
 
 def download(args: 'argparse.Namespace') -> None:
     # prepare values

@@ -93,7 +93,6 @@ class CSAcademyProblem(onlinejudge.type.Problem):
                 ) ]
         return samples
 
-
     def get_url(self) -> str:
         return 'https://csacademy.com/content/{}/task/{}/'.format(self.contest_name, self.task_name)
 
@@ -113,6 +112,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
             if m:
                 return cls(m.group(1), m.group(2))
         return None
+
 
 onlinejudge.dispatch.services += [ CSAcademyService ]
 onlinejudge.dispatch.problems += [ CSAcademyProblem ]

@@ -11,6 +11,7 @@ from typing import *
 if TYPE_CHECKING:
     import argparse
 
+
 def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
     def f(x):
         try:
@@ -32,6 +33,7 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
             if x != y:
                 return False
     return True
+
 
 def test(args: 'argparse.Namespace') -> None:
     # prepare
@@ -58,6 +60,7 @@ def test(args: 'argparse.Namespace') -> None:
     history = []  # type: List[Dict[str, Any]]
     for name, it in sorted(tests.items()):
         is_printed_input = not args.print_input
+
         def print_input():
             nonlocal is_printed_input
             if not is_printed_input:

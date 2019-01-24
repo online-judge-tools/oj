@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
 
+
 def submit(args: 'argparse.Namespace') -> None:
     # guess url
     history = onlinejudge.implementation.download_history.DownloadHistory()
@@ -60,7 +61,6 @@ def submit(args: 'argparse.Namespace') -> None:
         log.emit(log.bold(''.join(lines[: 10])))
         log.emit('... (%s lines) ...', len(lines[10 : -10]))
         log.emit(log.bold(''.join(lines[-10 :])))
-
 
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # guess or select language ids
@@ -162,6 +162,7 @@ def submit(args: 'argparse.Namespace') -> None:
                 log.status('open the submission page with: %s', browser)
                 subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
+
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
     result = []
     for lang_id in lang_ids:
@@ -174,6 +175,7 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
         if pred:
             result.append(lang_id)
     return result
+
 
 def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
     assert cxx_compiler.lower() in ( 'gcc', 'clang', 'all' )

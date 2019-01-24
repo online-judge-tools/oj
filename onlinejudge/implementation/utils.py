@@ -28,6 +28,7 @@ data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
 cache_dir = pathlib.Path(appdirs.user_cache_dir(version.__package_name__))
 html_parser = 'lxml'
 
+
 def percentformat(s: str, table: Dict[str, str]) -> str:
     assert '%' not in table or table['%'] == '%'
     table['%'] = '%'
@@ -40,8 +41,10 @@ def percentformat(s: str, table: Dict[str, str]) -> str:
             result += m.group(0)
     return result
 
+
 def describe_status_code(status_code: int) -> str:
     return '{} {}'.format(status_code, http.client.responses[status_code])
+
 
 def previous_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
     tag = tag.previous_sibling
@@ -49,18 +52,22 @@ def previous_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
         tag = tag.previous_sibling
     return tag
 
+
 def next_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
     tag = tag.next_sibling
     while tag and not isinstance(tag, bs4.Tag):
         tag = tag.next_sibling
     return tag
 
+
 def new_default_session() -> requests.Session:  # without setting cookiejar
     session = requests.Session()
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
     return session
 
+
 default_cookie_path = data_dir / 'cookie.jar'
+
 
 @contextlib.contextmanager
 def with_cookiejar(session: requests.Session, path: pathlib.Path = default_cookie_path) -> Generator[requests.Session, None, None]:
@@ -97,6 +104,7 @@ class SampleZipper(object):
             log.error('dangling sample string: %s', self.dangling[1])
         return self.data
 
+
 class FormSender(object):
     def __init__(self, form: bs4.Tag, url: str):
         assert isinstance(form, bs4.Tag)
@@ -131,8 +139,11 @@ class FormSender(object):
         log.status(describe_status_code(resp.status_code))
         return resp
 
+
 def dos2unix(s: str) -> str:
     return s.replace('\r\n', '\n')
+
+
 def textfile(s: str) -> str:  # should have trailing newline
     if s.endswith('\n'):
         return s
@@ -142,6 +153,8 @@ def textfile(s: str) -> str:  # should have trailing newline
         return s + '\n'
 
 # http://stackoverflow.com/questions/31875/is-there-a-simple-elegant-way-to-define-singletons-in-python/12850496#12850496
+
+
 def singleton(cls):
     instance = cls()
     # Always return the same object
@@ -152,6 +165,7 @@ def singleton(cls):
     except AttributeError:
         pass
     return cls
+
 
 def exec_command(command: List[str], timeout: float = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
     try:
@@ -170,6 +184,8 @@ def exec_command(command: List[str], timeout: float = None, **kwargs) -> Tuple[b
 
 # We should use this instead of posixpath.normpath
 # posixpath.normpath doesn't collapse a leading duplicated slashes. see: https://stackoverflow.com/questions/7816818/why-doesnt-os-normpath-collapse-a-leading-double-slash
+
+
 def normpath(path: str) -> str:
     path = posixpath.normpath(path)
     if path.startswith('//'):
@@ -219,6 +235,7 @@ def get_latest_version_from_pypi() -> str:
         json.dump(cache, fh)
 
     return value
+
 
 def is_update_available_on_pypi() -> bool:
     a = distutils.version.StrictVersion(version.__version__)

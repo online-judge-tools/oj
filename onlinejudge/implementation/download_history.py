@@ -10,6 +10,7 @@ import time
 import traceback
 from typing import *
 
+
 class DownloadHistory(object):
     def __init__(self, path: pathlib.Path = utils.cache_dir / 'download-history.jsonl'):
         self.path = path

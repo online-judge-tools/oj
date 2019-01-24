@@ -232,6 +232,7 @@ class YukicoderService(onlinejudge.type.Service):
             star += '.5'
         return star
 
+
 class YukicoderProblem(onlinejudge.type.Problem):
     def __init__(self, problem_no=None, problem_id=None):
         assert problem_no or problem_id

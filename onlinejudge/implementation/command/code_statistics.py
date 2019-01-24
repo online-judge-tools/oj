@@ -23,6 +23,7 @@ def get_char_class(c: int) -> str:
     else:
         return 'binary'
 
+
 def get_statistics(s: bytes) -> Dict[str, int]:
     stat = {
         'binary': 0,
@@ -33,6 +34,7 @@ def get_statistics(s: bytes) -> Dict[str, int]:
     for c in s:
         stat[get_char_class(c)] += 1
     return stat
+
 
 def code_statistics(args: 'argparse.Namespace') -> None:
     with open(args.file, 'rb') as fh:

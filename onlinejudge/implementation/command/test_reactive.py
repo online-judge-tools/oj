@@ -10,6 +10,7 @@ from typing import *
 if TYPE_CHECKING:
     import argparse
 
+
 @contextlib.contextmanager
 def fifo() -> Generator[Tuple[Any, Any], None, None]:
     fdr, fdw = os.pipe()
@@ -19,6 +20,7 @@ def fifo() -> Generator[Tuple[Any, Any], None, None]:
     fhw.close()
     fhr.close()
     # os.close(fdw), os.close(fdr) are unnecessary
+
 
 def test_reactive(args: 'argparse.Namespace') -> None:
     with fifo() as (fhr1, fhw1):

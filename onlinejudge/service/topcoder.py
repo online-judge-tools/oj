@@ -197,5 +197,6 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         assert header is not None
         return header, rows
 
+
 onlinejudge.dispatch.services += [ TopCoderService ]
 onlinejudge.dispatch.problems += [ TopCoderLongContestProblem ]

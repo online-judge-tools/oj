@@ -8,6 +8,7 @@ from typing import *
 if TYPE_CHECKING:
     import argparse
 
+
 def login(args: 'argparse.Namespace') -> None:
     # get service
     service = onlinejudge.dispatch.service_from_url(args.url)

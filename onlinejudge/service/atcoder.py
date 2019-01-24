@@ -22,6 +22,7 @@ def _request(*args, **kwargs):
     resp.encoding = 'UTF-8'
     return resp
 
+
 @utils.singleton
 class AtCoderService(onlinejudge.type.Service):
 
@@ -294,6 +295,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             self._task_id = int(m.group(1))
         return self._task_id
 
+
 class AtCoderSubmission(onlinejudge.type.Submission):
     def __init__(self, contest_id: str, submission_id: int, problem_id: Optional[str] = None):
         self.contest_id = contest_id
@@ -367,6 +369,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
             log.error('source code not found')
             raise RuntimeError
         return code
+
 
 onlinejudge.dispatch.services += [ AtCoderService ]
 onlinejudge.dispatch.problems += [ AtCoderProblem ]

@@ -13,6 +13,7 @@ from typing import *
 if TYPE_CHECKING:
     import argparse
 
+
 def tokenize(pre: str) -> Generator[List[Dict[str, str]], None, None]:
     for y, line in enumerate(pre.splitlines()):
         # remove mathjax tokens
@@ -39,10 +40,12 @@ def tokenize(pre: str) -> Generator[List[Dict[str, str]], None, None]:
                 tokens += [ { 'kind': 'fixed', 'name': s } ]
         yield tokens
 
+
 def simplify_expr(s: str) -> str:
     transformations = sympy_parser.standard_transformations + ( sympy_parser.implicit_multiplication_application ,)
     local_dict = { 'N': sympy.Symbol('N') }
     return str(sympy_parser.parse_expr(s, local_dict=local_dict, transformations=transformations))
+
 
 def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None, None]:
     env = collections.defaultdict(dict)  # type: Dict[str, Any]
@@ -100,8 +103,10 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
             else:
                 assert False
 
+
 def get_names(targets: List[Dict[str, str]]) -> List[str]:
     return list(map(lambda target: target['name'], targets))
+
 
 def postprocess(it: Any) -> Any:
     def go(it):
@@ -125,12 +130,14 @@ def postprocess(it: Any) -> Any:
     it = go(it)
     return it
 
+
 def paren_if(n: str, lr: Iterable[str]) -> str:
     l, r = lr
     if n:
         return l + n + r
     else:
         return n
+
 
 def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> str:
     def go(it, nest):
@@ -172,6 +179,7 @@ def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> s
     for line in it:
         s += go(line, 0)
     return s
+
 
 def generate_scanner(args: 'argparse.Namespace') -> None:
     if not args.silent:
