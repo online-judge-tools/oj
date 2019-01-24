@@ -10,11 +10,12 @@ import urllib.parse
 import zipfile
 from typing import *
 
+import requests
+
 import onlinejudge.dispatch
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.utils as utils
 import onlinejudge.type
-import requests
 from onlinejudge.type import LabeledString, TestCase
 
 

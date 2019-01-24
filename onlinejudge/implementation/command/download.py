@@ -8,6 +8,7 @@ import sys
 from typing import *
 
 import colorama
+
 import onlinejudge
 import onlinejudge.implementation.download_history
 import onlinejudge.implementation.logging as log

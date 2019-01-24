@@ -6,11 +6,12 @@ from typing import *
 
 import bs4
 import colorama
+import sympy
+import sympy.parsing.sympy_parser as sympy_parser
+
 import onlinejudge
 import onlinejudge.implementation.logging as log
 import onlinejudge.implementation.utils as utils
-import sympy
-import sympy.parsing.sympy_parser as sympy_parser
 
 if TYPE_CHECKING:
     import argparse

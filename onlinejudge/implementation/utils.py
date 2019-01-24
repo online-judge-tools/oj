@@ -17,9 +17,10 @@ from typing.io import *
 
 import appdirs
 import bs4
+import requests
+
 import onlinejudge.__about__ as version
 import onlinejudge.implementation.logging as log
-import requests
 from onlinejudge.type import LabeledString, TestCase
 
 config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
