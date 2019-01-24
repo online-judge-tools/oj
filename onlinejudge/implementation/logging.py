@@ -23,7 +23,7 @@ prefix = {
     'error'        : '[' + Fore.RED     +                'ERROR'    + Style.RESET_ALL + '] ',
     'exception'    : '[' + Fore.RED     +                'ERROR'    + Style.RESET_ALL + '] ',
     'critical'     : '[' + Fore.RED     +                'CRITICAL' + Style.RESET_ALL + '] ',
-}
+}  # yapf: disable
 
 def emit(s: str, *args) -> None:
     logger.info(str(s), *args)

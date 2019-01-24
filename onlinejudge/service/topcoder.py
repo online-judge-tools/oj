@@ -95,12 +95,12 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
 
         # at 2017/09/21
         return {
-                'Java':   { 'value': '1', 'description': 'Java 8' },
-                'C++':    { 'value': '3', 'description': 'C++11' },
-                'C#':     { 'value': '4', 'description': '' },
-                'VB':     { 'value': '5', 'description': '' },
-                'Python': { 'value': '6', 'description': 'Pyhton 2' },
-            }
+            'Java':   {'value': '1', 'description': 'Java 8'},
+            'C++':    {'value': '3', 'description': 'C++11'},
+            'C#':     {'value': '4', 'description': ''},
+            'VB':     {'value': '5', 'description': ''},
+            'Python': {'value': '6', 'description': 'Pyhton 2'},
+        }  # yapf: disable
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
         assert kind in [ 'example', 'full' ]

@@ -313,7 +313,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
              { 'names': [ 'text'                  ], 'exts': [ 'txt'       ] },
              { 'names': [ 'typescript'            ], 'exts': [ 'ts'        ] },
              { 'names': [ 'vim script'            ], 'exts': [ 'vim'       ] },
-        ]  # type: List[Dict[str, Any]]
+        ]  # type: List[Dict[str, Any]]  # yapf: disable
 
         lang_ids = []
         for data in table:
