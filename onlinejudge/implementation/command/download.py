@@ -61,7 +61,7 @@ def download(args: 'argparse.Namespace') -> None:
         log.emit('')
         log.info('sample %d', i)
         for kind in ['input', 'output']:
-            ext = kind[: -3]
+            ext = kind[:-3]
             data = getattr(sample, kind).data
             name = getattr(sample, kind).name
             table = {}

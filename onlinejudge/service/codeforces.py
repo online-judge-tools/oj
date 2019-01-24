@@ -16,7 +16,6 @@ from onlinejudge.type import SubmissionError
 
 @utils.singleton
 class CodeforcesService(onlinejudge.type.Service):
-
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://codeforces.com/enter'

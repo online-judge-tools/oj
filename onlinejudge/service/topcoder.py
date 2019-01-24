@@ -18,7 +18,6 @@ import requests
 
 @utils.singleton
 class TopCoderService(onlinejudge.type.Service):
-
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
 
@@ -141,7 +140,10 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
             'cd': self.cd,
             'compid': self.compid,
             'Action': 'submit',
-            'exOn': {'example': 'true', 'full': 'false'}[kind],
+            'exOn': {
+                'example': 'true',
+                'full': 'false'
+            }[kind],
             'lid': language_id,
             'code': code,
         }

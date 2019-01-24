@@ -38,5 +38,6 @@ def login(args: 'argparse.Namespace') -> None:
         if args.password is None:
             args.password = getpass.getpass()
         return args.username, args.password
+
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         service.login(get_credentials, session=sess, **kwargs)  # type: ignore

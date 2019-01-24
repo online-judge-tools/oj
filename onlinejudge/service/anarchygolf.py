@@ -13,7 +13,6 @@ import requests
 
 @utils.singleton
 class AnarchyGolfService(onlinejudge.type.Service):
-
     def get_url(self) -> str:
         return 'http://golf.shinh.org/'
 
@@ -53,7 +52,7 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         assert tag.name == 'h2'
         name = tag.contents[0]
         if ':' in name:
-            name = name[:  name.find(':')]
+            name = name[:name.find(':')]
         if name in ['Sample input', 'Sample output']:
             nxt = tag.next_sibling
             while nxt and nxt.string.strip() == '':

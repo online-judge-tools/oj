@@ -23,6 +23,7 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
             return y
         except ValueError:
             return x
+
     xs = list(map(f, xs_.split()))
     ys = list(map(f, ys_.split()))
     if len(xs) != len(ys):
@@ -47,6 +48,7 @@ def test(args: 'argparse.Namespace') -> None:
     if args.error:  # float mode
         match = lambda a, b: compare_as_floats(a, b, args.error)
     else:
+
         def match(a, b):
             if a == b:
                 return True
@@ -54,6 +56,7 @@ def test(args: 'argparse.Namespace') -> None:
                 log.warning('WA if no rstrip')
                 return True
             return False
+
     rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
     slowest = -1  # type: Union[int, float]
     slowest_name = ''
@@ -111,7 +114,7 @@ def test(args: 'argparse.Namespace') -> None:
                         log.emit('expected:\n%s', log.bold(correct))
                     result = 'WA'
             elif args.mode == 'line':
-                answer_words = answer .splitlines()
+                answer_words = answer.splitlines()
                 correct_words = correct.splitlines()
                 for i, (x, y) in enumerate(zip(answer_words + [None] * len(correct_words), correct_words + [None] * len(answer_words))):  # type: ignore
                     if x is None and y is None:

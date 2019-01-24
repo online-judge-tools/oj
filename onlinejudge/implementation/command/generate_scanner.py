@@ -44,7 +44,7 @@ def tokenize(pre: str) -> Generator[List[Dict[str, str]], None, None]:
 
 
 def simplify_expr(s: str) -> str:
-    transformations = sympy_parser.standard_transformations + (sympy_parser.implicit_multiplication_application,)
+    transformations = sympy_parser.standard_transformations + (sympy_parser.implicit_multiplication_application, )
     local_dict = {'N': sympy.Symbol('N')}
     return str(sympy_parser.parse_expr(s, local_dict=local_dict, transformations=transformations))
 
@@ -97,7 +97,7 @@ def parse(tokens: List[List[Dict[str, Any]]]) -> Generator[Dict[str, Any], None,
                     body = []  # type: List[Dict[str, Any]]
                     for name in names:
                         assert env[name]['n'] == n
-                        yield {'kind': 'decl-vector',  'targets': [{'name': name, 'length': n}]}
+                        yield {'kind': 'decl-vector', 'targets': [{'name': name, 'length': n}]}
                         body += [{'kind': 'read-indexed', 'targets': [{'name': name, 'index': 0}]}]
                     yield {'kind': 'loop', 'length': n, 'body': body}
                 else:
@@ -129,6 +129,7 @@ def postprocess(it: Any) -> Any:
                 it[i]['body'] = go(it[i]['body'])
             i += 1
         return it
+
     it = go(it)
     return it
 
@@ -153,14 +154,14 @@ def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> s
             if it['kind'] == 'read':
                 items = it['names']
             elif it['kind'] == 'read-indexed':
-                items = list(map(lambda x: x['name'] + '[' + 'ijk'[nest - x['index'] - 1] + ']', it['targets']))
+                items = list(map(lambda x: x['name'] + '[' + 'ijk' [nest - x['index'] - 1] + ']', it['targets']))
             if use_scanf:
                 return 'scanf("{}", {});\n'.format('%d' * len(items), ', '.join(map(lambda s: '&' + s, items)))
             else:
                 return 'cin >> {};\n'.format(' >> '.join(items))
         elif it['kind'] == 'loop':
             s = ''
-            i = 'ijk'[nest]
+            i = 'ijk' [nest]
             if repeat_macro is None:
                 s += 'for (int {} = 0; {} < {}; ++ {}) '.format(i, i, it['length'], i)
             else:
@@ -177,6 +178,7 @@ def export(it, repeat_macro: Optional[str] = None, use_scanf: bool = False) -> s
             return s
         else:
             assert False
+
     s = ''
     for line in it:
         s += go(line, 0)

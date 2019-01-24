@@ -60,8 +60,8 @@ def submit(args: 'argparse.Namespace') -> None:
     if len(lines) < 30:
         log.emit(log.bold(s))
     else:
-        log.emit(log.bold(''.join(lines[: 10])))
-        log.emit('... (%s lines) ...', len(lines[10: -10]))
+        log.emit(log.bold(''.join(lines[:10])))
+        log.emit('... (%s lines) ...', len(lines[10:-10]))
         log.emit(log.bold(''.join(lines[-10:])))
 
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
@@ -121,7 +121,7 @@ def submit(args: 'argparse.Namespace') -> None:
         if not args.yes:
             if guessed_unmatch:
                 problem_id = problem.get_url().rstrip('/').split('/')[-1].split('?')[-1]  # this is too ad-hoc
-                key = problem_id[: 3] + (problem_id[-1] if len(problem_id) >= 4 else '')
+                key = problem_id[:3] + (problem_id[-1] if len(problem_id) >= 4 else '')
                 sys.stdout.write('Are you sure? Please type "{}" '.format(key))
                 sys.stdout.flush()
                 c = sys.stdin.readline().rstrip()
@@ -265,7 +265,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                 if code.startswith(b'#!'):
                     s = lines[0]  # use shebang
                 else:
-                    s = b'\n'.join(lines[: 10] + lines[-5:])  # use modelines
+                    s = b'\n'.join(lines[:10] + lines[-5:])  # use modelines
                 versions = []
                 for version in (2, 3):
                     if re.search(r'python *(version:? *)?%d'.encode() % version, s.lower()):
@@ -323,7 +323,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         for data in table:
             if ext in data['exts']:
                 for name in data['names']:
-                        lang_ids += select(name, language_dict.keys(), split=data.get('split', False))
+                    lang_ids += select(name, language_dict.keys(), split=data.get('split', False))
         return list(set(lang_ids))
 
 

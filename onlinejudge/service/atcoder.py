@@ -26,7 +26,6 @@ def _request(*args, **kwargs):
 
 @utils.singleton
 class AtCoderService(onlinejudge.type.Service):
-
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://practice.contest.atcoder.jp/login'

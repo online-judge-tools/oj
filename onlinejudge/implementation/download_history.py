@@ -34,7 +34,7 @@ class DownloadHistory(object):
             with open(str(self.path)) as fh:
                 history_lines = fh.readlines()
             with open(str(self.path), 'w') as fh:
-                fh.write(''.join(history_lines[: - len(history_lines) // 2]))
+                fh.write(''.join(history_lines[:-len(history_lines) // 2]))
             log.status('halve history at: %s', self.path)
 
     def get(self, directory: pathlib.Path = pathlib.Path.cwd()) -> List[str]:

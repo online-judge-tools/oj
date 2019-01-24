@@ -20,7 +20,6 @@ from onlinejudge.type import LabeledString, TestCase
 
 @utils.singleton
 class AOJService(onlinejudge.type.Service):
-
     def get_url(self):
         return 'http://judge.u-aizu.ac.jp/onlinejudge/'
 
@@ -53,7 +52,7 @@ class AOJProblem(onlinejudge.type.Problem):
             samples += [TestCase(
                 LabeledString(str(sample['serial']), sample['in']),
                 LabeledString(str(sample['serial']), sample['out']),
-                )]
+            )]
         return samples
 
     def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
@@ -81,9 +80,9 @@ class AOJProblem(onlinejudge.type.Problem):
                 log.warning("skipped due to the limitation of AOJ API")
                 continue
             testcases += [TestCase(
-                LabeledString(header['name'],  testcase['in']),
+                LabeledString(header['name'], testcase['in']),
                 LabeledString(header['name'], testcase['out']),
-                )]
+            )]
         return testcases
 
     def get_url(self) -> str:

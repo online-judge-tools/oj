@@ -21,7 +21,6 @@ from onlinejudge.type import LabeledString, TestCase
 
 @utils.singleton
 class YukicoderService(onlinejudge.type.Service):
-
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
         if method == 'github':
             return self.login_with_github(get_credentials, session=session)
@@ -189,7 +188,15 @@ class YukicoderService(onlinejudge.type.Service):
         if comp_problem:  # 未完成問題は(ログインしてても)デフォルトで除外
             url += '&comp_problem=on'
         if sort is not None:
-            assert sort in ('no_asc', 'level_asc', 'level_desc', 'solved_asc', 'solved_desc', 'fav_asc', 'fav_desc', )
+            assert sort in (
+                'no_asc',
+                'level_asc',
+                'level_desc',
+                'solved_asc',
+                'solved_desc',
+                'fav_asc',
+                'fav_desc',
+            )
             url += '&sort=' + sort
         columns, rows = self._get_and_parse_the_table(url, session=session)
         assert columns == ['ナンバー', '問題名', 'レベル', 'タグ', '作問者', '解いた人数', 'Fav']

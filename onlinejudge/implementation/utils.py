@@ -151,6 +151,7 @@ def textfile(s: str) -> str:  # should have trailing newline
     else:
         return s + '\n'
 
+
 # http://stackoverflow.com/questions/31875/is-there-a-simple-elegant-way-to-define-singletons-in-python/12850496#12850496
 
 
@@ -180,6 +181,7 @@ def exec_command(command: List[str], timeout: float = None, **kwargs) -> Tuple[b
     except subprocess.TimeoutExpired:
         answer = b''
     return answer, proc
+
 
 # We should use this instead of posixpath.normpath
 # posixpath.normpath doesn't collapse a leading duplicated slashes. see: https://stackoverflow.com/questions/7816818/why-doesnt-os-normpath-collapse-a-leading-double-slash
