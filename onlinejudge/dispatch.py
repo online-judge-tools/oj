@@ -1,10 +1,14 @@
 # Python Version: 3.x
+from typing import TYPE_CHECKING, List, Optional, Type
+
 import onlinejudge.implementation.logging as log
-from typing import List, Optional, Type, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onlinejudge.type import Service, Problem, Submission
 
 submissions = []  # type: List[Type['Submission']]
+
+
 def submission_from_url(s: str) -> Optional['Submission']:
     for cls in submissions:
         submission = cls.from_url(s)
@@ -14,7 +18,10 @@ def submission_from_url(s: str) -> Optional['Submission']:
     log.failure('unknown submission: %s', s)
     return None
 
+
 problems = []  # type: List[Type['Problem']]
+
+
 def problem_from_url(s: str) -> Optional['Problem']:
     for cls in problems:
         problem = cls.from_url(s)
@@ -27,7 +34,10 @@ def problem_from_url(s: str) -> Optional['Problem']:
     log.failure('unknown problem: %s', s)
     return None
 
+
 services = []  # type: List[Type['Service']]
+
+
 def service_from_url(s: str) -> Optional['Service']:
     for cls in services:
         service = cls.from_url(s)

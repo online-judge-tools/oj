@@ -1,15 +1,18 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.format_utils as cutils
 import json
 import math
 import sys
 import time
 from typing import *
+
+import onlinejudge
+import onlinejudge.implementation.format_utils as cutils
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 if TYPE_CHECKING:
     import argparse
+
 
 def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
     def f(x):
@@ -20,6 +23,7 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
             return y
         except ValueError:
             return x
+
     xs = list(map(f, xs_.split()))
     ys = list(map(f, ys_.split()))
     if len(xs) != len(ys):
@@ -33,6 +37,7 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
                 return False
     return True
 
+
 def test(args: 'argparse.Namespace') -> None:
     # prepare
     if not args.test:
@@ -40,9 +45,10 @@ def test(args: 'argparse.Namespace') -> None:
     if args.ignore_backup:
         args.test = cutils.drop_backup_or_hidden_files(args.test)
     tests = cutils.construct_relationship_of_files(args.test, args.directory, args.format)
-    if args.error: # float mode
+    if args.error:  # float mode
         match = lambda a, b: compare_as_floats(a, b, args.error)
     else:
+
         def match(a, b):
             if a == b:
                 return True
@@ -50,6 +56,7 @@ def test(args: 'argparse.Namespace') -> None:
                 log.warning('WA if no rstrip')
                 return True
             return False
+
     rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
     slowest = -1  # type: Union[int, float]
     slowest_name = ''
@@ -58,6 +65,7 @@ def test(args: 'argparse.Namespace') -> None:
     history = []  # type: List[Dict[str, Any]]
     for name, it in sorted(tests.items()):
         is_printed_input = not args.print_input
+
         def print_input():
             nonlocal is_printed_input
             if not is_printed_input:
@@ -106,9 +114,9 @@ def test(args: 'argparse.Namespace') -> None:
                         log.emit('expected:\n%s', log.bold(correct))
                     result = 'WA'
             elif args.mode == 'line':
-                answer_words  = answer .splitlines()
+                answer_words = answer.splitlines()
                 correct_words = correct.splitlines()
-                for i, (x, y) in enumerate(zip(answer_words + [ None ] * len(correct_words), correct_words + [ None ] * len(answer_words))):  # type: ignore
+                for i, (x, y) in enumerate(zip(answer_words + [None] * len(correct_words), correct_words + [None] * len(answer_words))):  # type: ignore
                     if x is None and y is None:
                         break
                     elif x is None:
@@ -139,13 +147,13 @@ def test(args: 'argparse.Namespace') -> None:
         }
         if 'out' in it:
             testcase['output'] = str(it['out'].resolve())
-        history += [ {
+        history += [{
             'result': result,
             'testcase': testcase,
             'output': answer,
             'exitcode': proc.returncode,
             'elapsed': elapsed,
-        } ]
+        }]
 
     # summarize
     log.emit('')

@@ -1,14 +1,17 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
 import contextlib
 import os
 import subprocess
 import sys
 from typing import *
+
+import onlinejudge
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 if TYPE_CHECKING:
     import argparse
+
 
 @contextlib.contextmanager
 def fifo() -> Generator[Tuple[Any, Any], None, None]:
@@ -19,6 +22,7 @@ def fifo() -> Generator[Tuple[Any, Any], None, None]:
     fhw.close()
     fhr.close()
     # os.close(fdw), os.close(fdr) are unnecessary
+
 
 def test_reactive(args: 'argparse.Namespace') -> None:
     with fifo() as (fhr1, fhw1):

@@ -1,21 +1,22 @@
 # Python Version: 3.x
+import posixpath
+import re
+import string
+import urllib.parse
+from typing import *
+
+import bs4
+import requests
+
+import onlinejudge.dispatch
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
 import onlinejudge.type
 from onlinejudge.type import SubmissionError
-import onlinejudge.dispatch
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import requests
-import re
-import urllib.parse
-import posixpath
-import bs4
-import string
-from typing import *
 
 
 @utils.singleton
 class CodeforcesService(onlinejudge.type.Service):
-
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
         url = 'https://codeforces.com/enter'
@@ -65,7 +66,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
         assert index in string.ascii_uppercase
-        assert kind in ( None, 'contest', 'gym', 'problemset' )
+        assert kind in (None, 'contest', 'gym', 'problemset')
         self.contest_id = contest_id
         self.index = index
         if kind is None:
@@ -104,13 +105,13 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        select = soup.find('select', attrs={ 'name': 'programTypeId' })
+        select = soup.find('select', attrs={'name': 'programTypeId'})
         if select is None:
             log.error('not logged in')
             return {}
         language_dict = {}
         for option in select.findAll('option'):
-            language_dict[option.attrs['value']] = { 'description': option.string }
+            language_dict[option.attrs['value']] = {'description': option.string}
         return language_dict
 
     def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> onlinejudge.type.Submission:  # or SubmissionError
@@ -146,9 +147,9 @@ class CodeforcesProblem(onlinejudge.type.Problem):
 
     def get_url(self) -> str:
         table = {}
-        table['contest']    = 'https://codeforces.com/contest/{}/problem/{}'
+        table['contest'] = 'https://codeforces.com/contest/{}/problem/{}'
         table['problemset'] = 'https://codeforces.com/problemset/problem/{}/{}'
-        table['gym']        = 'https://codeforces.com/gym/{}/problem/{}'
+        table['gym'] = 'https://codeforces.com/gym/{}/problem/{}'
         return table[self.kind].format(self.contest_id, self.index)
 
     def get_service(self) -> CodeforcesService:
@@ -160,9 +161,9 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'codeforces.com':
             table = {}
-            table['contest']    = r'^/contest/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/contest/538/problem/H
+            table['contest'] = r'^/contest/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/contest/538/problem/H
             table['problemset'] = r'^/problemset/problem/([0-9]+)/([0A-Za-z])$'  # example: https://codeforces.com/problemset/problem/700/B
-            table['gym']        = r'^/gym/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/gym/101021/problem/A
+            table['gym'] = r'^/gym/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/gym/101021/problem/A
             normalize = (lambda c: c == '0' and 'A' or c.upper())
             for kind, expr in table.items():
                 m = re.match(expr, utils.normpath(result.path))
@@ -171,5 +172,5 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         return None
 
 
-onlinejudge.dispatch.services += [ CodeforcesService ]
-onlinejudge.dispatch.problems += [ CodeforcesProblem ]
+onlinejudge.dispatch.services += [CodeforcesService]
+onlinejudge.dispatch.problems += [CodeforcesProblem]

@@ -1,8 +1,4 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.download_history
 import pathlib
 import re
 import shutil
@@ -10,10 +6,17 @@ import subprocess
 import sys
 import time
 from typing import *
+
+import onlinejudge
+import onlinejudge.implementation.download_history
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 if TYPE_CHECKING:
     import argparse
 
-default_url_opener = [ 'sensible-browser', 'xdg-open', 'open' ]
+default_url_opener = ['sensible-browser', 'xdg-open', 'open']
+
 
 def submit(args: 'argparse.Namespace') -> None:
     # guess url
@@ -51,23 +54,22 @@ def submit(args: 'argparse.Namespace') -> None:
         s = code.decode()
     except UnicodeDecodeError as e:
         log.failure('%s: %s', e.__class__.__name__, str(e))
-        s = repr(code)[ 1 : ]
+        s = repr(code)[1:]
     log.info('code (%d byte):', len(code))
     lines = s.splitlines(keepends=True)
     if len(lines) < 30:
         log.emit(log.bold(s))
     else:
-        log.emit(log.bold(''.join(lines[: 10])))
-        log.emit('... (%s lines) ...', len(lines[10 : -10]))
-        log.emit(log.bold(''.join(lines[-10 :])))
-
+        log.emit(log.bold(''.join(lines[:10])))
+        log.emit('... (%s lines) ...', len(lines[10:-10]))
+        log.emit(log.bold(''.join(lines[-10:])))
 
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # guess or select language ids
         langs = problem.get_language_dict(session=sess)
         matched_lang_ids = None  # type: Optional[List[str]]
         if args.language in langs:
-            matched_lang_ids = [ args.language ]
+            matched_lang_ids = [args.language]
         else:
             if args.guess:
                 kwargs = {
@@ -109,7 +111,7 @@ def submit(args: 'argparse.Namespace') -> None:
             sys.exit(1)
 
         # confirm
-        guessed_unmatch = ([ problem.get_url() ] != guessed_urls)
+        guessed_unmatch = ([problem.get_url()] != guessed_urls)
         if guessed_unmatch:
             samples_text = ('samples of "{}'.format('", "'.join(guessed_urls)) if guessed_urls else 'no samples')
             log.warning('the problem "%s" is specified to submit, but %s were downloaded in this directory. this may be mis-operation', problem.get_url(), samples_text)
@@ -119,7 +121,7 @@ def submit(args: 'argparse.Namespace') -> None:
         if not args.yes:
             if guessed_unmatch:
                 problem_id = problem.get_url().rstrip('/').split('/')[-1].split('?')[-1]  # this is too ad-hoc
-                key = problem_id[: 3] + (problem_id[-1] if len(problem_id) >= 4 else '')
+                key = problem_id[:3] + (problem_id[-1] if len(problem_id) >= 4 else '')
                 sys.stdout.write('Are you sure? Please type "{}" '.format(key))
                 sys.stdout.flush()
                 c = sys.stdin.readline().rstrip()
@@ -160,7 +162,8 @@ def submit(args: 'argparse.Namespace') -> None:
                     log.failure('couldn\'t find browsers to open the url. please specify a browser')
             if browser:
                 log.status('open the submission page with: %s', browser)
-                subprocess.check_call([ browser, submission.get_url() ], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                subprocess.check_call([browser, submission.get_url()], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+
 
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
     result = []
@@ -168,27 +171,28 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
         desc = language_dict[lang_id]['description'].lower()
         if split:
             desc = desc.split()
-        pred = all([ word.lower() in desc for word in words ])
+        pred = all([word.lower() in desc for word in words])
         if remove:
             pred = not pred
         if pred:
             result.append(lang_id)
     return result
 
+
 def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
-    assert cxx_compiler.lower() in ( 'gcc', 'clang', 'all' )
-    assert python_version.lower() in ( '2', '3', 'auto', 'all' )
-    assert python_interpreter.lower() in ( 'cpython', 'pypy', 'all' )
+    assert cxx_compiler.lower() in ('gcc', 'clang', 'all')
+    assert python_version.lower() in ('2', '3', 'auto', 'all')
+    assert python_interpreter.lower() in ('cpython', 'pypy', 'all')
 
     select_words = (lambda words, lang_ids, **kwargs: select_ids_of_matched_languages(words, lang_ids, language_dict=language_dict, **kwargs))
-    select = (lambda word, lang_ids, **kwargs: select_words([ word ], lang_ids, **kwargs))
+    select = (lambda word, lang_ids, **kwargs: select_words([word], lang_ids, **kwargs))
     ext = filename.suffix
     lang_ids = language_dict.keys()
 
     log.debug('file extension: %s', ext)
     ext = ext.lstrip('.')
 
-    if ext in ( 'cpp', 'cxx', 'cc', 'C' ):
+    if ext in ('cpp', 'cxx', 'cc', 'C'):
         log.debug('language guessing: C++')
         # memo: https://stackoverflow.com/questions/1545080/c-code-file-extension-cc-vs-cpp
         lang_ids = list(set(select('c++', lang_ids) + select('g++', lang_ids)))
@@ -214,7 +218,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         if cxx_latest:
             saved_ids = lang_ids
             lang_ids = []
-            for compiler in ( None, 'gcc', 'clang' ):  # use the latest for each compiler
+            for compiler in (None, 'gcc', 'clang'):  # use the latest for each compiler
                 version_of = {}
                 if compiler == 'gcc':
                     ids = select_gcc(saved_ids)
@@ -229,7 +233,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                     if m:
                         version_of[lang_id] = m.group(0)
                 ids.sort(key=lambda lang_id: version_of.get(lang_id, ''))
-                lang_ids += [ ids[-1] ]  # since C++11 < C++1y < ... as strings
+                lang_ids += [ids[-1]]  # since C++11 < C++1y < ... as strings
             lang_ids = list(set(lang_ids))
         log.debug('lang ids after version filter: %s', lang_ids)
 
@@ -243,38 +247,38 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
 
         # interpreter
         lang_ids = []
-        if python_interpreter.lower() in ( 'cpython', 'all' ):
+        if python_interpreter.lower() in ('cpython', 'all'):
             lang_ids += select('python', language_dict.keys())
-        elif python_interpreter.lower() in ( 'pypy', 'all' ) or not lang_ids:
+        elif python_interpreter.lower() in ('pypy', 'all') or not lang_ids:
             lang_ids += select('pypy', language_dict.keys())
 
         # version
-        if select_words([ 'python', '2' ], lang_ids) and select_words([ 'python', '3' ], lang_ids):
+        if select_words(['python', '2'], lang_ids) and select_words(['python', '3'], lang_ids):
             log.status('both Python2 and Python3 are available for version of Python')
-            if python_version in ( '2', '3' ):
-                versions = [ int(python_version) ]
+            if python_version in ('2', '3'):
+                versions = [int(python_version)]
             elif python_version == 'all':
-                versions = [ 2, 3 ]
+                versions = [2, 3]
             else:
                 assert python_version == 'auto'
                 lines = code.splitlines()
                 if code.startswith(b'#!'):
                     s = lines[0]  # use shebang
                 else:
-                    s = b'\n'.join(lines[: 10] + lines[-5 :])  # use modelines
+                    s = b'\n'.join(lines[:10] + lines[-5:])  # use modelines
                 versions = []
-                for version in ( 2, 3 ):
+                for version in (2, 3):
                     if re.search(r'python *(version:? *)?%d'.encode() % version, s.lower()):
-                        versions += [ version ]
+                        versions += [version]
                 if not versions:
                     log.status('no version info in code')
-                    versions = [ 2, 3 ]
+                    versions = [2, 3]
             log.status('use: %s', ', '.join(map(str, versions)))
 
             saved_ids = lang_ids
             lang_ids = []
             for version in versions:
-                lang_ids += select('python%d'  % version, saved_ids)
+                lang_ids += select('python%d' % version, saved_ids)
                 lang_ids += select('python %d' % version, saved_ids)
 
         lang_ids = list(set(lang_ids))
@@ -313,13 +317,13 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
              { 'names': [ 'text'                  ], 'exts': [ 'txt'       ] },
              { 'names': [ 'typescript'            ], 'exts': [ 'ts'        ] },
              { 'names': [ 'vim script'            ], 'exts': [ 'vim'       ] },
-        ]  # type: List[Dict[str, Any]]
+        ]  # type: List[Dict[str, Any]]  # yapf: disable
 
         lang_ids = []
         for data in table:
             if ext in data['exts']:
                 for name in data['names']:
-                        lang_ids += select(name, language_dict.keys(), split=data.get('split', False))
+                    lang_ids += select(name, language_dict.keys(), split=data.get('split', False))
         return list(set(lang_ids))
 
 

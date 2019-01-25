@@ -1,13 +1,15 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import string
+import contextlib
 import os
 import os.path
+import string
 import subprocess
-import contextlib
 from typing import *
+
+import onlinejudge
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 if TYPE_CHECKING:
     import argparse
 
@@ -23,6 +25,7 @@ def get_char_class(c: int) -> str:
     else:
         return 'binary'
 
+
 def get_statistics(s: bytes) -> Dict[str, int]:
     stat = {
         'binary': 0,
@@ -34,10 +37,11 @@ def get_statistics(s: bytes) -> Dict[str, int]:
         stat[get_char_class(c)] += 1
     return stat
 
+
 def code_statistics(args: 'argparse.Namespace') -> None:
     with open(args.file, 'rb') as fh:
         code = fh.read()
     stat = get_statistics(code)
     stat['size'] = len(code)
-    for key in ( 'size', 'binary', 'alnum', 'symbol', 'whitespace' ):
+    for key in ('size', 'binary', 'alnum', 'symbol', 'whitespace'):
         log.info('%s = %d', key, stat[key])

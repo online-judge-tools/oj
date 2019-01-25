@@ -1,12 +1,15 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import sys
 import getpass
+import sys
 from typing import *
+
+import onlinejudge
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 if TYPE_CHECKING:
     import argparse
+
 
 def login(args: 'argparse.Namespace') -> None:
     # get service
@@ -19,7 +22,7 @@ def login(args: 'argparse.Namespace') -> None:
     if service.get_name() == 'yukicoder':
         if not args.method:
             args.method = 'github'
-        if args.method not in [ 'github', 'twitter' ]:
+        if args.method not in ['github', 'twitter']:
             log.failure('login for yukicoder: invalid option: --method %s', args.method)
             sys.exit(1)
         kwargs['method'] = args.method
@@ -35,5 +38,6 @@ def login(args: 'argparse.Namespace') -> None:
         if args.password is None:
             args.password = getpass.getpass()
         return args.username, args.password
+
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         service.login(get_credentials, session=sess, **kwargs)  # type: ignore

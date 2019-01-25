@@ -1,10 +1,4 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.type
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.download_history
-import colorama
 import datetime
 import json
 import os
@@ -12,8 +6,18 @@ import pathlib
 import random
 import sys
 from typing import *
+
+import colorama
+
+import onlinejudge
+import onlinejudge.implementation.download_history
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
+
 if TYPE_CHECKING:
     import argparse
+
 
 def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> dict:
     data = {}
@@ -22,6 +26,7 @@ def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> dict:
     if sample.input.name == sample.output.name:
         data["name"] = sample.input.name
     return data
+
 
 def download(args: 'argparse.Namespace') -> None:
     # prepare values
@@ -56,12 +61,12 @@ def download(args: 'argparse.Namespace') -> None:
     for i, sample in enumerate(samples):
         log.emit('')
         log.info('sample %d', i)
-        for kind in [ 'input', 'output' ]:
-            ext = kind[: -3]
+        for kind in ['input', 'output']:
+            ext = kind[:-3]
             data = getattr(sample, kind).data
             name = getattr(sample, kind).name
             table = {}
-            table['i'] = str(i+1)
+            table['i'] = str(i + 1)
             table['e'] = ext
             table['n'] = name
             table['b'] = os.path.basename(name)

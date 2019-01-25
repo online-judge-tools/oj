@@ -1,18 +1,19 @@
 # Python Version: 3.x
-import onlinejudge.type
-import onlinejudge.dispatch
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import urllib.parse
 import posixpath
+import urllib.parse
+from typing import *
+
 import bs4
 import requests
-from typing import *
+
+import onlinejudge.dispatch
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+import onlinejudge.type
 
 
 @utils.singleton
 class AnarchyGolfService(onlinejudge.type.Service):
-
     def get_url(self) -> str:
         return 'http://golf.shinh.org/'
 
@@ -52,8 +53,8 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         assert tag.name == 'h2'
         name = tag.contents[0]
         if ':' in name:
-            name = name[:  name.find(':') ]
-        if name in [ 'Sample input', 'Sample output' ]:
+            name = name[:name.find(':')]
+        if name in ['Sample input', 'Sample output']:
             nxt = tag.next_sibling
             while nxt and nxt.string.strip() == '':
                 nxt = nxt.next_sibling
@@ -82,5 +83,5 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         return None
 
 
-onlinejudge.dispatch.services += [ AnarchyGolfService ]
-onlinejudge.dispatch.problems += [ AnarchyGolfProblem ]
+onlinejudge.dispatch.services += [AnarchyGolfService]
+onlinejudge.dispatch.problems += [AnarchyGolfProblem]

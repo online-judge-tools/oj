@@ -1,14 +1,17 @@
 # Python Version: 3.x
-import onlinejudge
-import onlinejudge.implementation.utils as utils
-import onlinejudge.implementation.logging as log
-import sys
 import subprocess
+import sys
 import time
 from typing import *
 from typing.io import *
+
+import onlinejudge
+import onlinejudge.implementation.logging as log
+import onlinejudge.implementation.utils as utils
+
 if TYPE_CHECKING:
     import argparse
+
 
 def non_block_read(fh: IO[Any]) -> str:
     # workaround
@@ -22,7 +25,9 @@ def non_block_read(fh: IO[Any]) -> str:
     except:
         return ''
 
+
 split_input_auto_footer = ('__AUTO_FOOTER__', )  # this shouldn't be a string, so a tuple
+
 
 def split_input(args: 'argparse.Namespace') -> None:
     with open(args.input) as fh:
@@ -40,9 +45,9 @@ def split_input(args: 'argparse.Namespace') -> None:
             proc.stdin.write(line.encode())
             proc.stdin.flush()
             time.sleep(args.time)
-            if non_block_read(proc.stdout): # if output exists
+            if non_block_read(proc.stdout):  # if output exists
                 index += 1
-                path = utils.percentformat(args.output, { 'i': str(index) })
+                path = utils.percentformat(args.output, {'i': str(index)})
                 log.info('case found: %d', index)
                 if args.header:
                     if args.header == args.header.strip():
@@ -55,5 +60,5 @@ def split_input(args: 'argparse.Namespace') -> None:
                     fh.write(acc)
                 log.success('saved to: %s', path)
                 acc = ''
-                while non_block_read(proc.stdout): # consume all
+                while non_block_read(proc.stdout):  # consume all
                     pass
