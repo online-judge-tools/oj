@@ -5,7 +5,6 @@ from onlinejudge.service.yukicoder import YukicoderService
 
 
 class YukicoderTest(unittest.TestCase):
-
     def test_get_user_10(self):
         data = YukicoderService().get_user(id=10)
         self.assertIn('Id', data)
@@ -66,7 +65,10 @@ class YukicoderTest(unittest.TestCase):
 
     def test_get_user_favorite_wiki_10(self):
         data = YukicoderService().get_user_favorite_wiki(id=10)
-        it = list(filter(lambda row: row['Wikiページ'] == 'decomposable_searching_problem', data))
+        it = list(
+            filter(
+                lambda row: row['Wikiページ'] == 'decomposable_searching_problem',
+                data))
         self.assertEqual(len(it), 1)
 
     def test_get_submissions(self):
