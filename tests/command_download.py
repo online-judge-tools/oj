@@ -26,9 +26,9 @@ def snippet_call_download(self, url, files, is_system=False, type='files'):
 
     ojtools = os.path.abspath('oj')
     with tests.utils.sandbox([]):
-        cmd = [ ojtools, 'download', url ]
+        cmd = [ojtools, 'download', url]
         if is_system:
-            cmd += [ '--system' ]
+            cmd += ['--system']
         subprocess.check_call(cmd, stdout=sys.stdout, stderr=sys.stderr)
         result = {}
         if os.path.exists('test'):

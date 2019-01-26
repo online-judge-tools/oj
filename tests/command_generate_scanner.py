@@ -12,7 +12,7 @@ class GenerateScannerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cwd = os.getcwd()
-        cls.ojtools = os.path.join( cwd, 'oj' )
+        cls.ojtools = os.path.join(cwd, 'oj')
 
         # loggin
         log_level = log.logging.INFO
@@ -22,7 +22,7 @@ class GenerateScannerTest(unittest.TestCase):
         log.addHandler(handler)
 
     def call_generate_scanner(self, url, expected, options=[]):
-        cmd = [ self.ojtools, '-v', 'generate-scanner', url ] + options
+        cmd = [self.ojtools, '-v', 'generate-scanner', url] + options
         output = subprocess.check_output(cmd, stderr=sys.stderr).decode()
         log.status('result:\n%s', output)
         if expected != output:
@@ -38,7 +38,7 @@ class GenerateScannerTest(unittest.TestCase):
         self.call_generate_scanner(
             url='https://yukicoder.me/problems/no/2',
             expected='int N; scanf("%d", &N);\n',
-            options=[ '--scanf' ]
+            options=['--scanf']
             )
 
     def test_call_generate_scanner_yukicoder_vector(self):
@@ -55,7 +55,7 @@ class GenerateScannerTest(unittest.TestCase):
                 'int N; scanf("%d", &N);\n',
                 'vector<int> W(N); REP (i, N) scanf("%d", &W[i]);\n',
                 ]),
-            options=[ '--scanf', '--repeat-macro', 'REP' ]
+            options=['--scanf', '--repeat-macro', 'REP']
             )
 
     def test_call_generate_scanner_yukicoder_vars(self):
@@ -72,7 +72,7 @@ class GenerateScannerTest(unittest.TestCase):
                 'int W, H, N; scanf("%d%d%d", &W, &H, &N);\n',
                 'vector<int> S(N), K(N); repeat (i, N) scanf("%d%d", &S[i], &K[i]);\n',
                 ]),
-            options=[ '--scanf', '--repeat-macro', 'repeat' ]
+            options=['--scanf', '--repeat-macro', 'repeat']
             )
 
     def test_call_generate_scanner_yukicoder_others(self):
@@ -85,7 +85,7 @@ class GenerateScannerTest(unittest.TestCase):
                 'vector<int> Y(V); REP (i, V) cin >> Y[i];\n',
                 'vector<int> M(V); REP (i, V) cin >> M[i];\n',
                 ]),
-            options=[ '--repeat-macro', 'REP' ],
+            options=['--repeat-macro', 'REP'],
             )
         self.call_generate_scanner(
             url='https://yukicoder.me/problems/no/12',
@@ -93,7 +93,7 @@ class GenerateScannerTest(unittest.TestCase):
                 'int N; cin >> N;\n',
                 'vector<int> A(N); REP (i, N) cin >> A[i];\n',
                 ]),
-            options=[ '--repeat-macro', 'REP' ],
+            options=['--repeat-macro', 'REP'],
             )
 
     def test_call_generate_scanner_atcoder_others(self):
@@ -107,7 +107,7 @@ class GenerateScannerTest(unittest.TestCase):
                 'int N; cin >> N;\n',
                 'vector<int> A(N); REP (i, N) cin >> A[i];\n',
                 ]),
-            options=[ '--repeat-macro', 'REP' ],
+            options=['--repeat-macro', 'REP'],
             )
 
 

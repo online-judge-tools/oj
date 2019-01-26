@@ -7,7 +7,7 @@ import tests.utils
 class TestTest(unittest.TestCase):
 
     def snippet_call_test(self, args, files, expected):
-        result = tests.utils.run_in_sandbox(args=[ '-v', 'test', '--json' ] + args, files=files)
+        result = tests.utils.run_in_sandbox(args=['-v', 'test', '--json'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(result['proc'].stdout.decode())
         self.assertEqual(len(data), len(expected))
@@ -23,14 +23,14 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_simple(self):
         self.snippet_call_test(
-            args=[ '-c', 'cat' ],
+            args=['-c', 'cat'],
             files=[
-                { 'path': 'test/sample-1.in', 'data': 'foo\n' },
-                { 'path': 'test/sample-1.out', 'data': 'foo\n' },
-                { 'path': 'test/sample-2.in', 'data': 'bar\n' },
-                { 'path': 'test/sample-2.out', 'data': 'foo\n' },
+                {'path': 'test/sample-1.in', 'data': 'foo\n'},
+                {'path': 'test/sample-1.out', 'data': 'foo\n'},
+                {'path': 'test/sample-2.in', 'data': 'bar\n'},
+                {'path': 'test/sample-2.out', 'data': 'foo\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'AC',
                 'testcase': {
                     'name': 'sample-1',
@@ -48,21 +48,21 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'bar\n',
                 'exitcode': 0,
-            } ],
+            }],
         )
 
     def test_call_test_select(self):
         self.snippet_call_test(
-            args=[ '-c', 'cat', 'test/sample-2.in', 'test/sample-3.in', 'test/sample-3.out' ],
+            args=['-c', 'cat', 'test/sample-2.in', 'test/sample-3.in', 'test/sample-3.out'],
             files=[
-                { 'path': 'test/sample-1.in', 'data': 'foo\n' },
-                { 'path': 'test/sample-1.out', 'data': 'Yes\n' },
-                { 'path': 'test/sample-2.in', 'data': 'bar\n' },
-                { 'path': 'test/sample-2.out', 'data': 'No\n' },
-                { 'path': 'test/sample-3.in', 'data': 'baz\n' },
-                { 'path': 'test/sample-3.out', 'data': 'No\n' },
+                {'path': 'test/sample-1.in', 'data': 'foo\n'},
+                {'path': 'test/sample-1.out', 'data': 'Yes\n'},
+                {'path': 'test/sample-2.in', 'data': 'bar\n'},
+                {'path': 'test/sample-2.out', 'data': 'No\n'},
+                {'path': 'test/sample-3.in', 'data': 'baz\n'},
+                {'path': 'test/sample-3.out', 'data': 'No\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'AC',
                 'testcase': {
                     'name': 'sample-2',
@@ -79,18 +79,18 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'baz\n',
                 'exitcode': 0,
-            } ],
+            }],
         )
 
     def test_call_test_shell(self):
         self.snippet_call_test(
-            args=[ '-c', './build/foo.sh hoge' ],
+            args=['-c', './build/foo.sh hoge'],
             files=[
-                { 'path': 'build/foo.sh', 'data': '#!/bin/sh\necho $1\n', 'executable': True },
-                { 'path': 'test/sample-1.in', 'data': 'foo\n' },
-                { 'path': 'test/sample-1.out', 'data': 'foo\n' },
+                {'path': 'build/foo.sh', 'data': '#!/bin/sh\necho $1\n', 'executable': True},
+                {'path': 'test/sample-1.in', 'data': 'foo\n'},
+                {'path': 'test/sample-1.out', 'data': 'foo\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'WA',
                 'testcase': {
                     'name': 'sample-1',
@@ -99,18 +99,18 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'hoge\n',
                 'exitcode': 0,
-            } ],
+            }],
         )
 
     def test_call_test_fail(self):
         self.snippet_call_test(
-            args=[ '-c', './foo.sh' ],
+            args=['-c', './foo.sh'],
             files=[
-                { 'path': 'foo.sh', 'data': '#!/bin/sh\necho bar\nexit 3\n', 'executable': True },
-                { 'path': 'test/sample-1.in', 'data': 'foo\n' },
-                { 'path': 'test/sample-1.out', 'data': 'foo\n' },
+                {'path': 'foo.sh', 'data': '#!/bin/sh\necho bar\nexit 3\n', 'executable': True},
+                {'path': 'test/sample-1.in', 'data': 'foo\n'},
+                {'path': 'test/sample-1.out', 'data': 'foo\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'WA',
                 'testcase': {
                     'name': 'sample-1',
@@ -119,19 +119,19 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'bar\n',
                 'exitcode': 3,
-            } ],
+            }],
         )
 
     def test_call_test_dir(self):
         self.snippet_call_test(
-            args=[ '-c', 'cat', '-d', 'p/o/../../p/o/y/o' ],
+            args=['-c', 'cat', '-d', 'p/o/../../p/o/y/o'],
             files=[
-                { 'path': 'p/o/y/o/sample-1.in', 'data': 'foo\n' },
-                { 'path': 'p/o/y/o/sample-1.out', 'data': 'foo\n' },
-                { 'path': 'test/sample-2.in', 'data': 'bar\n' },
-                { 'path': 'test/sample-2.out', 'data': 'bar\n' },
+                {'path': 'p/o/y/o/sample-1.in', 'data': 'foo\n'},
+                {'path': 'p/o/y/o/sample-1.out', 'data': 'foo\n'},
+                {'path': 'test/sample-2.in', 'data': 'bar\n'},
+                {'path': 'test/sample-2.out', 'data': 'bar\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'AC',
                 'testcase': {
                     'name': 'sample-1',
@@ -140,19 +140,19 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'foo\n',
                 'exitcode': 0,
-            } ],
+            }],
         )
 
     def test_call_test_format(self):
         self.snippet_call_test(
-            args=[ '-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s' ],
+            args=['-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s'],
             files=[
-                { 'path': 'yuki/coder/test_in/sample-1.txt', 'data': 'foo\n' },
-                { 'path': 'yuki/coder/test_out/sample-1.txt', 'data': 'foo\n' },
-                { 'path': 'test_in/sample-2.in', 'data': 'bar\n' },
-                { 'path': 'test_out/sample-2.out', 'data': 'bar\n' },
+                {'path': 'yuki/coder/test_in/sample-1.txt', 'data': 'foo\n'},
+                {'path': 'yuki/coder/test_out/sample-1.txt', 'data': 'foo\n'},
+                {'path': 'test_in/sample-2.in', 'data': 'bar\n'},
+                {'path': 'test_out/sample-2.out', 'data': 'bar\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'AC',
                 'testcase': {
                     'name': 'sample-1.txt',
@@ -161,21 +161,21 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'foo\n',
                 'exitcode': 0,
-            } ],
+            }],
         )
 
     def test_call_test_format_select(self):
         self.snippet_call_test(
-            args=[ '-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s', 'yuki/coder/test_in/sample-2.txt', 'yuki/coder/test_in/sample-3.txt', 'yuki/coder/test_out/sample-3.txt' ],
+            args=['-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s', 'yuki/coder/test_in/sample-2.txt', 'yuki/coder/test_in/sample-3.txt', 'yuki/coder/test_out/sample-3.txt'],
             files=[
-                { 'path': 'yuki/coder/test_in/sample-1.txt', 'data': 'foo\n' },
-                { 'path': 'yuki/coder/test_out/sample-1.txt', 'data': 'foo\n' },
-                { 'path': 'yuki/coder/test_in/sample-2.txt', 'data': 'bar\n' },
-                { 'path': 'yuki/coder/test_out/sample-2.txt', 'data': 'bar\n' },
-                { 'path': 'yuki/coder/test_in/sample-3.txt', 'data': 'baz\n' },
-                { 'path': 'yuki/coder/test_out/sample-3.txt', 'data': 'baz\n' },
+                {'path': 'yuki/coder/test_in/sample-1.txt', 'data': 'foo\n'},
+                {'path': 'yuki/coder/test_out/sample-1.txt', 'data': 'foo\n'},
+                {'path': 'yuki/coder/test_in/sample-2.txt', 'data': 'bar\n'},
+                {'path': 'yuki/coder/test_out/sample-2.txt', 'data': 'bar\n'},
+                {'path': 'yuki/coder/test_in/sample-3.txt', 'data': 'baz\n'},
+                {'path': 'yuki/coder/test_out/sample-3.txt', 'data': 'baz\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'AC',
                 'testcase': {
                     'name': 'sample-2.txt',
@@ -192,19 +192,19 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'baz\n',
                 'exitcode': 0,
-            } ],
+            }],
         )
 
     def test_call_test_format_hack(self):
         self.snippet_call_test(
-            args=[ '-c', 'cat', '-d', 'a/b', '-f', 'c/test_%e/d/%s/e.case.txt' ],
+            args=['-c', 'cat', '-d', 'a/b', '-f', 'c/test_%e/d/%s/e.case.txt'],
             files=[
-                { 'path': 'a/b/c/test_in/d/sample.case.1/e.case.txt', 'data': 'foo\n' },
-                { 'path': 'a/b/c/test_out/d/sample.case.1/e.case.txt', 'data': 'foo\n' },
-                { 'path': 'a/b/c/test_in/d/sample.case.2/e.case.txt', 'data': 'bar\n' },
-                { 'path': 'a/b/c/test_out/d/sample.case.2/e.case.txt', 'data': 'bar\n' },
+                {'path': 'a/b/c/test_in/d/sample.case.1/e.case.txt', 'data': 'foo\n'},
+                {'path': 'a/b/c/test_out/d/sample.case.1/e.case.txt', 'data': 'foo\n'},
+                {'path': 'a/b/c/test_in/d/sample.case.2/e.case.txt', 'data': 'bar\n'},
+                {'path': 'a/b/c/test_out/d/sample.case.2/e.case.txt', 'data': 'bar\n'},
             ],
-            expected=[ {
+            expected=[{
                 'result': 'AC',
                 'testcase': {
                     'name': 'sample.case.1',
@@ -222,5 +222,5 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'bar\n',
                 'exitcode': 0,
-            } ],
+            }],
         )
