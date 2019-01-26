@@ -1,7 +1,7 @@
-import unittest
-import tests.utils
-
 import json
+import unittest
+
+import tests.utils
 
 
 class TestTest(unittest.TestCase):

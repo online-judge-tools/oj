@@ -2,6 +2,7 @@ import unittest
 
 from onlinejudge.implementation.command.code_statistics import get_statistics
 
+
 class CodeStatisticsTest(unittest.TestCase):
 
     def test_get_statistics_1(self):

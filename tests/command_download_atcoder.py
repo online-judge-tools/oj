@@ -1,5 +1,7 @@
 import unittest
+
 import tests.command_download
+
 
 class DownloadAtCoderTest(unittest.TestCase):
 

@@ -1,10 +1,11 @@
-import unittest
-import onlinejudge.implementation.logging as log
-
-import subprocess
 import os.path
+import subprocess
 import sys
 import time
+import unittest
+
+import onlinejudge.implementation.logging as log
+
 
 class GenerateScannerTest(unittest.TestCase):
 

@@ -1,11 +1,10 @@
-import unittest
-
-import tests.utils
-
 import os
 import subprocess
 import sys
 import time
+import unittest
+
+import tests.utils
 
 
 class SubmitAtCoderTest(unittest.TestCase):

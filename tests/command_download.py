@@ -1,11 +1,11 @@
-import unittest
-
-import tests.utils
-
 import hashlib
 import os
 import subprocess
 import sys
+import unittest
+
+import tests.utils
+
 
 def get_files_from_json(samples):
     files = {}

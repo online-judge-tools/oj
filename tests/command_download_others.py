@@ -1,7 +1,8 @@
+import os
 import unittest
+
 import tests.command_download
 
-import os
 
 class DownloadOthersTest(unittest.TestCase):
 

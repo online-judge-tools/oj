@@ -3,6 +3,7 @@ import unittest
 
 from onlinejudge.service.yukicoder import YukicoderService
 
+
 class YukicoderTest(unittest.TestCase):
 
     def test_get_user_10(self):

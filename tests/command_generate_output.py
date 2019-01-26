@@ -1,10 +1,9 @@
-import unittest
-
-import tests.utils
-
 import os
 import subprocess
 import sys
+import unittest
+
+import tests.utils
 
 
 class GenerateOutputTest(unittest.TestCase):
