@@ -98,7 +98,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
             'C++':    {'value': '3', 'description': 'C++11'},
             'C#':     {'value': '4', 'description': ''},
             'VB':     {'value': '5', 'description': ''},
-            'Python': {'value': '6', 'description': 'Pyhton 2'},
+            'Python': {'value': '6', 'description': 'Python 2'},
         }  # yapf: disable
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
