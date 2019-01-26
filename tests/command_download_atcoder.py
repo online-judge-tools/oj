@@ -18,6 +18,7 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-1.in':  'ec7562c808cc6c106a4d62d212daefd9',
                 'sample-1.out': '1dcca23355272056f04fe8bf20edfce0',
             })
+
     def test_call_download_atcoder_icpc2013spring_a(self):
         self.snippet_call_download(
             'http://jag2013spring.contest.atcoder.jp/tasks/icpc2013spring_a', {
@@ -32,6 +33,7 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-5.in':  '9c8befefed86e886539c9baa85e6724a',
                 'sample-4.out': 'e14b420b7266f69a2b2b457f3bbec804',
             })
+
     def test_call_download_atcoder_arc035_a(self):
         self.snippet_call_download(
             'http://arc035.contest.atcoder.jp/tasks/arc035_a', {
@@ -44,6 +46,7 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-1.out': '21da93069c74dfbc3c02999e8f27a712',
                 'sample-4.out': '21da93069c74dfbc3c02999e8f27a712',
             })
+
     def test_call_download_atcoder_arc001_1(self):
         self.snippet_call_download(
             'http://arc001.contest.atcoder.jp/tasks/arc001_1', {
@@ -54,6 +57,7 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-1.in':  'ffa1fbc1d14328005da451b67c65d35a',
                 'sample-1.out': '3e49d46d6c574dc91c9736436eb06d0a',
             })
+
     def test_call_download_atcoder_agc001_a(self):
         self.snippet_call_download(
             'http://agc001.contest.atcoder.jp//////tasks//////agc001_a//////?hoge=fuga#piyo', {
@@ -62,6 +66,7 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-2.in':  'd38a35564e44aa124f04f5088e7203d9',
                 'sample-1.out': '6d7fce9fee471194aa8b5b6e47267f03',
             })
+
     def test_call_download_atcoder_abc073_a(self):
         self.snippet_call_download(
             'https://beta.atcoder.jp/contests/abc073/tasks/abc073_a', {
@@ -72,6 +77,7 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-3.in':  '80ad60f95c32a3f6e413b5bb7c094e99',
                 'sample-3.out': '3ae2ea0c3867b219ef54d914437e76be',
             })
+
     def test_call_download_atcoder_ddcc2017_qual_a(self):
         self.snippet_call_download(
             'https://beta.atcoder.jp/contests/ddcc2017-qual/tasks/ddcc2017_qual_a', {
@@ -82,6 +88,7 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-3.in':  'ed5d34c74e59d16bd6d5b3683db655c3',
                 'sample-3.out': 'e14b420b7266f69a2b2b457f3bbec804',
             })
+
     def test_call_download_atcoder_agc029_a(self):
         self.snippet_call_download(
             'https://atcoder.jp/contests/agc029/tasks/agc029_a', {
@@ -90,12 +97,14 @@ class DownloadAtCoderTest(unittest.TestCase):
                 'sample-2.in':  '5bdcc020d84b69530288143e38b643b9',
                 'sample-2.out': '9ae0ea9e3c9c6e1b9b6252c8395efdc1',
             })
+
     def test_call_download_atcoder_abc114_c(self):
         self.snippet_call_download('https://atcoder.jp/contests/abc114/tasks/abc114_c', [
                 {"input": "575\n", "output": "4\n"},
                 {"input": "3600\n", "output": "13\n"},
                 {"input": "999999999\n", "output": "26484\n"},
             ], type='json')
+
     def test_call_download_atcoder_abc114_c(self):
         self.snippet_call_download('https://atcoder.jp/contests/abc003/tasks/abc003_4', [
                 {"input": "3 2\n2 2\n2 2\n", "output": "12\n"},

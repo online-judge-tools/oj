@@ -18,6 +18,7 @@ def get_files_from_json(samples):
             files[name] = hashlib.md5(sample[ext + 'put'].encode()).hexdigest()
     return files
 
+
 def snippet_call_download(self, url, files, is_system=False, type='files'):
     assert type in 'files' or 'json'
     if type == 'json':

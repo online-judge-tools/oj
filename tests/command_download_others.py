@@ -19,6 +19,7 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-1.in':  '3de90f793f16fad76da1527e09b8e528',
                 'sample-1.out': 'f67b46b3c53308d8a6414b20092a2220',
             })
+
     def test_call_download_anarchygolf_simple_language(self):
         self.snippet_call_download(
             'http://golf.shinh.org/p.rb?simple+language', {
@@ -29,12 +30,14 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-1.in':  '9b3c9ece5285bb1bcd1164cec8aa4243',
                 'sample-1.out': '48a24b70a0b376535542b996af517398',
             })
+
     def test_call_download_anarchygolf_hello_world(self):
         self.snippet_call_download(
             'http://golf.shinh.org/p.rb?hello+world', {
                 'sample-1.in':  'd41d8cd98f00b204e9800998ecf8427e',
                 'sample-1.out': '746308829575e17c3331bbcb00c0898b',
             })
+
     def test_call_download_anarchygolf_momomo(self):
         self.snippet_call_download(
             'http://golf.shinh.org/p.rb?momomo', {
@@ -50,6 +53,7 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-2.in':  '8a8c08b2901d4cfca41ad0703dfa718e',
                 'sample-1.out': '9ae0ea9e3c9c6e1b9b6252c8395efdc1',
             })
+
     def test_call_download_codeforces_contest_538_h(self):
         self.snippet_call_download(
             'http://codeforces.com/contest/538/problem/H', {
@@ -58,6 +62,7 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-2.in':  'afa0c8b2336e798b5f29a200a18432d1',
                 'sample-1.out': '166a3645f3c31595526624ce003b41fc',
             })
+
     def test_call_download_codeforces_gym_101021_a(self):
         self.snippet_call_download(
             'http://codeforces.com/gym/101021/problem/A', {
@@ -66,6 +71,7 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-2.in':  'dcfe1f14721a0e141c2e31adeebe7a53',
                 'sample-1.out': '45778e8e2d350841cf68711ece5cb9e1',
             })
+
     def test_call_download_codeforces_contest_1080_a(self):
         self.snippet_call_download(
             'https://codeforces.com/contest/1080/problem/A', {
@@ -74,7 +80,6 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-2.in':  'd33b56dd139d846a5df6eab7cfaf83e8',
                 'sample-2.out': 'bda81ba88c634b46394ead43aff31ad5',
             })
-
 
     def test_call_download_csacademy_k_swap(self):
         self.snippet_call_download(
@@ -86,6 +91,7 @@ class DownloadOthersTest(unittest.TestCase):
                 'sample-3.in':  '8e92bd4fb348c40f78a13c56a1f5a937',
                 'sample-3.out': 'c31f209a3d0412a16c4b93e4ee060b54',
             })
+
     def test_call_download_csacademy_unfair_game(self):
         self.snippet_call_download(
             'https://csacademy.com/contest/archive/task/unfair_game/', {

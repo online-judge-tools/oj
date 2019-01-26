@@ -20,6 +20,7 @@ class DownloadYukicoderTest(unittest.TestCase):
                 'sample-2.in':  '5b6b41ed9b343fed9cd05a66d36650f0',
                 'sample-1.out': 'b026324c6904b2a9cb4b88d6d61c81d1',
             })
+
     def test_call_download_yukicoder_100(self):
         self.snippet_call_download(
             'http://yukicoder.me/problems/100', {
@@ -30,6 +31,7 @@ class DownloadYukicoderTest(unittest.TestCase):
                 'sample-1.in':  'c8a8eeb947c8a1d6700d6f7fd151cb00',
                 'sample-1.out': '3bb50ff8eeb7ad116724b56a820139fa',
             })
+
     def test_call_download_yukicoder_no_104(self):
         self.snippet_call_download(
             'http://yukicoder.me/problems/no/104', {
@@ -42,6 +44,7 @@ class DownloadYukicoderTest(unittest.TestCase):
                 'sample-1.out': '1dcca23355272056f04fe8bf20edfce0',
                 'sample-4.out': 'b026324c6904b2a9cb4b88d6d61c81d1',
             })
+
     def test_call_download_yukicoder_no_400(self):
         self.snippet_call_download(
             'http://yukicoder.me/problems/no/400', {
@@ -54,6 +57,7 @@ class DownloadYukicoderTest(unittest.TestCase):
                 'sample-1.out': '3e1ce07401b37846f4d6aab1efbe771b',
                 'sample-4.out': '60f3f85857568779dbd10bc4fc506f35',
             })
+
     def test_call_download_yukicoder_no_260(self):
         self.snippet_call_download(
             'http://yukicoder.me/problems/no/260/', {
@@ -64,6 +68,7 @@ class DownloadYukicoderTest(unittest.TestCase):
                 'sample-1.in':  'b16aaad0c06f931e38ad651115b73f56',
                 'sample-1.out': '90e2a51705594d033a3abe9d77b2b7ad',
             })
+
     def test_call_download_yukicoder_no_8_system(self):
         self.snippet_call_download(
             'https://yukicoder.me/problems/no/8', {

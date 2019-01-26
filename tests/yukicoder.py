@@ -17,10 +17,12 @@ class YukicoderTest(unittest.TestCase):
         self.assertIn('Points', data)
         self.assertEqual(data['Id'], 10)
         self.assertEqual(data['Name'], 'yuki2006')
+
     def test_get_user_yuki2006(self):
         data = YukicoderService().get_user(name='yuki2006')
         self.assertEqual(data['Id'], 10)
         self.assertEqual(data['Name'], 'yuki2006')
+
     def test_get_user_0(self):
         data = YukicoderService().get_user(id=0)
         self.assertIs(data, None)
@@ -36,9 +38,11 @@ class YukicoderTest(unittest.TestCase):
         self.assertIn('Level', data[0])
         self.assertIn('ProblemType', data[0])
         self.assertIn('Tags', data[0])
+
     def test_get_solved_yuki2006(self):
         data = YukicoderService().get_solved(name='yuki2006')
         self.assertGreater(len(data), 200)
+
     def test_get_solved_0(self):
         data = YukicoderService().get_solved(id=0)
         self.assertIs(data, None)
@@ -77,6 +81,7 @@ class YukicoderTest(unittest.TestCase):
         self.assertEqual(data[3]['問題名'], "Happy Hallowe'en")
         self.assertEqual(data[3]['レベル'], '4')
         self.assertEqual(data[3]['作問者/url'], '/users/4')
+
 
 if __name__ == '__main__':
     unittest.main()
