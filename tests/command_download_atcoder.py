@@ -117,7 +117,7 @@ class DownloadAtCoderTest(unittest.TestCase):
             ],
             type='json')
 
-    def test_call_download_atcoder_abc114_c(self):
+    def test_call_download_atcoder_abc003_4(self):
         self.snippet_call_download(
             'https://atcoder.jp/contests/abc003/tasks/abc003_4', [
                 {
