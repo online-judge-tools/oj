@@ -66,20 +66,20 @@ t-   `onlinejudge/`
 
 isort と yapf を運用しています。
 行幅は実質無限に設定されています。
-それぞれ次のコマンドで実行できます。
+それぞれ次のようなコマンドで実行できます。
 
 ``` sh
-$ isort oj onlinejudge/**/*.py
-$ yapf --in-place oj onlinejudge/**/*.py
+$ isort --recursive oj onlinejudge
+$ yapf --in-place --recursive oj onlinejudge
 ```
 
 ## tests
 
 静的型検査と通常のテストをしています。
-手元ではそれぞれ次のコマンドで実行できます。
+手元ではそれぞれ次のようなコマンドで実行できます。
 
 ``` sh
-$ mypy oj onlinejudge/**/*.py
+$ mypy oj onlinejudge
 $ python3 setup.py test
 ```
 
