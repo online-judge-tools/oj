@@ -1,11 +1,11 @@
-import unittest
-
-import tests.utils
-
 import hashlib
 import os
 import subprocess
 import sys
+import unittest
+
+import tests.utils
+
 
 def get_files_from_json(samples):
     files = {}
@@ -18,6 +18,7 @@ def get_files_from_json(samples):
             files[name] = hashlib.md5(sample[ext + 'put'].encode()).hexdigest()
     return files
 
+
 def snippet_call_download(self, url, files, is_system=False, type='files'):
     assert type in 'files' or 'json'
     if type == 'json':
@@ -25,9 +26,9 @@ def snippet_call_download(self, url, files, is_system=False, type='files'):
 
     ojtools = os.path.abspath('oj')
     with tests.utils.sandbox([]):
-        cmd = [ ojtools, 'download', url ]
+        cmd = [ojtools, 'download', url]
         if is_system:
-            cmd += [ '--system' ]
+            cmd += ['--system']
         subprocess.check_call(cmd, stdout=sys.stdout, stderr=sys.stderr)
         result = {}
         if os.path.exists('test'):

@@ -2,8 +2,8 @@ import unittest
 
 from onlinejudge.implementation.command.code_statistics import get_statistics
 
-class CodeStatisticsTest(unittest.TestCase):
 
+class CodeStatisticsTest(unittest.TestCase):
     def test_get_statistics_1(self):
         # http://golf.shinh.org/reveal.rb?Turn+a+1d+array+into+a+5d+array/mitchs+%28cheat%29_1465127634&bf
         code = b'''<-],<[->>[.<]>>>.,+]\x00 ;\x01e\x0b'''

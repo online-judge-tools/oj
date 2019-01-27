@@ -1,15 +1,13 @@
-import unittest
-
-import tests.utils
-
 import os
 import subprocess
 import sys
 import time
+import unittest
+
+import tests.utils
 
 
 class SubmitAtCoderTest(unittest.TestCase):
-
     def test_call_submit_practice_1(self):
         if 'CI' in os.environ:
             print('NOTE: this test is skipped since login is required')
@@ -28,12 +26,18 @@ int main() {
 }
 '''
         files = [
-            { 'path': 'main.cpp', 'data': code },
+            {
+                'path': 'main.cpp',
+                'data': code
+            },
         ]
 
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ ojtools, 'submit', '-y', '--no-open', url, 'main.cpp' ], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(
+                [ojtools, 'submit', '-y', '--no-open', url, 'main.cpp'],
+                stdout=sys.stdout,
+                stderr=sys.stderr)
 
     def test_call_submit_practice_2(self):
         if 'CI' in os.environ:
@@ -63,12 +67,18 @@ assert n == 26 and q == 1000
 print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
 '''
         files = [
-            { 'path': 'main.py', 'data': code },
+            {
+                'path': 'main.py',
+                'data': code
+            },
         ]
 
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ ojtools, 'submit', '-y', '--no-open', url, 'main.py' ], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(
+                [ojtools, 'submit', '-y', '--no-open', url, 'main.py'],
+                stdout=sys.stdout,
+                stderr=sys.stderr)
 
     def test_call_submit_practice_1_with_history(self):
         if 'CI' in os.environ:
@@ -77,16 +87,22 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
         files = [
-            { 'path': 'a.pl', 'data': 'print<>+(<>=~$",$`+$\'),$",<>' },
+            {
+                'path': 'a.pl',
+                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
+            },
         ]
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ ojtools, 'dl', url ], stdout=sys.stdout, stderr=sys.stderr)
-            subprocess.check_call([ ojtools, 's', '-y', '--no-open', 'a.pl' ], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call([ojtools, 'dl', url],
+                                  stdout=sys.stdout,
+                                  stderr=sys.stderr)
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', 'a.pl'],
+                                  stdout=sys.stdout,
+                                  stderr=sys.stderr)
 
 
 class SubmitCodeforcesTest(unittest.TestCase):
-
     def test_call_submit_beta_1_a(self):
         if 'CI' in os.environ:
             print('NOTE: this test is skipped since login is required')
@@ -97,14 +113,22 @@ class SubmitCodeforcesTest(unittest.TestCase):
             '#!/usr/bin/env python3',
             'h, w, a = map(int, input().split())',
             'print(((h + a - 1) // a) * ((w + a - 1) // a))',
-            '# ' + str(int(time.time())),  # to bypass the "You have submitted exactly the same code before" error
+            '# ' + str(
+                int(time.time())
+            ),  # to bypass the "You have submitted exactly the same code before" error
         ]) + '\n'
         files = [
-            { 'path': 'a.py', 'data': code },
+            {
+                'path': 'a.py',
+                'data': code
+            },
         ]
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ ojtools, 's', '-y', '--no-open', url, 'a.py' ], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(
+                [ojtools, 's', '-y', '--no-open', url, 'a.py'],
+                stdout=sys.stdout,
+                stderr=sys.stderr)
 
     def test_call_submit_beta_3_b(self):
         if 'CI' in os.environ:
@@ -171,10 +195,18 @@ int main() {
     }
     return 0;
 }
-''' + '// ' + str(int(time.time())) + '\n'  # to bypass the "You have submitted exactly the same code before" error
+''' + '// ' + str(
+            int(time.time())
+        ) + '\n'  # to bypass the "You have submitted exactly the same code before" error
         files = [
-            { 'path': 'main.cpp', 'data': code },
+            {
+                'path': 'main.cpp',
+                'data': code
+            },
         ]
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ ojtools, 's', '-y', '--no-open', url, 'main.cpp' ], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(
+                [ojtools, 's', '-y', '--no-open', url, 'main.cpp'],
+                stdout=sys.stdout,
+                stderr=sys.stderr)

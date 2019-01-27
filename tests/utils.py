@@ -15,6 +15,7 @@ def chdir(path):
     finally:
         os.chdir(cwd)
 
+
 def prepare_files(files):
     for f in files:
         path = pathlib.Path(f['path'])
@@ -24,6 +25,7 @@ def prepare_files(files):
         if f.get('executable', False):
             path.chmod(0o755)
 
+
 @contextlib.contextmanager
 def sandbox(files):
     with tempfile.TemporaryDirectory() as tempdir:
@@ -31,10 +33,12 @@ def sandbox(files):
             prepare_files(files)
             yield tempdir
 
+
 def run_in_sandbox(args, files):
     ojtools = os.path.abspath('oj')
     with sandbox(files) as tempdir:
-        proc = subprocess.run([ ojtools ] + args, stdout=subprocess.PIPE, stderr=sys.stderr)
+        proc = subprocess.run(
+            [ojtools] + args, stdout=subprocess.PIPE, stderr=sys.stderr)
         return {
             'proc': proc,
             'tempdir': tempdir,
