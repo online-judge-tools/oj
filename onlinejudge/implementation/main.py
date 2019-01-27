@@ -33,7 +33,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Tools for online judge services')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-c', '--cookie', type=pathlib.Path, default=utils.default_cookie_path, help='path to cookie. (default: {})'.format(utils.default_cookie_path))
-    parser.add_argument('-V', '--version', action='store_true', help='print the online-judge-tools version number')
+    parser.add_argument('--version', action='store_true', help='print the online-judge-tools version number')
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
