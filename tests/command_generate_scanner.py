@@ -34,10 +34,7 @@ class GenerateScannerTest(unittest.TestCase):
             url='https://yukicoder.me/problems/no/2',
             expected='int N; cin >> N;\n',
         )
-        self.call_generate_scanner(
-            url='https://yukicoder.me/problems/no/2',
-            expected='int N; scanf("%d", &N);\n',
-            options=['--scanf'])
+        self.call_generate_scanner(url='https://yukicoder.me/problems/no/2', expected='int N; scanf("%d", &N);\n', options=['--scanf'])
 
     def test_call_generate_scanner_yukicoder_vector(self):
         self.call_generate_scanner(
@@ -48,12 +45,10 @@ class GenerateScannerTest(unittest.TestCase):
             ]),
         )
         self.call_generate_scanner(
-            url='https://yukicoder.me/problems/no/4',
-            expected=''.join([
+            url='https://yukicoder.me/problems/no/4', expected=''.join([
                 'int N; scanf("%d", &N);\n',
                 'vector<int> W(N); REP (i, N) scanf("%d", &W[i]);\n',
-            ]),
-            options=['--scanf', '--repeat-macro', 'REP'])
+            ]), options=['--scanf', '--repeat-macro', 'REP'])
 
     def test_call_generate_scanner_yukicoder_vars(self):
         self.call_generate_scanner(
@@ -64,12 +59,10 @@ class GenerateScannerTest(unittest.TestCase):
             ]),
         )
         self.call_generate_scanner(
-            url='https://yukicoder.me/problems/no/11',
-            expected=''.join([
+            url='https://yukicoder.me/problems/no/11', expected=''.join([
                 'int W, H, N; scanf("%d%d%d", &W, &H, &N);\n',
                 'vector<int> S(N), K(N); repeat (i, N) scanf("%d%d", &S[i], &K[i]);\n',
-            ]),
-            options=['--scanf', '--repeat-macro', 'repeat'])
+            ]), options=['--scanf', '--repeat-macro', 'repeat'])
 
     def test_call_generate_scanner_yukicoder_others(self):
         self.call_generate_scanner(
@@ -95,8 +88,7 @@ class GenerateScannerTest(unittest.TestCase):
     def test_call_generate_scanner_atcoder_others(self):
         self.call_generate_scanner(
             url='https://beta.atcoder.jp/contests/arc083/tasks/arc083_a',
-            expected=
-            'int A, B, C, D, E, F; cin >> A >> B >> C >> D >> E >> F;\n',
+            expected='int A, B, C, D, E, F; cin >> A >> B >> C >> D >> E >> F;\n',
         )
         self.call_generate_scanner(
             url='https://beta.atcoder.jp/contests/abc071/tasks/arc081_a',

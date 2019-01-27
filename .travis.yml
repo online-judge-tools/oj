@@ -5,9 +5,9 @@ python:
 install:
     - pip install -e .[dev,docs]
 script:
-    - isort --check-only --diff --recursive oj onlinejudge
-    - yapf --diff --recursive oj onlinejudge | tee yapf.patch && test ! -s yapf.patch
-    - mypy oj onlinejudge
+    - isort --check-only --diff --recursive oj onlinejudge setup.py tests
+    - yapf --diff --recursive oj onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
+    - mypy oj onlinejudge setup.py tests
     - make -C docs html
     - python setup.py test
 branches:

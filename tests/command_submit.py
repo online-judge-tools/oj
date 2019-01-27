@@ -34,10 +34,7 @@ int main() {
 
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call(
-                [ojtools, 'submit', '-y', '--no-open', url, 'main.cpp'],
-                stdout=sys.stdout,
-                stderr=sys.stderr)
+            subprocess.check_call([ojtools, 'submit', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
 
     def test_call_submit_practice_2(self):
         if 'CI' in os.environ:
@@ -75,10 +72,7 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
 
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call(
-                [ojtools, 'submit', '-y', '--no-open', url, 'main.py'],
-                stdout=sys.stdout,
-                stderr=sys.stderr)
+            subprocess.check_call([ojtools, 'submit', '-y', '--no-open', url, 'main.py'], stdout=sys.stdout, stderr=sys.stderr)
 
     def test_call_submit_practice_1_with_history(self):
         if 'CI' in os.environ:
@@ -94,12 +88,8 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
         ]
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 'dl', url],
-                                  stdout=sys.stdout,
-                                  stderr=sys.stderr)
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', 'a.pl'],
-                                  stdout=sys.stdout,
-                                  stderr=sys.stderr)
+            subprocess.check_call([ojtools, 'dl', url], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', 'a.pl'], stdout=sys.stdout, stderr=sys.stderr)
 
 
 class SubmitCodeforcesTest(unittest.TestCase):
@@ -113,9 +103,7 @@ class SubmitCodeforcesTest(unittest.TestCase):
             '#!/usr/bin/env python3',
             'h, w, a = map(int, input().split())',
             'print(((h + a - 1) // a) * ((w + a - 1) // a))',
-            '# ' + str(
-                int(time.time())
-            ),  # to bypass the "You have submitted exactly the same code before" error
+            '# ' + str(int(time.time())),  # to bypass the "You have submitted exactly the same code before" error
         ]) + '\n'
         files = [
             {
@@ -125,10 +113,7 @@ class SubmitCodeforcesTest(unittest.TestCase):
         ]
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call(
-                [ojtools, 's', '-y', '--no-open', url, 'a.py'],
-                stdout=sys.stdout,
-                stderr=sys.stderr)
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
 
     def test_call_submit_beta_3_b(self):
         if 'CI' in os.environ:
@@ -195,9 +180,7 @@ int main() {
     }
     return 0;
 }
-''' + '// ' + str(
-            int(time.time())
-        ) + '\n'  # to bypass the "You have submitted exactly the same code before" error
+''' + '// ' + str(int(time.time())) + '\n'  # to bypass the "You have submitted exactly the same code before" error
         files = [
             {
                 'path': 'main.cpp',
@@ -206,7 +189,4 @@ int main() {
         ]
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call(
-                [ojtools, 's', '-y', '--no-open', url, 'main.cpp'],
-                stdout=sys.stdout,
-                stderr=sys.stderr)
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
