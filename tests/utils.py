@@ -37,8 +37,7 @@ def sandbox(files):
 def run_in_sandbox(args, files):
     ojtools = os.path.abspath('oj')
     with sandbox(files) as tempdir:
-        proc = subprocess.run(
-            [ojtools] + args, stdout=subprocess.PIPE, stderr=sys.stderr)
+        proc = subprocess.run([ojtools] + args, stdout=subprocess.PIPE, stderr=sys.stderr)
         return {
             'proc': proc,
             'tempdir': tempdir,

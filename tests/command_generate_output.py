@@ -7,15 +7,10 @@ import tests.utils
 
 
 class GenerateOutputTest(unittest.TestCase):
-    def snippet_call_generate_output(self,
-                                     args,
-                                     input_files,
-                                     expected_values,
-                                     disallowed_files=None):
+    def snippet_call_generate_output(self, args, input_files, expected_values, disallowed_files=None):
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(input_files) as tempdir:
-            _ = subprocess.check_output(
-                [ojtools, 'generate-output'] + args, stderr=sys.stderr)
+            _ = subprocess.check_output([ojtools, 'generate-output'] + args, stderr=sys.stderr)
             for expect in expected_values:
                 with open(expect['path']) as f:
                     self.assertEqual(''.join(f.readlines()), expect['data'])
@@ -50,8 +45,7 @@ class GenerateOutputTest(unittest.TestCase):
 
     def test_call_generate_output_select(self):
         self.snippet_call_generate_output(
-            args=['-c', 'cat', 'test/sample-1.in', 'test/sample-2.in'],
-            input_files=[
+            args=['-c', 'cat', 'test/sample-1.in', 'test/sample-2.in'], input_files=[
                 {
                     'path': 'test/sample-1.in',
                     'data': 'foo\n'
@@ -64,8 +58,7 @@ class GenerateOutputTest(unittest.TestCase):
                     'path': 'test/sample-3.in',
                     'data': 'baz\n'
                 },
-            ],
-            expected_values=[
+            ], expected_values=[
                 {
                     'path': 'test/sample-1.out',
                     'data': 'foo\n'
@@ -74,8 +67,7 @@ class GenerateOutputTest(unittest.TestCase):
                     'path': 'test/sample-2.out',
                     'data': 'bar\n'
                 },
-            ],
-            disallowed_files=['test/sample-3.out'])
+            ], disallowed_files=['test/sample-3.out'])
 
     def test_call_generate_output_already_exists(self):
         # Since sample-1.out already exists, sample-1.out will not be updated.
@@ -151,11 +143,7 @@ class GenerateOutputTest(unittest.TestCase):
 
     def test_call_generate_output_format_select(self):
         self.snippet_call_generate_output(
-            args=[
-                '-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s',
-                'yuki/coder/test_in/sample-2.txt',
-                'yuki/coder/test_in/sample-3.txt'
-            ],
+            args=['-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s', 'yuki/coder/test_in/sample-2.txt', 'yuki/coder/test_in/sample-3.txt'],
             input_files=[
                 {
                     'path': 'yuki/coder/test_in/sample-2.txt',
