@@ -327,3 +327,36 @@ class TestTest(unittest.TestCase):
                 'exitcode': 0,
             }],
         )
+
+    def test_call_test_re_glob_injection(self):
+        self.snippet_call_test(
+            args=['-c', 'cat', '-d', 'a.*/[abc]/**', '-f', '***/**/def/test_%e/%s.txt'],
+            files=[
+                {
+                    'path': 'a.*/[abc]/**/***/**/def/test_in/1.txt',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'a.*/[abc]/**/***/**/def/test_out/1.txt',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'a.*/a/**/**/**/def/test_in/2.txt',
+                    'data': 'bar\n'
+                },
+                {
+                    'path': 'a.*/[abc]/**/**/**/def/test_out/2.txt',
+                    'data': 'bar\n'
+                },
+            ],
+            expected=[{
+                'result': 'AC',
+                'testcase': {
+                    'name': '1',
+                    'input': '%s/a.*/[abc]/**/***/**/def/test_in/1.txt',
+                    'output': '%s/a.*/[abc]/**/***/**/def/test_out/1.txt',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }],
+        )
