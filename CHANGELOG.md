@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.1.53 / 2019-01-28
+
+-   [@fukatani](https://github.com/fukatani) (AtCoder: [ryoryoryo111](https://atcoder.jp/users/ryoryoryo111)) joined as a maintainer :tada:
+-   [#281](https://github.com/kmyk/online-judge-tools/pull/281) add `--version` option
+-   [#243](https://github.com/kmyk/online-judge-tools/pull/243) add the PePy badge to `readme.md`
+-   [#259](https://github.com/kmyk/online-judge-tools/pull/259) introduce code formatters to repo
+-   [#257](https://github.com/kmyk/online-judge-tools/pull/257) fix regexp-injection and glob-injection bugs ([@Pachicobue](https://github.com/Pachicobue))
+
 ## 0.1.52 / 2019-01-22
 
 -   [#251](https://github.com/kmyk/online-judge-tools/issues/251) support `submit` to Codeforces
