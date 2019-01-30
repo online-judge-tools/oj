@@ -15,7 +15,7 @@ I used chrome with ["EditThisCookie" Plugin](https://chrome.google.com/webstore/
 
 Please copy REVEL_SESSION value.
 
-3. Make dummy session cookie.
+3. Generate dummy session cookie.
 
 ```
 $ oj login -u dummy -p dummy https://yukicoder.me/
@@ -32,7 +32,7 @@ $ oj login -u dummy -p dummy https://yukicoder.me/
 
 4. Edit cookie.jar
 
-Open ~/.local/share/online-judge-tools/cookie.jar,
+Open ~/.local/share/online-judge-tools/cookie.jar, you can find session cookie for yukicoder.
 
 ```
 Set-Cookie3: REVEL_SESSION="XXXXX"; path="/"; domain="yukicoder.me"; path_spec; expires="2019-02-28 14:53:09Z"; HttpOnly=None; version=0
@@ -53,5 +53,6 @@ $ oj login https://yukicoder.me/
 [x] save cookie to: /home/ryo/.local/share/online-judge-tools/cookie.jar
 ```
 
+You can find the sentence "You have already signed in.".
 Now, you can download testcases from yukicoder.
 
