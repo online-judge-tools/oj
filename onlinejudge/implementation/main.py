@@ -85,6 +85,7 @@ strings for --method:
     subparser.add_argument('url')
     subparser.add_argument('-u', '--username')
     subparser.add_argument('-p', '--password')
+    subparser.add_argument('--check', action='store_true', help='check whether you are logged in or not')
     subparser.add_argument('--method')
 
     # submit

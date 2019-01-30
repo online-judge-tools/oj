@@ -44,6 +44,13 @@ class AtCoderService(onlinejudge.type.Service):
         AtCoderService._report_messages(msgs)
         return 'login' not in resp.url  # AtCoder redirects to the top page if success
 
+    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+        session = session or utils.new_default_session()
+        url = 'https://practice.contest.atcoder.jp/login'
+        resp = _request('GET', url, session=session, allow_redirects=False)
+        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
+        return bool(msgs)
+
     def get_url(self) -> str:
         return 'https://atcoder.jp/'
 

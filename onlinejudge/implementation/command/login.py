@@ -31,16 +31,25 @@ def login(args: 'argparse.Namespace') -> None:
             log.failure('login for %s: invalid option: --method %s', service.get_name(), args.method)
             sys.exit(1)
 
-    # login
-    def get_credentials() -> Tuple[str, str]:
-        if args.username is None:
-            args.username = input('Username: ')
-        if args.password is None:
-            args.password = getpass.getpass()
-        return args.username, args.password
-
-    log.warning('If you don\'t want to give your password to this program, you can give only your session tokens.')
-    log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md')
-
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
-        service.login(get_credentials, session=sess, **kwargs)  # type: ignore
+
+        if args.check:
+            if service.is_logged_in(session=sess):
+                log.info('You have already signed in.')
+            else:
+                log.info('You are not signed in.')
+                sys.exit(1)
+
+        else:
+            # login
+            def get_credentials() -> Tuple[str, str]:
+                if args.username is None:
+                    args.username = input('Username: ')
+                if args.password is None:
+                    args.password = getpass.getpass()
+                return args.username, args.password
+
+            log.warning('If you don\'t want to give your password to this program, you can give only your session tokens.')
+            log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md')
+
+            service.login(get_credentials, session=sess, **kwargs)  # type: ignore
