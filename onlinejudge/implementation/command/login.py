@@ -39,5 +39,8 @@ def login(args: 'argparse.Namespace') -> None:
             args.password = getpass.getpass()
         return args.username, args.password
 
+    log.warning('If you don\'t want to give your password to this program, you can give only your session tokens.')
+    log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md')
+
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         service.login(get_credentials, session=sess, **kwargs)  # type: ignore
