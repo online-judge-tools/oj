@@ -30,7 +30,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Aizu Online Judge
 -   Login
     -   AtCoder
-    -   Yukicoder (via github.com)
+    -   Yukicoder (via github.com or [session token](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md))
     -   Codeforces
     -   ~~HackerRank~~ (removed)
     -   TopCoder
@@ -141,8 +141,8 @@ $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
     -   Yes. You can use `--directory` (`-d`) option. However, I recommend to make one directory per one problem.
 -   Can I specify problems by their IDs or names, instead of URLs?
     -   No. I have tried it once, but it is actually not so convenient and only increases the maintenance cost.
--   I don't want to input plaintext password to this tool.
-    - You can login with session cookies. Please see [Here](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md).
+-   I don't want to give my password to this program.
+    -   You can use this giving only your session tokens. Please see [here](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md).
 
 For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) or other SNSs.
 
