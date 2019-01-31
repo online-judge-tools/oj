@@ -17,7 +17,7 @@ Please copy REVEL_SESSION value.
 
 ![GetCookie](https://user-images.githubusercontent.com/8858287/52058622-31674e80-25ab-11e9-840d-f3960aee8711.png)
 
-3. Generate dummy session cookie.
+3. Generate dummy session token. (Template for rewriting later.)
 
 ```
 $ oj login -u dummy -p dummy https://yukicoder.me/
