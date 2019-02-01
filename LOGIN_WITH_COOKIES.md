@@ -50,11 +50,11 @@ Please replace current `REVEL_SESSION` value to value which you copied by the br
 5. Confirm logged in.
 
 ``` console
-$ oj login https://yukicoder.me/
+$ oj login --check https://yukicoder.me/
 [x] service recognized: <onlinejudge.service.yukicoder.YukicoderService object at 0x7f4467a0a2b0>: https://yukicoder.me/
 [x] load cookie from: ~/.local/share/online-judge-tools/cookie.jar
 [x] GET: https://yukicoder.me/auth/github
-[x] 200 OK
+[x] 302 Found
 [*] You have already signed in.
 [x] save cookie to: ~/.local/share/online-judge-tools/cookie.jar
 ```
