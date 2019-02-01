@@ -2,7 +2,11 @@
 import imp
 import os
 
+import setuptools
+from pkg_resources import parse_version
 from setuptools import setup
+
+assert parse_version('30.0.8') <= parse_version(setuptools.__version__)  # for setup.cfg
 
 
 def load_module(module_path):
