@@ -93,8 +93,8 @@ supported services:
   AtCoder
   Codeforces
   TopCoder (Marathon Match)
+  Yukicoder
 
-  (Yukicoder has been removed)
 ''')
     subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')
     subparser.add_argument('file', type=pathlib.Path)
