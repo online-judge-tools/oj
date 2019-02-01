@@ -5,6 +5,8 @@ python:
 install:
     - pip install -e .[dev,docs]
 script:
+    - which oj
+    - ( cd /tmp ; oj --help )
     - isort --check-only --diff --recursive oj onlinejudge setup.py tests
     - yapf --diff --recursive oj onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
     - mypy oj onlinejudge setup.py tests
