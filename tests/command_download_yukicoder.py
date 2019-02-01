@@ -6,9 +6,6 @@ import tests.command_download
 
 class DownloadYukicoderTest(unittest.TestCase):
     def snippet_call_download(self, *args, **kwargs):
-        if kwargs.get('is_system') and 'CI' in os.environ:
-            print('NOTE: this test is skipped since login is required')
-            return
         tests.command_download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_yukicoder_no_9002(self):
@@ -63,6 +60,7 @@ class DownloadYukicoderTest(unittest.TestCase):
             'sample-1.out': '90e2a51705594d033a3abe9d77b2b7ad',
         })
 
+    @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_download_yukicoder_no_8_system(self):
         self.snippet_call_download(
             'https://yukicoder.me/problems/no/8', {

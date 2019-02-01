@@ -8,10 +8,8 @@ import tests.utils
 
 
 class SubmitAtCoderTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_practice_1(self):
-        if 'CI' in os.environ:
-            print('NOTE: this test is skipped since login is required')
-            return
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
         code = '''\
@@ -36,10 +34,8 @@ int main() {
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 'submit', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
 
+    @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_practice_2(self):
-        if 'CI' in os.environ:
-            print('NOTE: this test is skipped since login is required')
-            return
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_2'
         code = '''\
@@ -74,10 +70,8 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 'submit', '-y', '--no-open', url, 'main.py'], stdout=sys.stdout, stderr=sys.stderr)
 
+    @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_practice_1_with_history(self):
-        if 'CI' in os.environ:
-            print('NOTE: this test is skipped since login is required')
-            return
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
         files = [
@@ -93,10 +87,8 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
 
 
 class SubmitCodeforcesTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_beta_1_a(self):
-        if 'CI' in os.environ:
-            print('NOTE: this test is skipped since login is required')
-            return
 
         url = 'https://codeforces.com/contest/1/problem/A'
         code = '\n'.join([
@@ -115,10 +107,8 @@ class SubmitCodeforcesTest(unittest.TestCase):
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
 
+    @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_beta_3_b(self):
-        if 'CI' in os.environ:
-            print('NOTE: this test is skipped since login is required')
-            return
 
         url = 'https://codeforces.com/contest/3/problem/B'
         code = r'''#include <bits/stdc++.h>
@@ -181,6 +171,49 @@ int main() {
     return 0;
 }
 ''' + '// ' + str(int(time.time())) + '\n'  # to bypass the "You have submitted exactly the same code before" error
+        files = [
+            {
+                'path': 'main.cpp',
+                'data': code
+            },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+
+
+class SubmitYukicoderTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_9000(self):
+
+        url = 'https://yukicoder.me/problems/no/9000'
+        code = '\n'.join([
+            '#!/usr/bin/env python2',
+            'print "Hello World!"',
+        ]) + '\n'
+        files = [
+            {
+                'path': 'a.py',
+                'data': code
+            },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_beta_3_b(self):
+
+        url = 'https://yukicoder.me/problems/no/9001'
+        code = r'''#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int a, b; cin >> a >> b;
+    string s; cin >> s;
+    cout << a + b << ' ' << s << endl;
+    return 0;
+}
+'''
         files = [
             {
                 'path': 'main.cpp',

@@ -129,6 +129,9 @@ class FormSender(object):
     def set_file(self, key: str, filename: str, content: bytes) -> None:
         self.files[key] = (filename, content)  # type: ignore
 
+    def unset(self, key: str) -> None:
+        del self.payload[key]
+
     def request(self, session: requests.Session, action: Optional[str] = None, **kwargs) -> requests.Response:
         action = action or self.form['action']
         url = urllib.parse.urljoin(self.url, action)

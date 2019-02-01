@@ -301,6 +301,50 @@ class YukicoderProblem(onlinejudge.type.Problem):
             return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
         return None
 
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:  # or SubmissionError
+        session = session or utils.new_default_session()
+        # get
+        url = 'https://yukicoder.me/problems/no/{}/submit'.format(self.problem_no)
+        resp = utils.request('GET', url, session=session)
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        form = soup.find('form', id='submit_form')
+        if not form:
+            log.error('form not found')
+            raise onlinejudge.type.SubmissionError
+        # post
+        form = utils.FormSender(form, url=resp.url)
+        form.set('lang', language)
+        form.set_file('file', 'code', code)
+        form.unset('custom_test')
+        resp = form.request(session=session)
+        resp.raise_for_status()
+        # result
+        if 'submissions' in resp.url:
+            # example: https://yukicoder.me/submissions/314087
+            log.success('success: result: %s', resp.url)
+            return onlinejudge.type.DummySubmission(resp.url)
+        else:
+            log.failure('failure')
+            log.debug('redirected to %s', resp.url)
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            for div in soup.findAll('div', attrs={'role': 'alert'}):
+                log.warning('yukicoder says: "%s"', div.string)
+            raise onlinejudge.type.SubmissionError
+
+    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
+        session = session or utils.new_default_session()
+        # get
+        # We use the problem page since it is available without logging in
+        resp = utils.request('GET', self.get_url(), session=session)
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        select = soup.find('select', id='lang')
+        language_dict = {}
+        for option in select.find_all('option'):
+            language_dict[option.attrs['value']] = {'description': ' '.join(option.string.split())}
+        return language_dict
+
     def get_url(self) -> str:
         if self.problem_no:
             return 'https://yukicoder.me/problems/no/{}'.format(self.problem_no)
