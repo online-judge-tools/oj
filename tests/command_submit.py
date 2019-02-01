@@ -180,3 +180,46 @@ int main() {
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+
+
+class SubmitYukicoderTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_9000(self):
+
+        url = 'https://yukicoder.me/problems/no/9000'
+        code = '\n'.join([
+            '#!/usr/bin/env python2',
+            'print "Hello World!"',
+        ]) + '\n'
+        files = [
+            {
+                'path': 'a.py',
+                'data': code
+            },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_beta_3_b(self):
+
+        url = 'https://yukicoder.me/problems/no/9001'
+        code = r'''#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int a, b; cin >> a >> b;
+    string s; cin >> s;
+    cout << a + b << ' ' << s << endl;
+    return 0;
+}
+'''
+        files = [
+            {
+                'path': 'main.cpp',
+                'data': code
+            },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
