@@ -11,6 +11,9 @@ class Service(object):
     def login(self, get_credentials: CredentialsProvider, session: Optional['requests.Session'] = None) -> bool:
         raise NotImplementedError
 
+    def is_logged_in(self, session: Optional['requests.Session'] = None) -> bool:
+        raise NotImplementedError
+
     def get_url(self) -> str:
         raise NotImplementedError
 

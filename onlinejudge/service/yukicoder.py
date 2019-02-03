@@ -66,6 +66,13 @@ class YukicoderService(onlinejudge.type.Service):
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
 
+    def is_logged_in(self, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
+        session = session or utils.new_default_session()
+        url = 'https://yukicoder.me/auth/github'
+        resp = utils.request('GET', url, session=session, allow_redirects=False)
+        assert resp.status_code == 302
+        return 'oauth' not in resp.headers['Location']
+
     def get_url(self) -> str:
         return 'https://yukicoder.me/'
 
