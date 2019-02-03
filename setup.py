@@ -6,7 +6,8 @@ import setuptools
 from pkg_resources import parse_version
 from setuptools import setup
 
-assert parse_version('30.0.8') <= parse_version(setuptools.__version__)  # for setup.cfg
+if parse_version(setuptools.__version__) < parse_version('30.3.0'):
+    raise RuntimeError('setuptools>=30.3.0 is required for "setup.cfg"')
 
 
 def load_module(module_path):
