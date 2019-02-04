@@ -45,8 +45,7 @@ supported services:
   Codeforces
   Yukicoder
   CS Academy
-
-  (HackerRank has been removed)
+  HackerRank
 
 supported services with --system:
   Aizu Online Judge
@@ -75,8 +74,7 @@ supported services:
   Codeforces
   Yukicoder
   TopCoder
-
-  (HackerRank has been removed)
+  HackerRank
 
 strings for --method:
   github                for yukicoder, login via github (default)

@@ -44,6 +44,14 @@ onlinejudge.service.csacademy module
     :undoc-members:
     :show-inheritance:
 
+onlinejudge.service.hackerrank module
+------------------------------------
+
+.. automodule:: onlinejudge.service.hackerrank
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 onlinejudge.service.topcoder module
 -----------------------------------
 
