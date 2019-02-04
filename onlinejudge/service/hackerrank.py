@@ -1,10 +1,12 @@
 # Python Version: 3.x
 import datetime
+import io
 import json
 import posixpath
 import re
 import time
 import urllib.parse
+import zipfile
 from typing import *
 
 import bs4
@@ -81,61 +83,41 @@ class HackerRankProblem(onlinejudge.type.Problem):
         self.contest_slug = contest_slug
         self.challenge_slug = challenge_slug
 
-    def download(self, session: Optional[requests.Session] = None, method: str = 'run_code') -> List[TestCase]:
-        if method == 'run_code':
-            return self.download_with_running_code(session=session)
-        elif method == 'parse_html':
-            return self.download_with_parsing_html(session=session)
-        else:
-            raise ValueError
-
-    def download_with_running_code(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        session = session or utils.new_default_session()
-        # get
-        resp = utils.request('GET', self.get_url(), session=session)
-        # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        csrftoken = soup.find('meta', attrs={'name': 'csrf-token'}).attrs['content']
-        # post
-        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/compile_tests'.format(self.contest_slug, self.challenge_slug)
-        payload = {'code': ':', 'language': 'bash', 'customtestcase': False}
-        log.debug('payload: %s', payload)
-        resp = utils.request('POST', url, session=session, json=payload, headers={'X-CSRF-Token': csrftoken})
-        # parse
-        it = json.loads(resp.content.decode())
-        log.debug('json: %s', it)
-        if not it['status']:
-            log.error('Run Code: failed')
-            return []
-        model_id = it['model']['id']
-        now = datetime.datetime.now()
-        unixtime = int(datetime.datetime.now().timestamp() * 10**3)
-        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/compile_tests/{}?_={}'.format(self.contest_slug, self.challenge_slug, it['model']['id'], unixtime)
-        # sleep
-        log.status('sleep(3)')
-        time.sleep(3)
-        # get
-        resp = utils.request('GET', url, session=session, headers={'X-CSRF-Token': csrftoken})
-        # parse
-        it = json.loads(resp.content.decode())
-        log.debug('json: %s', it)
-        if not it['status']:
-            log.error('Run Code: failed')
-            return []
-        samples: List[TestCase] = []
-        for i, (inf, outf) in enumerate(zip(it['model']['stdin'], it['model']['expected_output'])):
-            inname = 'Testcase {} Input'.format(i)
-            outname = 'Testcase {} Expected Output'.format(i)
-            samples += [TestCase(
-                LabeledString(inname, utils.textfile(inf)),
-                LabeledString(outname, utils.textfile(outf)),
-            )]
-        return samples
-
-    def download_with_parsing_html(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        session = session or utils.new_default_session()
-        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+        log.warning('use --system option')
         raise NotImplementedError
+
+    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+        session = session or utils.new_default_session()
+        # get
+        # example: https://www.hackerrank.com/rest/contests/hourrank-1/challenges/beautiful-array/download_testcases
+        url = f'https://www.hackerrank.com/rest/contests/{self.contest_slug}/challenges/{self.challenge_slug}/download_testcases'
+        resp = utils.request('GET', url, session=session, raise_for_status=False)
+        if resp.status_code != 200:
+            log.error('response: %s', resp.content.decode())
+            return []
+        # parse
+        with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
+            # list names
+            names = []  # type: List[str]
+            pattern = re.compile(r'(in|out)put/\1put(\d+).txt')
+            for filename in sorted(fh.namelist()):  # "input" < "output"
+                if filename.endswith('/'):
+                    continue
+                log.debug('filename: %s', filename)
+                m = pattern.match(filename)
+                assert m
+                if m.group(1) == 'in':
+                    names += [m.group(2)]
+            # zip samples
+            samples = []  # type: List[TestCase]
+            for name in names:
+                inpath = f'input/input{name}.txt'
+                outpath = f'output/output{name}.txt'
+                indata = fh.read(inpath).decode()
+                outdata = fh.read(outpath).decode()
+                samples += [TestCase(LabeledString(inpath, indata), LabeledString(outpath, outdata))]
+            return samples
 
     def get_url(self) -> str:
         if self.contest_slug == 'master':
