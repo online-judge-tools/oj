@@ -91,7 +91,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         # get
         # example: https://www.hackerrank.com/rest/contests/hourrank-1/challenges/beautiful-array/download_testcases
-        url = f'https://www.hackerrank.com/rest/contests/{self.contest_slug}/challenges/{self.challenge_slug}/download_testcases'
+        url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/download_testcases'.format(self.contest_slug, self.challenge_slug)
         resp = utils.request('GET', url, session=session, raise_for_status=False)
         if resp.status_code != 200:
             log.error('response: %s', resp.content.decode())
@@ -112,8 +112,8 @@ class HackerRankProblem(onlinejudge.type.Problem):
             # zip samples
             samples = []  # type: List[TestCase]
             for name in names:
-                inpath = f'input/input{name}.txt'
-                outpath = f'output/output{name}.txt'
+                inpath = 'input/input{}.txt'.format(name)
+                outpath = 'output/output{}.txt'.format(name)
                 indata = fh.read(inpath).decode()
                 outdata = fh.read(outpath).decode()
                 samples += [TestCase(LabeledString(inpath, indata), LabeledString(outpath, outdata))]
