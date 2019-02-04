@@ -65,6 +65,7 @@ format string for --format:
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
+    subparser.add_argument('-s', '--silent', action='store_true')
     subparser.add_argument('--json', action='store_true')
 
     # login

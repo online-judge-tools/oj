@@ -41,4 +41,4 @@ class DownloadHackerRankTest(unittest.TestCase):
                 '10.out': '66e67dc4e8edbf66ed9ae2c9a0862f2b',
                 '11.in': 'fe24b76ea70e0a44213d7f22d183a33b',
                 '11.out': '8b8ba206ea7bbb02f0361341cb8da7c7',
-            }, is_system=True)
+            }, is_system=True, is_silent=True)
