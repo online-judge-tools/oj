@@ -36,7 +36,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   TopCoder
 -   Submit your solution
     -   AtCoder
-    -   ~~Yukicoder~~ (removed)
+    -   Yukicoder
     -   Codeforces
     -   ~~HackerRank~~ (removed)
     -   TopCoder (Marathon Match)
