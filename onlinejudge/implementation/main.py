@@ -94,6 +94,7 @@ supported services:
   Codeforces
   TopCoder (Marathon Match)
   Yukicoder
+  HackerRank
 
 ''')
     subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')

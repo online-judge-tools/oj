@@ -156,11 +156,29 @@ class HackerRankProblem(onlinejudge.type.Problem):
             raise onlinejudge.type.SubmissionError
         return it['model']
 
+    def _get_lang_display_mapping(self, session: Optional[requests.Session] = None) -> Dict[str, str]:
+        session = session or utils.new_default_session()
+        # get
+        url = 'https://hrcdn.net/hackerrank/assets/codeshell/dist/codeshell-cdffcdf1564c6416e1a2eb207a4521ce.js'  # at "Mon Feb  4 14:51:27 JST 2019"
+        resp = utils.request('GET', url, session=session)
+        # parse
+        s = resp.content.decode()
+        l = s.index('lang_display_mapping:{c:"C",')
+        l = s.index('{', l)
+        r = s.index('}', l) + 1
+        s = s[l:r]
+        log.debug('lang_display_mapping (raw): %s', s)  # this is not a json
+        lang_display_mapping = {}
+        for lang in s[1:-2].split('",'):
+            key, value = lang.split(':"')
+            lang_display_mapping[key] = value
+        log.debug('lang_display_mapping (parsed): %s', lang_display_mapping)
+        return lang_display_mapping
+
     def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Dict[str, str]]:
         session = session or utils.new_default_session()
         info = self._get_model(session=session)
-        # lang_display_mapping from https://hrcdn.net/hackerrank/assets/codeshell/dist/codeshell-449bb296b091277fedc42b23f7c9c447.js, Sun Feb 19 02:25:36 JST 2017
-        lang_display_mapping = {'c': 'C', 'cpp': 'C++', 'java': 'Java 7', 'csharp': 'C#', 'haskell': 'Haskell', 'php': 'PHP', 'python': 'Python 2', 'pypy': 'Pypy 2', 'pypy3': 'Pypy 3', 'ruby': 'Ruby', 'perl': 'Perl', 'bash': 'BASH', 'oracle': 'Oracle', 'mysql': 'MySQL', 'sql': 'SQL', 'clojure': 'Clojure', 'scala': 'Scala', 'code': 'Generic', 'text': 'Plain Text', 'brainfuck': 'Brainfuck', 'javascript': 'Javascript', 'typescript': 'Typescript', 'lua': 'Lua', 'sbcl': 'Common Lisp (SBCL)', 'erlang': 'Erlang', 'go': 'Go', 'd': 'D', 'ocaml': 'OCaml', 'pascal': 'Pascal', 'python3': 'Python 3', 'groovy': 'Groovy', 'objectivec': 'Objective-C', 'text_pseudo': 'Plain Text', 'fsharp': 'F#', 'visualbasic': 'VB. NET', 'cobol': 'COBOL', 'tsql': 'MS SQL Server', 'lolcode': 'LOLCODE', 'smalltalk': 'Smalltalk', 'tcl': 'Tcl', 'whitespace': 'Whitespace', 'css': 'CSS', 'html': 'HTML', 'java8': 'Java 8', 'db2': 'DB2', 'octave': 'Octave', 'r': 'R', 'xquery': 'XQuery', 'racket': 'Racket', 'xml': 'XML', 'rust': 'Rust', 'swift': 'Swift', 'elixir': 'Elixir', 'fortran': 'Fortran', 'ada': 'Ada', 'nim': 'Nim', 'julia': 'Julia', 'cpp14': 'C++14', 'coffeescript': 'Coffeescript'}
+        lang_display_mapping = self._get_lang_display_mapping()
         result = {}
         for lang in info['languages']:
             descr = lang_display_mapping.get(lang)
@@ -170,7 +188,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
             result[lang] = {'description': descr}
         return result
 
-    def submit(self, code: str, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -179,7 +197,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         csrftoken = soup.find('meta', attrs={'name': 'csrf-token'}).attrs['content']
         # post
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/submissions'.format(self.contest_slug, self.challenge_slug)
-        payload = {'code': code, 'language': language}
+        payload = {'code': code, 'language': language, 'contest_slug': self.contest_slug}
         log.debug('payload: %s', payload)
         resp = utils.request('POST', url, session=session, json=payload, headers={'X-CSRF-Token': csrftoken})
         # parse
