@@ -45,8 +45,7 @@ supported services:
   Codeforces
   Yukicoder
   CS Academy
-
-  (HackerRank has been removed)
+  HackerRank
 
 supported services with --system:
   Aizu Online Judge
@@ -66,6 +65,7 @@ format string for --format:
     subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
+    subparser.add_argument('-s', '--silent', action='store_true')
     subparser.add_argument('--json', action='store_true')
 
     # login
@@ -75,8 +75,7 @@ supported services:
   Codeforces
   Yukicoder
   TopCoder
-
-  (HackerRank has been removed)
+  HackerRank
 
 strings for --method:
   github                for yukicoder, login via github (default)
@@ -95,6 +94,7 @@ supported services:
   Codeforces
   TopCoder (Marathon Match)
   Yukicoder
+  HackerRank
 
 ''')
     subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')

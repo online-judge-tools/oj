@@ -132,10 +132,11 @@ class FormSender(object):
     def unset(self, key: str) -> None:
         del self.payload[key]
 
-    def request(self, session: requests.Session, action: Optional[str] = None, **kwargs) -> requests.Response:
+    def request(self, session: requests.Session, method: str = None, action: Optional[str] = None, **kwargs) -> requests.Response:
         action = action or self.form['action']
         url = urllib.parse.urljoin(self.url, action)
-        method = self.form['method'].upper()
+        if method is None:
+            method = self.form['method'].upper()
         log.status('%s: %s', method, url)
         log.debug('payload: %s', str(self.payload))
         resp = session.request(method, url, data=self.payload, files=self.files, **kwargs)
