@@ -25,6 +25,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   HackerRank
     -   Aizu Online Judge
     -   CS Academy
+    -   PKU JudgeOnline
 -   Download system test cases
     -   Yukicoder
     -   Aizu Online Judge

@@ -46,6 +46,7 @@ supported services:
   Yukicoder
   CS Academy
   HackerRank
+  PKU JudgeOnline
 
 supported services with --system:
   Aizu Online Judge
