@@ -107,3 +107,16 @@ class DownloadOthersTest(unittest.TestCase):
                     "output": "5\r\n6\r\n3"
                 },
             ], type='json')
+
+    def test_call_download_poj_3150(self):
+        self.snippet_call_download(
+            'http://poj.org/problem?id=3150', [
+                {
+                    "input": "\r\n5 3 1 1\r\n1 2 2 1 2\r\n\r\n",
+                    "output": "\r\n2 2 2 2 1\r\n\r\n"
+                },
+                {
+                    "input": "\r\n5 3 1 10\r\n1 2 2 1 2",
+                    "output": "\r\n2 0 0 2 2"
+                },
+            ], type='json')

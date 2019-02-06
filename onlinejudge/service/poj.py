@@ -44,9 +44,31 @@ class POJProblem(onlinejudge.type.Problem):
         in_pre, out_pre = soup.find_all('pre', class_='sio')
         in_p = in_pre.find_previous_sibling('p', class_='pst')
         out_p = out_pre.find_previous_sibling('p', class_='pst')
+        log.debug('pre  (in): %s', in_pre.contents)
+        log.debug('pre (out): %s', out_pre.contents)
         assert in_p.text.strip() == 'Sample Input'
         assert out_p.text.strip() == 'Sample Output'
-        return [TestCase(LabeledString(in_p.text.strip(), in_pre.text), LabeledString(out_p.text.strip(), out_pre.text))]
+        assert len(in_pre.contents) == len(out_pre.contents)
+        samples = []  # type: List[TestCase]
+        if len(in_pre.contents) == 1:
+            assert isinstance(in_pre.contents[0], bs4.NavigableString)
+            assert isinstance(out_pre.contents[0], bs4.NavigableString)
+            samples += [TestCase(LabeledString(in_p.text.strip(), in_pre.text), LabeledString(out_p.text.strip(), out_pre.text))]
+        else:
+            assert len(in_pre.contents) % 2 == 0
+            for i in range(len(in_pre.contents) // 2):
+                in_name = in_pre.contents[2 * i]
+                in_data = in_pre.contents[2 * i + 1]
+                out_name = out_pre.contents[2 * i]
+                out_data = out_pre.contents[2 * i + 1]
+                assert in_name.name == 'b'
+                assert isinstance(in_data, bs4.NavigableString)
+                assert out_name.name == 'b'
+                assert isinstance(out_data, bs4.NavigableString)
+                indata = LabeledString(in_name.text.strip(), str(in_data))
+                outdata = LabeledString(out_name.text.strip(), str(out_data))
+                samples += [TestCase(indata, outdata)]
+        return samples
 
     def get_url(self) -> str:
         return 'http://poj.org/problem?id={}'.format(self.problem_id)
