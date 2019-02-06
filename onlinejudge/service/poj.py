@@ -53,7 +53,7 @@ class POJProblem(onlinejudge.type.Problem):
         if len(in_pre.contents) == 1:
             assert isinstance(in_pre.contents[0], bs4.NavigableString)
             assert isinstance(out_pre.contents[0], bs4.NavigableString)
-            samples += [TestCase(LabeledString(in_p.text.strip(), in_pre.text), LabeledString(out_p.text.strip(), out_pre.text))]
+            samples += [TestCase(LabeledString(in_p.text.strip(), in_pre.text + '\r\n'), LabeledString(out_p.text.strip(), out_pre.text + '\r\n'))]
         else:
             assert len(in_pre.contents) % 2 == 0
             for i in range(len(in_pre.contents) // 2):
@@ -65,8 +65,8 @@ class POJProblem(onlinejudge.type.Problem):
                 assert isinstance(in_data, bs4.NavigableString)
                 assert out_name.name == 'b'
                 assert isinstance(out_data, bs4.NavigableString)
-                indata = LabeledString(in_name.text.strip(), str(in_data))
-                outdata = LabeledString(out_name.text.strip(), str(out_data))
+                indata = LabeledString(in_name.text.strip(), str(in_data).strip() + '\r\n')
+                outdata = LabeledString(out_name.text.strip(), str(out_data).strip() + '\r\n')
                 samples += [TestCase(indata, outdata)]
         return samples
 
