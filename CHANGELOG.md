@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.1.54 / 2019-02-07
+
+-   [#113](https://github.com/kmyk/online-judge-tools/issues/113) support `download` from POJ
+-   [#208](https://github.com/kmyk/online-judge-tools/issues/208) support `download` and `submit` for HackerRank again
+-   [#275](https://github.com/kmyk/online-judge-tools/issues/275) support `submit` to Yukicoder again
+-   [#276](https://github.com/kmyk/online-judge-tools/issues/276) add messages and document to login with directly editing session tokens on `cookie.jar`
+-   [#200](https://github.com/kmyk/online-judge-tools/issues/200) add `--check` option to `login` command
+-   [#290](https://github.com/kmyk/online-judge-tools/issues/290) add an error message for when `setuptools` is too old
+
 ## 0.1.53 / 2019-01-28
 
 -   [@fukatani](https://github.com/fukatani) (AtCoder: [ryoryoryo111](https://atcoder.jp/users/ryoryoryo111)) joined as a maintainer :tada:
