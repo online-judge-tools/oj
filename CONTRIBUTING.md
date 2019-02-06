@@ -1,5 +1,7 @@
 # Contribute Guide / 開発を手伝ってくれる人へ
 
+TODO: translate this document to English
+
 ## language / 言語について
 
 In the source code and documents for end users, we should use English.
@@ -45,38 +47,39 @@ Web scraping をする性質により動作は必然的に不安定であり、�
 
 ## module structure
 
-主に以下のような構造です。
+The structure is as follows:
 
-t-   `onlinejudge/`
-    -   `type.py`: 型はすべてここ
-    -   `dispatch.py`: URL から object を解決する仕組み
+-   `onlinejudge/`
+    -   `type.py`: contains all 
+    -   `dispatch.py`: resolves classes from URL
     -   `implementation/`
-        -   `main.py`: 個別のコマンドを呼び出すまでの部分
-        -   `command/`: `download` `submit` などのコマンドの本体が置かれる
+        -   `main.py`
+        -   `command/`: has the bodies of commands like `download`, `submit`, etc.
             -   `download.py`
             -   `submit.py`
             -   ...
-    -   `service/`: AtCoder, Codeforces などのサービスごとの実装が置かれる
+    -   `service/`: has classes for services like AtCoder, Codeforces, etc.
         -   `atcoder.py`
         -   `codeforces.py`
         -   ...
--   `tests/`: テストが置かれる
+-   `tests/`
 
 ## formatter
 
-isort と yapf を運用しています。
-行幅は実質無限に設定されています。
-それぞれ次のようなコマンドで実行できます。
+We use `isort` adn `yapf`.
+You can run them with the following commands:
 
 ``` sh
 $ isort --recursive oj onlinejudge
 $ yapf --in-place --recursive oj onlinejudge
 ```
 
+The line width is set as infinity.
+
 ## tests
 
-静的型検査と通常のテストをしています。
-手元ではそれぞれ次のようなコマンドで実行できます。
+We use static type checking and unit testing.
+You can run them with the following commands:
 
 ``` sh
 $ mypy oj onlinejudge
@@ -108,3 +111,19 @@ Travis CI から PyPI 上へ upload を仕掛けるように設定されてい�
     -   例: [3a24dc](https://github.com/kmyk/online-judge-tools/commit/3a24dc64b56d898e387dee56cf9915be3ab0f7e2)
 2.  `v0.1.23` の形で Git tag を打って GitHub 上へ push する
     -   これにより Travis CI の機能が呼び出され PyPI への upload がなされる
+
+## how to add a new contest platform / 対応サービスの追加の手順
+
+Short version: see files for other platforms like `onlinejudge/service/poj.py` or `onlinejudge/service/codeforces.py`, and `tests/command_download_hackerrank.py` or `https://github.com/kmyk/online-judge-tools/blob/master/tests/command_submit.py` for tests
+
+Long version:
+
+1.  make the file `onlinejudge/service/${NAME}.py`
+1.  write the singleton class `${NAME}Service` inheriting `onlinejudge.type.Service`
+    -   You must implement at least methods `get_url()` `get_name()` and `cls.from_url()`, and you can ignore others.
+1.  write the class `${NAME}Problem` inheriting `onlinejudge.type.Problem`
+    -   You must implement at least methods `download_sample_cases()` `get_url()` `get_service()` and `cls.from_url()`, and you can ignore others.
+1.  register the classes to the lists `onlinejudge.dispatch.services` and `onlinejudge.dispatch.problems`
+1.  register the module to the `onlinejudge/service/__init__.py`
+1.  write tests for your platform
+    -   You should make `tests/command_download_${NAME}.py` and/or append to `tests/command_submit.py`. Please see other existing tests.
