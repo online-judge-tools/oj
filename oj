@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+import sys
+
+import onlinejudge.implementation.main
+
+if __name__ == '__main__':
+    onlinejudge.implementation.main.main(args=sys.argv[1:])
