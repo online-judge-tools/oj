@@ -311,7 +311,10 @@ class YukicoderProblem(onlinejudge.type.Problem):
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:  # or SubmissionError
         session = session or utils.new_default_session()
         # get
-        url = 'https://yukicoder.me/problems/no/{}/submit'.format(self.problem_no)
+        if self.problem_no is not None:
+            url = 'https://yukicoder.me/problems/no/{}/submit'.format(self.problem_no)
+        else:
+            url = 'https://yukicoder.me/problems/{}/submit'.format(self.problem_id)
         resp = utils.request('GET', url, session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
