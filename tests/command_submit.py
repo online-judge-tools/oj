@@ -204,7 +204,7 @@ class SubmitYukicoderTest(unittest.TestCase):
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_beta_3_b(self):
 
-        url = 'https://yukicoder.me/problems/no/9001'
+        url = 'https://yukicoder.me/problems/527'
         code = r'''#include <bits/stdc++.h>
 using namespace std;
 int main() {
