@@ -12,10 +12,24 @@ For other place, both English and Japanese are acceptable.
 
 ## issues / issue について
 
+Not only sending Pull Requests, feature requests and bug reports are welcome.
+
 機能要求やバグ報告は気軽にしてください。
 コードを書くことだけが開発ではありません。
 
 ## pull requests / プルリクについて
+
+PR is always welcome.
+
+However, please note that PR is not always merged as it is.
+To improve PR quality, reviewers may ask you change requests.
+
+-   Test your PR branch on local by `python3 setup.py test`.
+-   Write friendly code to the reviewers.
+    -   Diffs need to be limited to the PR purpose.   
+    -   Split commits appropriately.
+    -   Comment on the code where you are not confident of.
+-   If you want to add feature, it is desirable discuss in advance that before writing code.
 
 基本的にはどんなものでも歓迎します。
 
@@ -35,6 +49,10 @@ For other place, both English and Japanese are acceptable.
 # Internal Structure / 内部構造
 
 ## philosophy of design / 設計の方針
+
+Our first purpose is "to help get the top in the programming contests".
+Especially, we are focusing on "online-judge-tools does not cause the penalties".
+To make it possible, online-judge-tools automates "mistakable manual work".
 
 第一義は「コンテストで上位を取ることに役立つこと」です。
 特に「ペナルティを出させないこと」に注力しています。
