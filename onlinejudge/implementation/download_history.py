@@ -29,7 +29,7 @@ class DownloadHistory(object):
         self._flush()
 
     def _flush(self) -> None:
-        # halve the size if it is more than 1MiB
+        # have the size if it is more than 1MiB
         if self.path.stat().st_size >= 1024 * 1024:
             with open(str(self.path)) as fh:
                 history_lines = fh.readlines()
