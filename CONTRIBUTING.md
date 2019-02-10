@@ -39,7 +39,7 @@ To improve PR quality, reviewers may ask you change requests.
 -   手元でテストをする (`python3 setup.py test` を実行する)
     -   CI が通らない限りは merge はできません
 -   レビュアーにやさしいコードを書く
-    -   変更箇所は必要最低限にする
+    -   変更箇所はPRの目的に沿った必要最低限のものにする
     -   commit は適切に分割する
     -   怪しげなところにはコメントを書いておく
 -   機能追加をする場合は事前に確認をする
@@ -51,13 +51,13 @@ To improve PR quality, reviewers may ask you change requests.
 ## philosophy of design / 設計の方針
 
 Our first purpose is "to help get the top in the programming contests".
-Especially, we are focusing on "online-judge-tools does not cause the penalties".
-To make it possible, online-judge-tools automates "mistakable manual work".
+To make it possible, online-judge-tools automates "mistakable and cumbersome manual work".
+Also, we are focusing on "online-judge-tools does not cause the penalties".
 
 第一義は「コンテストで上位を取ることに役立つこと」です。
-特に「ペナルティを出させないこと」に注力しています。
 これを実現する手段として「手動だと間違えたりさぼったりしやすい作業を自動化する」を用いています。
 
+また、「ペナルティを出させないこと」に注力しています。
 Web scraping をする性質により動作は必然的に不安定であり、これは「ペナルティを出させないこと」の壁となります。
 これへの対応として「誤動作の起こりやすい機能は避ける」「誤動作があったときに誤動作があると気付きやすいようにする」などを重要視しています。
 その実践の例としては「取得したサンプルケースを(ファイルに出力するだけでなく)画面に見やすく表示する」が分かりやすいでしょう。
