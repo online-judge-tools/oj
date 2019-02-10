@@ -47,6 +47,7 @@ supported services:
   CS Academy
   HackerRank
   PKU JudgeOnline
+  Kattis
 
 supported services with --system:
   Aizu Online Judge
