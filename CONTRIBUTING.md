@@ -25,11 +25,12 @@ However, please note that PR is not always merged as it is.
 To improve PR quality, reviewers may ask you change requests.
 
 -   Test your PR branch on local by `python3 setup.py test`.
--   Write friendly code to the reviewers.
-    -   Diffs need to be limited to the PR purpose.   
+-   Write code easy to understand.
+    -   Don't make diff which is unnecessary for the purpose of PR.
     -   Split commits appropriately.
     -   Comment on the code where you are not confident of.
--   If you want to add feature, it is desirable discuss in advance that before writing code.
+-   If you want to add a feature, it would be better to discuss before writing code
+    -   because your feature is not always merged
 
 基本的にはどんなものでも歓迎します。
 
@@ -50,9 +51,14 @@ To improve PR quality, reviewers may ask you change requests.
 
 ## philosophy of design / 設計の方針
 
-Our first purpose is "to help get the top in the programming contests".
-To make it possible, online-judge-tools automates "mistakable and cumbersome manual work".
-Also, we are focusing on "online-judge-tools does not cause the penalties".
+**Our purpose is to help get a higher rank in programming contests.**
+To make it possible, online-judge-tools automates *mistakable and cumbersome manual work*.
+
+Also, we are focusing on *online-judge-tools does not cause the penalties*.
+Since online-judge-tools does web scraping, the behavior is unstable.
+To prevent penalties under this condition, *we avoid to supports the features which is prone to malfunction* and *make it easy to notice malfunction if malfunction is occured*. 
+For example, this program pretty-prints the downloaded sample cases.
+If such a printing does not exist, false acquisition of the sample cases causes a considerable time loss.
 
 第一義は「コンテストで上位を取ることに役立つこと」です。
 これを実現する手段として「手動だと間違えたりさぼったりしやすい作業を自動化する」を用いています。
@@ -115,8 +121,11 @@ $ python3 setup.py test -s tests.command_download_atcoder.DownloadAtCoderTest
 
 ## CI
 
+Travis CI will run automatically when you commit or send PR on `master` or `develop` branch.
+The same test as that by `python3 setup.py test` is executed.
+
 `master` `develop` に関する commit や pull request について CI が走ります。
-`python3 setup.py test` の実行でも同等の処理が行われるように設定されているので、手元でこれを実行しているなら気にする必要はありません。
+`python3 setup.py test` の実行によるものと同等のテストが行われます。
 
 ## deployment
 
