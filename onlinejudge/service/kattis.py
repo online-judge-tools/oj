@@ -37,9 +37,9 @@ class KattisService(onlinejudge.type.Service):
 
 
 class KattisProblem(onlinejudge.type.Problem):
-    def __init__(self, problem_id: str, contest: Optional[str] = None, domain: str = 'open.kattis.com'):
+    def __init__(self, problem_id: str, contest_id: Optional[str] = None, domain: str = 'open.kattis.com'):
         self.domain = domain
-        self.contest = contest
+        self.contest_id = contest_id
         self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
@@ -65,10 +65,10 @@ class KattisProblem(onlinejudge.type.Problem):
                     samples += [TestCase(LabeledString(inpath, indata), LabeledString(outpath, outdata))]
             return samples
 
-    def get_url(self, contests=True) -> str:
-        if contests and self.contest is not None:
+    def get_url(self, contests: bool = True) -> str:
+        if contests and self.contest_id is not None:
             # the URL without "/contests/{}" also works
-            return 'https://{}/contests/{}/problems/{}'.format(self.domain, self.contest, self.problem_id)
+            return 'https://{}/contests/{}/problems/{}'.format(self.domain, self.contest_id, self.problem_id)
         else:
             return 'https://{}/problems/{}'.format(self.domain, self.problem_id)
 
@@ -85,9 +85,9 @@ class KattisProblem(onlinejudge.type.Problem):
                 and result.netloc.endswith('.kattis.com'):
             m = re.match(r'(?:/contests/([0-9A-Z_a-z-]+))?/problems/([0-9A-Z_a-z-]+)/?', result.path)
             if m:
-                contest = m.group(1) or None
+                contest_id = m.group(1) or None
                 problem_id = m.group(2)
-                return cls(problem_id, contest=contest, domain=result.netloc)
+                return cls(problem_id, contest_id=contest_id, domain=result.netloc)
         return None
 
 
