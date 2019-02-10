@@ -29,3 +29,7 @@ class DownloadKattisTest(unittest.TestCase):
                     "output": "YES\nRRUULLD\nNO\nYES\nRD\n"
                 },
             ], type='json')
+
+    def test_call_download_kattis_hello(self):
+        # there is no sample cases (and no samples.zip; it returns 404)
+        self.snippet_call_download('https://open.kattis.com/problems/hello', [], type='json')

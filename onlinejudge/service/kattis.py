@@ -46,7 +46,12 @@ class KattisProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         # get
         url = self.get_url(contests=False) + '/file/statement/samples.zip'
-        resp = utils.request('GET', url, session=session)
+        resp = utils.request('GET', url, session=session, raise_for_status=False)
+        if resp.status_code == 404:
+            log.warning('samples.zip not found')
+            log.info('this 404 happens in both cases: 1. no sample cases as intended; 2. just an error')
+            return []
+        resp.raise_for_status()
         # parse
         with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
             samples = []  # type: List[TestCase]
