@@ -29,8 +29,8 @@ To improve PR quality, reviewers may ask you change requests.
     -   Don't make diff which is unnecessary for the purpose of PR.
     -   Split commits appropriately.
     -   Comment on the code where you are not confident of.
--   If you want to add a feature, it would be better to discuss before writing code
-    -   because your feature is not always merged
+-   If you want to add a feature, it would be better to discuss before writing code.
+    -   because your feature is not always merged.
 
 基本的にはどんなものでも歓迎します。
 
