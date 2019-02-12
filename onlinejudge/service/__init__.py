@@ -6,3 +6,4 @@ import onlinejudge.service.codeforces
 import onlinejudge.service.csacademy
 import onlinejudge.service.topcoder
 import onlinejudge.service.yukicoder
+import onlinejudge.service.toph
