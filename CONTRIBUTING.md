@@ -51,15 +51,6 @@ To improve PR quality, reviewers may ask you change requests.
 
 ## philosophy of design / 設計の方針
 
-**Our purpose is to help get a higher rank in programming contests.**
-To make it possible, online-judge-tools automates *mistakable and cumbersome manual work*.
-
-Also, we are focusing on *online-judge-tools does not cause the penalties*.
-Since online-judge-tools does web scraping, the behavior is unstable.
-To prevent penalties under this condition, *we avoid to supports the features which is prone to malfunction* and *make it easy to notice malfunction if malfunction is occured*. 
-For example, this program pretty-prints the downloaded sample cases.
-If such a printing does not exist, false acquisition of the sample cases causes a considerable time loss.
-
 第一義は「コンテストで上位を取ることに役立つこと」です。
 これを実現する手段として「手動だと間違えたりさぼったりしやすい作業を自動化する」を用いています。
 
