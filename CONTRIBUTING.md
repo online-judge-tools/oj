@@ -12,10 +12,25 @@ For other place, both English and Japanese are acceptable.
 
 ## issues / issue について
 
+Not only sending Pull Requests, feature requests and bug reports are welcome.
+
 機能要求やバグ報告は気軽にしてください。
 コードを書くことだけが開発ではありません。
 
 ## pull requests / プルリクについて
+
+PR is always welcome.
+
+However, please note that PR is not always merged as it is.
+To improve PR quality, reviewers may ask you change requests.
+
+-   Test your PR branch on local by `python3 setup.py test`.
+-   Write code easy to understand.
+    -   Don't make diff which is unnecessary for the purpose of PR.
+    -   Split commits appropriately.
+    -   Comment on the code where you are not confident of.
+-   If you want to add a feature, it would be better to discuss before writing code.
+    -   because your feature is not always merged.
 
 基本的にはどんなものでも歓迎します。
 
@@ -25,7 +40,7 @@ For other place, both English and Japanese are acceptable.
 -   手元でテストをする (`python3 setup.py test` を実行する)
     -   CI が通らない限りは merge はできません
 -   レビュアーにやさしいコードを書く
-    -   変更箇所は必要最低限にする
+    -   変更箇所はPRの目的に沿った必要最低限のものにする
     -   commit は適切に分割する
     -   怪しげなところにはコメントを書いておく
 -   機能追加をする場合は事前に確認をする
@@ -37,9 +52,9 @@ For other place, both English and Japanese are acceptable.
 ## philosophy of design / 設計の方針
 
 第一義は「コンテストで上位を取ることに役立つこと」です。
-特に「ペナルティを出させないこと」に注力しています。
 これを実現する手段として「手動だと間違えたりさぼったりしやすい作業を自動化する」を用いています。
 
+また、「ペナルティを出させないこと」に注力しています。
 Web scraping をする性質により動作は必然的に不安定であり、これは「ペナルティを出させないこと」の壁となります。
 これへの対応として「誤動作の起こりやすい機能は避ける」「誤動作があったときに誤動作があると気付きやすいようにする」などを重要視しています。
 その実践の例としては「取得したサンプルケースを(ファイルに出力するだけでなく)画面に見やすく表示する」が分かりやすいでしょう。
@@ -97,8 +112,11 @@ $ python3 setup.py test -s tests.command_download_atcoder.DownloadAtCoderTest
 
 ## CI
 
+Travis CI will run automatically when you commit or send PR on `master` or `develop` branch.
+The same test as that by `python3 setup.py test` is executed.
+
 `master` `develop` に関する commit や pull request について CI が走ります。
-`python3 setup.py test` の実行でも同等の処理が行われるように設定されているので、手元でこれを実行しているなら気にする必要はありません。
+`python3 setup.py test` の実行によるものと同等のテストが行われます。
 
 ## deployment
 
