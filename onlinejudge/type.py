@@ -1,17 +1,16 @@
 # Python Version: 3.x
 from typing import *
 
-if TYPE_CHECKING:
-    import requests
+import requests
 
 CredentialsProvider = Callable[[], Tuple[str, str]]
 
 
 class Service(object):
-    def login(self, get_credentials: CredentialsProvider, session: Optional['requests.Session'] = None) -> bool:
+    def login(self, get_credentials: CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         raise NotImplementedError
 
-    def is_logged_in(self, session: Optional['requests.Session'] = None) -> bool:
+    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         raise NotImplementedError
 
     def get_url(self) -> str:
@@ -37,19 +36,19 @@ class SubmissionError(RuntimeError):
 
 
 class Problem(object):
-    def download_sample_cases(self, session: Optional['requests.Session'] = None) -> List[TestCase]:
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         raise NotImplementedError
 
-    def download_system_cases(self, session: Optional['requests.Session'] = None) -> List[TestCase]:
+    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         raise NotImplementedError
 
-    def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> 'Submission':
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> 'Submission':
         """
         :raises SubmissionError:
         """
         raise NotImplementedError
 
-    def get_language_dict(self, session: Optional['requests.Session'] = None) -> Dict[str, Language]:
+    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Language]:
         raise NotImplementedError
 
     def get_url(self) -> str:
@@ -58,10 +57,10 @@ class Problem(object):
     def get_service(self) -> Service:
         raise NotImplementedError
 
-    def get_input_format(self, session: Optional['requests.Session'] = None) -> Optional[str]:
+    def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
         raise NotImplementedError
 
-    def get_standings(self, session: Optional['requests.Session'] = None) -> Standings:
+    def get_standings(self, session: Optional[requests.Session] = None) -> Standings:
         raise NotImplementedError
 
     @classmethod
@@ -70,7 +69,7 @@ class Problem(object):
 
 
 class Submission(object):
-    def download_code(self, session: Optional['requests.Session'] = None) -> bytes:
+    def download_code(self, session: Optional[requests.Session] = None) -> bytes:
         raise NotImplementedError
 
     def get_url(self) -> str:
