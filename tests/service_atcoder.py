@@ -76,6 +76,23 @@ class AtCoderSubmissionTest(unittest.TestCase):
         self.assertEqual(submission.get_exec_time_msec(), 85)
         self.assertEqual(submission.get_memory_byte(), 3328 * 1000)
 
+    def test_get_test_sets(self):
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/arc028/submissions/223928')
+        test_cases = submission.get_test_sets()
+        self.assertEqual(len(test_cases), 3)
+        self.assertEqual(test_cases[0].set_name, 'Sample')
+        self.assertEqual(test_cases[0].score, 0)
+        self.assertEqual(test_cases[0].max_score, 0)
+        self.assertEqual(test_cases[0].test_case_names, ['sample_01.txt', 'sample_02.txt'])
+        self.assertEqual(test_cases[1].set_name, 'Subtask1')
+        self.assertEqual(test_cases[1].score, 40)
+        self.assertEqual(test_cases[1].max_score, 40)
+        self.assertEqual(len(test_cases[1].test_case_names), 13)
+        self.assertEqual(test_cases[2].set_name, 'Subtask2')
+        self.assertEqual(test_cases[2].score, 0)
+        self.assertEqual(test_cases[2].max_score, 60)
+        self.assertEqual(len(test_cases[2].test_case_names), 20)
+
     def test_get_test_cases(self):
         submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/tricky/submissions/119944')
         test_cases = submission.get_test_cases()
