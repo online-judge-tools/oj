@@ -3,6 +3,7 @@
 import contextlib
 import datetime
 import distutils.version
+import functools
 import http.client
 import http.cookiejar
 import json
@@ -259,6 +260,7 @@ tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 
 
 def getter_with_load_details(name: str) -> Callable:
+    @functools.wraps(lambda self: getattr(self, name))
     def wrapper(self, session: Optional[requests.Session] = None):
         if getattr(self, name) is None:
             getattr(self, '_load_details')(session)
