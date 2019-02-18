@@ -1,5 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
+import datetime
+import itertools
 import json
 import posixpath
 import re
@@ -97,6 +99,99 @@ class AtCoderService(onlinejudge.type.Service):
         if msgs and unexpected:
             log.failure('unexpected messages found')
         return bool(msgs)
+
+    def iterate_contests(self, lang: str = 'ja', session: Optional[requests.Session] = None) -> Generator['AtCoderContest', None, None]:
+        assert lang in ('ja', 'en')  # NOTE: "lang=ja" is required to see some Japanese-local contests. However you can use "lang=en" to see the English names of contests.
+        session = session or utils.new_default_session()
+        last_page = None
+        for page in itertools.count(1):  # 1-based
+            if last_page is not None and page > last_page:
+                break
+            # get
+            url = 'https://atcoder.jp/contests/archive?lang={}&page={}'.format(lang, page)
+            resp = _request('GET', url, session=session)
+            # parse
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            if last_page is None:
+                last_page = int(soup.find('ul', class_='pagination').find_all('li')[-1].text)
+                log.debug('last page: %s', last_page)
+            tbody = soup.find('tbody')
+            for tr in tbody.find_all('tr'):
+                yield AtCoderContest._from_table_row(tr, lang=lang)
+
+    def get_user_history_url(self, user_id: str) -> str:
+        return 'https://atcoder.jp/users/{}/history/json'.format(user_id)
+
+
+class AtCoderContest(object):
+    def __init__(self, contest_id: str):
+        self.contest_id = contest_id
+
+        # NOTE: some fields remain undefined, comparing `_from_table_row`
+        self._start_time_url = None  # type: Optional[str]
+        self._contest_name_ja = None  # type: Optional[str]
+        self._contest_name_en = None  # type: Optional[str]
+        self._duration_text = None  # type: Optional[str]
+        self._rated_range = None  # type: Optional[str]
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag, lang: str) -> 'AtCoderContest':
+        tds = tr.find_all('td')
+        assert len(tds) == 4
+        anchors = [tds[0].find('a'), tds[1].find('a')]
+        contest_path = anchors[1]['href']
+        assert contest_path.startswith('/contests/')
+        contest_id = contest_path[len('/contests/'):]
+        self = AtCoderContest(contest_id)
+        self._start_time_url = anchors[0]['href']
+        if lang == 'ja':
+            self._contest_name_ja = anchors[1].text
+        elif lang == 'en':
+            self._contest_name_en = anchors[1].text
+        else:
+            assert False
+        self._duration_text = tds[2].text
+        self._rated_range = tds[3].text
+        return self
+
+    def get_start_time(self) -> datetime.datetime:
+        if self._start_time_url is None:
+            raise NotImplementedError
+        # TODO: we need to use an ISO-format parser
+        query = urllib.parse.parse_qs(urllib.parse.urlparse(self._start_time_url).query)
+        assert len(query['iso']) == 1
+        assert query['p1'] == ['248']  # means JST
+        return datetime.datetime.strptime(query['iso'][0], '%Y%m%dT%H%M').replace(tzinfo=utils.tzinfo_jst)
+
+    def get_contest_name(self, lang: Optional[str] = None) -> str:
+        if lang is None:
+            if self._contest_name_en is not None:
+                return self._contest_name_en
+            elif self._contest_name_ja is not None:
+                return self._contest_name_ja
+            else:
+                raise NotImplementedError
+        elif lang == 'en':
+            if self._contest_name_en is None:
+                raise NotImplementedError
+            return self._contest_name_en
+        elif lang == 'ja':
+            if self._contest_name_ja is None:
+                raise NotImplementedError
+            return self._contest_name_ja
+        else:
+            assert False
+
+    def get_duration(self) -> datetime.timedelta:
+        if self._duration_text is None:
+            raise NotImplementedError
+        hours, minutes = map(int, self._duration_text.split(':'))
+        return datetime.timedelta(hours=hours, minutes=minutes)
+
+    def get_rated_range(self) -> str:
+        if self._rated_range is None:
+            raise NotImplementedError
+        return self._rated_range
 
 
 class AtCoderProblem(onlinejudge.type.Problem):
