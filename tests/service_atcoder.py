@@ -76,6 +76,19 @@ class AtCoderSubmissionTest(unittest.TestCase):
         self.assertEqual(submission.get_exec_time_msec(), 85)
         self.assertEqual(submission.get_memory_byte(), 3328 * 1000)
 
+    def test_get_test_cases(self):
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/tricky/submissions/119944')
+        test_cases = submission.get_test_cases()
+        self.assertEqual(len(test_cases), 2)
+        self.assertEqual(test_cases[0].case_name, 'input_01.txt')
+        self.assertEqual(test_cases[0].status, 'TLE')
+        self.assertEqual(test_cases[0].exec_time_msec, None)
+        self.assertEqual(test_cases[0].memory_byte, None)
+        self.assertEqual(test_cases[1].case_name, 'input_02.txt')
+        self.assertEqual(test_cases[1].status, 'AC')
+        self.assertEqual(test_cases[1].exec_time_msec, 131)
+        self.assertEqual(test_cases[1].memory_byte, 7400 * 1000)
+
     def test_get_source_code(self):
         submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/abc100/submissions/3082514')
         self.assertEqual(submission.get_source_code(), b'/9\\|\\B/c:(\ncYay!')
