@@ -1,5 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
+"""
+the module for Aizu Online Judge (http://judge.u-aizu.ac.jp/onlinejudge/)
+"""
+
 import collections
 import io
 import itertools
@@ -21,17 +25,17 @@ from onlinejudge.type import LabeledString, TestCase
 
 @utils.singleton
 class AOJService(onlinejudge.type.Service):
-    def get_url(self):
+    def get_url(self) -> str:
         return 'http://judge.u-aizu.ac.jp/onlinejudge/'
 
-    def get_name(self):
+    def get_name(self) -> str:
         return 'aoj'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['AOJService']:
+    def from_url(cls, url: str) -> Optional['AOJService']:
         # example: http://judge.u-aizu.ac.jp/onlinejudge/
         # example: https://onlinejudge.u-aizu.ac.jp/home
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('judge.u-aizu.ac.jp', 'onlinejudge.u-aizu.ac.jp'):
             return cls()
@@ -90,8 +94,8 @@ class AOJProblem(onlinejudge.type.Problem):
         return 'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id={}'.format(self.problem_id)
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['AOJProblem']:
-        result = urllib.parse.urlparse(s)
+    def from_url(cls, url: str) -> Optional['AOJProblem']:
+        result = urllib.parse.urlparse(url)
 
         # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1169
         # example: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A&lang=jp
