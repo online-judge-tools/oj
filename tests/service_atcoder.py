@@ -63,6 +63,32 @@ class AtCoderSubmissionTest(unittest.TestCase):
         self.assertEqual(AtCoderSubmission.from_url('https://qupc2014.contest.atcoder.jp/submissions/1444440').contest_id, 'qupc2014')
         self.assertEqual(AtCoderSubmission.from_url('https://qupc2014.contest.atcoder.jp/submissions/1444440').submission_id, 1444440)
 
+    def test_submission_info(self):
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/agc030/submissions/3904911')
+        self.assertEqual(submission.get_submission_time().year, 2018)
+        self.assertEqual(submission.get_submission_time().month, 12)
+        self.assertEqual(submission.get_submission_time().day, 31)
+        self.assertEqual(submission.get_user_id(), 'kimiyuki')
+        self.assertEqual(submission.get_problem().problem_id, 'agc030_b')
+        self.assertEqual(submission.get_language_name(), 'C++14 (GCC 5.4.1)')
+        self.assertEqual(submission.get_score(), 800)
+        self.assertEqual(submission.get_code_size(), 1457)
+        self.assertEqual(submission.get_exec_time_ms(), 85)
+        self.assertEqual(submission.get_memory_kb(), 3328)
+
+    def test_get_source_code(self):
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/abc100/submissions/3082514')
+        self.assertEqual(submission.get_source_code(), b'/9\\|\\B/c:(\ncYay!')
+        self.assertEqual(submission.get_code_size(), 16)
+
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/abc100/submissions/4069980')
+        self.assertEqual(submission.get_source_code(), b'/9\\|\\B/c:(\r\ncYay!')
+        self.assertEqual(submission.get_code_size(), 17)
+
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/abc100/submissions/4317534')
+        self.assertEqual(submission.get_source_code(), b'/9\\|\\B/c:(\r\ncYay!\r\n')
+        self.assertEqual(submission.get_code_size(), 19)
+
 
 if __name__ == '__main__':
     unittest.main()

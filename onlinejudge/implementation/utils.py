@@ -256,3 +256,14 @@ def remove_suffix(s: str, suffix: str) -> str:
 
 
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
+
+
+def getter_with_load_details(name: str) -> Callable:
+    def wrapper(self, session: Optional[requests.Session] = None):
+        if getattr(self, name) is None:
+            getattr(self, '_load_details')(session)
+        attr = getattr(self, name)
+        assert attr is not None
+        return attr
+
+    return wrapper
