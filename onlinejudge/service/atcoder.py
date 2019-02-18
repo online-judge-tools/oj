@@ -474,6 +474,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._exec_time_msec = None  # type: Optional[int]
         self._memory_byte = None  # type: Optional[int]
         self._compile_error = None  # type: Optional[str]
+        self._test_sets = None  # type: Optional[List[AtCoderSubmissionTestSet]]
         self._test_cases = None  # type: Optional[List[AtCoderSubmissionTestCaseResult]]
 
     @classmethod
@@ -576,6 +577,8 @@ class AtCoderSubmission(onlinejudge.type.Submission):
             self.compile_error = compile_error.text
 
         # Test Cases
+        trs = test_cases_summary.find('tbody').find_all('tr')
+        self._test_sets = [AtCoderSubmissionTestSet._from_table_row(tr) for tr in trs]
         trs = test_cases_data.find('tbody').find_all('tr')
         self._test_cases = [AtCoderSubmissionTestCaseResult._from_table_row(tr) for tr in trs]
 
@@ -595,7 +598,25 @@ class AtCoderSubmission(onlinejudge.type.Submission):
     get_status = utils.getter_with_load_details('_status')  # type: Callable[..., str]
     get_exec_time_msec = utils.getter_with_load_details('_exec_time_msec', check_with='_status')  # type: Callable[..., int]
     get_memory_byte = utils.getter_with_load_details('_memory_byte', check_with='_status')  # type: Callable[..., int]
+    get_test_sets = utils.getter_with_load_details('_test_sets')  # type: Callable[..., List[AtCoderSubmissionTestSet]]
     get_test_cases = utils.getter_with_load_details('_test_cases')  # type: Callable[..., List[AtCoderSubmissionTestCaseResult]]
+
+
+class AtCoderSubmissionTestSet(object):
+    def __init__(self, set_name: str, score: int, max_score: int, test_case_names: List[str]):
+        self.set_name = set_name
+        self.score = score
+        self.max_score = max_score
+        self.test_case_names = test_case_names
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag) -> 'AtCoderSubmissionTestSet':
+        tds = tr.find_all('td')
+        assert len(tds) == 3
+        set_name = tds[0].text
+        score, max_score = [int(s) for s in tds[1].text.split('/')]
+        test_case_names = tds[2].text.split(', ')
+        return AtCoderSubmissionTestSet(set_name, score, max_score, test_case_names)
 
 
 class AtCoderSubmissionTestCaseResult(object):
