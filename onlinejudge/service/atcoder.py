@@ -562,8 +562,10 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._score = int(data['Score'])
         self._code_size = int(utils.remove_suffix(data['Code Size'], ' Byte'))
         self._status = data['Status']
-        self._exec_time_msec = int(utils.remove_suffix(data['Exec Time'], ' ms'))
-        self._memory_byte = int(utils.remove_suffix(data['Memory'], ' KB')) * 1000
+        if 'Exec Time' in data:
+            self._exec_time_msec = int(utils.remove_suffix(data['Exec Time'], ' ms'))
+        if 'Memory' in data:
+            self._memory_byte = int(utils.remove_suffix(data['Memory'], ' KB')) * 1000
 
         # Compile Error
         compile_error = soup.find('h4', text='Compile Error')
@@ -591,26 +593,31 @@ class AtCoderSubmission(onlinejudge.type.Submission):
     get_score = utils.getter_with_load_details('_score')  # type: Callable[..., int]
     get_code_size = utils.getter_with_load_details('_code_size')  # type: Callable[..., int]
     get_status = utils.getter_with_load_details('_status')  # type: Callable[..., str]
-    get_exec_time_msec = utils.getter_with_load_details('_exec_time_msec')  # type: Callable[..., int]
-    get_memory_byte = utils.getter_with_load_details('_memory_byte')  # type: Callable[..., int]
+    get_exec_time_msec = utils.getter_with_load_details('_exec_time_msec', check_with='_status')  # type: Callable[..., int]
+    get_memory_byte = utils.getter_with_load_details('_memory_byte', check_with='_status')  # type: Callable[..., int]
     get_test_cases = utils.getter_with_load_details('_test_cases')  # type: Callable[..., List[AtCoderSubmissionTestCaseResult]]
 
 
 class AtCoderSubmissionTestCaseResult(object):
-    def __init__(self, case_name: str, status: str, exec_time_msec: int, memory_kb: int):
+    def __init__(self, case_name: str, status: str, exec_time_msec: Optional[int], memory_byte: Optional[int]):
         self.case_name = case_name
         self.status = status
         self.exec_time_msec = exec_time_msec
-        self.memory_kb = memory_kb
+        self.memory_byte = memory_byte
 
     @classmethod
     def _from_table_row(cls, tr: bs4.Tag) -> 'AtCoderSubmissionTestCaseResult':
         tds = tr.find_all('td')
         case_name = tds[0].text
         status = tds[1].text
-        exec_time_msec = int(utils.remove_suffix(tds[2].text, ' ms'))
-        memory_kb = int(utils.remove_suffix(tds[3].text, ' KB'))
-        return AtCoderSubmissionTestCaseResult(case_name, status, exec_time_msec, memory_kb)
+        exec_time_msec = None  # type: Optional[int]
+        memory_byte = None  # type: Optional[int]
+        if len(tds) == 4:
+            exec_time_msec = int(utils.remove_suffix(tds[2].text, ' ms'))
+            memory_byte = int(utils.remove_suffix(tds[3].text, ' KB')) * 1000
+        else:
+            assert len(tds) == 2
+        return AtCoderSubmissionTestCaseResult(case_name, status, exec_time_msec, memory_byte)
 
 
 onlinejudge.dispatch.services += [AtCoderService]

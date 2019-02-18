@@ -259,7 +259,10 @@ def remove_suffix(s: str, suffix: str) -> str:
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 
 
-def getter_with_load_details(name: str) -> Callable:
+def getter_with_load_details(name: str, check_with: Optional[str] = None) -> Callable:
+    if check_with is None:
+        check_with = name
+
     @functools.wraps(lambda self: getattr(self, name))
     def wrapper(self, session: Optional[requests.Session] = None):
         if getattr(self, name) is None:
