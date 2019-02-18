@@ -8,18 +8,18 @@ from typing import List, Optional
 
 import onlinejudge
 import onlinejudge.__about__ as version
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.utils as utils
-from onlinejudge.implementation.command.code_statistics import code_statistics
-from onlinejudge.implementation.command.download import download
-from onlinejudge.implementation.command.generate_output import generate_output
-from onlinejudge.implementation.command.generate_scanner import generate_scanner
-from onlinejudge.implementation.command.get_standings import get_standings
-from onlinejudge.implementation.command.login import login
-from onlinejudge.implementation.command.split_input import split_input, split_input_auto_footer
-from onlinejudge.implementation.command.submit import submit
-from onlinejudge.implementation.command.test import test
-from onlinejudge.implementation.command.test_reactive import test_reactive
+import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.utils as utils
+from onlinejudge._implementation.command.code_statistics import code_statistics
+from onlinejudge._implementation.command.download import download
+from onlinejudge._implementation.command.generate_output import generate_output
+from onlinejudge._implementation.command.generate_scanner import generate_scanner
+from onlinejudge._implementation.command.get_standings import get_standings
+from onlinejudge._implementation.command.login import login
+from onlinejudge._implementation.command.split_input import split_input, split_input_auto_footer
+from onlinejudge._implementation.command.submit import submit
+from onlinejudge._implementation.command.test import test
+from onlinejudge._implementation.command.test_reactive import test_reactive
 
 
 def version_check() -> None:

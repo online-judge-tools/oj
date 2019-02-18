@@ -21,7 +21,7 @@
 
 from typing import TYPE_CHECKING, List, Optional, Type
 
-import onlinejudge.implementation.logging as log
+import onlinejudge._implementation.logging as log
 from onlinejudge.type import Problem, Service, Submission
 
 submissions = []  # type: List[Type['Submission']]

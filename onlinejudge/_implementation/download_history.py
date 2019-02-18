@@ -7,8 +7,8 @@ import traceback
 from typing import *
 
 import onlinejudge
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.utils as utils
+import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.utils as utils
 import onlinejudge.type
 
 
