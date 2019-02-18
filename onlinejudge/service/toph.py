@@ -17,6 +17,41 @@ from onlinejudge.type import SubmissionError
 
 @utils.singleton
 class TophService(onlinejudge.type.Service):
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+        session = session or utils.new_default_session()
+        url = 'https://toph.co/login'
+        # get
+        resp = utils.request('GET', url, session=session)
+        if resp.url != url:  # redirected
+            log.info('You are already logged in.')
+            return True
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        form = soup.find('form', class_='login-form')
+        log.debug('form: %s', str(form))
+        username, password = get_credentials()
+        form['action'] = '/login' # to avoid KeyError inside form.request method as Toph does not have any defined action
+        form = utils.FormSender(form, url=resp.url)
+        form.set('handle', username)
+        form.set('password', password)
+        # post
+        resp = form.request(session)
+        resp.raise_for_status()
+
+        newResp = utils.request('GET', url, session=session)    # Toph's Location header is not getting the expected value
+        if newResp.url != url:
+            log.success('Welcome, %s.', username)
+            return True
+        else:
+            log.failure('Invalid handle/email or password.')
+            return False
+
+    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+        session = session or utils.new_default_session()
+        url = 'https://toph.co/login'
+        resp = utils.request('GET', url, session=session, allow_redirects=False)
+        return resp.status_code == 302
+
     def get_url(self) -> str:
         return 'https://toph.co/'
 
