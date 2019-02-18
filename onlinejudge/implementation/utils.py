@@ -249,4 +249,10 @@ def is_update_available_on_pypi() -> bool:
     b = distutils.version.StrictVersion(get_latest_version_from_pypi())
     return a < b
 
+
+def remove_suffix(s: str, suffix: str) -> str:
+    assert s.endswith(suffix)
+    return s[:-len(suffix)]
+
+
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')

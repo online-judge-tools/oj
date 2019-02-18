@@ -135,6 +135,24 @@ class AtCoderContest(object):
         self._rated_range = None  # type: Optional[str]
 
     @classmethod
+    def from_url(cls, url: str) -> Optional['AtCoderContest']:
+        result = urllib.parse.urlparse(url)
+
+        # example: https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d
+        if result.scheme in ('', 'http', 'https') and result.hostname.endswith('.contest.atcoder.jp'):
+            contest_id = utils.remove_suffix(result.hostname, '.contest.atcoder.jp')
+            return cls(contest_id)
+
+        # example: https://atcoder.jp/contests/agc030
+        if result.scheme in ('', 'http', 'https') and result.hostname in ('atcoder.jp', 'beta.atcoder.jp'):
+            m = re.match(r'^/contests/([\w\-_]+)/?$', utils.normpath(result.path))
+            if m:
+                contest_id = m.group(1)
+                return cls(contest_id)
+
+        return None
+
+    @classmethod
     def _from_table_row(cls, tr: bs4.Tag, lang: str) -> 'AtCoderContest':
         tds = tr.find_all('td')
         assert len(tds) == 4
@@ -193,12 +211,43 @@ class AtCoderContest(object):
             raise NotImplementedError
         return self._rated_range
 
+    def list_problems(self, session: Optional[requests.Session] = None) -> List['AtCoderProblem']:
+        # get
+        session = session or utils.new_default_session()
+        url = 'https://atcoder.jp/contests/{}/tasks'.format(self.contest_id)
+        resp = _request('GET', url, session=session)
+
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        tbody = soup.find('tbody')
+        return [AtCoderProblem._from_table_row(tr) for tr in tbody.find_all('tr')]
+
 
 class AtCoderProblem(onlinejudge.type.Problem):
+    # AtCoder has problems independently from contests. Therefore the notions "contest_id", "alphabet", and "url" don't belong to problems itself.
+
     def __init__(self, contest_id: str, problem_id: str):
         self.contest_id = contest_id
-        self.problem_id = problem_id
+        self.problem_id = problem_id  # TODO: fix the name, since AtCoder calls this as "task_screen_name"
         self._task_id = None  # type: Optional[int]
+        self._task_name = None  # type: Optional[str]
+        self._time_limit_msec = None  # type: Optional[int]
+        self._memory_limit_mb = None  # type: Optional[int]
+        self._alphabet = None  # type: Optional[str]
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag) -> 'AtCoderProblem':
+        tds = tr.find_all('td')
+        assert len(tds) == 5
+        path = tds[1].find('a')['href']
+        self = cls.from_url('https://atcoder.jp/' + path)
+        assert self is not None
+        self._alphabet = tds[0].text
+        self._task_name = tds[1].text
+        self._time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
+        self._memory_limit_mb = int(utils.remove_suffix(tds[3].text, ' MB'))
+        assert tds[4].text.strip() in ('', 'Submit')
+        return self
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
@@ -264,6 +313,9 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
     def get_service(self) -> AtCoderService:
         return AtCoderService()
+
+    def get_contest(self) -> AtCoderContest:
+        return AtCoderContest(self.contest_id)
 
     @classmethod
     def from_url(cls, s: str) -> Optional['AtCoderProblem']:
@@ -397,6 +449,33 @@ class AtCoderProblem(onlinejudge.type.Problem):
             assert m
             self._task_id = int(m.group(1))
         return self._task_id
+
+    def _load_details(self, session: Optional[requests.Session] = None) -> int:
+        raise NotImplementedError
+
+    def get_task_name(self) -> str:
+        if self._task_name is None:
+            self._load_details()
+        assert self._task_name is not None
+        return self._task_name
+
+    def get_time_limit_msec(self) -> int:
+        if self._time_limit_msec is None:
+            self._load_details()
+        assert self._time_limit_msec is not None
+        return self._time_limit_msec
+
+    def get_memory_limit_mb(self) -> int:
+        if self._memory_limit_mb is None:
+            self._load_details()
+        assert self._memory_limit_mb is not None
+        return self._memory_limit_mb
+
+    def get_alphabet(self) -> str:
+        if self._alphabet is None:
+            self._load_details()
+        assert self._alphabet is not None
+        return self._alphabet
 
 
 class AtCoderSubmission(onlinejudge.type.Submission):

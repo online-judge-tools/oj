@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from onlinejudge.service.atcoder import AtCoderService
+from onlinejudge.service.atcoder import AtCoderContest, AtCoderProblem, AtCoderService, AtCoderSubmission
 
 
 class AtCoderSerivceTest(unittest.TestCase):
@@ -26,6 +26,26 @@ class AtCoderSerivceTest(unittest.TestCase):
         self.assertEqual(contest.get_contest_name(), '東京大学プログラミングコンテスト2013')
         self.assertEqual(contest.get_duration().total_seconds(), 5 * 60 * 60)
         self.assertEqual(contest.get_rated_range(), 'All')
+
+
+class AtCoderContestTest(unittest.TestCase):
+    def test_from_url(self):
+        self.assertEqual(AtCoderContest.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d').contest_id, 'kupc2014')
+        self.assertEqual(AtCoderContest.from_url('https://atcoder.jp/contests/agc030').contest_id, 'agc030')
+        self.assertEqual(AtCoderContest.from_url('https://atcoder.jp/contests/'), None)
+
+    def test_list_problems(self):
+        contest = AtCoderContest('agc028')
+        problems = contest.list_problems()
+        self.assertEqual(len(problems), 7)
+        self.assertEqual(problems[0].get_alphabet(), 'A')
+        self.assertEqual(problems[0].get_task_name(), 'Two Abbreviations')
+        self.assertEqual(problems[0].get_time_limit_msec(), 2000)
+        self.assertEqual(problems[0].get_memory_limit_mb(), 1024)
+        self.assertEqual(problems[5].get_alphabet(), 'F')
+        self.assertEqual(problems[5].problem_id, 'agc028_f')
+        self.assertEqual(problems[6].get_alphabet(), 'F2')
+        self.assertEqual(problems[6].problem_id, 'agc028_f2')
 
 
 if __name__ == '__main__':
