@@ -1,4 +1,8 @@
 # Python Version: 3.x
+"""
+the module for CS Academy (https://csacademy.com/)
+"""
+
 import json
 import posixpath
 import re
@@ -23,9 +27,9 @@ class CSAcademyService(onlinejudge.type.Service):
         return 'csacademy'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['CSAcademyService']:
+    def from_url(cls, url: str) -> Optional['CSAcademyService']:
         # example: https://csacademy.com/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('csacademy.com', 'www.csacademy.com'):
             return cls()
@@ -101,12 +105,12 @@ class CSAcademyProblem(onlinejudge.type.Problem):
         return CSAcademyService()
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['CSAcademyProblem']:
+    def from_url(cls, url: str) -> Optional['CSAcademyProblem']:
         # example: https://csacademy.com/contest/round-38/task/path-union/
         # example: https://csacademy.com/contest/round-38/task/path-union/discussion/
         # example: https://csacademy.com/contest/archive/task/swap_permutation/
         # example: https://csacademy.com/contest/archive/task/swap_permutation/statement/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('csacademy.com', 'www.csacademy.com'):
             m = re.match(r'^/contest/([0-9A-Za-z_-]+)/task/([0-9A-Za-z_-]+)(|/statement|/solution|/discussion|/statistics|/submissions)/?$', utils.normpath(result.path))

@@ -1,4 +1,8 @@
 # Python Version: 3.x
+"""
+the module for Anarchy Golf (http://golf.shinh.org/)
+"""
+
 import posixpath
 import urllib.parse
 from typing import *
@@ -21,9 +25,9 @@ class AnarchyGolfService(onlinejudge.type.Service):
         return 'anarchygolf'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['AnarchyGolfService']:
+    def from_url(cls, url: str) -> Optional['AnarchyGolfService']:
         # example: http://golf.shinh.org/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'golf.shinh.org':
             return cls()
@@ -72,9 +76,9 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         return AnarchyGolfService()
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['AnarchyGolfProblem']:
+    def from_url(cls, url: str) -> Optional['AnarchyGolfProblem']:
         # example: http://golf.shinh.org/p.rb?The+B+Programming+Language
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'golf.shinh.org' \
                 and utils.normpath(result.path) == '/p.rb' \

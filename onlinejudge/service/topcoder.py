@@ -1,4 +1,10 @@
 # Python Version: 3.x
+"""
+the module for Topcoder (https://www.topcoder.com/)
+
+:note: only the Marathon Match is supported
+"""
+
 import collections
 import itertools
 import json
@@ -48,9 +54,9 @@ class TopCoderService(onlinejudge.type.Service):
         return 'topcoder'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['TopCoderService']:
+    def from_url(cls, url: str) -> Optional['TopCoderService']:
         # example: https://www.topcoder.com/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ['www.topcoder.com', 'community.topcoder.com']:
             return cls()
@@ -71,12 +77,12 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         return TopCoderService()
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['TopCoderLongContestProblem']:
+    def from_url(cls, url: str) -> Optional['TopCoderLongContestProblem']:
         # example: https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16997&pm=14690
         # example: https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16997&compid=57374
         # example: https://community.topcoder.com/longcontest/?module=ViewStandings&rd=16997
         # example: https://community.topcoder.com/tc?module=MatchDetails&rd=16997
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'community.topcoder.com' \
                 and utils.normpath(result.path) in ['/longcontest', '/tc']:
@@ -102,6 +108,10 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         }  # yapf: disable
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
+        """
+        :param kind: must be one of `example` (default) or `full`
+        """
+
         assert kind in ['example', 'full']
         session = session or utils.new_default_session()
 

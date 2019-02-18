@@ -1,4 +1,8 @@
 # Python Version: 3.x
+"""
+the module for Kattis (http://open.kattis.org/)
+"""
+
 import io
 import re
 import urllib.parse
@@ -18,17 +22,20 @@ from onlinejudge.type import LabeledString, TestCase
 @utils.singleton
 class KattisService(onlinejudge.type.Service):
     def get_url(self) -> str:
-        # NOTE: sometimes this URL is not correct, i.e. something like https://hanoi18.kattis.com/ exists
+        """
+        :note: sometimes this URL is not correct, i.e. something like https://hanoi18.kattis.com/ exists
+        """
+
         return 'http://open.kattis.org/'
 
     def get_name(self) -> str:
         return 'kattis'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['KattisService']:
+    def from_url(cls, url: str) -> Optional['KattisService']:
         # example: https://open.kattis.com/
         # example: https://hanoi18.kattis.com/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc.endswith('.kattis.com'):
             # NOTE: ignore the subdomain
@@ -77,10 +84,10 @@ class KattisProblem(onlinejudge.type.Problem):
         return KattisService()
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['KattisProblem']:
+    def from_url(cls, url: str) -> Optional['KattisProblem']:
         # example: https://open.kattis.com/problems/hello
         # example: https://open.kattis.com/contests/asiasg15prelwarmup/problems/8queens
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc.endswith('.kattis.com'):
             m = re.match(r'(?:/contests/([0-9A-Z_a-z-]+))?/problems/([0-9A-Z_a-z-]+)/?', result.path)

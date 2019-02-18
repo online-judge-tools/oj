@@ -1,5 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
+"""
+the module for AtCoder (https://atcoder.jp/)
+"""
+
 import datetime
 import itertools
 import json
