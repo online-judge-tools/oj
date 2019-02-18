@@ -25,6 +25,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   ~~HackerRank~~ (removed)
     -   Aizu Online Judge
     -   CS Academy
+    -   Toph
 -   Download system test cases
     -   Yukicoder
     -   Aizu Online Judge
@@ -34,12 +35,14 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Codeforces
     -   ~~HackerRank~~ (removed)
     -   TopCoder
+    -   Toph
 -   Submit your solution
     -   AtCoder
     -   Yukicoder
     -   Codeforces
     -   ~~HackerRank~~ (removed)
     -   TopCoder (Marathon Match)
+    -   Toph
 -   Generate scanner for input  (experimental)
     -   AtCoder
     -   Yukicoder
