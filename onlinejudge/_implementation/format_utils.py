@@ -7,8 +7,8 @@ import sys
 from typing import Dict, List, Match, Optional
 
 import onlinejudge
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.utils as utils
+import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.utils as utils
 
 
 def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]:

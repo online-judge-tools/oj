@@ -10,8 +10,8 @@ import sympy
 import sympy.parsing.sympy_parser as sympy_parser
 
 import onlinejudge
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.utils as utils
+import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.utils as utils
 
 if TYPE_CHECKING:
     import argparse

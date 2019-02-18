@@ -10,9 +10,9 @@ from typing import *
 import colorama
 
 import onlinejudge
-import onlinejudge.implementation.download_history
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.utils as utils
+import onlinejudge._implementation.download_history
+import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.utils as utils
 import onlinejudge.type
 
 if TYPE_CHECKING:
@@ -54,7 +54,7 @@ def download(args: 'argparse.Namespace') -> None:
 
     # append the history for submit command
     if not args.dry_run and is_default_format:
-        history = onlinejudge.implementation.download_history.DownloadHistory()
+        history = onlinejudge._implementation.download_history.DownloadHistory()
         history.add(problem)
 
     # write samples to files

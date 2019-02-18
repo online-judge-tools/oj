@@ -1,6 +1,6 @@
 import unittest
 
-from onlinejudge.implementation.command.code_statistics import get_statistics
+from onlinejudge._implementation.command.code_statistics import get_statistics
 
 
 class CodeStatisticsTest(unittest.TestCase):

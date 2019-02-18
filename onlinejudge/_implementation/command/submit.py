@@ -8,9 +8,9 @@ import time
 from typing import *
 
 import onlinejudge
-import onlinejudge.implementation.download_history
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.utils as utils
+import onlinejudge._implementation.download_history
+import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.utils as utils
 
 if TYPE_CHECKING:
     import argparse
@@ -20,7 +20,7 @@ default_url_opener = ['sensible-browser', 'xdg-open', 'open']
 
 def submit(args: 'argparse.Namespace') -> None:
     # guess url
-    history = onlinejudge.implementation.download_history.DownloadHistory()
+    history = onlinejudge._implementation.download_history.DownloadHistory()
     if args.file.parent.resolve() == pathlib.Path.cwd():
         guessed_urls = history.get()
     else:
