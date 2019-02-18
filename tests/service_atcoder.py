@@ -41,7 +41,7 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(problems[0].get_alphabet(), 'A')
         self.assertEqual(problems[0].get_task_name(), 'Two Abbreviations')
         self.assertEqual(problems[0].get_time_limit_msec(), 2000)
-        self.assertEqual(problems[0].get_memory_limit_mb(), 1024)
+        self.assertEqual(problems[0].get_memory_limit_byte(), 1024 * 1000 * 1000)
         self.assertEqual(problems[5].get_alphabet(), 'F')
         self.assertEqual(problems[5].problem_id, 'agc028_f')
         self.assertEqual(problems[6].get_alphabet(), 'F2')
@@ -73,8 +73,8 @@ class AtCoderSubmissionTest(unittest.TestCase):
         self.assertEqual(submission.get_language_name(), 'C++14 (GCC 5.4.1)')
         self.assertEqual(submission.get_score(), 800)
         self.assertEqual(submission.get_code_size(), 1457)
-        self.assertEqual(submission.get_exec_time_ms(), 85)
-        self.assertEqual(submission.get_memory_kb(), 3328)
+        self.assertEqual(submission.get_exec_time_msec(), 85)
+        self.assertEqual(submission.get_memory_byte(), 3328 * 1000)
 
     def test_get_source_code(self):
         submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/abc100/submissions/3082514')
