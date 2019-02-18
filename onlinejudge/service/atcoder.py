@@ -232,7 +232,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         self._task_id = None  # type: Optional[int]
         self._task_name = None  # type: Optional[str]
         self._time_limit_msec = None  # type: Optional[int]
-        self._memory_limit_mb = None  # type: Optional[int]
+        self._memory_limit_byte = None  # type: Optional[int]
         self._alphabet = None  # type: Optional[str]
 
     @classmethod
@@ -245,7 +245,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         self._alphabet = tds[0].text
         self._task_name = tds[1].text
         self._time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
-        self._memory_limit_mb = int(utils.remove_suffix(tds[3].text, ' MB'))
+        self._memory_limit_byte = int(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000
         assert tds[4].text.strip() in ('', 'Submit')
         return self
 
@@ -455,7 +455,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
     get_task_name = utils.getter_with_load_details('_task_name')  # type: Callable[..., str]
     get_time_limit_msec = utils.getter_with_load_details('_time_limit_msec')  # type: Callable[..., int]
-    get_memory_limit_mb = utils.getter_with_load_details('_memory_limit_mb')  # type: Callable[..., int]
+    get_memory_limit_byte = utils.getter_with_load_details('_memory_limit_byte')  # type: Callable[..., int]
     get_alphabet = utils.getter_with_load_details('_alphabet')  # type: Callable[..., str]
 
 
@@ -471,8 +471,8 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._score = None  # type: Optional[int]
         self._code_size = None  # type: Optional[int]
         self._status = None  # type: Optional[str]
-        self._exec_time_ms = None  # type: Optional[int]
-        self._memory_kb = None  # type: Optional[int]
+        self._exec_time_msec = None  # type: Optional[int]
+        self._memory_byte = None  # type: Optional[int]
         self._compile_error = None  # type: Optional[str]
         self._test_cases = None  # type: Optional[List[AtCoderSubmissionTestCaseResult]]
 
@@ -562,8 +562,8 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._score = int(data['Score'])
         self._code_size = int(utils.remove_suffix(data['Code Size'], ' Byte'))
         self._status = data['Status']
-        self._exec_time_ms = int(utils.remove_suffix(data['Exec Time'], ' ms'))
-        self._memory_kb = int(utils.remove_suffix(data['Memory'], ' KB'))
+        self._exec_time_msec = int(utils.remove_suffix(data['Exec Time'], ' ms'))
+        self._memory_byte = int(utils.remove_suffix(data['Memory'], ' KB')) * 1000
 
         # Compile Error
         compile_error = soup.find('h4', text='Compile Error')
@@ -591,16 +591,16 @@ class AtCoderSubmission(onlinejudge.type.Submission):
     get_score = utils.getter_with_load_details('_score')  # type: Callable[..., int]
     get_code_size = utils.getter_with_load_details('_code_size')  # type: Callable[..., int]
     get_status = utils.getter_with_load_details('_status')  # type: Callable[..., str]
-    get_exec_time_ms = utils.getter_with_load_details('_exec_time_ms')  # type: Callable[..., int]
-    get_memory_kb = utils.getter_with_load_details('_memory_kb')  # type: Callable[..., int]
+    get_exec_time_msec = utils.getter_with_load_details('_exec_time_msec')  # type: Callable[..., int]
+    get_memory_byte = utils.getter_with_load_details('_memory_byte')  # type: Callable[..., int]
     get_test_cases = utils.getter_with_load_details('_test_cases')  # type: Callable[..., List[AtCoderSubmissionTestCaseResult]]
 
 
 class AtCoderSubmissionTestCaseResult(object):
-    def __init__(self, case_name: str, status: str, exec_time_ms: int, memory_kb: int):
+    def __init__(self, case_name: str, status: str, exec_time_msec: int, memory_kb: int):
         self.case_name = case_name
         self.status = status
-        self.exec_time_ms = exec_time_ms
+        self.exec_time_msec = exec_time_msec
         self.memory_kb = memory_kb
 
     @classmethod
@@ -608,9 +608,9 @@ class AtCoderSubmissionTestCaseResult(object):
         tds = tr.find_all('td')
         case_name = tds[0].text
         status = tds[1].text
-        exec_time_ms = int(utils.remove_suffix(tds[2].text, ' ms'))
+        exec_time_msec = int(utils.remove_suffix(tds[2].text, ' ms'))
         memory_kb = int(utils.remove_suffix(tds[3].text, ' KB'))
-        return AtCoderSubmissionTestCaseResult(case_name, status, exec_time_ms, memory_kb)
+        return AtCoderSubmissionTestCaseResult(case_name, status, exec_time_msec, memory_kb)
 
 
 onlinejudge.dispatch.services += [AtCoderService]
