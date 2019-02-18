@@ -69,6 +69,12 @@ class CodeforcesService(onlinejudge.type.Service):
 
 # NOTE: Codeforces has its API: https://codeforces.com/api/help
 class CodeforcesProblem(onlinejudge.type.Problem):
+    """
+    :ivar contest_id: :py:class:`int`
+    :ivar index: :py:class:`str`
+    :ivar kind: :py:class:`str` must be `contest` or `gym`
+    """
+
     def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
         assert index in string.ascii_uppercase
