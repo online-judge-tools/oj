@@ -4,70 +4,18 @@ onlinejudge.service package
 Submodules
 ----------
 
-onlinejudge.service.anarchygolf module
---------------------------------------
+.. toctree::
 
-.. automodule:: onlinejudge.service.anarchygolf
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.service.aoj module
-------------------------------
-
-.. automodule:: onlinejudge.service.aoj
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.service.atcoder module
-----------------------------------
-
-.. automodule:: onlinejudge.service.atcoder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.service.codeforces module
--------------------------------------
-
-.. automodule:: onlinejudge.service.codeforces
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.service.csacademy module
-------------------------------------
-
-.. automodule:: onlinejudge.service.csacademy
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.service.hackerrank module
-------------------------------------
-
-.. automodule:: onlinejudge.service.hackerrank
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.service.topcoder module
------------------------------------
-
-.. automodule:: onlinejudge.service.topcoder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.service.yukicoder module
-------------------------------------
-
-.. automodule:: onlinejudge.service.yukicoder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   onlinejudge.service.anarchygolf
+   onlinejudge.service.aoj
+   onlinejudge.service.atcoder
+   onlinejudge.service.codeforces
+   onlinejudge.service.csacademy
+   onlinejudge.service.hackerrank
+   onlinejudge.service.kattis
+   onlinejudge.service.poj
+   onlinejudge.service.topcoder
+   onlinejudge.service.yukicoder
 
 Module contents
 ---------------
