@@ -1,6 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
 import contextlib
+import datetime
 import distutils.version
 import http.client
 import http.cookiejar
@@ -247,3 +248,5 @@ def is_update_available_on_pypi() -> bool:
     a = distutils.version.StrictVersion(version.__version__)
     b = distutils.version.StrictVersion(get_latest_version_from_pypi())
     return a < b
+
+tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
