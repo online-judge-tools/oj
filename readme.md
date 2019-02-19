@@ -22,10 +22,12 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Yukicoder
     -   Anarchy Golf
     -   Codeforces
-    -   ~~HackerRank~~ (removed)
+    -   HackerRank
     -   Aizu Online Judge
     -   CS Academy
-    -   Toph
+    -   PKU JudgeOnline
+    -   Kattis
+    -   Toph (Problem Archive)
 -   Download system test cases
     -   Yukicoder
     -   Aizu Online Judge
@@ -33,16 +35,16 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   AtCoder
     -   Yukicoder (via github.com or [session token](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md))
     -   Codeforces
-    -   ~~HackerRank~~ (removed)
+    -   HackerRank
     -   TopCoder
     -   Toph
 -   Submit your solution
     -   AtCoder
     -   Yukicoder
     -   Codeforces
-    -   ~~HackerRank~~ (removed)
+    -   HackerRank
     -   TopCoder (Marathon Match)
-    -   Toph
+    -   Toph (Problem Archive)
 -   Generate scanner for input  (experimental)
     -   AtCoder
     -   Yukicoder
