@@ -251,6 +251,11 @@ def is_update_available_on_pypi() -> bool:
     return a < b
 
 
+def remove_prefix(s: str, prefix: str) -> str:
+    assert s.startswith(prefix)
+    return s[len(prefix):]
+
+
 def remove_suffix(s: str, suffix: str) -> str:
     assert s.endswith(suffix)
     return s[:-len(suffix)]
@@ -269,9 +274,10 @@ def getter_with_load_details(name: str, check_with: Optional[str] = None) -> Cal
     @functools.wraps(lambda self: getattr(self, name))
     def wrapper(self, session: Optional[requests.Session] = None):
         if getattr(self, name) is None:
+            assert session is None or isinstance(session, requests.Session)
             getattr(self, '_load_details')(session)
         attr = getattr(self, name)
-        assert attr is not None
+        assert check_with is not None
         return attr
 
     return wrapper

@@ -146,6 +146,9 @@ class AtCoderContest(object):
     """
 
     def __init__(self, contest_id: str):
+        if contest_id.startswith('http'):
+            # an exception should be raised since mypy cannot check this kind of failure
+            raise ValueError('You should use AtCoderContest.from_url(url) instead of AtCoderContest(url)')
         self.contest_id = contest_id
 
         # NOTE: some fields remain undefined, comparing `_from_table_row`
@@ -154,6 +157,17 @@ class AtCoderContest(object):
         self._contest_name_en = None  # type: Optional[str]
         self._duration_text = None  # type: Optional[str]
         self._rated_range = None  # type: Optional[str]
+
+    def get_url(self, type: Optional[str] = None, lang: Optional[str] = None) -> str:
+        if type is None or type == 'beta':
+            url = 'https://atcoder.jp/contests/{}'.format(self.contest_id)
+        elif type == 'old':
+            url = 'http://{}.contest.atcoder.jp/'.format(self.contest_id)
+        else:
+            assert False
+        if lang is not None:
+            url += '?lang={}'.format(lang)
+        return url
 
     @classmethod
     def from_url(cls, url: str) -> Optional['AtCoderContest']:
@@ -267,6 +281,8 @@ class AtCoderProblem(onlinejudge.type.Problem):
         self._time_limit_msec = None  # type: Optional[int]
         self._memory_limit_byte = None  # type: Optional[int]
         self._alphabet = None  # type: Optional[str]
+        self._score = None  # type: Optional[int]
+        self._score_checked = None  # type: Optional[bool]
 
     @classmethod
     def _from_table_row(cls, tr: bs4.Tag) -> 'AtCoderProblem':
@@ -341,8 +357,16 @@ class AtCoderProblem(onlinejudge.type.Problem):
                     if prv and prv.name == 'h3' and prv.string:
                         yield (pre, prv)
 
-    def get_url(self) -> str:
-        return 'http://{}.contest.atcoder.jp/tasks/{}'.format(self.contest_id, self.problem_id)
+    def get_url(self, type: Optional[str] = None, lang: Optional[str] = None) -> str:
+        if type is None or type == 'beta':
+            url = 'https://atcoder.jp/contests/{}/tasks/{}'.format(self.contest_id, self.problem_id)
+        elif type == 'old':
+            url = 'http://{}.contest.atcoder.jp/tasks/{}'.format(self.contest_id, self.problem_id)
+        else:
+            assert False
+        if lang is not None:
+            url += '?lang={}'.format(lang)
+        return url
 
     def get_service(self) -> AtCoderService:
         return AtCoderService()
@@ -379,7 +403,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def get_input_format(self, session: Optional[requests.Session] = None) -> str:
         session = session or utils.new_default_session()
         # get
-        resp = _request('GET', self.get_url(), session=session)
+        resp = _request('GET', self.get_url(type='old'), session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
             return ''
@@ -468,7 +492,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         if self._task_id is None:
             session = session or utils.new_default_session()
             # get
-            resp = _request('GET', self.get_url(), session=session)
+            resp = _request('GET', self.get_url(type='old'), session=session)
             msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
             if AtCoderService._report_messages(msgs, unexpected=True):
                 raise SubmissionError
@@ -483,13 +507,30 @@ class AtCoderProblem(onlinejudge.type.Problem):
             self._task_id = int(m.group(1))
         return self._task_id
 
-    def _load_details(self, session: Optional[requests.Session] = None) -> int:
-        raise NotImplementedError
+    def _load_details(self, session: Optional[requests.Session] = None) -> None:
+        session = session or utils.new_default_session()
+
+        # get
+        resp = _request('GET', self.get_url(type='beta', lang='ja'), session=session)
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+
+        # parse
+        h2 = soup.find('span', class_='h2')
+        self._alphabet, _, self._task_name = h2.text.partition(' - ')
+        time_limit, memory_limit = h2.find_next_sibling('p').text.split(' / ')
+        self._time_limit_msec = int(utils.remove_suffix(utils.remove_prefix(time_limit, '実行時間制限: '), ' sec')) * 1000
+        self._memory_limit_byte = int(utils.remove_suffix(utils.remove_prefix(memory_limit, 'メモリ制限: '), ' MB')) * 1000 * 1000
+        task_statement = soup.find('div', id='task-statement')
+        p = task_statement.find('p')  # first
+        if p is not None and p.text.startswith('配点 : '):
+            self._score = int(utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点'))
+        self._score_checked = True
 
     get_task_name = utils.getter_with_load_details('_task_name')  # type: Callable[..., str]
     get_time_limit_msec = utils.getter_with_load_details('_time_limit_msec')  # type: Callable[..., int]
     get_memory_limit_byte = utils.getter_with_load_details('_memory_limit_byte')  # type: Callable[..., int]
     get_alphabet = utils.getter_with_load_details('_alphabet')  # type: Callable[..., str]
+    get_score = utils.getter_with_load_details('_score', check_with='_score_checked')  # type: Callable[..., str]
 
 
 class AtCoderSubmission(onlinejudge.type.Submission):
@@ -551,8 +592,8 @@ class AtCoderSubmission(onlinejudge.type.Submission):
 
         return None
 
-    def get_url(self, type: str = 'latest', lang: Optional[str] = None) -> str:
-        if type == 'latest' or type == 'beta':
+    def get_url(self, type: Optional[str] = None, lang: Optional[str] = None) -> str:
+        if type is None or type == 'beta':
             url = 'https://atcoder.jp/contests/{}/submissions/{}'.format(self.contest_id, self.submission_id)
         elif type == 'old':
             url = 'https://{}.contest.atcoder.jp/submissions/{}'.format(self.contest_id, self.submission_id)
