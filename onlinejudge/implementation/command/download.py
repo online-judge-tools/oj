@@ -73,7 +73,8 @@ def download(args: 'argparse.Namespace') -> None:
             table['d'] = os.path.dirname(name)
             path = args.directory / utils.percentformat(args.format, table)  # type: pathlib.Path
             log.status('%sput: %s', ext, name)
-            log.emit(colorama.Style.BRIGHT + data.rstrip() + colorama.Style.RESET_ALL)
+            if not args.silent:
+                log.emit(colorama.Style.BRIGHT + data.rstrip() + colorama.Style.RESET_ALL)
             if args.dry_run:
                 continue
             if path.exists():

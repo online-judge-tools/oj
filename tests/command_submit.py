@@ -204,7 +204,7 @@ class SubmitYukicoderTest(unittest.TestCase):
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_beta_3_b(self):
 
-        url = 'https://yukicoder.me/problems/no/9001'
+        url = 'https://yukicoder.me/problems/527'
         code = r'''#include <bits/stdc++.h>
 using namespace std;
 int main() {
@@ -223,3 +223,30 @@ int main() {
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+
+
+class SubmitHackerRankTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_worldcodesprint_mars_exploration(self):
+        url = 'https://www.hackerrank.com/contests/worldcodesprint/challenges/mars-exploration'
+        code = '''#!/usr/bin/env python3
+s = input()
+ans = 0
+for i in range(len(s) // 3):
+    if s[3 * i] != 'S':
+        ans += 1
+    if s[3 * i + 1] != 'O':
+        ans += 1
+    if s[3 * i + 2] != 'S':
+        ans += 1
+print(ans)
+'''
+        files = [
+            {
+                'path': 'a.py',
+                'data': code
+            },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
