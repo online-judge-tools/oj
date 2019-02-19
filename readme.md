@@ -36,14 +36,14 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Yukicoder (via github.com or [session token](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md))
     -   Codeforces
     -   HackerRank
-    -   TopCoder
+    -   Topcoder
     -   Toph
 -   Submit your solution
     -   AtCoder
     -   Yukicoder
     -   Codeforces
     -   HackerRank
-    -   TopCoder (Marathon Match)
+    -   Topcoder (Marathon Match)
     -   Toph (Problem Archive)
 -   Generate scanner for input  (experimental)
     -   AtCoder
@@ -160,8 +160,8 @@ conflicted:
 
 not conflicted:
 
--   [shivawu/topcoder-greed](https://github.com/shivawu/topcoder-greed) for TopCoder Single Round Match
--   [FakePsyho/mmstats](https://github.com/FakePsyho/mmstats) for TopCoder Marathon Match
+-   [shivawu/topcoder-greed](https://github.com/shivawu/topcoder-greed) for Topcoder Single Round Match
+-   [FakePsyho/mmstats](https://github.com/FakePsyho/mmstats) for Topcoder Marathon Match
 -   <https://community.topcoder.com/tc?module=Static&d1=applet&d2=plugins>
 
 ## License

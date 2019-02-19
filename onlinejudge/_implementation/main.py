@@ -77,7 +77,7 @@ supported services:
   AtCoder
   Codeforces
   Yukicoder
-  TopCoder
+  Topcoder
   HackerRank
   Toph
 
@@ -96,7 +96,7 @@ strings for --method:
 supported services:
   AtCoder
   Codeforces
-  TopCoder (Marathon Match)
+  Topcoder (Marathon Match)
   Yukicoder
   HackerRank
   Toph (Problem Archive)
@@ -120,7 +120,7 @@ supported services:
     subparser.add_argument('--open-browser')
     subparser.add_argument('-w', '--wait', metavar='SECOND', type=float, default=3, help='sleep before submitting')
     subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
-    subparser.add_argument('--full-submission', action='store_true', help='for TopCoder Marathon Match. use this to do "Submit", the default behavier is "Test Examples".')
+    subparser.add_argument('--full-submission', action='store_true', help='for Topcoder Marathon Match. use this to do "Submit", the default behavier is "Test Examples".')
 
     # test
     subparser = subparsers.add_parser('test', aliases=['t'], help='test your code', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
@@ -267,7 +267,7 @@ example:
     # get standings
     subparser = subparsers.add_parser('get-standings', help='get and print the standings', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 supported services:
-  TopCoder (Marathon Match)
+  Topcoder (Marathon Match)
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', choices=['csv', 'tsv', 'json'], default='tsv', help='default: tsv')
