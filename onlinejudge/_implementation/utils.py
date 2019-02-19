@@ -134,16 +134,13 @@ class FormSender(object):
     def unset(self, key: str) -> None:
         del self.payload[key]
 
-    def request(self, session: requests.Session, method: str = None, action: Optional[str] = None, **kwargs) -> requests.Response:
-        action = action or self.form['action']
-        url = urllib.parse.urljoin(self.url, action)
+    def request(self, session: requests.Session, method: str = None, action: Optional[str] = None, raise_for_status: bool = True, **kwargs) -> requests.Response:
         if method is None:
             method = self.form['method'].upper()
-        log.status('%s: %s', method, url)
+        url = urllib.parse.urljoin(self.url, action)
+        action = action or self.form['action']
         log.debug('payload: %s', str(self.payload))
-        resp = session.request(method, url, data=self.payload, files=self.files, **kwargs)
-        log.status(describe_status_code(resp.status_code))
-        return resp
+        return request(method, url, session=session, raise_for_status=raise_for_status, data=self.payload, files=self.files, **kwargs)
 
 
 def dos2unix(s: str) -> str:
@@ -206,6 +203,8 @@ def request(method: str, url: str, session: requests.Session, raise_for_status: 
     kwargs.setdefault('allow_redirects', True)
     log.status('%s: %s', method, url)
     resp = session.request(method, url, **kwargs)
+    if resp.url != url:
+        log.status('redirected: %s', resp.url)
     log.status(describe_status_code(resp.status_code))
     if raise_for_status:
         resp.raise_for_status()

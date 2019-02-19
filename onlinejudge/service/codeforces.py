@@ -166,7 +166,6 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             return utils.DummySubmission(resp.url, problem=self)
         else:
             log.failure('failure')
-            log.debug('redirected to %s', resp.url)
             # parse error messages
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             msgs = []  # type: List[str]
