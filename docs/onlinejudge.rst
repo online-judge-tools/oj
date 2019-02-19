@@ -12,22 +12,10 @@ Subpackages
 Submodules
 ----------
 
-onlinejudge.dispatch module
----------------------------
+.. toctree::
 
-.. automodule:: onlinejudge.dispatch
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.type module
------------------------
-
-.. automodule:: onlinejudge.type
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   onlinejudge.dispatch
+   onlinejudge.type
 
 Module contents
 ---------------

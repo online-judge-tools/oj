@@ -11,30 +11,13 @@ Subpackages
 Submodules
 ----------
 
-onlinejudge.implementation.logging module
------------------------------------------
+.. toctree::
 
-.. automodule:: onlinejudge.implementation.logging
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.implementation.main module
---------------------------------------
-
-.. automodule:: onlinejudge.implementation.main
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-onlinejudge.implementation.utils module
----------------------------------------
-
-.. automodule:: onlinejudge.implementation.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   onlinejudge.implementation.download_history
+   onlinejudge.implementation.format_utils
+   onlinejudge.implementation.logging
+   onlinejudge.implementation.main
+   onlinejudge.implementation.utils
 
 Module contents
 ---------------
