@@ -19,7 +19,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 
 -   Download sample cases
     -   AtCoder
-    -   Yukicoder
+    -   yukicoder
     -   Anarchy Golf
     -   Codeforces
     -   HackerRank
@@ -29,25 +29,25 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Kattis
     -   Toph (Problem Archive)
 -   Download system test cases
-    -   Yukicoder
+    -   yukicoder
     -   Aizu Online Judge
 -   Login
     -   AtCoder
-    -   Yukicoder (via github.com or [session token](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md))
+    -   yukicoder (via github.com or [session token](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md))
     -   Codeforces
     -   HackerRank
     -   Topcoder
     -   Toph
 -   Submit your solution
     -   AtCoder
-    -   Yukicoder
+    -   yukicoder
     -   Codeforces
     -   HackerRank
     -   Topcoder (Marathon Match)
     -   Toph (Problem Archive)
 -   Generate scanner for input  (experimental)
     -   AtCoder
-    -   Yukicoder
+    -   yukicoder
 -   Test your solution
 -   Test your solution for reactive problem
 -   Generate output files from input and reference implementation

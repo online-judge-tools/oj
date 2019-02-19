@@ -43,7 +43,7 @@ supported services:
   Aizu Online Judge
   AtCoder
   Codeforces
-  Yukicoder
+  yukicoder
   CS Academy
   HackerRank
   PKU JudgeOnline
@@ -52,7 +52,7 @@ supported services:
 
 supported services with --system:
   Aizu Online Judge
-  Yukicoder
+  yukicoder
 
 format string for --format:
   %i                    index: 1, 2, 3, ...
@@ -76,7 +76,7 @@ format string for --format:
 supported services:
   AtCoder
   Codeforces
-  Yukicoder
+  yukicoder
   Topcoder
   HackerRank
   Toph
@@ -97,7 +97,7 @@ supported services:
   AtCoder
   Codeforces
   Topcoder (Marathon Match)
-  Yukicoder
+  yukicoder
   HackerRank
   Toph (Problem Archive)
 
@@ -153,7 +153,7 @@ tips:
 supported services:
   AtCoder
 
-  (Yukicoder has been removed)
+  (yukicoder has been removed)
   (HackerRank has been removed)
 
 example:
