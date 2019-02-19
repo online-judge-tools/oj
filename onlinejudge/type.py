@@ -6,8 +6,15 @@ import requests
 CredentialsProvider = Callable[[], Tuple[str, str]]
 
 
+class LoginError(RuntimeError):
+    pass
+
+
 class Service(object):
-    def login(self, get_credentials: CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+        """
+        :raises LoginError:
+        """
         raise NotImplementedError
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
@@ -31,6 +38,10 @@ Language = Dict[str, Any]
 Standings = Tuple[List[str], List[Dict[str, Any]]]  # ( [ 'column1', 'column2', ... ], [ { 'column1': data1, ... } ... ] )
 
 
+class NotLoggedInError(RuntimeError):
+    pass
+
+
 class SubmissionError(RuntimeError):
     pass
 
@@ -40,10 +51,14 @@ class Problem(object):
         raise NotImplementedError
 
     def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+        """
+        :raises NotLoggedInError:
+        """
         raise NotImplementedError
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> 'Submission':
         """
+        :raises NotLoggedInError:
         :raises SubmissionError:
         """
         raise NotImplementedError

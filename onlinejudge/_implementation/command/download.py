@@ -48,7 +48,11 @@ def download(args: 'argparse.Namespace') -> None:
     # get samples from the server
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         if args.system:
-            samples = problem.download_system_cases(session=sess)  # type: ignore
+            try:
+                samples = problem.download_system_cases(session=sess)  # type: ignore
+            except onlinejudge.type.NotLoggedInError:
+                log.error('login required')
+                sys.exit(1)
         else:
             samples = problem.download_sample_cases(session=sess)  # type: ignore
 

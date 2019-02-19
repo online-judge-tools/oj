@@ -20,12 +20,16 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LabeledString, TestCase
+from onlinejudge.type import LabeledString, LoginError, NotLoggedInError, SubmissionError, TestCase
 
 
 @utils.singleton
 class HackerRankService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+        """
+        :raises LoginError:
+        """
+
         session = session or utils.new_default_session()
         url = 'https://www.hackerrank.com/auth/login'
         # get
@@ -33,7 +37,7 @@ class HackerRankService(onlinejudge.type.Service):
         if resp.url != url:
             log.debug('redirected: %s', resp.url)
             log.info('You have already signed in.')
-            return True
+            return
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         csrftoken = soup.find('meta', attrs={'name': 'csrf-token'}).attrs['content']
@@ -54,10 +58,9 @@ class HackerRankService(onlinejudge.type.Service):
         # result
         if '/auth' not in resp.url:
             log.success('You signed in.')
-            return True
         else:
             log.failure('You failed to sign in. Wrong user ID or password.')
-            return False
+            raise LoginError('You failed to sign in. Wrong user ID or password.')
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
@@ -88,6 +91,9 @@ class HackerRankProblem(onlinejudge.type.Problem):
         self.challenge_slug = challenge_slug
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+        """
+        :raises NotImplementedError:
+        """
         log.warning('use --system option')
         raise NotImplementedError
 
@@ -148,6 +154,10 @@ class HackerRankProblem(onlinejudge.type.Problem):
         return None
 
     def _get_model(self, session: Optional[requests.Session] = None) -> Dict[str, Any]:
+        """
+        :raises SubmissionError:
+        """
+
         session = session or utils.new_default_session()
         # get
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
@@ -157,7 +167,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         log.debug('json: %s', it)
         if not it['status']:
             log.error('get model: failed')
-            raise onlinejudge.type.SubmissionError
+            raise SubmissionError
         return it['model']
 
     def _get_lang_display_mapping(self, session: Optional[requests.Session] = None) -> Dict[str, str]:
@@ -193,7 +203,14 @@ class HackerRankProblem(onlinejudge.type.Problem):
         return result
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+        """
+        :raises NotLoggedInError:
+        :raises SubmissionError:
+        """
+
         session = session or utils.new_default_session()
+        if not self.get_service().is_logged_in(session=session):
+            raise NotLoggedInError
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
@@ -209,7 +226,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         log.debug('json: %s', it)
         if not it['status']:
             log.failure('Submit Code: failed')
-            raise onlinejudge.type.SubmissionError
+            raise SubmissionError
         model_id = it['model']['id']
         url = self.get_url().rstrip('/') + '/submissions/code/{}'.format(model_id)
         log.success('success: result: %s', url)

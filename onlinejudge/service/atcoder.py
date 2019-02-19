@@ -19,7 +19,7 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import SubmissionError
+from onlinejudge.type import LoginError, NotLoggedInError, SubmissionError
 
 
 def _request(*args, **kwargs):
@@ -35,7 +35,11 @@ def _request(*args, **kwargs):
 
 @utils.singleton
 class AtCoderService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+        """
+        :raises LoginError:
+        """
+
         session = session or utils.new_default_session()
         url = 'https://practice.contest.atcoder.jp/login'
         # get
@@ -44,13 +48,19 @@ class AtCoderService(onlinejudge.type.Service):
         for msg in msgs:
             log.status('message: %s', msg)
         if msgs:
-            return 'login' not in resp.url
+            if 'login' not in resp.url:
+                return  # redirect means that you are already logged in
+            else:
+                raise LoginError('something wrong: ' + str(msgs))
         # post
         username, password = get_credentials()
         resp = _request('POST', url, session=session, data={'name': username, 'password': password}, allow_redirects=False)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         AtCoderService._report_messages(msgs)
-        return 'login' not in resp.url  # AtCoder redirects to the top page if success
+        if 'login' not in resp.url:
+            pass  # AtCoder redirects to the top page if success
+        else:
+            raise LoginError('your password may be not correct: ' + str(msgs))
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
@@ -421,6 +431,10 @@ class AtCoderProblem(onlinejudge.type.Problem):
         return language_dict
 
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
+        """
+        :raises NotLoggedInError:
+        :raises SubmissionError:
+        """
         assert language in self.get_language_dict(session=session)
         session = session or utils.new_default_session()
         # get
@@ -433,7 +447,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         path = utils.normpath(urllib.parse.urlparse(resp.url).path)
         if path.startswith('/login'):
             log.error('not logged in')
-            raise SubmissionError
+            raise NotLoggedInError
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', action=re.compile(r'^/submit\?task_id='))
@@ -462,7 +476,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         else:
             log.failure('failure')
             log.debug('redirected to %s', resp.url)
-            raise SubmissionError
+            raise SubmissionError('it may be a rate limit')
 
     def _get_task_id(self, session: Optional[requests.Session] = None) -> int:
         if self._task_id is None:

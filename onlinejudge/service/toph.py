@@ -12,19 +12,22 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import SubmissionError
+from onlinejudge.type import LoginError, NotLoggedInError, SubmissionError
 
 
 @utils.singleton
 class TophService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+        """
+        :raises LoginError:
+        """
         session = session or utils.new_default_session()
         url = 'https://toph.co/login'
         # get
         resp = utils.request('GET', url, session=session)
         if resp.url != url:  # redirected
             log.info('You are already logged in.')
-            return True
+            return
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', class_='login-form')
@@ -41,10 +44,9 @@ class TophService(onlinejudge.type.Service):
         resp = utils.request('GET', url, session=session)  # Toph's Location header is not getting the expected value
         if resp.url != url:
             log.success('Welcome, %s.', username)
-            return True
         else:
             log.failure('Invalid handle/email or password.')
-            return False
+            raise LoginError('Invalid handle/email or password.')
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
@@ -98,6 +100,9 @@ class TophProblem(onlinejudge.type.Problem):
         return samples.get()
 
     def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
+        """
+        :raises NotImplementedError:
+        """
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -105,14 +110,17 @@ class TophProblem(onlinejudge.type.Problem):
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         select = soup.find('select', attrs={'name': 'languageId'})
         if select is None:
-            log.error('not logged in')
-            return {}
+            raise NotLoggedInError
         language_dict = {}
         for option in select.findAll('option'):
             language_dict[option.attrs['value']] = {'description': option.string.strip()}
         return language_dict
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:  # or SubmissionError
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+        """
+        :raises NotImplementedError:
+        :raises SubmissionError:
+        """
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -121,7 +129,7 @@ class TophProblem(onlinejudge.type.Problem):
         form = soup.find('form')
         if form is None:
             log.error('not logged in')
-            raise SubmissionError
+            raise LoginError
         log.debug('form: %s', str(form))
         if form.find('select') and form.find('select').attrs['name'] != 'languageId':
             log.error("Wrong submission URL")

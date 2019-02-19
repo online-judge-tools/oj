@@ -52,4 +52,7 @@ def login(args: 'argparse.Namespace') -> None:
             log.warning('If you don\'t want to give your password to this program, you can give only your session tokens.')
             log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md')
 
-            service.login(get_credentials, session=sess, **kwargs)  # type: ignore
+            try:
+                service.login(get_credentials, session=sess, **kwargs)  # type: ignore
+            except onlinejudge.type.LoginError:
+                pass
