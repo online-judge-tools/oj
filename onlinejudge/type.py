@@ -80,9 +80,6 @@ class Problem(object):
     def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
         raise NotImplementedError
 
-    def get_standings(self, session: Optional[requests.Session] = None) -> Standings:
-        raise NotImplementedError
-
     @classmethod
     def from_url(self, s: str) -> Optional['Problem']:
         pass

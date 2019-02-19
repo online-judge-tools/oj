@@ -186,7 +186,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
             log.failure('%s', messages)
             raise SubmissionError('it may be a rate limit: ' + messages)
 
-    def get_standings(self, session: Optional[requests.Session] = None) -> onlinejudge.type.Standings:
+    def get_standings(self, session: Optional[requests.Session] = None):
         session = session or utils.new_default_session()
 
         header = None  # type: Optional[List[str]]
