@@ -21,7 +21,7 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LoginError, NotLoggedInError, SubmissionError
+from onlinejudge.type import *
 
 
 @utils.singleton
@@ -104,19 +104,18 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
                 return cls(**kwargs)
         return None
 
-    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Dict[str, str]]:
+    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         session = session or utils.new_default_session()
 
-        # at 2017/09/21
-        return {
-            'Java':   {'value': '1', 'description': 'Java 8'},
-            'C++':    {'value': '3', 'description': 'C++11'},
-            'C#':     {'value': '4', 'description': ''},
-            'VB':     {'value': '5', 'description': ''},
-            'Python': {'value': '6', 'description': 'Python 2'},
-        }  # yapf: disable
+        return [
+            Language(LanguageId('1'), 'Java 8'),
+            Language(LanguageId('3'), 'C++11'),
+            Language(LanguageId('4'), 'C#'),
+            Language(LanguageId('5'), 'VB'),
+            Language(LanguageId('6'), 'Python 2'),
+        ]
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
         """
         :param kind: must be one of `example` (default) or `full`
         :raises NotLoggedInError:
@@ -159,7 +158,6 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
 
         # post
         url = 'https://community.topcoder.com/longcontest/'
-        language_id = self.get_language_dict(session=session)[language]['value']
         data = {
             'module': 'Submit',
             'rd': self.rd,
@@ -170,7 +168,7 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
                 'example': 'true',
                 'full': 'false'
             }[kind],
-            'lid': language_id,
+            'lid': str(language_id),
             'code': code,
         }
         resp = utils.request('POST', url, session=session, data=data)

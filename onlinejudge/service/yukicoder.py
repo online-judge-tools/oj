@@ -20,8 +20,7 @@ import requests
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
-import onlinejudge.type
-from onlinejudge.type import LabeledString, LoginError, NotLoggedInError, SubmissionError, TestCase
+from onlinejudge.type import *
 
 
 @utils.singleton
@@ -325,7 +324,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
         return None
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
         """
         :raises NotLoggedInError:
         """
@@ -342,8 +341,8 @@ class YukicoderProblem(onlinejudge.type.Problem):
             raise NotLoggedInError
         # post
         form = utils.FormSender(form, url=resp.url)
-        form.set('lang', language)
-        form.set_file('file', 'code', code)
+        form.set('lang', language_id)
+        form.set_file('file', filename or 'code', code)
         form.unset('custom_test')
         resp = form.request(session=session)
         resp.raise_for_status()
@@ -360,7 +359,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 log.warning('yukicoder says: "%s"', div.string)
             raise SubmissionError
 
-    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
+    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         session = session or utils.new_default_session()
         # get
         # We use the problem page since it is available without logging in
@@ -368,10 +367,10 @@ class YukicoderProblem(onlinejudge.type.Problem):
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         select = soup.find('select', id='lang')
-        language_dict = {}
+        languages = []  # type: List[Language]
         for option in select.find_all('option'):
-            language_dict[option.attrs['value']] = {'description': ' '.join(option.string.split())}
-        return language_dict
+            languages += [Language(option.attrs['value'], ' '.join(option.string.split()))]
+        return languages
 
     def get_url(self) -> str:
         if self.problem_no:
