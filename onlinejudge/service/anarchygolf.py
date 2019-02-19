@@ -11,6 +11,7 @@ import bs4
 import requests
 
 import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
@@ -44,7 +45,7 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        samples = utils.SampleZipper()
+        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         for h2 in soup.find_all('h2'):
             it = self._parse_sample_tag(h2)
             if it is not None:

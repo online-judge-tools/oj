@@ -11,13 +11,13 @@ import os.path
 import posixpath
 import re
 import urllib.parse
-import zipfile
 from typing import *
 
 import bs4
 import requests
 
 import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 from onlinejudge.type import *
@@ -270,7 +270,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        samples = utils.SampleZipper()
+        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         for pre in soup.find_all('pre'):
             log.debug('pre: %s', str(pre))
             it = self._parse_sample_tag(pre)
@@ -287,30 +287,10 @@ class YukicoderProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         if not self.get_service().is_logged_in(session=session):
             raise NotLoggedInError
-
-        # get
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         resp = utils.request('GET', url, session=session)
-        # parse
-        basenames = collections.defaultdict(dict)  # type: Dict[str, Dict[str, LabeledString]]
-        with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
-            for filename in sorted(fh.namelist()):  # "test_in" < "test_out"
-                dirname = os.path.dirname(filename)
-                basename = os.path.basename(filename)
-                kind = {'test_in': 'input', 'test_out': 'output'}[dirname]
-                content = fh.read(filename).decode()
-                name = basename
-                if os.path.splitext(name)[1] == '.in':  # ".in" extension is confusing
-                    name = os.path.splitext(name)[0]
-                basenames[basename][kind] = LabeledString(name, content)
-        samples = []  # type: List[TestCase]
-        for basename in sorted(basenames.keys()):
-            data = basenames[basename]
-            if 'input' not in data or 'output' not in data or len(data) != 2:
-                log.error('dangling sample found: %s', str(data))
-            else:
-                samples += [TestCase(data['input'], data['output'])]
-        return samples
+        fmt = 'test_%e/%s'
+        return onlinejudge._implementation.testcase_zipper.extract_from_zip(resp.content, fmt)
 
     def _parse_sample_tag(self, tag: bs4.Tag) -> Optional[Tuple[str, str]]:
         assert isinstance(tag, bs4.Tag)

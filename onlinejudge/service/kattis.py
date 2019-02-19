@@ -13,10 +13,11 @@ import bs4
 import requests
 
 import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LabeledString, TestCase
+from onlinejudge.type import TestCase
 
 
 @utils.singleton
@@ -60,17 +61,7 @@ class KattisProblem(onlinejudge.type.Problem):
             return []
         resp.raise_for_status()
         # parse
-        with zipfile.ZipFile(io.BytesIO(resp.content)) as fh:
-            samples = []  # type: List[TestCase]
-            for filename in sorted(fh.namelist()):
-                log.debug('filename: %s', filename)
-                if filename.endswith('.in'):
-                    inpath = filename
-                    outpath = filename[:-3] + '.ans'
-                    indata = fh.read(inpath).decode()
-                    outdata = fh.read(outpath).decode()
-                    samples += [TestCase(LabeledString(inpath, indata), LabeledString(outpath, outdata))]
-            return samples
+        return onlinejudge._implementation.testcase_zipper.extract_from_zip(resp.content, '%s.%e', out='ans')
 
     def get_url(self, contests: bool = True) -> str:
         if contests and self.contest_id is not None:
