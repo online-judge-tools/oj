@@ -19,7 +19,7 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LoginError, NotLoggedInError, SubmissionError
+from onlinejudge.type import *
 
 
 def _request(*args, **kwargs):
@@ -433,33 +433,36 @@ class AtCoderProblem(onlinejudge.type.Problem):
                         return s
         return ''
 
-    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
+    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
+        """
+        :raises NotLoggedInError:
+        """
         session = session or utils.new_default_session()
         # get
         url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)
         resp = _request('GET', url, session=session)
         msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
         if AtCoderService._report_messages(msgs, unexpected=True):
-            return {}
+            return []
         # check whether logged in
         path = utils.normpath(urllib.parse.urlparse(resp.url).path)
         if path.startswith('/login'):
             log.error('not logged in')
-            return {}
+            raise NotLoggedInError
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         select = soup.find('select', class_='submit-language-selector')  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
-        language_dict = {}
+        languages = []  # type: List[Language]
         for option in select.find_all('option'):
-            language_dict[option.attrs['value']] = {'description': option.string}
-        return language_dict
+            languages += [Language(option.attrs['value'], option.string)]
+        return languages
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
         """
         :raises NotLoggedInError:
         :raises SubmissionError:
         """
-        assert language in self.get_language_dict(session=session)
+        assert language_id in [language.id for language in self.get_available_languages(session=session)]
         session = session or utils.new_default_session()
         # get
         url = 'http://{}.contest.atcoder.jp/submit'.format(self.contest_id)  # TODO: use beta.atcoder.jp
@@ -484,7 +487,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         form = utils.FormSender(form, url=resp.url)
         form.set('task_id', str(task_id))
         form.set('source_code', code)
-        form.set('language_id_{}'.format(task_id), language)
+        form.set('language_id_{}'.format(task_id), str(language_id))
         resp = form.request(session=session)
         resp.raise_for_status()
         # result
@@ -628,8 +631,8 @@ class AtCoderSubmission(onlinejudge.type.Submission):
     def get_service(self) -> AtCoderService:
         return AtCoderService()
 
-    def download(self, session: Optional[requests.Session] = None) -> str:
-        return self.get_source_code(session=session).decode()
+    def download_code(self, session: Optional[requests.Session] = None) -> bytes:
+        return self.get_source_code(session=session)
 
     def _load_details(self, session: Optional[requests.Session] = None) -> None:
         session = session or utils.new_default_session()

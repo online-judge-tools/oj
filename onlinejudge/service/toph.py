@@ -16,7 +16,7 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LoginError, NotLoggedInError, SubmissionError
+from onlinejudge.type import *
 
 
 @utils.singleton
@@ -108,7 +108,7 @@ class TophProblem(onlinejudge.type.Problem):
             samples.add(s, "Output")
         return samples.get()
 
-    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
+    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         """
         :raises NotImplementedError:
         """
@@ -120,12 +120,12 @@ class TophProblem(onlinejudge.type.Problem):
         select = soup.find('select', attrs={'name': 'languageId'})
         if select is None:
             raise NotLoggedInError
-        language_dict = {}
+        languages = []  # type: List[Language]
         for option in select.findAll('option'):
-            language_dict[option.attrs['value']] = {'description': option.string.strip()}
-        return language_dict
+            languages += [Language(LanguageId(option.attrs['value']), option.string.strip())]
+        return languages
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> Submission:
         """
         :raises NotImplementedError:
         :raises SubmissionError:
@@ -146,7 +146,7 @@ class TophProblem(onlinejudge.type.Problem):
 
         # make data
         form = utils.FormSender(form, url=resp.url)
-        form.set('languageId', language)
+        form.set('languageId', language_id)
         form.set_file('source', 'code', code)
         resp = form.request(session=session)
         resp.raise_for_status()

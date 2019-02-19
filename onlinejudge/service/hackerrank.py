@@ -20,7 +20,7 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LabeledString, LoginError, NotLoggedInError, SubmissionError, TestCase
+from onlinejudge.type import *
 
 
 @utils.singleton
@@ -189,20 +189,20 @@ class HackerRankProblem(onlinejudge.type.Problem):
         log.debug('lang_display_mapping (parsed): %s', lang_display_mapping)
         return lang_display_mapping
 
-    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Dict[str, str]]:
+    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         session = session or utils.new_default_session()
         info = self._get_model(session=session)
         lang_display_mapping = self._get_lang_display_mapping()
-        result = {}
+        result = []  # type: List[Language]
         for lang in info['languages']:
             descr = lang_display_mapping.get(lang)
             if descr is None:
                 log.warning('display mapping for language `%s\' not found', lang)
                 descr = lang
-            result[lang] = {'description': descr}
+            result += [Language(lang, descr)]
         return result
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
         """
         :raises NotLoggedInError:
         :raises SubmissionError:
@@ -218,7 +218,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         csrftoken = soup.find('meta', attrs={'name': 'csrf-token'}).attrs['content']
         # post
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/submissions'.format(self.contest_slug, self.challenge_slug)
-        payload = {'code': code, 'language': language, 'contest_slug': self.contest_slug}
+        payload = {'code': code, 'language': str(language_id), 'contest_slug': self.contest_slug}
         log.debug('payload: %s', payload)
         resp = utils.request('POST', url, session=session, json=payload, headers={'X-CSRF-Token': csrftoken})
         # parse

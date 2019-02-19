@@ -11,6 +11,7 @@ import onlinejudge
 import onlinejudge._implementation.download_history
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
+from onlinejudge.type import *
 
 if TYPE_CHECKING:
     import argparse
@@ -60,7 +61,7 @@ def submit(args: 'argparse.Namespace') -> None:
 
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # guess or select language ids
-        langs = problem.get_language_dict(session=sess)
+        langs = {language.id: {'description': language.name} for language in problem.get_available_languages(session=sess)}  # type: Dict[LanguageId, Dict[str, str]]
         matched_lang_ids = None  # type: Optional[List[str]]
         if args.language in langs:
             matched_lang_ids = [args.language]
@@ -89,7 +90,7 @@ def submit(args: 'argparse.Namespace') -> None:
         # report selected language ids
         if matched_lang_ids is not None and len(matched_lang_ids) == 1:
             args.language = matched_lang_ids[0]
-            log.info('chosen language: %s (%s)', args.language, langs[args.language]['description'])
+            log.info('chosen language: %s (%s)', args.language, langs[LanguageId(args.language)]['description'])
         else:
             if matched_lang_ids is None:
                 log.error('language is unknown')
@@ -101,7 +102,7 @@ def submit(args: 'argparse.Namespace') -> None:
                 log.error('Matched languages were not narrowed down to one.')
                 log.info('You have to choose:')
             for lang_id in sorted(matched_lang_ids or langs.keys()):
-                log.emit('%s (%s)', lang_id, langs[lang_id]['description'])
+                log.emit('%s (%s)', lang_id, langs[LanguageId(lang_id)]['description'])
             sys.exit(1)
 
         # confirm
@@ -138,11 +139,11 @@ def submit(args: 'argparse.Namespace') -> None:
             else:
                 kwargs['kind'] = 'example'
         try:
-            submission = problem.submit_code(code, language=args.language, session=sess, **kwargs)  # type: ignore
-        except onlinejudge.type.NotLoggedInError:
+            submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess, **kwargs)  # type: ignore
+        except NotLoggedInError:
             log.failure('login required')
             sys.exit(1)
-        except onlinejudge.type.SubmissionError:
+        except SubmissionError:
             log.failure('submission failed')
             sys.exit(1)
 
