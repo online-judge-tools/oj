@@ -30,6 +30,18 @@ import onlinejudge.type
 from onlinejudge.type import *
 
 
+def _list_alert(resp: requests.Response, soup: Optional[bs4.BeautifulSoup] = None, print_: bool = False) -> List[str]:
+    if soup is None:
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+    msgs = []  # type: List[str]
+    for alert in soup.find_all('div', attrs={'role': 'alert'}):
+        msg = ' '.join([s.strip() for s in alert.strings if s.strip()])
+        if print_:
+            log.warning('AtCoder says: %s', msg)
+        msgs += [msg]
+    return msgs
+
+
 def _request(*args, **kwargs):
     """
     This is a workaround. AtCoder's servers sometime fail to send "Content-Type" field.
@@ -38,6 +50,7 @@ def _request(*args, **kwargs):
     resp = utils.request(*args, **kwargs)
     log.debug('AtCoder\'s server said "Content-Type: %s"', resp.headers.get('Content-Type', '(not sent)'))
     resp.encoding = 'UTF-8'
+    _list_alert(resp, print_=True)
     return resp
 
 
@@ -67,8 +80,9 @@ class AtCoderService(onlinejudge.type.Service):
         form.set('username', username)
         form.set('password', password)
         resp = form.request(session)
-        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        AtCoderService._report_messages(msgs)
+        _list_alert(resp, print_=True)
+
+        # result
         if 'login' not in resp.url:
             log.success('Welcome,')  # AtCoder redirects to the top page if success
         else:
@@ -101,37 +115,6 @@ class AtCoderService(onlinejudge.type.Service):
                 and (result.netloc in ('atcoder.jp', 'beta.atcoder.jp') or result.netloc.endswith('.contest.atcoder.jp')):
             return cls()
         return None
-
-    @classmethod
-    def _get_messages_from_cookie(cls, cookies) -> List[str]:
-        msgtags = []  # type: List[str]
-        for cookie in cookies:
-            log.debug('cookie: %s', str(cookie))
-            if cookie.name.startswith('__message_'):
-                msg = json.loads(urllib.parse.unquote_plus(cookie.value))
-                msgtags += [msg['c']]
-                log.debug('message: %s: %s', cookie.name, str(msg))
-        msgs = []  # type: List[str]
-        for msgtag in msgtags:
-            soup = bs4.BeautifulSoup(msgtag, utils.html_parser)
-            msg = None
-            for tag in soup.find_all():
-                if tag.string and tag.string.strip():
-                    msg = tag.string
-                    break
-            if msg is None:
-                log.error('failed to parse message')
-            else:
-                msgs += [msg]
-        return msgs
-
-    @classmethod
-    def _report_messages(cls, msgs: List[str], unexpected: bool = False) -> bool:
-        for msg in msgs:
-            log.status('message: %s', msg)
-        if msgs and unexpected:
-            log.failure('unexpected messages found')
-        return bool(msgs)
 
     def iterate_contests(self, lang: str = 'ja', session: Optional[requests.Session] = None) -> Generator['AtCoderContest', None, None]:
         """
@@ -323,8 +306,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         # get
         resp = _request('GET', self.get_url(type='beta'), session=session)
-        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        if AtCoderService._report_messages(msgs, unexpected=True):
+        if _list_alert(resp):
             # example message: "message: You cannot see this page."
             log.warning('are you logged in?')
             return []
@@ -425,8 +407,8 @@ class AtCoderProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         # get
         resp = _request('GET', self.get_url(type='beta'), session=session)
-        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        if AtCoderService._report_messages(msgs, unexpected=True):
+        if _list_alert(resp):
+            log.warning('are you logged in?')
             return ''
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
@@ -479,12 +461,9 @@ class AtCoderProblem(onlinejudge.type.Problem):
         # get
         url = 'https://atcoder.jp/contests/{}/submit'.format(self.contest_id)
         resp = _request('GET', url, session=session)
-        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        AtCoderService._report_messages(msgs, unexpected=True)
 
         # check whether logged in
         if 'login' in resp.url:
-            log.error('not logged in')
             raise NotLoggedInError
 
         # parse
@@ -500,19 +479,15 @@ class AtCoderProblem(onlinejudge.type.Problem):
         form.set('data.LanguageId', str(language_id))
         form.set('sourceCode', code)
         resp = form.request(session=session)
-        resp.raise_for_status()
+        _list_alert(resp, print_=True)
 
         # result
-        msgs = AtCoderService._get_messages_from_cookie(resp.cookies)
-        AtCoderService._report_messages(msgs)
         if '/submissions/me' in resp.url:
             # example: https://practice.contest.atcoder.jp/submissions/me#32174
             # CAUTION: this URL is not a URL of the submission
             log.success('success: result: %s', resp.url)
             return utils.DummySubmission(resp.url, problem=self)
         else:
-            log.failure('failure')
-            log.debug('redirected to %s', resp.url)
             raise SubmissionError('it may be a rate limit')
 
     def _load_details(self, session: Optional[requests.Session] = None) -> None:
