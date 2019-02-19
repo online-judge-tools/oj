@@ -1,5 +1,7 @@
 # Contribute Guide / 開発を手伝ってくれる人へ
 
+TODO: translate this document to English
+
 ## language / 言語について
 
 In the source code and documents for end users, we should use English.
@@ -10,10 +12,25 @@ For other place, both English and Japanese are acceptable.
 
 ## issues / issue について
 
+Not only sending Pull Requests, feature requests and bug reports are welcome.
+
 機能要求やバグ報告は気軽にしてください。
 コードを書くことだけが開発ではありません。
 
 ## pull requests / プルリクについて
+
+PR is always welcome.
+
+However, please note that PR is not always merged as it is.
+To improve PR quality, reviewers may ask you change requests.
+
+-   Test your PR branch on local by `python3 setup.py test`.
+-   Write code easy to understand.
+    -   Don't make diff which is unnecessary for the purpose of PR.
+    -   Split commits appropriately.
+    -   Comment on the code where you are not confident of.
+-   If you want to add a feature, it would be better to discuss before writing code.
+    -   because your feature is not always merged.
 
 基本的にはどんなものでも歓迎します。
 
@@ -23,7 +40,7 @@ For other place, both English and Japanese are acceptable.
 -   手元でテストをする (`python3 setup.py test` を実行する)
     -   CI が通らない限りは merge はできません
 -   レビュアーにやさしいコードを書く
-    -   変更箇所は必要最低限にする
+    -   変更箇所はPRの目的に沿った必要最低限のものにする
     -   commit は適切に分割する
     -   怪しげなところにはコメントを書いておく
 -   機能追加をする場合は事前に確認をする
@@ -35,9 +52,9 @@ For other place, both English and Japanese are acceptable.
 ## philosophy of design / 設計の方針
 
 第一義は「コンテストで上位を取ることに役立つこと」です。
-特に「ペナルティを出させないこと」に注力しています。
 これを実現する手段として「手動だと間違えたりさぼったりしやすい作業を自動化する」を用いています。
 
+また、「ペナルティを出させないこと」に注力しています。
 Web scraping をする性質により動作は必然的に不安定であり、これは「ペナルティを出させないこと」の壁となります。
 これへの対応として「誤動作の起こりやすい機能は避ける」「誤動作があったときに誤動作があると気付きやすいようにする」などを重要視しています。
 その実践の例としては「取得したサンプルケースを(ファイルに出力するだけでなく)画面に見やすく表示する」が分かりやすいでしょう。
@@ -45,38 +62,39 @@ Web scraping をする性質により動作は必然的に不安定であり、�
 
 ## module structure
 
-主に以下のような構造です。
+The structure is as follows:
 
-t-   `onlinejudge/`
-    -   `type.py`: 型はすべてここ
-    -   `dispatch.py`: URL から object を解決する仕組み
+-   `onlinejudge/`
+    -   `type.py`: contains all 
+    -   `dispatch.py`: resolves classes from URL
     -   `implementation/`
-        -   `main.py`: 個別のコマンドを呼び出すまでの部分
-        -   `command/`: `download` `submit` などのコマンドの本体が置かれる
+        -   `main.py`
+        -   `command/`: has the bodies of commands like `download`, `submit`, etc.
             -   `download.py`
             -   `submit.py`
             -   ...
-    -   `service/`: AtCoder, Codeforces などのサービスごとの実装が置かれる
+    -   `service/`: has classes for services like AtCoder, Codeforces, etc.
         -   `atcoder.py`
         -   `codeforces.py`
         -   ...
--   `tests/`: テストが置かれる
+-   `tests/`
 
 ## formatter
 
-isort と yapf を運用しています。
-行幅は実質無限に設定されています。
-それぞれ次のようなコマンドで実行できます。
+We use `isort` adn `yapf`.
+You can run them with the following commands:
 
 ``` sh
 $ isort --recursive oj onlinejudge
 $ yapf --in-place --recursive oj onlinejudge
 ```
 
+The line width is set as infinity.
+
 ## tests
 
-静的型検査と通常のテストをしています。
-手元ではそれぞれ次のようなコマンドで実行できます。
+We use static type checking and unit testing.
+You can run them with the following commands:
 
 ``` sh
 $ mypy oj onlinejudge
@@ -94,8 +112,11 @@ $ python3 setup.py test -s tests.command_download_atcoder.DownloadAtCoderTest
 
 ## CI
 
+Travis CI will run automatically when you commit or send PR on `master` or `develop` branch.
+The same test as that by `python3 setup.py test` is executed.
+
 `master` `develop` に関する commit や pull request について CI が走ります。
-`python3 setup.py test` の実行でも同等の処理が行われるように設定されているので、手元でこれを実行しているなら気にする必要はありません。
+`python3 setup.py test` の実行によるものと同等のテストが行われます。
 
 ## deployment
 
@@ -108,3 +129,19 @@ Travis CI から PyPI 上へ upload を仕掛けるように設定されてい�
     -   例: [3a24dc](https://github.com/kmyk/online-judge-tools/commit/3a24dc64b56d898e387dee56cf9915be3ab0f7e2)
 2.  `v0.1.23` の形で Git tag を打って GitHub 上へ push する
     -   これにより Travis CI の機能が呼び出され PyPI への upload がなされる
+
+## how to add a new contest platform / 対応サービスの追加の手順
+
+Short version: see files for other platforms like `onlinejudge/service/poj.py` or `onlinejudge/service/codeforces.py`, and `tests/command_download_hackerrank.py` or `https://github.com/kmyk/online-judge-tools/blob/master/tests/command_submit.py` for tests
+
+Long version:
+
+1.  make the file `onlinejudge/service/${NAME}.py`
+1.  write the singleton class `${NAME}Service` inheriting `onlinejudge.type.Service`
+    -   You must implement at least methods `get_url()` `get_name()` and `cls.from_url()`, and you can ignore others.
+1.  write the class `${NAME}Problem` inheriting `onlinejudge.type.Problem`
+    -   You must implement at least methods `download_sample_cases()` `get_url()` `get_service()` and `cls.from_url()`, and you can ignore others.
+1.  register the classes to the lists `onlinejudge.dispatch.services` and `onlinejudge.dispatch.problems`
+1.  register the module to the `onlinejudge/service/__init__.py`
+1.  write tests for your platform
+    -   You should make `tests/command_download_${NAME}.py` and/or append to `tests/command_submit.py`. Please see other existing tests.

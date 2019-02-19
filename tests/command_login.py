@@ -23,6 +23,9 @@ class LoginTest(unittest.TestCase):
     def test_call_login_check_codeforces_failure(self):
         self.snippet_call_login_check_failure('https://codeforces.com/')
 
+    def test_call_login_check_hackerrank_failure(self):
+        self.snippet_call_login_check_failure('https://www.hackerrank.com/')
+
     def test_call_login_check_yukicoder_failure(self):
         self.snippet_call_login_check_failure('https://yukicoder.me/')
 
@@ -35,6 +38,11 @@ class LoginTest(unittest.TestCase):
     def test_call_login_check_codeforces_success(self):
         ojtools = os.path.abspath('oj')
         subprocess.check_call([ojtools, 'login', '--check', 'https://codeforces.com/'], stdout=sys.stdout, stderr=sys.stderr)
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_login_check_hackerrank_success(self):
+        ojtools = os.path.abspath('oj')
+        subprocess.check_call([ojtools, 'login', '--check', 'https://www.hackerrank.com/'], stdout=sys.stdout, stderr=sys.stderr)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_login_check_yukicoder_success(self):

@@ -19,7 +19,7 @@ def get_files_from_json(samples):
     return files
 
 
-def snippet_call_download(self, url, files, is_system=False, type='files'):
+def snippet_call_download(self, url, files, is_system=False, is_silent=False, type='files'):
     assert type in 'files' or 'json'
     if type == 'json':
         files = get_files_from_json(files)
@@ -29,6 +29,8 @@ def snippet_call_download(self, url, files, is_system=False, type='files'):
         cmd = [ojtools, 'download', url]
         if is_system:
             cmd += ['--system']
+        if is_silent:
+            cmd += ['--silent']
         subprocess.check_call(cmd, stdout=sys.stdout, stderr=sys.stderr)
         result = {}
         if os.path.exists('test'):
