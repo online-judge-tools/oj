@@ -30,7 +30,7 @@ class HackerRankService(onlinejudge.type.Service):
         :raises LoginError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://www.hackerrank.com/auth/login'
         # get
         resp = utils.request('GET', url, session=session)
@@ -61,7 +61,7 @@ class HackerRankService(onlinejudge.type.Service):
             raise LoginError('You failed to sign in. Wrong user ID or password.')
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://www.hackerrank.com/auth/login'
         resp = utils.request('GET', url, session=session)
         return '/auth' not in resp.url
@@ -95,7 +95,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         raise NotImplementedError
 
     def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # example: https://www.hackerrank.com/rest/contests/hourrank-1/challenges/beautiful-array/download_testcases
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/download_testcases'.format(self.contest_slug, self.challenge_slug)
         resp = utils.request('GET', url, session=session, raise_for_status=False)
@@ -133,7 +133,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         :raises SubmissionError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}'.format(self.contest_slug, self.challenge_slug)
         resp = utils.request('GET', url, session=session)
@@ -146,7 +146,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         return it['model']
 
     def _get_lang_display_mapping(self, session: Optional[requests.Session] = None) -> Dict[str, str]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         url = 'https://hrcdn.net/hackerrank/assets/codeshell/dist/codeshell-cdffcdf1564c6416e1a2eb207a4521ce.js'  # at "Mon Feb  4 14:51:27 JST 2019"
         resp = utils.request('GET', url, session=session)
@@ -165,7 +165,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         return lang_display_mapping
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         info = self._get_model(session=session)
         lang_display_mapping = self._get_lang_display_mapping()
         result = []  # type: List[Language]
@@ -183,7 +183,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         :raises SubmissionError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         if not self.get_service().is_logged_in(session=session):
             raise NotLoggedInError
         # get

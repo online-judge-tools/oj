@@ -39,7 +39,7 @@ class YukicoderService(onlinejudge.type.Service):
         :raise LoginError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://yukicoder.me/auth/github'
         # get
         resp = utils.request('GET', url, session=session)
@@ -72,12 +72,12 @@ class YukicoderService(onlinejudge.type.Service):
         :raise NotImplementedError: always raised
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
 
     def is_logged_in(self, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://yukicoder.me/auth/github'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
         assert resp.status_code == 302
@@ -107,7 +107,7 @@ class YukicoderService(onlinejudge.type.Service):
         else:
             assert name is not None
             url = 'https://yukicoder.me/api/v1/{}/name/{}'.format(api, urllib.parse.quote(name))
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         try:
             resp = utils.request('GET', url, session=session)
         except requests.exceptions.HTTPError:
@@ -264,7 +264,7 @@ class YukicoderService(onlinejudge.type.Service):
 
     def _get_and_parse_the_table(self, url: str, session: Optional[requests.Session] = None) -> Tuple[List[Any], List[Dict[str, bs4.Tag]]]:
         # get
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         resp = utils.request('GET', url, session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
@@ -294,7 +294,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
@@ -313,7 +313,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         :raises NotLoggedInError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         if not self.get_service().is_logged_in(session=session):
             raise NotLoggedInError
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
@@ -338,7 +338,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         :raises NotLoggedInError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         url = self.get_url() + '/submit'
         resp = utils.request('GET', url, session=session)
@@ -368,7 +368,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             raise SubmissionError
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         # We use the problem page since it is available without logging in
         resp = utils.request('GET', self.get_url(), session=session)
@@ -413,7 +413,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         return YukicoderService()
 
     def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse

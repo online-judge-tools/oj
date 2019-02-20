@@ -30,7 +30,7 @@ class TopcoderService(onlinejudge.type.Service):
         """
         :raises LoginError:
         """
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
 
         # NOTE: you can see this login page with https://community.topcoder.com/longcontest/?module=Submit
         url = 'https://community.topcoder.com/longcontest/'
@@ -105,7 +105,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
         return None
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
 
         return [
             Language(LanguageId('1'), 'Java 8'),
@@ -123,7 +123,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
         """
 
         assert kind in ['example', 'full']
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
 
         # TODO: implement self.is_logged_in()
         # if not self.is_logged_in(session=session):
@@ -191,7 +191,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
         .. deprecated:: 6.0.0
             This method may be deleted in future.
         """
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
 
         header = None  # type: Optional[List[str]]
         rows = []  # type: List[Dict[str, str]]

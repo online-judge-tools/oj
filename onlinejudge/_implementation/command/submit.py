@@ -54,7 +54,7 @@ def submit(args: 'argparse.Namespace') -> None:
     log.info('code (%d byte):', len(code))
     log.emit(utils.snip_large_file_content(code, limit=30, head=10, tail=10, bold=True))
 
-    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
+    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
         # guess or select language ids
         langs = {language.id: {'description': language.name} for language in problem.get_available_languages(session=sess)}  # type: Dict[LanguageId, Dict[str, str]]
         matched_lang_ids = None  # type: Optional[List[str]]

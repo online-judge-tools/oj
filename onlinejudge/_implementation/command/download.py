@@ -41,7 +41,7 @@ def download(args: 'argparse.Namespace') -> None:
         args.format = '%b.%e'
 
     # get samples from the server
-    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
+    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
         if args.system:
             try:
                 samples = problem.download_system_cases(session=sess)  # type: ignore

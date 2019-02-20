@@ -25,7 +25,7 @@ class TophService(onlinejudge.type.Service):
         """
         :raises LoginError:
         """
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://toph.co/login'
         # get
         resp = utils.request('GET', url, session=session)
@@ -53,7 +53,7 @@ class TophService(onlinejudge.type.Service):
             raise LoginError('Invalid handle/email or password.')
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://toph.co/login'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
         return resp.status_code != 200
@@ -88,7 +88,7 @@ class TophProblem(onlinejudge.type.Problem):
         self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         resp = utils.request('GET', self.get_url(), session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
@@ -108,7 +108,7 @@ class TophProblem(onlinejudge.type.Problem):
         """
         :raises NotImplementedError:
         """
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
@@ -126,7 +126,7 @@ class TophProblem(onlinejudge.type.Problem):
         :raises NotImplementedError:
         :raises SubmissionError:
         """
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse

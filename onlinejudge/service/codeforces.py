@@ -27,7 +27,7 @@ class CodeforcesService(onlinejudge.type.Service):
         """
         :raises LoginError:
         """
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://codeforces.com/enter'
         # get
         resp = utils.request('GET', url, session=session)
@@ -53,7 +53,7 @@ class CodeforcesService(onlinejudge.type.Service):
             raise LoginError('Invalid handle or password.')
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         url = 'https://codeforces.com/enter'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
         return resp.status_code == 302
@@ -97,7 +97,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
@@ -124,7 +124,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         :raises NotLoggedInError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
@@ -143,7 +143,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         :raises SubmissionError:
         """
 
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse

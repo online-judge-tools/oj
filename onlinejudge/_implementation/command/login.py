@@ -31,7 +31,7 @@ def login(args: 'argparse.Namespace') -> None:
             log.failure('login for %s: invalid option: --method %s', service.get_name(), args.method)
             sys.exit(1)
 
-    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
+    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
 
         if args.check:
             if service.is_logged_in(session=sess):

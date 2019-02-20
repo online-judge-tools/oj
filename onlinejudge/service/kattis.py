@@ -50,7 +50,7 @@ class KattisProblem(onlinejudge.type.Problem):
         self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         url = self.get_url(contests=False) + '/file/statement/samples.zip'
         resp = utils.request('GET', url, session=session, raise_for_status=False)

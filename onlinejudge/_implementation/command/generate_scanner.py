@@ -195,7 +195,7 @@ def generate_scanner(args: 'argparse.Namespace') -> None:
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
-    with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
+    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
         it = problem.get_input_format(session=sess)  # type: Any
     if not it:
         log.error('input format not found')

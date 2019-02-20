@@ -48,10 +48,23 @@ def next_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
     return tag
 
 
-def new_default_session() -> requests.Session:  # without setting cookiejar
+def new_session_with_our_user_agent() -> requests.Session:
     session = requests.Session()
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
     return session
+
+
+_default_session = None  # Optional[requests.Session]
+
+
+def get_default_session() -> requests.Session:
+    """
+    :note: cookie is not saved to disk
+    """
+    global _default_session
+    if _default_session is None:
+        _default_session = new_session_with_our_user_agent()
+    return _default_session
 
 
 default_cookie_path = data_dir / 'cookie.jar'
