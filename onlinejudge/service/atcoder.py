@@ -1,5 +1,7 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
+import datetime
+import itertools
 import json
 import posixpath
 import re
@@ -98,12 +100,154 @@ class AtCoderService(onlinejudge.type.Service):
             log.failure('unexpected messages found')
         return bool(msgs)
 
+    def iterate_contests(self, lang: str = 'ja', session: Optional[requests.Session] = None) -> Generator['AtCoderContest', None, None]:
+        assert lang in ('ja', 'en')  # NOTE: "lang=ja" is required to see some Japanese-local contests. However you can use "lang=en" to see the English names of contests.
+        session = session or utils.new_default_session()
+        last_page = None
+        for page in itertools.count(1):  # 1-based
+            if last_page is not None and page > last_page:
+                break
+            # get
+            url = 'https://atcoder.jp/contests/archive?lang={}&page={}'.format(lang, page)
+            resp = _request('GET', url, session=session)
+            # parse
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            if last_page is None:
+                last_page = int(soup.find('ul', class_='pagination').find_all('li')[-1].text)
+                log.debug('last page: %s', last_page)
+            tbody = soup.find('tbody')
+            for tr in tbody.find_all('tr'):
+                yield AtCoderContest._from_table_row(tr, lang=lang)
+
+    def get_user_history_url(self, user_id: str) -> str:
+        return 'https://atcoder.jp/users/{}/history/json'.format(user_id)
+
+
+class AtCoderContest(object):
+    def __init__(self, contest_id: str):
+        self.contest_id = contest_id
+
+        # NOTE: some fields remain undefined, comparing `_from_table_row`
+        self._start_time_url = None  # type: Optional[str]
+        self._contest_name_ja = None  # type: Optional[str]
+        self._contest_name_en = None  # type: Optional[str]
+        self._duration_text = None  # type: Optional[str]
+        self._rated_range = None  # type: Optional[str]
+
+    @classmethod
+    def from_url(cls, url: str) -> Optional['AtCoderContest']:
+        result = urllib.parse.urlparse(url)
+
+        # example: https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d
+        if result.scheme in ('', 'http', 'https') and result.hostname.endswith('.contest.atcoder.jp'):
+            contest_id = utils.remove_suffix(result.hostname, '.contest.atcoder.jp')
+            return cls(contest_id)
+
+        # example: https://atcoder.jp/contests/agc030
+        if result.scheme in ('', 'http', 'https') and result.hostname in ('atcoder.jp', 'beta.atcoder.jp'):
+            m = re.match(r'^/contests/([\w\-_]+)/?$', utils.normpath(result.path))
+            if m:
+                contest_id = m.group(1)
+                return cls(contest_id)
+
+        return None
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag, lang: str) -> 'AtCoderContest':
+        tds = tr.find_all('td')
+        assert len(tds) == 4
+        anchors = [tds[0].find('a'), tds[1].find('a')]
+        contest_path = anchors[1]['href']
+        assert contest_path.startswith('/contests/')
+        contest_id = contest_path[len('/contests/'):]
+        self = AtCoderContest(contest_id)
+        self._start_time_url = anchors[0]['href']
+        if lang == 'ja':
+            self._contest_name_ja = anchors[1].text
+        elif lang == 'en':
+            self._contest_name_en = anchors[1].text
+        else:
+            assert False
+        self._duration_text = tds[2].text
+        self._rated_range = tds[3].text
+        return self
+
+    def get_start_time(self) -> datetime.datetime:
+        if self._start_time_url is None:
+            raise NotImplementedError
+        # TODO: we need to use an ISO-format parser
+        query = urllib.parse.parse_qs(urllib.parse.urlparse(self._start_time_url).query)
+        assert len(query['iso']) == 1
+        assert query['p1'] == ['248']  # means JST
+        return datetime.datetime.strptime(query['iso'][0], '%Y%m%dT%H%M').replace(tzinfo=utils.tzinfo_jst)
+
+    def get_contest_name(self, lang: Optional[str] = None) -> str:
+        if lang is None:
+            if self._contest_name_en is not None:
+                return self._contest_name_en
+            elif self._contest_name_ja is not None:
+                return self._contest_name_ja
+            else:
+                raise NotImplementedError
+        elif lang == 'en':
+            if self._contest_name_en is None:
+                raise NotImplementedError
+            return self._contest_name_en
+        elif lang == 'ja':
+            if self._contest_name_ja is None:
+                raise NotImplementedError
+            return self._contest_name_ja
+        else:
+            assert False
+
+    def get_duration(self) -> datetime.timedelta:
+        if self._duration_text is None:
+            raise NotImplementedError
+        hours, minutes = map(int, self._duration_text.split(':'))
+        return datetime.timedelta(hours=hours, minutes=minutes)
+
+    def get_rated_range(self) -> str:
+        if self._rated_range is None:
+            raise NotImplementedError
+        return self._rated_range
+
+    def list_problems(self, session: Optional[requests.Session] = None) -> List['AtCoderProblem']:
+        # get
+        session = session or utils.new_default_session()
+        url = 'https://atcoder.jp/contests/{}/tasks'.format(self.contest_id)
+        resp = _request('GET', url, session=session)
+
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        tbody = soup.find('tbody')
+        return [AtCoderProblem._from_table_row(tr) for tr in tbody.find_all('tr')]
+
 
 class AtCoderProblem(onlinejudge.type.Problem):
+    # AtCoder has problems independently from contests. Therefore the notions "contest_id", "alphabet", and "url" don't belong to problems itself.
+
     def __init__(self, contest_id: str, problem_id: str):
         self.contest_id = contest_id
-        self.problem_id = problem_id
+        self.problem_id = problem_id  # TODO: fix the name, since AtCoder calls this as "task_screen_name"
         self._task_id = None  # type: Optional[int]
+        self._task_name = None  # type: Optional[str]
+        self._time_limit_msec = None  # type: Optional[int]
+        self._memory_limit_mb = None  # type: Optional[int]
+        self._alphabet = None  # type: Optional[str]
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag) -> 'AtCoderProblem':
+        tds = tr.find_all('td')
+        assert len(tds) == 5
+        path = tds[1].find('a')['href']
+        self = cls.from_url('https://atcoder.jp/' + path)
+        assert self is not None
+        self._alphabet = tds[0].text
+        self._task_name = tds[1].text
+        self._time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
+        self._memory_limit_mb = int(utils.remove_suffix(tds[3].text, ' MB'))
+        assert tds[4].text.strip() in ('', 'Submit')
+        return self
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
@@ -169,6 +313,9 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
     def get_service(self) -> AtCoderService:
         return AtCoderService()
+
+    def get_contest(self) -> AtCoderContest:
+        return AtCoderContest(self.contest_id)
 
     @classmethod
     def from_url(cls, s: str) -> Optional['AtCoderProblem']:
@@ -303,6 +450,33 @@ class AtCoderProblem(onlinejudge.type.Problem):
             self._task_id = int(m.group(1))
         return self._task_id
 
+    def _load_details(self, session: Optional[requests.Session] = None) -> int:
+        raise NotImplementedError
+
+    def get_task_name(self) -> str:
+        if self._task_name is None:
+            self._load_details()
+        assert self._task_name is not None
+        return self._task_name
+
+    def get_time_limit_msec(self) -> int:
+        if self._time_limit_msec is None:
+            self._load_details()
+        assert self._time_limit_msec is not None
+        return self._time_limit_msec
+
+    def get_memory_limit_mb(self) -> int:
+        if self._memory_limit_mb is None:
+            self._load_details()
+        assert self._memory_limit_mb is not None
+        return self._memory_limit_mb
+
+    def get_alphabet(self) -> str:
+        if self._alphabet is None:
+            self._load_details()
+        assert self._alphabet is not None
+        return self._alphabet
+
 
 class AtCoderSubmission(onlinejudge.type.Submission):
     def __init__(self, contest_id: str, submission_id: int, problem_id: Optional[str] = None):
@@ -334,7 +508,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         # example: https://beta.atcoder.jp/contests/abc073/submissions/1592381
         m = re.match(r'^/contests/([\w\-_]+)/submissions/(\d+)$', utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc == ('atcoder.jp', 'beta.atcoder.jp') \
+                and result.netloc in ('atcoder.jp', 'beta.atcoder.jp') \
                 and m:
             contest_id = m.group(1)
             try:
