@@ -260,6 +260,9 @@ tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 
 
 def getter_with_load_details(name: str, check_with: Optional[str] = None) -> Callable:
+    """
+    TODO: confirm that the type annotation `get_foo = getter_with_load_details("_foo")  # type: Callable[..., int]` is correct one
+    """
     if check_with is None:
         check_with = name
 

@@ -245,7 +245,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         self._alphabet = tds[0].text
         self._task_name = tds[1].text
         self._time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
-        self._memory_limit_byte = int(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000
+        self._memory_limit_byte = int(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000  # TODO: confirm this is MB truly, not MiB
         assert tds[4].text.strip() in ('', 'Submit')
         return self
 
@@ -566,7 +566,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         if 'Exec Time' in data:
             self._exec_time_msec = int(utils.remove_suffix(data['Exec Time'], ' ms'))
         if 'Memory' in data:
-            self._memory_byte = int(utils.remove_suffix(data['Memory'], ' KB')) * 1000
+            self._memory_byte = int(utils.remove_suffix(data['Memory'], ' KB')) * 1000  # TODO: confirm this is KB truly, not KiB
 
         # Compile Error
         compile_error = soup.find('h4', text='Compile Error')
@@ -635,7 +635,7 @@ class AtCoderSubmissionTestCaseResult(object):
         memory_byte = None  # type: Optional[int]
         if len(tds) == 4:
             exec_time_msec = int(utils.remove_suffix(tds[2].text, ' ms'))
-            memory_byte = int(utils.remove_suffix(tds[3].text, ' KB')) * 1000
+            memory_byte = int(utils.remove_suffix(tds[3].text, ' KB')) * 1000  # TODO: confirm this is KB truly, not KiB
         else:
             assert len(tds) == 2
         return AtCoderSubmissionTestCaseResult(case_name, status, exec_time_msec, memory_byte)
