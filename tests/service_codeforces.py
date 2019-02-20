@@ -6,10 +6,9 @@ from onlinejudge.service.codeforces import CodeforcesProblem, CodeforcesService
 
 class CodeforcesSerivceTest(unittest.TestCase):
     def test_from_url(self):
-        service = CodeforcesService()
-        self.assertEqual(CodeforcesService.from_url('http://codeforces.com/'), service)
-        self.assertEqual(CodeforcesService.from_url('https://codeforces.com/'), service)
-        self.assertEqual(CodeforcesService.from_url('https://codeforces.com/problemset/problem/700/B'), service)
+        self.assertIsInstance(CodeforcesService.from_url('http://codeforces.com/'), CodeforcesService)
+        self.assertIsInstance(CodeforcesService.from_url('https://codeforces.com/'), CodeforcesService)
+        self.assertIsInstance(CodeforcesService.from_url('https://codeforces.com/problemset/problem/700/B'), CodeforcesService)
         self.assertEqual(CodeforcesService.from_url('https://atcoder.jp/'), None)
 
 

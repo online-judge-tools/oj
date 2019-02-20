@@ -19,7 +19,6 @@ import onlinejudge.type
 from onlinejudge.type import LabeledString, TestCase
 
 
-@utils.singleton
 class KattisService(onlinejudge.type.Service):
     def get_url(self) -> str:
         """

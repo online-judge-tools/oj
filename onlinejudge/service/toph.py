@@ -19,7 +19,6 @@ import onlinejudge.type
 from onlinejudge.type import *
 
 
-@utils.singleton
 class TophService(onlinejudge.type.Service):
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """

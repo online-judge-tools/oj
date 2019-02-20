@@ -16,7 +16,6 @@ import onlinejudge.type
 from onlinejudge.type import LabeledString, TestCase
 
 
-@utils.singleton
 class POJService(onlinejudge.type.Service):
     def get_url(self) -> str:
         # no HTTPS support  (Wed Feb  6 14:35:37 JST 2019)
