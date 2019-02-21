@@ -3,6 +3,7 @@
 import contextlib
 import datetime
 import distutils.version
+import functools
 import http.client
 import http.cookiejar
 import json
@@ -256,3 +257,21 @@ def remove_suffix(s: str, suffix: str) -> str:
 
 
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
+
+
+def getter_with_load_details(name: str, check_with: Optional[str] = None) -> Callable:
+    """
+    TODO: confirm that the type annotation `get_foo = getter_with_load_details("_foo")  # type: Callable[..., int]` is correct one
+    """
+    if check_with is None:
+        check_with = name
+
+    @functools.wraps(lambda self: getattr(self, name))
+    def wrapper(self, session: Optional[requests.Session] = None):
+        if getattr(self, name) is None:
+            getattr(self, '_load_details')(session)
+        attr = getattr(self, name)
+        assert attr is not None
+        return attr
+
+    return wrapper
