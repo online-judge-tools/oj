@@ -1,5 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
+"""
+the module for yukicoder (https://yukicoder.me/)
+"""
+
 import collections
 import io
 import json
@@ -62,6 +66,10 @@ class YukicoderService(onlinejudge.type.Service):
             return False
 
     def login_with_twitter(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+        """
+        :raise NotImplementedError: always raised
+        """
+
         session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
@@ -80,9 +88,9 @@ class YukicoderService(onlinejudge.type.Service):
         return 'yukicoder'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['YukicoderService']:
+    def from_url(cls, url: str) -> Optional['YukicoderService']:
         # example: http://yukicoder.me/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'yukicoder.me':
             return cls()
@@ -361,10 +369,10 @@ class YukicoderProblem(onlinejudge.type.Problem):
             raise ValueError
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['YukicoderProblem']:
+    def from_url(cls, url: str) -> Optional['YukicoderProblem']:
         # example: https://yukicoder.me/problems/no/499
         # example: http://yukicoder.me/problems/1476
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         dirname, basename = posixpath.split(utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'yukicoder.me':

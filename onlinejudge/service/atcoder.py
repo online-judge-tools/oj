@@ -1,5 +1,9 @@
 # Python Version: 3.x
 # -*- coding: utf-8 -*-
+"""
+the module for AtCoder (https://atcoder.jp/)
+"""
+
 import datetime
 import itertools
 import json
@@ -18,9 +22,11 @@ import onlinejudge.type
 from onlinejudge.type import SubmissionError
 
 
-# This is a workaround. AtCoder's servers sometime fail to send "Content-Type" field.
-# see https://github.com/kmyk/online-judge-tools/issues/28 and https://github.com/kmyk/online-judge-tools/issues/232
 def _request(*args, **kwargs):
+    """
+    This is a workaround. AtCoder's servers sometime fail to send "Content-Type" field.
+    see https://github.com/kmyk/online-judge-tools/issues/28 and https://github.com/kmyk/online-judge-tools/issues/232
+    """
     resp = utils.request(*args, **kwargs)
     log.debug('AtCoder\'s server said "Content-Type: %s"', resp.headers.get('Content-Type', '(not sent)'))
     resp.encoding = 'UTF-8'
@@ -60,10 +66,15 @@ class AtCoderService(onlinejudge.type.Service):
         return 'atcoder'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['AtCoderService']:
-        # example: https://atcoder.jp/
-        # example: http://agc012.contest.atcoder.jp/
-        result = urllib.parse.urlparse(s)
+    def from_url(cls, url: str) -> Optional['AtCoderService']:
+        """
+        :param url: example:
+
+        -   https://atcoder.jp/
+        -   http://agc012.contest.atcoder.jp/
+        """
+
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and (result.netloc in ('atcoder.jp', 'beta.atcoder.jp') or result.netloc.endswith('.contest.atcoder.jp')):
             return cls()
@@ -101,7 +112,13 @@ class AtCoderService(onlinejudge.type.Service):
         return bool(msgs)
 
     def iterate_contests(self, lang: str = 'ja', session: Optional[requests.Session] = None) -> Generator['AtCoderContest', None, None]:
-        assert lang in ('ja', 'en')  # NOTE: "lang=ja" is required to see some Japanese-local contests. However you can use "lang=en" to see the English names of contests.
+        """
+        :param lang: must be `ja` (default) or `en`.
+        :note: `lang=ja` is required to see some Japanese-local contests.
+        :note: You can use `lang=en` to see the English names of contests.
+        """
+
+        assert lang in ('ja', 'en')
         session = session or utils.new_default_session()
         last_page = None
         for page in itertools.count(1):  # 1-based
@@ -124,6 +141,10 @@ class AtCoderService(onlinejudge.type.Service):
 
 
 class AtCoderContest(object):
+    """
+    :ivar contest_id: :py:class:`str`
+    """
+
     def __init__(self, contest_id: str):
         self.contest_id = contest_id
 
@@ -136,6 +157,13 @@ class AtCoderContest(object):
 
     @classmethod
     def from_url(cls, url: str) -> Optional['AtCoderContest']:
+        """
+        :param url: example:
+
+        -   https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d
+        -   https://atcoder.jp/contests/agc030
+        """
+
         result = urllib.parse.urlparse(url)
 
         # example: https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d
@@ -224,7 +252,12 @@ class AtCoderContest(object):
 
 
 class AtCoderProblem(onlinejudge.type.Problem):
-    # AtCoder has problems independently from contests. Therefore the notions "contest_id", "alphabet", and "url" don't belong to problems itself.
+    """
+    :ivar contest_id: :py:class:`str`
+    :ivar problem_id: :py:class:`str`
+
+    :note: AtCoder has problems independently from contests. Therefore the notions `contest_id`, `alphabet`, and `url` don't belong to problems itself.
+    """
 
     def __init__(self, contest_id: str, problem_id: str):
         self.contest_id = contest_id
@@ -460,6 +493,11 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
 
 class AtCoderSubmission(onlinejudge.type.Submission):
+    """
+    :ivar contest_id: :py:class:`str`
+    :ivar submission_id: :py:class:`str`
+    """
+
     def __init__(self, contest_id: str, submission_id: int, problem_id: Optional[str] = None):
         self.contest_id = contest_id
         self.submission_id = submission_id
@@ -603,6 +641,13 @@ class AtCoderSubmission(onlinejudge.type.Submission):
 
 
 class AtCoderSubmissionTestSet(object):
+    """
+    :ivar set_name: :py:class:`str`
+    :ivar score: :py:class:`int`
+    :ivar max_score: :py:class:`int`
+    :ivar test_case_names: :py:class:`List` [ :py:class:`str` ]
+    """
+
     def __init__(self, set_name: str, score: int, max_score: int, test_case_names: List[str]):
         self.set_name = set_name
         self.score = score
@@ -620,6 +665,13 @@ class AtCoderSubmissionTestSet(object):
 
 
 class AtCoderSubmissionTestCaseResult(object):
+    """
+    :ivar case_name: :py:class:`str`
+    :ivar status: :py:class:`str`
+    :ivar exec_time_msec: :py:class:`int` in millisecond
+    :ivar memory_byte: :py:class:`int` in byte
+    """
+
     def __init__(self, case_name: str, status: str, exec_time_msec: Optional[int], memory_byte: Optional[int]):
         self.case_name = case_name
         self.status = status

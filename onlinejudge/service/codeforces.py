@@ -1,4 +1,8 @@
 # Python Version: 3.x
+"""
+the module for Codeforces (https://codeforces.com/)
+"""
+
 import posixpath
 import re
 import string
@@ -57,10 +61,10 @@ class CodeforcesService(onlinejudge.type.Service):
         return 'codeforces'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['CodeforcesService']:
+    def from_url(cls, url: str) -> Optional['CodeforcesService']:
         # example: https://codeforces.com/
         # example: http://codeforces.com/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'codeforces.com':
             return cls()
@@ -69,6 +73,12 @@ class CodeforcesService(onlinejudge.type.Service):
 
 # NOTE: Codeforces has its API: https://codeforces.com/api/help
 class CodeforcesProblem(onlinejudge.type.Problem):
+    """
+    :ivar contest_id: :py:class:`int`
+    :ivar index: :py:class:`str`
+    :ivar kind: :py:class:`str` must be `contest` or `gym`
+    """
+
     def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
         assert index in string.ascii_uppercase
@@ -162,8 +172,8 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         return CodeforcesService()
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['CodeforcesProblem']:
-        result = urllib.parse.urlparse(s)
+    def from_url(cls, url: str) -> Optional['CodeforcesProblem']:
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'codeforces.com':
             table = {}

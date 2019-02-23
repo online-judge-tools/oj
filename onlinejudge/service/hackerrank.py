@@ -1,4 +1,8 @@
 # Python Version: 3.x
+"""
+the module for HackerRank (https://www.hackerrank.com/)
+"""
+
 import datetime
 import io
 import json
@@ -69,9 +73,9 @@ class HackerRankService(onlinejudge.type.Service):
         return 'hackerrank'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['HackerRankService']:
+    def from_url(cls, url: str) -> Optional['HackerRankService']:
         # example: https://www.hackerrank.com/dashboard
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('hackerrank.com', 'www.hackerrank.com'):
             return cls()
@@ -129,10 +133,10 @@ class HackerRankProblem(onlinejudge.type.Problem):
         return HackerRankService()
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['HackerRankProblem']:
+    def from_url(cls, url: str) -> Optional['HackerRankProblem']:
         # example: https://www.hackerrank.com/contests/university-codesprint-2/challenges/the-story-of-a-tree
         # example: https://www.hackerrank.com/challenges/fp-hello-world
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('hackerrank.com', 'www.hackerrank.com'):
             m = re.match(r'^/contests/([0-9A-Za-z-]+)/challenges/([0-9A-Za-z-]+)$', utils.normpath(result.path))

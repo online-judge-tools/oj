@@ -1,4 +1,8 @@
 # Python Version: 3.x
+"""
+the module for PKU JudgeOnline (http://poj.org/)
+"""
+
 import urllib.parse
 from typing import *
 
@@ -22,9 +26,9 @@ class POJService(onlinejudge.type.Service):
         return 'poj'
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['POJService']:
+    def from_url(cls, url: str) -> Optional['POJService']:
         # example: http://poj.org/
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'poj.org':
             return cls()
@@ -77,9 +81,9 @@ class POJProblem(onlinejudge.type.Problem):
         return POJService()
 
     @classmethod
-    def from_url(cls, s: str) -> Optional['POJProblem']:
+    def from_url(cls, url: str) -> Optional['POJProblem']:
         # example: http://poj.org/problem?id=2104
-        result = urllib.parse.urlparse(s)
+        result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'poj.org' \
                 and utils.normpath(result.path) == '/problem':

@@ -43,7 +43,10 @@ class Problem(object):
     def download_system_cases(self, session: Optional['requests.Session'] = None) -> List[TestCase]:
         raise NotImplementedError
 
-    def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> 'Submission':  # or SubmissionError
+    def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> 'Submission':
+        """
+        :raises SubmissionError:
+        """
         raise NotImplementedError
 
     def get_language_dict(self, session: Optional['requests.Session'] = None) -> Dict[str, Language]:
@@ -67,7 +70,7 @@ class Problem(object):
 
 
 class Submission(object):
-    def download_code(self, session: Optional['requests.Session'] = None) -> str:
+    def download_code(self, session: Optional['requests.Session'] = None) -> bytes:
         raise NotImplementedError
 
     def get_url(self) -> str:
