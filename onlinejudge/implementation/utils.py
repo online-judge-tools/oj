@@ -275,3 +275,17 @@ def getter_with_load_details(name: str, check_with: Optional[str] = None) -> Cal
         return attr
 
     return wrapper
+
+
+def snip_large_text(text: str, limit: int, head: int, tail: int, bold: bool = False) -> str:
+    assert head + tail < limit
+    font = log.bold if bold else (lambda s: s)
+    lines = text.splitlines(keepends=True)
+    if len(lines) < limit:
+        return font(text)
+    else:
+        return ''.join([
+            font(''.join(lines[:head])),
+            '... ({} lines) ...\n'.format(len(lines[head:-tail])),
+            font(''.join(lines[-tail:])),
+        ])

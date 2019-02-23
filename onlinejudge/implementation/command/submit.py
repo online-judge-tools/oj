@@ -56,13 +56,7 @@ def submit(args: 'argparse.Namespace') -> None:
         log.failure('%s: %s', e.__class__.__name__, str(e))
         s = repr(code)[1:]
     log.info('code (%d byte):', len(code))
-    lines = s.splitlines(keepends=True)
-    if len(lines) < 30:
-        log.emit(log.bold(s))
-    else:
-        log.emit(log.bold(''.join(lines[:10]).rstrip()))
-        log.emit('... (%s lines) ...', len(lines[10:-10]))
-        log.emit(log.bold(''.join(lines[-10:])))
+    log.emit(utils.snip_large_text(s.rstrip(), limit=30, head=10, tail=10, bold=True))
 
     with utils.with_cookiejar(utils.new_default_session(), path=args.cookie) as sess:
         # guess or select language ids
