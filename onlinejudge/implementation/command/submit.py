@@ -60,7 +60,7 @@ def submit(args: 'argparse.Namespace') -> None:
     if len(lines) < 30:
         log.emit(log.bold(s))
     else:
-        log.emit(log.bold(''.join(lines[:10])))
+        log.emit(log.bold(''.join(lines[:10]).rstrip()))
         log.emit('... (%s lines) ...', len(lines[10:-10]))
         log.emit(log.bold(''.join(lines[-10:])))
 
