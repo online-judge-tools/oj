@@ -277,7 +277,7 @@ def getter_with_load_details(name: str, check_with: Optional[str] = None) -> Cal
     return wrapper
 
 
-def snip_large_text(text: str, limit: int, head: int, tail: int, bold: bool = False) -> str:
+def snip_large_file_content(text: str, limit: int, head: int, tail: int, bold: bool = False) -> str:
     assert head + tail < limit
     font = log.bold if bold else (lambda s: s)
     lines = text.splitlines(keepends=True)
