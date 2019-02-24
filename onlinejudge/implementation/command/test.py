@@ -71,7 +71,7 @@ def test(args: 'argparse.Namespace') -> None:
             if not is_printed_input:
                 is_printed_input = True
                 with open(it['in']) as inf:
-                    log.emit('input:\n%s', log.bold(inf.read()))
+                    log.emit('input:\n%s', utils.snip_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
 
         log.emit('')
         log.info('%s', name)
@@ -110,8 +110,8 @@ def test(args: 'argparse.Namespace') -> None:
                     log.failure(log.red('WA'))
                     print_input()
                     if not args.silent:
-                        log.emit('output:\n%s', log.bold(answer))
-                        log.emit('expected:\n%s', log.bold(correct))
+                        log.emit('output:\n%s', utils.snip_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
+                        log.emit('expected:\n%s', utils.snip_large_file_content(correct, limit=40, head=20, tail=10, bold=True))
                     result = 'WA'
             elif args.mode == 'line':
                 answer_words = answer.splitlines()
@@ -135,7 +135,7 @@ def test(args: 'argparse.Namespace') -> None:
                 assert False
         else:
             if not args.silent:
-                log.emit(log.bold(answer))
+                log.emit(utils.snip_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
         if result == 'AC':
             log.success(log.green('AC'))
             ac_count += 1

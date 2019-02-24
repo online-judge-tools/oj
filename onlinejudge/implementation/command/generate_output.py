@@ -34,7 +34,7 @@ def generate_output(args: 'argparse.Namespace') -> None:
             log.failure(log.red('RE') + ': return code %d', proc.returncode)
             log.info('skipped.')
             continue
-        log.emit(log.bold(answer.decode().rstrip()))
+        log.emit(utils.snip_large_file_content(answer.decode().rstrip(), limit=40, head=20, tail=10, bold=True))
         match_result = cutils.match_with_format(args.directory, args.format, it['in'])  # type: Optional[Match[Any]]
         if match_result is not None:
             matched_name = match_result.groupdict()['name']  # type: str
