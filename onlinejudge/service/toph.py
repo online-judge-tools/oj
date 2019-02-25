@@ -1,12 +1,12 @@
 # Python Version: 3.x
 import posixpath
+import re
 import string
 import urllib.parse
 from typing import *
 
 import bs4
 import requests
-import re
 
 import onlinejudge.dispatch
 import onlinejudge.implementation.logging as log
@@ -38,8 +38,8 @@ class TophService(onlinejudge.type.Service):
         resp = form.request(session)
         resp.raise_for_status()
 
-        newResp = utils.request('GET', url, session=session)    # Toph's Location header is not getting the expected value
-        if newResp.url != url:
+        resp = utils.request('GET', url, session=session)    # Toph's Location header is not getting the expected value
+        if resp.url != url:
             log.success('Welcome, %s.', username)
             return True
         else:
@@ -50,7 +50,7 @@ class TophService(onlinejudge.type.Service):
         session = session or utils.new_default_session()
         url = 'https://toph.co/login'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
-        return resp.status_code == 302
+        return resp.status_code != 200
 
     def get_url(self) -> str:
         return 'https://toph.co/'
@@ -69,11 +69,13 @@ class TophService(onlinejudge.type.Service):
         return None
 
 class TophProblem(onlinejudge.type.Problem):
-    def __init__(self, slug: str, kind: Optional[str] = None):
-        assert isinstance(slug, str)
-        assert kind in (None, 'problem')
+    def __init__(self, problem_id: str, kind: Optional[str] = None, contest_id: Optional[str] = None):
+        assert isinstance(problem_id, str)
+        assert kind in ('problem')
+        if contest_id is not None:
+            raise NotImplementedError
         self.kind = kind
-        self.slug = slug
+        self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.new_default_session()
@@ -108,7 +110,7 @@ class TophProblem(onlinejudge.type.Problem):
             return {}
         language_dict = {}
         for option in select.findAll('option'):
-            language_dict[option.attrs['value']] = {'description': option.string}
+            language_dict[option.attrs['value']] = {'description': option.string.strip()}
         return language_dict
 
     def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> onlinejudge.type.Submission:  # or SubmissionError
@@ -134,7 +136,7 @@ class TophProblem(onlinejudge.type.Problem):
         resp.raise_for_status()
         # result
         if '/s/' in resp.url:
-            # example: https://codeforces.com/contest/598/my
+            # example: https://toph.co/s/201410
             log.success('success: result: %s', resp.url)
             return onlinejudge.type.DummySubmission(resp.url)
         else:
@@ -145,7 +147,7 @@ class TophProblem(onlinejudge.type.Problem):
     def get_url(self) -> str:
         table = {}
         table['problem'] = 'https://toph.co/p/{}'
-        return table[self.kind].format(self.slug)
+        return table[self.kind].format(self.problem_id)
 
     def get_service(self) -> TophService:
         return TophService()
@@ -154,14 +156,15 @@ class TophProblem(onlinejudge.type.Problem):
     def from_url(cls, s: str) -> Optional['TophProblem']:
         result = urllib.parse.urlparse(s)
         dirname, basename = posixpath.split(utils.normpath(result.path))
+        # example: https://toph.co/p/new-year-couple
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc.count('.') == 1 \
                 and result.netloc.endswith('toph.co') \
                 and dirname == '/p' \
                 and basename:
             kind = 'problem'
-            slug = basename
-            return cls(slug, kind)
+            problem_id = basename
+            return cls(problem_id, kind)
 
         return None
 
