@@ -250,3 +250,38 @@ print(ans)
         ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+
+class SubmitTophTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_copycat(self):
+        url = 'https://toph.co/p/copycat'
+        code = '''#!/usr/bin/env python3
+s = input()
+print(s)
+'''
+        files = [
+            {
+                'path': 'a.py',
+                'data': code
+            },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ojtools, 's', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_add_them_up(self):
+        url = 'https://toph.co/p/add-them-up'
+        code = '''#!/usr/bin/env python3
+nums = map(int, input().split())
+print(sum(nums))
+'''
+        files = [
+            {
+                'path': 'a.py',
+                'data': code
+            },
+        ]
+        ojtools = os.path.abspath('oj')
+        with tests.utils.sandbox(files):
+            subprocess.check_call([ojtools, 's', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)

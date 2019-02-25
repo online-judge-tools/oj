@@ -1,12 +1,12 @@
 # Python Version: 3.x
 import posixpath
+import re
 import string
 import urllib.parse
 from typing import *
 
 import bs4
 import requests
-import re
 
 import onlinejudge.dispatch
 import onlinejudge.implementation.logging as log

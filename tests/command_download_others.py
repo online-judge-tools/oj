@@ -90,6 +90,20 @@ class DownloadOthersTest(unittest.TestCase):
             'sample-2.out': 'eb844645e8e61de0a4cf4b991e65e63e',
         })
 
+    def test_call_download_toph_new_year_couple(self):
+        self.snippet_call_download('https://toph.co/p/new-year-couple', {
+            'sample-2.out': 'a147d4af6796629a62fa43341f0e0bdf',
+            'sample-2.in': 'fc1dbb7bb49bfbb37e7afe9a64d2f89b',
+            'sample-1.in': 'd823c94a5bbd1af3161ad8eb4e48654e',
+            'sample-1.out': '0f051fce168dc5aa9e45605992cd63c5',
+        })
+
+    def test_call_download_toph_power_and_mod(self):
+        self.snippet_call_download('https://toph.co/p/power-and-mod', {
+            'sample-1.in': '46e186317c8c10d9452d6070f6c63b09',
+            'sample-1.out': 'ad938662144b559bff344ff266f9d1cc',
+        })
+
     def test_call_download_poj_1000(self):
         self.snippet_call_download(
             'http://poj.org/problem?id=1000', [
