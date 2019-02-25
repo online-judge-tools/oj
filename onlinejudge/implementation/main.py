@@ -48,6 +48,7 @@ supported services:
   HackerRank
   PKU JudgeOnline
   Kattis
+  Toph (Problem Archive)
 
 supported services with --system:
   Aizu Online Judge
@@ -78,6 +79,7 @@ supported services:
   Yukicoder
   TopCoder
   HackerRank
+  Toph
 
 strings for --method:
   github                for yukicoder, login via github (default)
@@ -97,6 +99,7 @@ supported services:
   TopCoder (Marathon Match)
   Yukicoder
   HackerRank
+  Toph (Problem Archive)
 
 ''')
     subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')
