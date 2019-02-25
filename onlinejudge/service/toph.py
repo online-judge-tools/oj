@@ -30,7 +30,7 @@ class TophService(onlinejudge.type.Service):
         form = soup.find('form', class_='login-form')
         log.debug('form: %s', str(form))
         username, password = get_credentials()
-        form['action'] = '/login' # to avoid KeyError inside form.request method as Toph does not have any defined action
+        form['action'] = '/login'  # to avoid KeyError inside form.request method as Toph does not have any defined action
         form = utils.FormSender(form, url=resp.url)
         form.set('handle', username)
         form.set('password', password)
@@ -38,7 +38,7 @@ class TophService(onlinejudge.type.Service):
         resp = form.request(session)
         resp.raise_for_status()
 
-        resp = utils.request('GET', url, session=session)    # Toph's Location header is not getting the expected value
+        resp = utils.request('GET', url, session=session)  # Toph's Location header is not getting the expected value
         if resp.url != url:
             log.success('Welcome, %s.', username)
             return True
@@ -67,6 +67,7 @@ class TophService(onlinejudge.type.Service):
                 and result.netloc == 'toph.co':
             return cls()
         return None
+
 
 class TophProblem(onlinejudge.type.Problem):
     def __init__(self, problem_id: str, contest_id: Optional[str] = None):
@@ -163,6 +164,7 @@ class TophProblem(onlinejudge.type.Problem):
             return cls(problem_id)
 
         return None
+
 
 onlinejudge.dispatch.services += [TophService]
 onlinejudge.dispatch.problems += [TophProblem]

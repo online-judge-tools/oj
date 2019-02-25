@@ -251,6 +251,7 @@ print(ans)
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
 
+
 class SubmitTophTest(unittest.TestCase):
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_copycat(self):
