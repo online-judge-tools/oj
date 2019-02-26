@@ -28,7 +28,6 @@ LabeledString = NamedTuple('LabeledString', [('name', str), ('data', str)])
 TestCase = NamedTuple('TestCase', [('input', LabeledString), ('output', LabeledString)])
 # Language = NamedTuple('Language', [ ('id', str), ('name', str), ('description': str) ])
 Language = Dict[str, Any]
-Standings = Tuple[List[str], List[Dict[str, Any]]]  # ( [ 'column1', 'column2', ... ], [ { 'column1': data1, ... } ... ] )
 
 
 class SubmissionError(RuntimeError):
@@ -58,9 +57,6 @@ class Problem(object):
         raise NotImplementedError
 
     def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
-        raise NotImplementedError
-
-    def get_standings(self, session: Optional[requests.Session] = None) -> Standings:
         raise NotImplementedError
 
     @classmethod

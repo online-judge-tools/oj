@@ -173,7 +173,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             log.failure('%s', messages)
             raise onlinejudge.type.SubmissionError
 
-    def get_standings(self, session: Optional[requests.Session] = None) -> onlinejudge.type.Standings:
+    def get_standings(self, session: Optional[requests.Session] = None) -> Tuple[List[str], List[Dict[str, Any]]]:
         session = session or utils.new_default_session()
 
         header = None  # type: Optional[List[str]]

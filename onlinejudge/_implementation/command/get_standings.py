@@ -18,7 +18,7 @@ def get_standings(args: 'argparse.Namespace') -> None:
         sys.exit(1)
 
     # get standings
-    header, rows = problem.get_standings()
+    header, rows = problem.get_standings()  # type: ignore
 
     # print it
     if args.format in ['csv', 'tsv']:
