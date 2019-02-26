@@ -69,12 +69,10 @@ class TophService(onlinejudge.type.Service):
         return None
 
 class TophProblem(onlinejudge.type.Problem):
-    def __init__(self, problem_id: str, kind: Optional[str] = None, contest_id: Optional[str] = None):
+    def __init__(self, problem_id: str, contest_id: Optional[str] = None):
         assert isinstance(problem_id, str)
-        assert kind in ('problem')
         if contest_id is not None:
             raise NotImplementedError
-        self.kind = kind
         self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
@@ -145,9 +143,8 @@ class TophProblem(onlinejudge.type.Problem):
             raise SubmissionError
 
     def get_url(self) -> str:
-        table = {}
-        table['problem'] = 'https://toph.co/p/{}'
-        return table[self.kind].format(self.problem_id)
+        # TODO: Check for contest_id to return the appropriate  URL when support for contest is added
+        return f'https://toph.co/p/{self.problem_id}'
 
     def get_service(self) -> TophService:
         return TophService()
@@ -162,9 +159,8 @@ class TophProblem(onlinejudge.type.Problem):
                 and result.netloc.endswith('toph.co') \
                 and dirname == '/p' \
                 and basename:
-            kind = 'problem'
             problem_id = basename
-            return cls(problem_id, kind)
+            return cls(problem_id)
 
         return None
 
