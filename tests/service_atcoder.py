@@ -46,6 +46,15 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(problems[6].get_alphabet(), 'F2')
         self.assertEqual(problems[6].problem_id, 'agc028_f2')
 
+    def test_iterate_submissions(self):
+        contest = AtCoderContest.from_url('https://atcoder.jp/contests/code-festival-2014-exhibition-open')
+        submissions = list(contest.iterate_submissions())
+        self.assertGreater(len(submissions), 300)
+        self.assertEqual(submissions[0].get_code_size(), 276)
+        self.assertEqual(submissions[0].get_status(), 'WA')
+        self.assertEqual(submissions[1].get_user_id(), 'snuke')
+        self.assertEqual(submissions[1].get_status(), 'WA')
+
 
 class AtCoderProblemTest(unittest.TestCase):
     def test_from_url(self):
@@ -69,6 +78,14 @@ class AtCoderProblemTest(unittest.TestCase):
     def test_get_score(self):
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/future-contest-2018-final/tasks/future_contest_2018_final_a').get_score(), 50000000)
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/abc001/tasks/abc001_4').get_score(), None)
+
+    def test_iterate_submissions(self):
+        problem = AtCoderProblem.from_url('https://atcoder.jp/contests/abc119/tasks/abc119_c')
+        submissions = problem.iterate_submissions()
+        self.assertEqual(next(submissions).get_score(), 300)
+        self.assertEqual(next(submissions).get_code_size(), 1208)
+        self.assertEqual(next(submissions).get_exec_time_msec(), 2)
+        self.assertEqual(next(submissions).get_memory_byte(), 256 * 1000)
 
 
 class AtCoderSubmissionTest(unittest.TestCase):
