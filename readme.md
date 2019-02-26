@@ -27,6 +27,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   CS Academy
     -   PKU JudgeOnline
     -   Kattis
+    -   Toph (Problem Archive)
 -   Download system test cases
     -   Yukicoder
     -   Aizu Online Judge
@@ -36,12 +37,14 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Codeforces
     -   HackerRank
     -   TopCoder
+    -   Toph
 -   Submit your solution
     -   AtCoder
     -   Yukicoder
     -   Codeforces
     -   HackerRank
     -   TopCoder (Marathon Match)
+    -   Toph (Problem Archive)
 -   Generate scanner for input  (experimental)
     -   AtCoder
     -   Yukicoder
