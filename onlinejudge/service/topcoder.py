@@ -24,7 +24,7 @@ import onlinejudge.type
 
 
 @utils.singleton
-class TopCoderService(onlinejudge.type.Service):
+class TopcoderService(onlinejudge.type.Service):
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
 
@@ -54,7 +54,7 @@ class TopCoderService(onlinejudge.type.Service):
         return 'topcoder'
 
     @classmethod
-    def from_url(cls, url: str) -> Optional['TopCoderService']:
+    def from_url(cls, url: str) -> Optional['TopcoderService']:
         # example: https://www.topcoder.com/
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
@@ -63,7 +63,7 @@ class TopCoderService(onlinejudge.type.Service):
         return None
 
 
-class TopCoderLongContestProblem(onlinejudge.type.Problem):
+class TopcoderLongContestProblem(onlinejudge.type.Problem):
     def __init__(self, rd, cd=None, compid=None, pm=None):
         self.rd = rd
         self.cd = cd
@@ -73,11 +73,11 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
     def get_url(self) -> str:
         return 'https://community.topcoder.com/tc?module=MatchDetails&rd=' + str(self.rd)
 
-    def get_service(self) -> TopCoderService:
-        return TopCoderService()
+    def get_service(self) -> TopcoderService:
+        return TopcoderService()
 
     @classmethod
-    def from_url(cls, url: str) -> Optional['TopCoderLongContestProblem']:
+    def from_url(cls, url: str) -> Optional['TopcoderLongContestProblem']:
         # example: https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16997&pm=14690
         # example: https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16997&compid=57374
         # example: https://community.topcoder.com/longcontest/?module=ViewStandings&rd=16997
@@ -210,5 +210,5 @@ class TopCoderLongContestProblem(onlinejudge.type.Problem):
         return header, rows
 
 
-onlinejudge.dispatch.services += [TopCoderService]
-onlinejudge.dispatch.problems += [TopCoderLongContestProblem]
+onlinejudge.dispatch.services += [TopcoderService]
+onlinejudge.dispatch.problems += [TopcoderLongContestProblem]
