@@ -15,6 +15,7 @@ Submodules
    onlinejudge.service.kattis
    onlinejudge.service.poj
    onlinejudge.service.topcoder
+   onlinejudge.service.toph
    onlinejudge.service.yukicoder
 
 Module contents
