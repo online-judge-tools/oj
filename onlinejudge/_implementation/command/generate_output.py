@@ -4,9 +4,9 @@ import time
 from typing import *
 
 import onlinejudge
-import onlinejudge.implementation.format_utils as cutils
-import onlinejudge.implementation.logging as log
-import onlinejudge.implementation.utils as utils
+import onlinejudge._implementation.format_utils as cutils
+import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.utils as utils
 
 if TYPE_CHECKING:
     import argparse

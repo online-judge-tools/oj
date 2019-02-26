@@ -4,7 +4,7 @@ import sys
 import time
 import unittest
 
-import onlinejudge.implementation.logging as log
+import onlinejudge._implementation.logging as log
 
 
 class GenerateScannerTest(unittest.TestCase):

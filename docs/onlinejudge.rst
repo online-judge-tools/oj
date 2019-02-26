@@ -6,7 +6,6 @@ Subpackages
 
 .. toctree::
 
-    onlinejudge.implementation
     onlinejudge.service
 
 Submodules
