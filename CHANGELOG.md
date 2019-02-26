@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.1.55 / 2019-02-26
+
+-   [#323](https://github.com/kmyk/online-judge-tools/pull/323) support `download` and `submit` for [Toph](https://toph.co/)'s problem archive ([@kfaRabi](https://github.com/kfaRabi))
+-   [#305](https://github.com/kmyk/online-judge-tools/pull/305) support `download` for [Kattis](https://open.kattis.com/)
+-   [#331](https://github.com/kmyk/online-judge-tools/pull/331) snip large outputs in all subcommands
+-   [#314](https://github.com/kmyk/online-judge-tools/issues/314) fix a bug of code snipping at `submit`
+-   [#311](https://github.com/kmyk/online-judge-tools/pull/311) improve the [CONTRIBUTING.md](https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md)
+-   [#307](https://github.com/kmyk/online-judge-tools/pull/307) fix a bug of `submit` to yukicoder
+
 ## 0.1.54 / 2019-02-07
 
 -   [#113](https://github.com/kmyk/online-judge-tools/issues/113) support `download` from POJ
