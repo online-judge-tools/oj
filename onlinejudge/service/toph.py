@@ -144,7 +144,7 @@ class TophProblem(onlinejudge.type.Problem):
 
     def get_url(self) -> str:
         # TODO: Check for contest_id to return the appropriate  URL when support for contest is added
-        return f'https://toph.co/p/{self.problem_id}'
+        return 'https://toph.co/p/{}'.format(self.problem_id)
 
     def get_service(self) -> TophService:
         return TophService()
