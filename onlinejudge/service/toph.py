@@ -97,7 +97,7 @@ class TophProblem(onlinejudge.type.Problem):
             samples.add(s, "Output")
         return samples.get()
 
-    def get_language_dict(self, session: Optional['requests.Session'] = None) -> Dict[str, onlinejudge.type.Language]:
+    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -112,7 +112,7 @@ class TophProblem(onlinejudge.type.Problem):
             language_dict[option.attrs['value']] = {'description': option.string.strip()}
         return language_dict
 
-    def submit_code(self, code: bytes, language: str, session: Optional['requests.Session'] = None) -> onlinejudge.type.Submission:  # or SubmissionError
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:  # or SubmissionError
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
