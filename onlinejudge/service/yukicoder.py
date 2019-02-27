@@ -21,12 +21,12 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LabeledString, TestCase
+from onlinejudge.type import LabeledString, LoginError, NotLoggedInError, SubmissionError, TestCase
 
 
 @utils.singleton
 class YukicoderService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> None:
         if method == 'github':
             return self.login_with_github(get_credentials, session=session)
         elif method == 'twitter':
@@ -34,22 +34,25 @@ class YukicoderService(onlinejudge.type.Service):
         else:
             assert False
 
-    def login_with_github(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login_with_github(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+        """
+        :raise LoginError:
+        """
+
         session = session or utils.new_default_session()
         url = 'https://yukicoder.me/auth/github'
         # get
         resp = utils.request('GET', url, session=session)
         if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
             log.info('You have already signed in.')
-            return True
+            return
         # redirect to github.com
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form')
         if not form:
             log.error('form not found')
-            log.info('Did you logged in?')
-            return False
+            raise LoginError('something wrong')
         log.debug('form: %s', str(form))
         # post
         username, password = get_credentials()
@@ -60,12 +63,11 @@ class YukicoderService(onlinejudge.type.Service):
         resp.raise_for_status()
         if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
             log.success('You signed in.')
-            return True
         else:
             log.failure('You failed to sign in. Wrong user ID or password.')
-            return False
+            raise LoginError
 
-    def login_with_twitter(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login_with_twitter(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raise NotImplementedError: always raised
         """
@@ -279,7 +281,14 @@ class YukicoderProblem(onlinejudge.type.Problem):
         return samples.get()
 
     def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+        """
+        :raises NotLoggedInError:
+        """
+
         session = session or utils.new_default_session()
+        if not self.get_service().is_logged_in(session=session):
+            raise NotLoggedInError
+
         # get
         url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
         resp = utils.request('GET', url, session=session)
@@ -316,7 +325,11 @@ class YukicoderProblem(onlinejudge.type.Problem):
             return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
         return None
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:  # or SubmissionError
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+        """
+        :raises NotLoggedInError:
+        """
+
         session = session or utils.new_default_session()
         # get
         url = self.get_url() + '/submit'
@@ -326,7 +339,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         form = soup.find('form', id='submit_form')
         if not form:
             log.error('form not found')
-            raise onlinejudge.type.SubmissionError
+            raise NotLoggedInError
         # post
         form = utils.FormSender(form, url=resp.url)
         form.set('lang', language)
@@ -345,7 +358,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             for div in soup.findAll('div', attrs={'role': 'alert'}):
                 log.warning('yukicoder says: "%s"', div.string)
-            raise onlinejudge.type.SubmissionError
+            raise SubmissionError
 
     def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, onlinejudge.type.Language]:
         session = session or utils.new_default_session()

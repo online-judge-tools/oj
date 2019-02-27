@@ -21,11 +21,15 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
+from onlinejudge.type import LoginError, NotLoggedInError, SubmissionError
 
 
 @utils.singleton
 class TopcoderService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+        """
+        :raises LoginError:
+        """
         session = session or utils.new_default_session()
 
         # NOTE: you can see this login page with https://community.topcoder.com/longcontest/?module=Submit
@@ -42,10 +46,15 @@ class TopcoderService(onlinejudge.type.Service):
 
         if 'longcontest' not in resp.url:
             log.success('Success')
-            return True
         else:
             log.failure('Failure')
-            return False
+            raise LoginError
+
+    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+        """
+        :raises NotImplementedError:
+        """
+        raise NotImplementedError
 
     def get_url(self) -> str:
         return 'https://www.topcoder.com/'
@@ -110,10 +119,16 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
     def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
         """
         :param kind: must be one of `example` (default) or `full`
+        :raises NotLoggedInError:
+        :raises SubmissionError:
         """
 
         assert kind in ['example', 'full']
         session = session or utils.new_default_session()
+
+        # TODO: implement self.is_logged_in()
+        # if not self.is_logged_in(session=session):
+        #     raise NotLoggedInError
 
         # module=MatchDetails
         url = 'https://community.topcoder.com/tc?module=MatchDetails&rd=%d' % self.rd
@@ -129,7 +144,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
         path = [tag.attrs['href'] for tag in soup.find_all('a', text='Submit') if ('rd=%d' % self.rd) in tag.attrs['href']]
         if len(path) == 0:
             log.error('link to submit not found:  Are you logged in?  Are you registered?  Is the contest running?')
-            raise onlinejudge.type.SubmissionError
+            raise SubmissionError('something wrong')
         assert len(path) == 1
         path = path[0]
         assert path.startswith('/') and 'module=Submit' in path
@@ -171,7 +186,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             messages = soup.find('textarea', {'name': 'messages'}).text
             log.failure('%s', messages)
-            raise onlinejudge.type.SubmissionError
+            raise SubmissionError('it may be a rate limit: ' + messages)
 
     def get_standings(self, session: Optional[requests.Session] = None) -> Tuple[List[str], List[Dict[str, Any]]]:
         session = session or utils.new_default_session()

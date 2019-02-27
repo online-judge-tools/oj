@@ -16,19 +16,22 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import SubmissionError
+from onlinejudge.type import LoginError, NotLoggedInError, SubmissionError
 
 
 @utils.singleton
 class CodeforcesService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> bool:
+    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+        """
+        :raises LoginError:
+        """
         session = session or utils.new_default_session()
         url = 'https://codeforces.com/enter'
         # get
         resp = utils.request('GET', url, session=session)
         if resp.url != url:  # redirected
             log.info('You have already signed in.')
-            return True
+            return
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         form = soup.find('form', id='enterForm')
@@ -43,10 +46,9 @@ class CodeforcesService(onlinejudge.type.Service):
         resp.raise_for_status()
         if resp.url != url:  # redirected
             log.success('Welcome, %s.', username)
-            return True
         else:
             log.failure('Invalid handle or password.')
-            return False
+            raise LoginError('Invalid handle or password.')
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.new_default_session()
@@ -130,7 +132,12 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             language_dict[option.attrs['value']] = {'description': option.string}
         return language_dict
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:  # or SubmissionError
+    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+        """
+        :raises NotLoggedInError:
+        :raises SubmissionError:
+        """
+
         session = session or utils.new_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -139,7 +146,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         form = soup.find('form', class_='submitForm')
         if form is None:
             log.error('not logged in')
-            raise SubmissionError
+            raise NotLoggedInError
         log.debug('form: %s', str(form))
         # make data
         form = utils.FormSender(form, url=resp.url)
@@ -157,9 +164,11 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             log.debug('redirected to %s', resp.url)
             # parse error messages
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            msgs = []  # type: List[str]
             for span in soup.findAll('span', class_='error'):
+                msgs += [span.string]
                 log.warning('Codeforces says: "%s"', span.string)
-            raise SubmissionError
+            raise SubmissionError('it may be the "You have submitted exactly the same code before" error: ' + str(msgs))
 
     def get_url(self) -> str:
         table = {}
