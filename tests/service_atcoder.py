@@ -35,7 +35,7 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(AtCoderContest.from_url('https://atcoder.jp/contests/'), None)
 
     def test_list_problems(self):
-        contest = AtCoderContest('agc028')
+        contest = AtCoderContest.from_url('https://atcoder.jp/contests/agc028')
         problems = contest.list_problems()
         self.assertEqual(len(problems), 7)
         self.assertEqual(problems[0].get_alphabet(), 'A')
@@ -54,6 +54,22 @@ class AtCoderProblemTest(unittest.TestCase):
         self.assertEqual(AtCoderProblem.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d').problem_id, 'kupc2014_d')
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c').contest_id, 'agc030')
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c').problem_id, 'agc030_c')
+
+    def test_load_details(self):
+        problem = AtCoderProblem.from_url('https://atcoder.jp/contests/abc118/tasks/abc118_a')
+        self.assertEqual(problem.get_alphabet(), 'A')
+        self.assertEqual(problem.get_task_name(), 'B +/- A')
+        self.assertEqual(problem.get_time_limit_msec(), 2000)
+        self.assertEqual(problem.get_memory_limit_byte(), 1024 * 1000 * 1000)
+        self.assertEqual(problem.get_score(), 100)
+
+    def test_get_alphabet(self):
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc028/tasks/agc028_f').get_alphabet(), 'F')
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc028/tasks/agc028_f2').get_alphabet(), 'F2')
+
+    def test_get_score(self):
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/future-contest-2018-final/tasks/future_contest_2018_final_a').get_score(), 50000000)
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/abc001/tasks/abc001_4').get_score(), None)
 
 
 class AtCoderSubmissionTest(unittest.TestCase):
