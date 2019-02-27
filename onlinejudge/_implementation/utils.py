@@ -264,7 +264,7 @@ def remove_suffix(s: str, suffix: str) -> str:
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 
 
-def getter_with_load_details(name: str, type: Union[str, Type], check_with: Optional[str] = None) -> Callable:
+def getter_with_load_details(name: str, type: Union[str, Type]) -> Callable:
     """
     :note: confirm that the type annotation `get_foo = getter_with_load_details("_foo", type=int)  # type: Callable[..., int]` is correct one
     :note: this cannot be a decorator, since mypy fails to recognize the types
@@ -284,17 +284,12 @@ def getter_with_load_details(name: str, type: Union[str, Type], check_with: Opti
     Of course the latter is better when it is used only once, but the former is better when the pattern is repeated.
     """
 
-    if check_with is None:
-        check_with = name
-
     @functools.wraps(lambda self: getattr(self, name))
     def wrapper(self, session: Optional[requests.Session] = None):
         if getattr(self, name) is None:
             assert session is None or isinstance(session, requests.Session)
             self._load_details(session=session)
-        attr = getattr(self, name)
-        assert check_with is not None
-        return attr
+        return getattr(self, name)
 
     # add documents
     assert type is not None
