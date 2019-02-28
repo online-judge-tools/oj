@@ -258,8 +258,12 @@ def getter_with_load_details(name: str, type: Union[str, Type]) -> Callable:
     return wrapper
 
 
-def snip_large_file_content(text: str, limit: int, head: int, tail: int, bold: bool = False) -> str:
+def snip_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
     assert head + tail < limit
+    try:
+        text = content.decode()
+    except UnicodeDecodeError as e:
+        return str(e)
     font = log.bold if bold else (lambda s: s)
     lines = text.splitlines(keepends=True)
     if len(lines) < limit:
