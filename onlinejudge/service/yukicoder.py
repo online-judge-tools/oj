@@ -116,15 +116,27 @@ class YukicoderService(onlinejudge.type.Service):
 
     # example: {"Id":10,"Name":"yuki2006","Solved":280,"Level":34,"Rank":59,"Score":52550,"Points":7105,"Notice":"匿名ユーザーの情報は取れません。ユーザー名が重複している場合は最初に作られたIDが優先されます（その場合は運営にご報告いただければマージします）。このAPIはベータ版です。予告なく変更される場合があります。404を返したら廃止です。"}
     def get_user(self, *args, **kwargs) -> Dict[str, Any]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         return self._issue_official_api('user', *args, **kwargs)
 
     # https://twitter.com/yukicoder/status/935943170210258944
     # example: [{"No":46,"ProblemId":43,"Title":"はじめのn歩","AuthorId":25,"TesterId":0,"Level":1,"ProblemType":0,"Tags":"実装"}]
     def get_solved(self, *args, **kwargs) -> List[Dict[str, Any]]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         return self._issue_official_api('solved', *args, **kwargs)
 
     # example: https://yukicoder.me/users/237/favorite
     def get_user_favorite(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         url = 'https://yukicoder.me/users/%d/favorite' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
         assert columns == ['#', '提出時間', '提出者', '問題', '言語', '結果', '実行時間', 'コード長']
@@ -140,6 +152,10 @@ class YukicoderService(onlinejudge.type.Service):
 
     # example: https://yukicoder.me/users/504/favoriteProblem
     def get_user_favorite_problem(self, id, session: Optional[requests.Session] = None) -> List[Any]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         url = 'https://yukicoder.me/users/%d/favoriteProblem' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
         assert columns == ['ナンバー', '問題名', 'レベル', 'タグ', '時間制限', 'メモリ制限', '作問者']
@@ -162,6 +178,10 @@ class YukicoderService(onlinejudge.type.Service):
 
     # example: https://yukicoder.me/users/1786/favoriteWiki
     def get_user_favorite_wiki(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         url = 'https://yukicoder.me/users/%d/favoriteWiki' % id
         columns, rows = self._get_and_parse_the_table(url, session=session)
         assert columns == ['Wikiページ']
@@ -175,6 +195,10 @@ class YukicoderService(onlinejudge.type.Service):
     # example: https://yukicoder.me/submissions?page=2192&status=AC
     # NOTE: 1ページしか読まない 全部欲しい場合は呼び出し側で頑張る
     def get_submissions(self, page: int, status: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         assert isinstance(page, int) and page >= 1
         url = 'https://yukicoder.me/submissions?page=%d' % page
         if status is not None:
@@ -197,6 +221,10 @@ class YukicoderService(onlinejudge.type.Service):
     # example: https://yukicoder.me/problems?page=2
     # NOTE: loginしてると
     def get_problems(self, page: int, comp_problem: bool = True, other: bool = False, sort: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         assert isinstance(page, int) and page >= 1
         url = 'https://yukicoder.me/problems'
         if other:
