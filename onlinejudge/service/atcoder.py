@@ -540,11 +540,19 @@ class AtCoderProblem(onlinejudge.type.Problem):
             self._score = int(utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点'))
         self._score_checked = True
 
-    get_task_name = utils.getter_with_load_details('_task_name')  # type: Callable[..., str]
-    get_time_limit_msec = utils.getter_with_load_details('_time_limit_msec')  # type: Callable[..., int]
-    get_memory_limit_byte = utils.getter_with_load_details('_memory_limit_byte')  # type: Callable[..., int]
-    get_alphabet = utils.getter_with_load_details('_alphabet')  # type: Callable[..., str]
-    get_score = utils.getter_with_load_details('_score', check_with='_score_checked')  # type: Callable[..., str]
+    def get_score(self, session: Optional[requests.Session] = None) -> Optional[int]:
+        """
+        :return: :py:data:`None` if the problem has no score  (e.g. https://atcoder.jp/contests/abc012/tasks/abc012_3)
+        """
+        if not self._score_checked:
+            self._load_details(session=session)
+            assert self._score_checked
+        return self._score
+
+    get_task_name = utils.getter_with_load_details('_task_name', type=str)  # type: Callable[..., str]
+    get_time_limit_msec = utils.getter_with_load_details('_time_limit_msec', type=int)  # type: Callable[..., int]
+    get_memory_limit_byte = utils.getter_with_load_details('_memory_limit_byte', type=int)  # type: Callable[..., int]
+    get_alphabet = utils.getter_with_load_details('_alphabet', type=str)  # type: Callable[..., str]
 
 
 class AtCoderSubmission(onlinejudge.type.Submission):
@@ -681,18 +689,34 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         assert self._problem_id is not None
         return AtCoderProblem(self.contest_id, self._problem_id)
 
-    get_source_code = utils.getter_with_load_details('_source_code')  # type: Callable[..., bytes]
-    get_compile_error = utils.getter_with_load_details('_compiler_error')  # type: Callable[..., str]
-    get_user_id = utils.getter_with_load_details('_user_id')  # type: Callable[..., str]
-    get_submission_time = utils.getter_with_load_details('_submission_time')  # type: Callable[..., datetime.datetime]
-    get_language_name = utils.getter_with_load_details('_language_name')  # type: Callable[..., str]
-    get_score = utils.getter_with_load_details('_score')  # type: Callable[..., int]
-    get_code_size = utils.getter_with_load_details('_code_size')  # type: Callable[..., int]
-    get_status = utils.getter_with_load_details('_status')  # type: Callable[..., str]
-    get_exec_time_msec = utils.getter_with_load_details('_exec_time_msec', check_with='_status')  # type: Callable[..., int]
-    get_memory_byte = utils.getter_with_load_details('_memory_byte', check_with='_status')  # type: Callable[..., int]
-    get_test_sets = utils.getter_with_load_details('_test_sets')  # type: Callable[..., List[AtCoderSubmissionTestSet]]
-    get_test_cases = utils.getter_with_load_details('_test_cases')  # type: Callable[..., List[AtCoderSubmissionTestCaseResult]]
+    def get_exec_time_msec(self, session: Optional[requests.Session] = None) -> Optional[int]:
+        """
+        :note: `Exec Time` is undefined when the status is `RE` or `TLE`
+        """
+        if self._status is None:
+            self._load_details(session=session)
+            assert self._status is not None
+        return self._exec_time_msec
+
+    def get_memory_byte(self, session: Optional[requests.Session] = None) -> Optional[int]:
+        """
+        :note: `Memory` is undefined when the status is `RE` or `TLE`
+        """
+        if self._status is None:
+            self._load_details(session=session)
+            assert self._status is not None
+        return self._memory_byte
+
+    get_source_code = utils.getter_with_load_details('_source_code', type=bytes)  # type: Callable[..., bytes]
+    get_compile_error = utils.getter_with_load_details('_compiler_error', type=str)  # type: Callable[..., str]
+    get_user_id = utils.getter_with_load_details('_user_id', type=str)  # type: Callable[..., str]
+    get_submission_time = utils.getter_with_load_details('_submission_time', type=datetime.datetime)  # type: Callable[..., datetime.datetime]
+    get_language_name = utils.getter_with_load_details('_language_name', type=str)  # type: Callable[..., str]
+    get_score = utils.getter_with_load_details('_score', type=int)  # type: Callable[..., int]
+    get_code_size = utils.getter_with_load_details('_code_size', type=int)  # type: Callable[..., int]
+    get_status = utils.getter_with_load_details('_status', type=str)  # type: Callable[..., str]
+    get_test_sets = utils.getter_with_load_details('_test_sets', type='List[AtCoderSubmissionTestSet]')  # type: Callable[..., List[AtCoderSubmissionTestSet]]
+    get_test_cases = utils.getter_with_load_details('_test_cases', type='List[AtCoderSubmissionTestCaseResult]')  # type: Callable[..., List[AtCoderSubmissionTestCaseResult]]
 
 
 class AtCoderSubmissionTestSet(object):
