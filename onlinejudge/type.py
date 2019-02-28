@@ -1,5 +1,5 @@
 # Python Version: 3.x
-from typing import *
+from typing import Callable, List, NamedTuple, NewType, Optional, Tuple
 
 import requests
 
@@ -13,6 +13,7 @@ class LoginError(RuntimeError):
 class Service(object):
     def login(self, get_credentials: CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
+        :param get_credentials: returns a tuple of (username, password)
         :raises LoginError:
         """
         raise NotImplementedError
@@ -33,8 +34,20 @@ class Service(object):
 
 LabeledString = NamedTuple('LabeledString', [('name', str), ('data', str)])
 TestCase = NamedTuple('TestCase', [('input', LabeledString), ('output', LabeledString)])
-# Language = NamedTuple('Language', [ ('id', str), ('name', str), ('description': str) ])
-Language = Dict[str, Any]
+
+LanguageId = NewType('LanguageId', str)
+"""
+:note: This is just a :py:class:`NewType` -ed :py:class:`str` not, but you should not use this other than a label.
+"""
+
+Language = NamedTuple('Language', [
+    ('id', LanguageId),
+    ('name', str),
+])
+"""
+:ivar id: :py:class:`LanguageId`
+:ivar name: :py:class:`str`
+"""
 
 
 class NotLoggedInError(RuntimeError):
@@ -55,14 +68,16 @@ class Problem(object):
         """
         raise NotImplementedError
 
-    def submit_code(self, code: bytes, language: str, session: Optional[requests.Session] = None) -> 'Submission':
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> 'Submission':
         """
+        :param code:
+        :arg language_id: :py:class:`LanguageId`
         :raises NotLoggedInError:
         :raises SubmissionError:
         """
         raise NotImplementedError
 
-    def get_language_dict(self, session: Optional[requests.Session] = None) -> Dict[str, Language]:
+    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         raise NotImplementedError
 
     def get_url(self) -> str:
