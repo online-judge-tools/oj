@@ -36,7 +36,6 @@ LabeledString = NamedTuple('LabeledString', [('name', str), ('data', str)])
 TestCase = NamedTuple('TestCase', [('input', LabeledString), ('output', LabeledString)])
 
 LanguageId = NewType('LanguageId', str)
-
 """
 :note: This is just a :py:class:`NewType` -ed :py:class:`str` not, but you should not use this other than a label.
 """
@@ -45,7 +44,6 @@ Language = NamedTuple('Language', [
     ('id', LanguageId),
     ('name', str),
 ])
-
 """
 :ivar id: :py:class:`LanguageId`
 :ivar name: :py:class:`str`
