@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 the module for Aizu Online Judge (http://judge.u-aizu.ac.jp/onlinejudge/)
+
+:note: There is the offcial API http://developers.u-aizu.ac.jp/index
 """
 
 import collections

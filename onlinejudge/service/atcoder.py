@@ -2,6 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 the module for AtCoder (https://atcoder.jp/)
+
+:note: There are some useful endpoints:
+
+    -   https://atcoder.jp/contests/abc001/standings/json
+    -   https://atcoder.jp/users/chokudai/history/json
+
+:note: There is an unofficial API https://github.com/kenkoooo/AtCoderProblems
 """
 
 import datetime

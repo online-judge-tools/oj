@@ -1,6 +1,8 @@
 # Python Version: 3.x
 """
 the module for Codeforces (https://codeforces.com/)
+
+:note: There is the offcial API https://codeforces.com/api/help
 """
 
 import posixpath
