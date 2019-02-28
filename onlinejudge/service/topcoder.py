@@ -177,7 +177,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
         if 'module=SubmitSuccess' in resp.content.decode(resp.encoding):
             url = 'http://community.topcoder.com/longcontest/?module=SubmitSuccess&rd={}&cd={}&compid={}'.format(self.rd, self.cd, self.compid)
             log.success('success: result: %s', url)
-            return onlinejudge.type.CompatibilitySubmission(url, self)
+            return utils.DummySubmission(url, problem=self)
         else:
             # module=Submit to get error messages
             resp = utils.request('GET', submit_url, session=session)

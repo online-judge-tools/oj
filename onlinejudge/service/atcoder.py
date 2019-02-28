@@ -457,7 +457,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             languages += [Language(option.attrs['value'], option.string)]
         return languages
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.DummySubmission:
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> Submission:
         """
         :raises NotLoggedInError:
         :raises SubmissionError:
@@ -499,7 +499,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             log.success('success: result: %s', resp.url)
             # NOTE: ignore the returned legacy URL and use beta.atcoder.jp's one
             url = 'https://beta.atcoder.jp/contests/{}/submissions/me'.format(self.contest_id)
-            return onlinejudge.type.DummySubmission(url)
+            return utils.DummySubmission(url, problem=self)
         else:
             log.failure('failure')
             log.debug('redirected to %s', resp.url)
