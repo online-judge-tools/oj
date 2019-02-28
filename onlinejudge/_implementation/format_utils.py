@@ -4,18 +4,55 @@ import glob
 import pathlib
 import re
 import sys
-from typing import Dict, List, Match, Optional
+from typing import Dict, Generator, List, Match, Optional, Set
 
 import onlinejudge
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 
 
+def percentsplit(s: str) -> Generator[str, None, None]:
+    for m in re.finditer('[^%]|%(.)', s):
+        yield m.group(0)
+
+
+def percentformat(s: str, table: Dict[str, str]) -> str:
+    assert '%' not in table or table['%'] == '%'
+    table['%'] = '%'
+    result = ''
+    for c in percentsplit(s):
+        if c.startswith('%'):
+            result += table[c[1]]
+        else:
+            result += c
+    return result
+
+
+def percentparse(s: str, format: str, table: Dict[str, str]) -> Optional[Dict[str, str]]:
+    table = {key: '(?P<{}>{})'.format(key, value) for key, value in table.items()}
+    used = set()  # type: Set[str]
+    pattern = ''
+    for token in percentsplit(re.escape(format).replace('\\%', '%')):
+        if token.startswith('%'):
+            c = token[1]
+            if c not in used:
+                pattern += table[c]
+                used.add(c)
+            else:
+                pattern += r'(?P={})'.format(c)
+        else:
+            pattern += token
+    m = re.match(pattern, s)
+    if not m:
+        return None
+    return m.groupdict()
+
+
 def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]:
     table = {}
     table['s'] = '*'
     table['e'] = '*'
-    pattern = (glob.escape(str(directory)) + '/' + utils.percentformat(glob.escape(format).replace('\\%', '%'), table))
+    pattern = (glob.escape(str(directory)) + '/' + percentformat(glob.escape(format).replace('\\%', '%'), table))
     paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
         log.debug('testcase globbed: %s', path)
@@ -26,7 +63,7 @@ def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) 
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
-    pattern = re.compile('^' + re.escape(str(directory.resolve())) + '/' + utils.percentformat(re.escape(format).replace('\\%', '%'), table) + '$')
+    pattern = re.compile('^' + re.escape(str(directory.resolve())) + '/' + percentformat(re.escape(format).replace('\\%', '%'), table) + '$')
     return pattern.match(str(path.resolve()))
 
 
@@ -34,7 +71,7 @@ def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) 
     table = {}
     table['s'] = name
     table['e'] = ext
-    return directory / utils.percentformat(format, table)
+    return directory / percentformat(format, table)
 
 
 def is_backup_or_hidden_file(path: pathlib.Path) -> bool:

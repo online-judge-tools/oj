@@ -1,5 +1,4 @@
 # Python Version: 3.x
-# -*- coding: utf-8 -*-
 import contextlib
 import datetime
 import distutils.version
@@ -23,25 +22,12 @@ import requests
 
 import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
-from onlinejudge.type import LabeledString, Problem, Submission, TestCase
+from onlinejudge.type import *
 
 config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
 data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
 cache_dir = pathlib.Path(appdirs.user_cache_dir(version.__package_name__))
 html_parser = 'lxml'
-
-
-def percentformat(s: str, table: Dict[str, str]) -> str:
-    assert '%' not in table or table['%'] == '%'
-    table['%'] = '%'
-    result = ''
-    for m in re.finditer('[^%]|%(.)', s):
-        if m.group(1):
-            if m.group(1) in table:
-                result += table[m.group(1)]
-        else:
-            result += m.group(0)
-    return result
 
 
 def describe_status_code(status_code: int) -> str:
@@ -82,29 +68,6 @@ def with_cookiejar(session: requests.Session, path: pathlib.Path = default_cooki
     path.parent.mkdir(parents=True, exist_ok=True)
     session.cookies.save()  # type: ignore
     path.chmod(0o600)  # NOTE: to make secure a little bit
-
-
-class SampleZipper(object):
-    def __init__(self):
-        self.data = []
-        self.dangling = None
-
-    def add(self, s: str, name: str = '') -> None:
-        if self.dangling is None:
-            if re.search('output', name, re.IGNORECASE) or re.search('出力', name):
-                log.warning('strange name for input string: %s', name)
-            self.dangling = LabeledString(name, s)
-        else:
-            if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
-                if not (re.search('output', name, re.IGNORECASE) or re.search('出力', name)):  # to ignore titles like "Output for Sample Input 1"
-                    log.warning('strange name for output string: %s', name)
-            self.data += [TestCase(self.dangling, LabeledString(name, s))]
-            self.dangling = None
-
-    def get(self) -> List[TestCase]:
-        if self.dangling is not None:
-            log.error('dangling sample string: %s', self.dangling[1])
-        return self.data
 
 
 class FormSender(object):

@@ -23,6 +23,7 @@ import bs4
 import requests
 
 import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
@@ -325,7 +326,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             return []
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        samples = utils.SampleZipper()
+        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         lang = None
         for pre, h3 in self._find_sample_tags(soup):
             s = utils.textfile(utils.dos2unix(pre.string.lstrip()))

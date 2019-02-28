@@ -32,8 +32,13 @@ class Service(object):
         pass
 
 
-LabeledString = NamedTuple('LabeledString', [('name', str), ('data', str)])
-TestCase = NamedTuple('TestCase', [('input', LabeledString), ('output', LabeledString)])
+TestCase = NamedTuple('TestCase', [
+    ('name', str),
+    ('input_name', str),
+    ('input_data', bytes),
+    ('output_name', Optional[str]),
+    ('output_data', Optional[bytes]),
+])
 
 LanguageId = NewType('LanguageId', str)
 """
