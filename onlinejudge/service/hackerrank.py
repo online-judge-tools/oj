@@ -230,7 +230,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         model_id = it['model']['id']
         url = self.get_url().rstrip('/') + '/submissions/code/{}'.format(model_id)
         log.success('success: result: %s', url)
-        return onlinejudge.type.CompatibilitySubmission(url, problem=self)
+        return utils.DummySubmission(url, problem=self)
 
 
 onlinejudge.dispatch.services += [HackerRankService]

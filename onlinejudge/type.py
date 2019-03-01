@@ -110,26 +110,3 @@ class Submission(object):
     @classmethod
     def from_url(cls, s: str) -> Optional['Submission']:
         pass
-
-
-class CompatibilitySubmission(Submission):
-    def __init__(self, url: str, problem: Problem):
-        self.url = url
-        self.problem = problem
-
-    def get_url(self) -> str:
-        return self.url
-
-    def get_problem(self) -> Problem:
-        return self.problem
-
-
-class DummySubmission(Submission):
-    def __init__(self, url: str):
-        self.url = url
-
-    def get_url(self) -> str:
-        return self.url
-
-    def get_problem(self) -> Problem:
-        raise Exception

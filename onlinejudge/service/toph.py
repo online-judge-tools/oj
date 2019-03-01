@@ -154,7 +154,7 @@ class TophProblem(onlinejudge.type.Problem):
         if '/s/' in resp.url:
             # example: https://toph.co/s/201410
             log.success('success: result: %s', resp.url)
-            return onlinejudge.type.DummySubmission(resp.url)
+            return utils.DummySubmission(resp.url, problem=self)
         else:
             log.failure('failure')
             log.debug('redirected to %s', resp.url)

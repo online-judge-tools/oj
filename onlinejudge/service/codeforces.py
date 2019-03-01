@@ -163,7 +163,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         if resp.url.endswith('/my'):
             # example: https://codeforces.com/contest/598/my
             log.success('success: result: %s', resp.url)
-            return onlinejudge.type.DummySubmission(resp.url)
+            return utils.DummySubmission(resp.url, problem=self)
         else:
             log.failure('failure')
             log.debug('redirected to %s', resp.url)

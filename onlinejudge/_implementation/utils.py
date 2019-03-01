@@ -23,7 +23,7 @@ import requests
 
 import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
-from onlinejudge.type import LabeledString, TestCase
+from onlinejudge.type import LabeledString, Problem, Submission, TestCase
 
 config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
 data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
@@ -323,3 +323,15 @@ def snip_large_file_content(text: str, limit: int, head: int, tail: int, bold: b
             '... ({} lines) ...\n'.format(len(lines[head:-tail])),
             font(''.join(lines[-tail:])),
         ])
+
+
+class DummySubmission(Submission):
+    def __init__(self, url: str, problem: Problem):
+        self.url = url
+        self.problem = problem
+
+    def get_url(self) -> str:
+        return self.url
+
+    def get_problem(self) -> Problem:
+        return self.problem
