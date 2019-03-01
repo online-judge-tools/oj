@@ -188,6 +188,10 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             raise SubmissionError('it may be a rate limit: ' + messages)
 
     def get_standings(self, session: Optional[requests.Session] = None) -> Tuple[List[str], List[Dict[str, Any]]]:
+        """
+        .. deprecated:: 6.0.0
+            This method may be deleted in future.
+        """
         session = session or utils.new_default_session()
 
         header = None  # type: Optional[List[str]]
