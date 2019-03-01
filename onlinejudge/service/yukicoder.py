@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 the module for yukicoder (https://yukicoder.me/)
+
+:note: There is the official API https://petstore.swagger.io/?url=https://yukicoder.me/api/swagger.yaml
 """
 
 import collections

@@ -2,6 +2,7 @@
 """
 the module for Topcoder (https://www.topcoder.com/)
 
+:note: There is the offcial API https://tcapi.docs.apiary.io/
 :note: only the Marathon Match is supported
 """
 
