@@ -10,7 +10,7 @@ class AtCoderSerivceTest(unittest.TestCase):
         self.assertIsInstance(AtCoderService.from_url('https://beta.atcoder.jp/'), AtCoderService)
         self.assertIsInstance(AtCoderService.from_url('https://abc001.contest.atcoder.jp/'), AtCoderService)
         self.assertIsInstance(AtCoderService.from_url('https://atcoder.jp/contests/agc001/submissions/806160'), AtCoderService)
-        self.assertEqual(AtCoderService.from_url('https://codeforces.com/'), None)
+        self.assertIsNone(AtCoderService.from_url('https://codeforces.com/'))
 
     def test_iterate_contests(self):
         contests = list(AtCoderService().iterate_contests())
@@ -31,7 +31,7 @@ class AtCoderContestTest(unittest.TestCase):
     def test_from_url(self):
         self.assertEqual(AtCoderContest.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d').contest_id, 'kupc2014')
         self.assertEqual(AtCoderContest.from_url('https://atcoder.jp/contests/agc030').contest_id, 'agc030')
-        self.assertEqual(AtCoderContest.from_url('https://atcoder.jp/contests/'), None)
+        self.assertIsNone(AtCoderContest.from_url('https://atcoder.jp/contests/'))
 
     def test_list_problems(self):
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/agc028')
