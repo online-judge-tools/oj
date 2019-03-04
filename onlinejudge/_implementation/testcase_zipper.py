@@ -37,6 +37,10 @@ class SampleZipper(object):
 
 
 def extract_from_zip(zip_data: bytes, format: str, out: str = 'out') -> List[TestCase]:
+    """
+    :param out: is the extension for output files. This is used when the zip-file contains files like `sample-1.ans` instead of `sample-1.out`.
+    """
+
     table = {
         's': r'[^/]+',
         'e': r'(in|{})'.format(out),
