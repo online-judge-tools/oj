@@ -81,7 +81,7 @@ class YukicoderOfficialAPITest(unittest.TestCase):
 
     def test_get_user_0(self):
         data = YukicoderService().get_user(id=0)
-        self.assertIs(data, None)
+        self.assertIsNone(data)
 
     def test_get_solved_10(self):
         data = YukicoderService().get_solved(id=10)
@@ -101,7 +101,7 @@ class YukicoderOfficialAPITest(unittest.TestCase):
 
     def test_get_solved_0(self):
         data = YukicoderService().get_solved(id=0)
-        self.assertIs(data, None)
+        self.assertIsNone(data)
 
     def test_get_user_favorite_10(self):
         data = YukicoderService().get_user_favorite(id=10)
