@@ -27,4 +27,5 @@ setup(
     author_email=version.__email__,
     url=version.__url__,
     license=version.__license__,
+    description=version.__description__,
 )
