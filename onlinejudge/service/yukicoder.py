@@ -305,7 +305,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             it = self._parse_sample_tag(pre)
             if it is not None:
                 data, name = it
-                samples.add(data, name)
+                samples.add(data.encode(), name)
         return samples.get()
 
     def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:

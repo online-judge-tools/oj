@@ -116,7 +116,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                 else:
                     s += it.string
             s = s.lstrip()
-            samples.add(s, title.string)
+            samples.add(s.encode(), title.string)
         return samples.get()
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:

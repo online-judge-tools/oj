@@ -100,12 +100,8 @@ class TophProblem(onlinejudge.type.Problem):
             assert output_pre.name == 'pre'
             assert re.search("^preSample.*Input$", input_pre.attrs['id'])
             assert re.search("^preSample.*Output$", output_pre.attrs['id'])
-            s = input_pre.get_text()
-            s = s.lstrip()
-            samples.add(s, "Input")
-            s = output_pre.get_text()
-            s = s.lstrip()
-            samples.add(s, "Output")
+            samples.add(input_pre.text.lstrip().encode(), "Input")
+            samples.add(output_pre.text.lstrip().encode(), "Output")
         return samples.get()
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:

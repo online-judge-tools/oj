@@ -337,7 +337,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             elif lang != l:
                 log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
                 continue
-            samples.add(s, name)
+            samples.add(s.encode(), name)
         return samples.get()
 
     def _get_tag_lang(self, tag):

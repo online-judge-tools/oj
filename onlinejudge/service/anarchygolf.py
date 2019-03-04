@@ -49,7 +49,7 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
             it = self._parse_sample_tag(h2)
             if it is not None:
                 s, name = it
-                samples.add(s, name)
+                samples.add(s.encode(), name)
         return samples.get()
 
     def _parse_sample_tag(self, tag: bs4.Tag) -> Optional[Tuple[str, str]]:

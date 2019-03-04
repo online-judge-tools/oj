@@ -14,20 +14,20 @@ from onlinejudge.type import *
 class SampleZipper(object):
     def __init__(self):
         self.data = []
-        self.dangling = None  # Optional[Tuple(str, str)]
+        self.dangling = None  # Optional[Tuple(str, bytes)]
 
-    def add(self, s: str, name: str = '') -> None:
+    def add(self, content: bytes, name: str) -> None:
         if self.dangling is None:
             if re.search('output', name, re.IGNORECASE) or re.search('出力', name):
                 log.warning('strange name for input string: %s', name)
-            self.dangling = (name, s)
+            self.dangling = (name, content)
         else:
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
                 if not (re.search('output', name, re.IGNORECASE) or re.search('出力', name)):  # to ignore titles like "Output for Sample Input 1"
                     log.warning('strange name for output string: %s', name)
             index = len(self.data)
-            input_name, input_s = self.dangling
-            self.data += [TestCase('sample-{}'.format(index + 1), input_name, input_s.encode(), name, s.encode())]
+            input_name, input_content = self.dangling
+            self.data += [TestCase('sample-{}'.format(index + 1), input_name, input_content, name, content)]
             self.dangling = None
 
     def get(self) -> List[TestCase]:
