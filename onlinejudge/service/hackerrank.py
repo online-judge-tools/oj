@@ -23,7 +23,6 @@ import onlinejudge.type
 from onlinejudge.type import *
 
 
-@utils.singleton
 class HackerRankService(onlinejudge.type.Service):
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """

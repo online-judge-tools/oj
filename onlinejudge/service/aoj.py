@@ -25,7 +25,6 @@ import onlinejudge.type
 from onlinejudge.type import LabeledString, TestCase
 
 
-@utils.singleton
 class AOJService(onlinejudge.type.Service):
     def get_url(self) -> str:
         return 'http://judge.u-aizu.ac.jp/onlinejudge/'

@@ -25,7 +25,6 @@ import onlinejudge.dispatch
 from onlinejudge.type import *
 
 
-@utils.singleton
 class YukicoderService(onlinejudge.type.Service):
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> None:
         if method == 'github':

@@ -16,7 +16,6 @@ import onlinejudge.dispatch
 import onlinejudge.type
 
 
-@utils.singleton
 class AnarchyGolfService(onlinejudge.type.Service):
     def get_url(self) -> str:
         return 'http://golf.shinh.org/'

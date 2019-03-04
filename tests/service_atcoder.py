@@ -6,11 +6,10 @@ from onlinejudge.service.atcoder import AtCoderContest, AtCoderProblem, AtCoderS
 
 class AtCoderSerivceTest(unittest.TestCase):
     def test_from_url(self):
-        service = AtCoderService()
-        self.assertEqual(AtCoderService.from_url('https://atcoder.jp/'), service)
-        self.assertEqual(AtCoderService.from_url('https://beta.atcoder.jp/'), service)
-        self.assertEqual(AtCoderService.from_url('https://abc001.contest.atcoder.jp/'), service)
-        self.assertEqual(AtCoderService.from_url('https://atcoder.jp/contests/agc001/submissions/806160'), service)
+        self.assertIsInstance(AtCoderService.from_url('https://atcoder.jp/'), AtCoderService)
+        self.assertIsInstance(AtCoderService.from_url('https://beta.atcoder.jp/'), AtCoderService)
+        self.assertIsInstance(AtCoderService.from_url('https://abc001.contest.atcoder.jp/'), AtCoderService)
+        self.assertIsInstance(AtCoderService.from_url('https://atcoder.jp/contests/agc001/submissions/806160'), AtCoderService)
         self.assertEqual(AtCoderService.from_url('https://codeforces.com/'), None)
 
     def test_iterate_contests(self):

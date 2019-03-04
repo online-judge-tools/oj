@@ -40,7 +40,6 @@ def _request(*args, **kwargs):
     return resp
 
 
-@utils.singleton
 class AtCoderService(onlinejudge.type.Service):
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
