@@ -383,7 +383,6 @@ class YukicoderProblem(onlinejudge.type.Problem):
             return utils.DummySubmission(resp.url, problem=self)
         else:
             log.failure('failure')
-            log.debug('redirected to %s', resp.url)
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             for div in soup.findAll('div', attrs={'role': 'alert'}):
                 log.warning('yukicoder says: "%s"', div.string)
