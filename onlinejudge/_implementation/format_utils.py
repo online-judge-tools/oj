@@ -17,12 +17,6 @@ def percentsplit(s: str) -> Generator[str, None, None]:
 
 
 def percentformat(s: str, table: Dict[str, str]) -> str:
-    """a function to format with the printf-style format
-
-    >>> percentformat("foo %a%a bar %b", {"a": "AA", "b": "12345"})
-    'foo AAAA bar 12345'
-    """
-
     assert '%' not in table or table['%'] == '%'
     table['%'] = '%'
     result = ''
@@ -35,14 +29,6 @@ def percentformat(s: str, table: Dict[str, str]) -> str:
 
 
 def percentparse(s: str, format: str, table: Dict[str, str]) -> Optional[Dict[str, str]]:
-    """a function to parse with the printf-style format
-
-    >>> percentparse("foo AAAA bar 12345", "foo %a%a bar %b", {"a": "AA", "b": "12345"})
-    {'a': 'AA', 'b': '12345'}
-    >>> percentparse("123456789", "%x%y%z", {"x": r"\d+", "y": r"\d", "z": r"(\d\d\d)+"})
-    {'x': '12345', 'y': '6', 'z': '789'}
-    """
-
     table = {key: '(?P<{}>{})'.format(key, value) for key, value in table.items()}
     used = set()  # type: Set[str]
     pattern = ''
