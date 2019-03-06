@@ -37,6 +37,16 @@ class YukicoderProblemTest(unittest.TestCase):
             TestCase(name='sample-4', input_name='サンプル4 入力', input_data=b'\n', output_name='サンプル4 出力', output_data=b'1\n'),
         ])
 
+    @unittest.expectedFailure
+    def test_donwload_sample_cases_issue_355(self):
+        # see https://github.com/kmyk/online-judge-tools/issues/355
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/649').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'15 3\n1 3\n1 4\n1 5\n2\n2\n1 10\n1 10\n1 1\n2\n1 3\n2\n1 1000\n2\n1 0\n2\n', output_name='サンプル1 出力', output_data=b'5\n-1\n4\n3\n10\n3\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'4 1\n1 10\n1 10\n2\n2\n', output_name='サンプル2 出力', output_data=b'10\n10\n'),
+            TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'4 2\n1 9\n1 10000000000000000\n1 90000000000000000\n2\n', output_name='サンプル3 出力', output_data=b'10000000000000000\n'),
+            TestCase(name='sample-4', input_name='サンプル4 入力', input_data=b'1 1\n2\n', output_name='サンプル4 出力', output_data=b'-1\n'),
+        ])
+
 
 class YukicoderOfficialAPITest(unittest.TestCase):
     def test_get_user_10(self):
