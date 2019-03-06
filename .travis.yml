@@ -12,11 +12,6 @@ script:
     - mypy oj onlinejudge setup.py tests
     - make -C docs html
     - python setup.py test
-branches:
-    only:
-        - master
-        - develop
-        - "/^v\\d+\\.\\d+\\.\\d+$/"
 deploy:
     provider: pypi
     user: kimiyuki
