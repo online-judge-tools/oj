@@ -6,8 +6,8 @@ from typing import *
 from typing.io import *
 
 import onlinejudge
+import onlinejudge._implementation.format_utils as format_utils
 import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
 
 if TYPE_CHECKING:
     import argparse
@@ -47,7 +47,7 @@ def split_input(args: 'argparse.Namespace') -> None:
             time.sleep(args.time)
             if non_block_read(proc.stdout):  # if output exists
                 index += 1
-                path = utils.percentformat(args.output, {'i': str(index)})
+                path = format_utils.percentformat(args.output, {'i': str(index)})
                 log.info('case found: %d', index)
                 if args.header:
                     if args.header == args.header.strip():

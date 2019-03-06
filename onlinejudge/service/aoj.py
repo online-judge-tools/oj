@@ -22,7 +22,7 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LabeledString, TestCase
+from onlinejudge.type import TestCase
 
 
 class AOJService(onlinejudge.type.Service):
@@ -54,10 +54,13 @@ class AOJProblem(onlinejudge.type.Problem):
         url = 'https://judgedat.u-aizu.ac.jp/testcases/samples/{}'.format(self.problem_id)
         resp = utils.request('GET', url, session=session)
         samples = []  # type: List[TestCase]
-        for sample in json.loads(resp.content.decode(resp.encoding)):
+        for i, sample in enumerate(json.loads(resp.content.decode(resp.encoding))):
             samples += [TestCase(
-                LabeledString(str(sample['serial']), sample['in']),
-                LabeledString(str(sample['serial']), sample['out']),
+                'sample-{}'.format(i + 1),
+                str(sample['serial']),
+                sample['in'].encode(),
+                str(sample['serial']),
+                sample['out'].encode(),
             )]
         return samples
 
@@ -86,8 +89,11 @@ class AOJProblem(onlinejudge.type.Problem):
                 log.warning("skipped due to the limitation of AOJ API")
                 continue
             testcases += [TestCase(
-                LabeledString(header['name'], testcase['in']),
-                LabeledString(header['name'], testcase['out']),
+                header['name'],
+                header['name'],
+                testcase['in'].encode(),
+                header['name'],
+                testcase['out'].encode(),
             )]
         return testcases
 

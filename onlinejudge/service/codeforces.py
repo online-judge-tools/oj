@@ -15,6 +15,7 @@ import bs4
 import requests
 
 import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
@@ -101,7 +102,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', self.get_url(), session=session)
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        samples = utils.SampleZipper()
+        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         for tag in soup.find_all('div', class_=re.compile('^(in|out)put$')):  # Codeforces writes very nice HTML :)
             log.debug('tag: %s', str(tag))
             assert len(list(tag.children))
@@ -115,7 +116,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                 else:
                     s += it.string
             s = s.lstrip()
-            samples.add(s, title.string)
+            samples.add(s.encode(), title.string)
         return samples.get()
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:

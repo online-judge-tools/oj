@@ -13,6 +13,7 @@ import bs4
 import requests
 
 import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
@@ -90,7 +91,7 @@ class TophProblem(onlinejudge.type.Problem):
         session = session or utils.new_default_session()
         resp = utils.request('GET', self.get_url(), session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        samples = utils.SampleZipper()
+        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         for case in soup.find('table', class_="samples").find('tbody').find_all('tr'):
             log.debug('case: %s', str(case))
             assert len(list(case.children))
@@ -99,12 +100,8 @@ class TophProblem(onlinejudge.type.Problem):
             assert output_pre.name == 'pre'
             assert re.search("^preSample.*Input$", input_pre.attrs['id'])
             assert re.search("^preSample.*Output$", output_pre.attrs['id'])
-            s = input_pre.get_text()
-            s = s.lstrip()
-            samples.add(s, "Input")
-            s = output_pre.get_text()
-            s = s.lstrip()
-            samples.add(s, "Output")
+            samples.add(input_pre.text.lstrip().encode(), "Input")
+            samples.add(output_pre.text.lstrip().encode(), "Output")
         return samples.get()
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:

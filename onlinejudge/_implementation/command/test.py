@@ -70,7 +70,7 @@ def test(args: 'argparse.Namespace') -> None:
             nonlocal is_printed_input
             if not is_printed_input:
                 is_printed_input = True
-                with open(it['in']) as inf:
+                with open(it['in'], 'rb') as inf:
                     log.emit('input:\n%s', utils.snip_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
 
         log.emit('')
@@ -82,7 +82,7 @@ def test(args: 'argparse.Namespace') -> None:
             answer_byte, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
             elapsed = end - begin
-            answer = answer_byte.decode()
+            answer = answer_byte.decode()  # TODO: the `answer` should be bytes, not str
             if slowest < elapsed:
                 slowest = elapsed
                 slowest_name = name
@@ -110,8 +110,8 @@ def test(args: 'argparse.Namespace') -> None:
                     log.failure(log.red('WA'))
                     print_input()
                     if not args.silent:
-                        log.emit('output:\n%s', utils.snip_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
-                        log.emit('expected:\n%s', utils.snip_large_file_content(correct, limit=40, head=20, tail=10, bold=True))
+                        log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+                        log.emit('expected:\n%s', utils.snip_large_file_content(correct.encode(), limit=40, head=20, tail=10, bold=True))
                     result = 'WA'
             elif args.mode == 'line':
                 answer_words = answer.splitlines()
@@ -135,7 +135,7 @@ def test(args: 'argparse.Namespace') -> None:
                 assert False
         else:
             if not args.silent:
-                log.emit(utils.snip_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
+                log.emit(utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
         if result == 'AC':
             log.success(log.green('AC'))
             ac_count += 1

@@ -15,7 +15,7 @@ import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch
 import onlinejudge.type
-from onlinejudge.type import LabeledString, TestCase
+from onlinejudge.type import TestCase
 
 
 class CSAcademyService(onlinejudge.type.Service):
@@ -92,8 +92,11 @@ class CSAcademyProblem(onlinejudge.type.Problem):
             inname = 'Input {}'.format(test_number)
             outname = 'Output {}'.format(test_number)
             samples += [TestCase(
-                LabeledString(inname, example_test['input']),
-                LabeledString(outname, example_test['output']),
+                'sample-{}'.format(test_number + 1),
+                inname,
+                example_test['input'].encode(),
+                outname,
+                example_test['output'].encode(),
             )]
         return samples
 
