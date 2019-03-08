@@ -303,13 +303,18 @@ class AtCoderProblem(onlinejudge.type.Problem):
         return self
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+        """
+        :raises Exception: if no such problem exists
+        """
+
         session = session or utils.new_default_session()
+
         # get
-        resp = _request('GET', self.get_url(type='beta'), session=session)
+        resp = _request('GET', self.get_url(type='beta'), raise_for_status=False, session=session)
         if _list_alert(resp):
-            # example message: "message: You cannot see this page."
             log.warning('are you logged in?')
-            return []
+        resp.raise_for_status()
+
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
@@ -404,12 +409,18 @@ class AtCoderProblem(onlinejudge.type.Problem):
         return None
 
     def get_input_format(self, session: Optional[requests.Session] = None) -> str:
+        """
+        :raises Exception: if no such problem exists
+        """
+
         session = session or utils.new_default_session()
+
         # get
-        resp = _request('GET', self.get_url(type='beta'), session=session)
+        resp = _request('GET', self.get_url(type='beta'), raise_for_status=False, session=session)
         if _list_alert(resp):
             log.warning('are you logged in?')
-            return ''
+        resp.raise_for_status()
+
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         for h3 in soup.find_all('h3'):
