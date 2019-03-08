@@ -138,8 +138,6 @@ $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
 
 ## FAQ
 
--   I cannot install this tool on my Windows machine. How should I do?
-    -   Use Windows Subsystem for Linux (WSL). If your Windows is too and WSL is not supported, you can use virtual machines, MinGW or Cygwin, but you should buy a new machine.
 -   Are there features to manage templates or snippets?
     -   No. They are not the responsibility of this tool. You should use plugins of your editor, like [thinca/vim-template](https://github.com/thinca/vim-template) or [Shougo/deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
 -   I usually make one directory per one contest (or, site). Is there a support for this style?

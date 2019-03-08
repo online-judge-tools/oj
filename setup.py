@@ -28,4 +28,9 @@ setup(
     url=version.__url__,
     license=version.__license__,
     description=version.__description__,
+    entry_points={
+        'console_scripts': [
+            'oj = onlinejudge._implementation.main:main'
+        ],
+    },
 )
