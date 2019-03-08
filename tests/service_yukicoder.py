@@ -1,10 +1,66 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from onlinejudge.service.yukicoder import YukicoderService
+from onlinejudge.service.yukicoder import YukicoderProblem, YukicoderService
+from onlinejudge.type import *
 
 
-class YukicoderTest(unittest.TestCase):
+class YukicoderProblemTest(unittest.TestCase):
+    def test_from_url(self):
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/9003').problem_no, 9003)
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/100').problem_id, 100)
+        self.assertEqual(YukicoderProblem.from_url('http://yukicoder.me/problems/no/123/').problem_no, 123)
+        self.assertEqual(YukicoderProblem.from_url('http://yukicoder.me/problems/123').problem_id, 123)
+
+    def test_donwload_sample_cases(self):
+        self.assertEqual(YukicoderProblem.from_url('http://yukicoder.me/problems/no/9000').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'yukicoder\n', output_name='サンプル1 出力', output_data=b'Hello World!\n'),
+        ])
+
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/400').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'<<<\n', output_name='サンプル1 出力', output_data=b'>>>\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'<>>\n', output_name='サンプル2 出力', output_data=b'<<>\n'),
+            TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'>>><<<\n', output_name='サンプル3 出力', output_data=b'>>><<<\n'),
+            TestCase(name='sample-4', input_name='サンプル4 入力', input_data=b'><<><<<><><\n', output_name='サンプル4 出力', output_data=b'><><>>><>><\n'),
+        ])
+
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/260').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'1 100\n', output_name='サンプル1 出力', output_data=b'40\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'114 514\n', output_name='サンプル2 出力', output_data=b'211\n'),
+            TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'1234 567890\n', output_name='サンプル3 出力', output_data=b'339733\n'),
+        ])
+
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/104').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'LR\n', output_name='サンプル1 出力', output_data=b'5\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'RLL\n', output_name='サンプル2 出力', output_data=b'12\n'),
+            TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'RLLRLRLRRRLRL\n', output_name='サンプル3 出力', output_data=b'12986\n'),
+            TestCase(name='sample-4', input_name='サンプル4 入力', input_data=b'\n', output_name='サンプル4 出力', output_data=b'1\n'),
+        ])
+
+    def test_donwload_sample_cases_issue_355(self):
+        # see https://github.com/kmyk/online-judge-tools/issues/355
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/649').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'15 3\n1 3\n1 4\n1 5\n2\n2\n1 10\n1 10\n1 1\n2\n1 3\n2\n1 1000\n2\n1 0\n2\n', output_name='サンプル1 出力', output_data=b'5\n-1\n4\n3\n10\n3\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'4 1\n1 10\n1 10\n2\n2\n', output_name='サンプル2 出力', output_data=b'10\n10\n'),
+            TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'4 2\n1 9\n1 10000000000000000\n1 90000000000000000\n2\n', output_name='サンプル3 出力', output_data=b'10000000000000000\n'),
+            TestCase(name='sample-4', input_name='サンプル4 入力', input_data=b'1 1\n2\n', output_name='サンプル4 出力', output_data=b'-1\n'),
+        ])
+
+    @unittest.expectedFailure
+    def test_donwload_sample_cases_issue_192(self):
+        # see https://github.com/kmyk/online-judge-tools/issues/192
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/750').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'6\n4 5\n3 7\n3 4\n-2 3\n9 1\n3 8\n', output_name='サンプル1 出力', output_data=b'9 1\n4 5\n3 4\n3 7\n3 8\n-2 3\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'3\n3 7\n1 1\n5 3\n', output_name='サンプル2 出力', output_data=b'5 3\n1 1\n3 7\n'),
+            TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'6\n1 1\n7 4\n0 5\n1 3\n-8 9\n5 1\n', output_name='サンプル3 出力', output_data=b'5 1\n7 4\n1 1\n1 3\n0 5\n-8 9\n'),
+        ])
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/751').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'3\n1 8 3\n2\n6 10\n', output_name='サンプル1 出力', output_data=b'5 72\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'2\n-1 1\n3\n-1 1 -1\n', output_name='サンプル2 出力', output_data=b'-1 1\n'),
+        ])
+
+
+class YukicoderOfficialAPITest(unittest.TestCase):
     def test_get_user_10(self):
         data = YukicoderService().get_user(id=10)
         self.assertIn('Id', data)

@@ -300,7 +300,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
-        for pre in soup.find_all('pre'):
+        for pre in soup.select('.sample pre'):
             log.debug('pre: %s', str(pre))
             it = self._parse_sample_tag(pre)
             if it is not None:
