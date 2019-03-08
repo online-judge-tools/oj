@@ -211,7 +211,7 @@ def remove_suffix(s: str, suffix: str) -> str:
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 
 
-def getter_with_load_details(name: str, type: Union[str, Type]) -> Callable:
+def getter_with_load_details(name: str, type: Union[str, type]) -> Callable:
     """
     :note: confirm that the type annotation `get_foo = getter_with_load_details("_foo", type=int)  # type: Callable[..., int]` is correct one
     :note: this cannot be a decorator, since mypy fails to recognize the types
