@@ -162,7 +162,6 @@ class AtCoderContest(object):
         self._contest_name_en = None  # type: Optional[str]
         self._duration = None  # type: Optional[datetime.timedelta]
         self._rated_range = None  # type: Optional[str]
-        self._rated_range = None  # type: Optional[str]
         self._can_participate = None  # type: Optional[str]
         self._penalty = None  # type: Optional[datetime.timedelta]
 
