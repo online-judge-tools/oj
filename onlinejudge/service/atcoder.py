@@ -269,6 +269,55 @@ class AtCoderContest(object):
         tbody = soup.find('tbody')
         return [AtCoderProblem._from_table_row(tr) for tr in tbody.find_all('tr')]
 
+    def iterate_submissions_with(self, me: bool = False, problem_id: Optional[str] = None, language_id: Optional[LanguageId] = None, status: Optional[str] = None, user_glob: Optional[str] = None, order: Optional[str] = None, desc: bool = False, lang: Optional[str] = None, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
+        """
+        :note: If you use certain combination of options, then the results may not correct when there are new submissions while crawling.
+        """
+        assert status in (None, 'AC', 'WA', 'TLE', 'MLE', 'RE', 'CE', 'QLE', 'OLE', 'IE', 'WJ', 'WR', 'Judging')
+        assert order in (None, 'created', 'score', 'source_length', 'time_consumption', 'memory_consumption')
+        if desc:
+            assert order is not None
+
+        base_url = 'https://atcoder.jp/contests/{}/submissions'.format(self.contest_id)
+        if me:
+            base_url += '/me'
+        params = {}
+        if problem_id is not None:
+            params['f.Task'] = problem_id
+        if language_id is not None:
+            params['f.Language'] = language_id
+        if status is not None:
+            params['f.Status'] = status
+        if user_glob is not None:
+            params['f.User'] = user_glob
+        if order is not None:
+            params['orderBy'] = order
+        if desc:
+            params['desc'] = 'true'
+
+        # get
+        session = session or utils.new_default_session()
+        for page in itertools.count(1):
+            params_page = ({'page': str(page)} if page >= 2 else {})
+            url = base_url + '?' + urllib.parse.urlencode({**params, **params_page})
+            resp = _request('GET', url, session=session)
+
+            # parse
+            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+            tbodies = soup.find_all('tbody')
+            if len(tbodies) == 0:
+                break  # No Submissions
+            assert len(tbodies) == 1
+            tbody = tbodies[0]
+            for tr in tbody.find_all('tr'):
+                yield AtCoderSubmission._from_table_row(tr, contest_id=self.contest_id)
+
+    def iterate_submissions(self, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
+        """
+        :note: in implementation, use "ORDER BY created DESC" to list all submissions even when there are new submissions
+        """
+        yield from self.iterate_submissions_with(order='created', desc=False, session=session)
+
 
 class AtCoderProblem(onlinejudge.type.Problem):
     """
@@ -534,6 +583,12 @@ class AtCoderProblem(onlinejudge.type.Problem):
     get_memory_limit_byte = utils.getter_with_load_details('_memory_limit_byte', type=int)  # type: Callable[..., int]
     get_alphabet = utils.getter_with_load_details('_alphabet', type=str)  # type: Callable[..., str]
 
+    def iterate_submissions(self, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
+        """
+        :note: in implementation, use "ORDER BY created DESC" to list all submissions even when there are new submissions
+        """
+        yield from self.get_contest().iterate_submissions_with(problem_id=self.problem_id, order='created', desc=False, session=session)
+
 
 class AtCoderSubmission(onlinejudge.type.Submission):
     """
@@ -557,6 +612,28 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._compile_error = None  # type: Optional[str]
         self._test_sets = None  # type: Optional[List[AtCoderSubmissionTestSet]]
         self._test_cases = None  # type: Optional[List[AtCoderSubmissionTestCaseResult]]
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag, contest_id: str) -> 'AtCoderSubmission':
+        tds = tr.find_all('td')
+        assert len(tds) in (8, 10)
+
+        self = cls.from_url('https://atcoder.jp' + tds[-1].find('a')['href'])
+        problem = AtCoderProblem.from_url('https://atcoder.jp' + tds[1].find('a')['href'])
+        assert self is not None
+        assert problem is not None
+
+        self._submission_time = datetime.datetime.strptime(tds[0].text, '%Y-%m-%d %H:%M:%S+0900').replace(tzinfo=utils.tzinfo_jst)
+        self._problem_id = problem.problem_id
+        self._user_id = tds[2].find_all('a')[0]['href'].split('/')[-1]
+        self._language_name = tds[3].text
+        self._score = int(tds[4].text)
+        self._code_size = int(utils.remove_suffix(tds[5].text, ' Byte'))
+        self._status = tds[6].text
+        if len(tds) == 10:
+            self._exec_time_msec = int(utils.remove_suffix(tds[7].text, ' ms'))
+            self._memory_byte = int(utils.remove_suffix(tds[8].text, ' KB')) * 1000
+        return self
 
     @classmethod
     def from_url(cls, s: str, problem_id: Optional[str] = None) -> Optional['AtCoderSubmission']:
