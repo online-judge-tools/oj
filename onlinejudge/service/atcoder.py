@@ -253,17 +253,8 @@ class AtCoderContest(object):
         assert m
         self._penalty = datetime.timedelta(minutes=int(m.group(2)))
 
-    def get_contest_name(self, lang: Optional[str] = None, session: Optional[requests.Session] = None) -> str:
-        if lang is None:
-            if self._contest_name_en is not None:
-                return self._contest_name_en
-            elif self._contest_name_ja is not None:
-                return self._contest_name_ja
-            else:
-                self._load_details(lang='en', session=session)
-                assert self._contest_name_en is not None
-                return self._contest_name_en
-        elif lang == 'en':
+    def get_name(self, lang: str = 'en', session: Optional[requests.Session] = None) -> str:
+        if lang == 'en':
             if self._contest_name_en is None:
                 self._load_details(lang='en', session=session)
             assert self._contest_name_en is not None
