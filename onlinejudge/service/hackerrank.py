@@ -70,7 +70,7 @@ class HackerRankService(onlinejudge.type.Service):
         return 'https://www.hackerrank.com/'
 
     def get_name(self) -> str:
-        return 'hackerrank'
+        return 'HackeRrank'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['HackerRankService']:

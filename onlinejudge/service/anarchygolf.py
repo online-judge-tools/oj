@@ -22,7 +22,7 @@ class AnarchyGolfService(onlinejudge.type.Service):
         return 'http://golf.shinh.org/'
 
     def get_name(self) -> str:
-        return 'anarchygolf'
+        return 'Anarchy Golf'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['AnarchyGolfService']:

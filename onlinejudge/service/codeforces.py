@@ -62,7 +62,7 @@ class CodeforcesService(onlinejudge.type.Service):
         return 'https://codeforces.com/'
 
     def get_name(self) -> str:
-        return 'codeforces'
+        return 'Codeforces'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['CodeforcesService']:
