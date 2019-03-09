@@ -1,6 +1,6 @@
 language: python
 python:
-    - 3.5
+    - 3.5.2
     - 3.6
 install:
     - pip install -e .[dev,docs]
