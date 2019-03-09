@@ -606,7 +606,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             assert self._score_checked
         return self._score
 
-    get_task_name = utils.getter_with_load_details('_task_name', type=str)  # type: Callable[..., str]
+    get_name = utils.getter_with_load_details('_task_name', type=str)  # type: Callable[..., str]
     get_time_limit_msec = utils.getter_with_load_details('_time_limit_msec', type=int)  # type: Callable[..., int]
     get_memory_limit_byte = utils.getter_with_load_details('_memory_limit_byte', type=int)  # type: Callable[..., int]
     get_alphabet = utils.getter_with_load_details('_alphabet', type=str)  # type: Callable[..., str]
