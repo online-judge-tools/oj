@@ -10,7 +10,7 @@ the module for AtCoder (https://atcoder.jp/)
 
 :note: There is an unofficial API https://github.com/kenkoooo/AtCoderProblems
 
-:note: Some methods not inhereted from classes :py:mod:`onlinejudge.type` may be modified in future, because the specification is not fixed yet.
+:note: Some methods not inherited from classes :py:mod:`onlinejudge.type` may be modified in future, because the specification is not fixed yet.
 """
 
 import datetime
