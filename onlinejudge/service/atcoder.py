@@ -326,15 +326,20 @@ class AtCoderContest(object):
             url = base_url + '?' + urllib.parse.urlencode({**params, **params_page})
             resp = _request('GET', url, session=session)
 
-            # parse
-            soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-            tbodies = soup.find_all('tbody')
-            if len(tbodies) == 0:
-                break  # No Submissions
-            assert len(tbodies) == 1
-            tbody = tbodies[0]
-            for tr in tbody.find_all('tr'):
-                yield AtCoderSubmission._from_table_row(tr, contest_id=self.contest_id)
+            submissions = list(self._iterate_submissions_from_response(resp))
+            if not submissions:
+                break
+            yield from submissions
+
+    def _iterate_submissions_from_response(self, resp: requests.Response) -> Generator['AtCoderSubmission', None, None]:
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        tbodies = soup.find_all('tbody')
+        if len(tbodies) == 0:
+            return  # No Submissions
+        assert len(tbodies) == 1
+        tbody = tbodies[0]
+        for tr in tbody.find_all('tr'):
+            yield AtCoderSubmission._from_table_row(tr, contest_id=self.contest_id)
 
     def iterate_submissions(self, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
         """
@@ -533,7 +538,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
             languages += [Language(option.attrs['value'], option.string)]
         return languages
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> 'AtCoderSubmission':
         """
         :raises NotLoggedInError:
         :raises SubmissionError:
@@ -567,10 +572,9 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
         # result
         if '/submissions/me' in resp.url:
-            # example: https://practice.contest.atcoder.jp/submissions/me#32174
-            # CAUTION: this URL is not a URL of the submission
-            log.success('success: result: %s', resp.url)
-            return utils.DummySubmission(resp.url, problem=self)
+            submission = next(AtCoderContest(self.contest_id)._iterate_submissions_from_response(resp))
+            log.success('success: result: %s', submission.get_url())
+            return submission
         else:
             raise SubmissionError('it may be a rate limit')
 
