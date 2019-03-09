@@ -157,11 +157,13 @@ class AtCoderContest(object):
         self.contest_id = contest_id
 
         # NOTE: some fields remain undefined, comparing `_from_table_row`
-        self._start_time_url = None  # type: Optional[str]
+        self._start_time = None  # type: Optional[datetime.datetime]
         self._contest_name_ja = None  # type: Optional[str]
         self._contest_name_en = None  # type: Optional[str]
-        self._duration_text = None  # type: Optional[str]
+        self._duration = None  # type: Optional[datetime.timedelta]
         self._rated_range = None  # type: Optional[str]
+        self._can_participate = None  # type: Optional[str]
+        self._penalty = None  # type: Optional[datetime.timedelta]
 
     def get_url(self, type: Optional[str] = None, lang: Optional[str] = None) -> str:
         if type is None or type == 'beta':
@@ -208,55 +210,75 @@ class AtCoderContest(object):
         assert contest_path.startswith('/contests/')
         contest_id = contest_path[len('/contests/'):]
         self = AtCoderContest(contest_id)
-        self._start_time_url = anchors[0]['href']
+        self._start_time = self._parse_start_time(anchors[0]['href'])
         if lang == 'ja':
             self._contest_name_ja = anchors[1].text
         elif lang == 'en':
             self._contest_name_en = anchors[1].text
         else:
             assert False
-        self._duration_text = tds[2].text
+        hours, minutes = map(int, tds[2].text.split(':'))
+        self._duration = datetime.timedelta(hours=hours, minutes=minutes)
         self._rated_range = tds[3].text
         return self
 
-    def get_start_time(self) -> datetime.datetime:
-        if self._start_time_url is None:
-            raise NotImplementedError
+    def _parse_start_time(self, url: str) -> datetime.datetime:
         # TODO: we need to use an ISO-format parser
-        query = urllib.parse.parse_qs(urllib.parse.urlparse(self._start_time_url).query)
+        query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
         assert len(query['iso']) == 1
         assert query['p1'] == ['248']  # means JST
         return datetime.datetime.strptime(query['iso'][0], '%Y%m%dT%H%M').replace(tzinfo=utils.tzinfo_jst)
 
-    def get_contest_name(self, lang: Optional[str] = None) -> str:
+    def _load_details(self, session: Optional[requests.Session] = None, lang: Optional[str] = None):
+        session = session or utils.new_default_session()
+        resp = _request('GET', self.get_url(type='beta', lang=lang), session=session)
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+
+        contest_name, _, _ = soup.find('title').text.rpartition(' - ')
+        contest_duration = soup.find('small', class_='contest-duration')
+        self._start_time, end_time = [self._parse_start_time(a['href']) for a in contest_duration.find_all('a')]
+        self._duration = end_time - self._start_time
+        if lang == 'en':
+            self._contest_name_en = contest_name
+        elif lang == 'ja':
+            self._contest_name_ja = contest_name
+        else:
+            assert False
+        _, _, self._can_participate = soup.find('span', text=re.compile(r'^(Can Participate|参加対象): ')).text.partition(': ')
+        _, _, self._rated_range = soup.find('span', text=re.compile(r'^(Rated Range|Rated対象): ')).text.partition(': ')
+        penalty_text = soup.find('span', text=re.compile(r'^(Penalty|ペナルティ): ')).text
+        m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes|分)', penalty_text)
+        assert m
+        self._penalty = datetime.timedelta(minutes=int(m.group(2)))
+
+    def get_contest_name(self, lang: Optional[str] = None, session: Optional[requests.Session] = None) -> str:
         if lang is None:
             if self._contest_name_en is not None:
                 return self._contest_name_en
             elif self._contest_name_ja is not None:
                 return self._contest_name_ja
             else:
-                raise NotImplementedError
+                self._load_details(lang='en', session=session)
+                assert self._contest_name_en is not None
+                return self._contest_name_en
         elif lang == 'en':
             if self._contest_name_en is None:
-                raise NotImplementedError
+                self._load_details(lang='en', session=session)
+            assert self._contest_name_en is not None
             return self._contest_name_en
         elif lang == 'ja':
             if self._contest_name_ja is None:
-                raise NotImplementedError
+                self._load_details(lang='ja', session=session)
+            assert self._contest_name_ja is not None
             return self._contest_name_ja
         else:
             assert False
 
-    def get_duration(self) -> datetime.timedelta:
-        if self._duration_text is None:
-            raise NotImplementedError
-        hours, minutes = map(int, self._duration_text.split(':'))
-        return datetime.timedelta(hours=hours, minutes=minutes)
-
-    def get_rated_range(self) -> str:
-        if self._rated_range is None:
-            raise NotImplementedError
-        return self._rated_range
+    get_start_time = utils.getter_with_load_details('_start_time', type=datetime.datetime)  # type: Callable[..., datetime.datetime]
+    get_duration = utils.getter_with_load_details('_duration', type=datetime.timedelta)  # type: Callable[..., datetime.timedelta]
+    get_rated_range = utils.getter_with_load_details('_rated_range', type=str)  # type: Callable[..., str]
+    get_can_participate = utils.getter_with_load_details('_can_participate', type=str)  # type: Callable[..., str]
+    get_penalty = utils.getter_with_load_details('_penalty', type=datetime.timedelta)  # type: Callable[..., datetime.timedelta]
 
     def list_problems(self, session: Optional[requests.Session] = None) -> List['AtCoderProblem']:
         # get

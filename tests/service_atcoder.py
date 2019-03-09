@@ -33,6 +33,29 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(AtCoderContest.from_url('https://atcoder.jp/contests/agc030').contest_id, 'agc030')
         self.assertIsNone(AtCoderContest.from_url('https://atcoder.jp/contests/'))
 
+    def test_load_details(self):
+        contest = AtCoderContest.from_url('https://atcoder.jp/contests/keyence2019')
+        self.assertEqual(contest.get_contest_name(lang='en'), 'KEYENCE Programming Contest 2019')
+        self.assertEqual(contest.get_contest_name(lang='ja'), 'キーエンス プログラミング コンテスト 2019')
+        self.assertEqual(contest.get_start_time().year, 2019)
+        self.assertEqual(contest.get_start_time().month, 1)
+        self.assertEqual(contest.get_start_time().day, 13)
+        self.assertEqual(contest.get_duration().total_seconds(), 2 * 60 * 60)
+        self.assertEqual(contest.get_can_participate(), 'All')
+        self.assertEqual(contest.get_rated_range(), ' ~ 2799')
+        self.assertEqual(contest.get_penalty().total_seconds(), 5 * 60)
+
+        contest = AtCoderContest.from_url('https://atcoder.jp/contests/dp')
+        self.assertEqual(contest.get_contest_name(lang='ja'), 'Educational DP Contest / DP まとめコンテスト')
+        self.assertEqual(contest.get_contest_name(lang='en'), 'Educational DP Contest')
+        self.assertEqual(contest.get_start_time().year, 2019)
+        self.assertEqual(contest.get_start_time().month, 1)
+        self.assertEqual(contest.get_start_time().day, 6)
+        self.assertEqual(contest.get_duration().total_seconds(), 5 * 60 * 60)
+        self.assertEqual(contest.get_can_participate(), 'All')
+        self.assertEqual(contest.get_rated_range(), '-')
+        self.assertEqual(contest.get_penalty().total_seconds(), 5 * 60)
+
     def test_list_problems(self):
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/agc028')
         problems = contest.list_problems()
