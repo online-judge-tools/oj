@@ -13,7 +13,6 @@ import onlinejudge._implementation.utils as utils
 from onlinejudge._implementation.command.code_statistics import code_statistics
 from onlinejudge._implementation.command.download import download
 from onlinejudge._implementation.command.generate_output import generate_output
-from onlinejudge._implementation.command.generate_scanner import generate_scanner
 from onlinejudge._implementation.command.get_standings import get_standings
 from onlinejudge._implementation.command.login import login
 from onlinejudge._implementation.command.split_input import split_input, split_input_auto_footer
@@ -148,34 +147,6 @@ tips:
     subparser.add_argument('--json', action='store_true')
     subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
 
-    # generate scanner
-    subparser = subparsers.add_parser('generate-scanner', aliases=['g/s'], help='generate input scanner  (experimental)', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
-supported services:
-  AtCoder
-
-  (yukicoder has been removed)
-  (HackerRank has been removed)
-
-example:
-  http://agc001.contest.atcoder.jp/tasks/agc001_a
-  input format:
-    N
-    L_1 L_2 \dots L_{2N}
-  generated code:
-    int N; cin >> N;
-    vector<int> L(2*N); REPEAT (i,2*N) cin >> L[i];
-
-tips:
-  in Vim, the command "r! oj g/s -s http://agc001.contest.atcoder.jp/tasks/agc001_a" inserts above generated code.
-  in Emacs, the command "C-u M-! oj g/s -s http://agc001.contest.atcoder.jp/tasks/agc001_a" does.
-  I recommend that map it to some command, like "nnoremap <space>gs :r! oj generate-scanner --silent --repeat-macro=repeat ",
-               and use some plugin for templates, e.g. https://github.com/thinca/vim-template.
-''')
-    subparser.add_argument('--repeat-macro', help='use repeat macro with given name')
-    subparser.add_argument('--scanf', action='store_true', help='use scanf instead of cin')
-    subparser.add_argument('-s', '--silent', action='store_true')
-    subparser.add_argument('url')
-
     # generate output
     subparser = subparsers.add_parser('generate-output', aliases=['g/o'], help='generate output files form input and reference implementation', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 format string for --format:
@@ -293,8 +264,6 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         test(args)
     elif args.subcommand in ['test-reactive', 't/r']:
         test_reactive(args)
-    elif args.subcommand in ['generate-scanner', 'g/s']:
-        generate_scanner(args)
     elif args.subcommand in ['generate-output', 'g/o']:
         generate_output(args)
     elif args.subcommand in ['split-input', 's/i']:
