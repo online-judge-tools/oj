@@ -39,7 +39,7 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
         self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
         # parse

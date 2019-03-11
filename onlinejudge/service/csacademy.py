@@ -41,7 +41,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
         self.task_name = task_name
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         base_url = self.get_url()
 
         # get csrftoken

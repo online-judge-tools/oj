@@ -48,7 +48,7 @@ class AOJProblem(onlinejudge.type.Problem):
         self.problem_id = problem_id
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
         # get samples via the official API
         # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2Fsamples%2F%7BproblemId%7D_GET
         url = 'https://judgedat.u-aizu.ac.jp/testcases/samples/{}'.format(self.problem_id)
@@ -65,7 +65,7 @@ class AOJProblem(onlinejudge.type.Problem):
         return samples
 
     def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        session = session or utils.new_default_session()
+        session = session or utils.get_default_session()
 
         # get header
         # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2Fheader_GET
