@@ -30,7 +30,7 @@ class AOJService(onlinejudge.type.Service):
         return 'http://judge.u-aizu.ac.jp/onlinejudge/'
 
     def get_name(self) -> str:
-        return 'aoj'
+        return 'Aizu Online Judge'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['AOJService']:

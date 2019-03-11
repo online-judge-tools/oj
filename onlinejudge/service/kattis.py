@@ -29,7 +29,7 @@ class KattisService(onlinejudge.type.Service):
         return 'http://open.kattis.org/'
 
     def get_name(self) -> str:
-        return 'kattis'
+        return 'Kattis'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['KattisService']:

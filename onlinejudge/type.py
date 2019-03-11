@@ -25,6 +25,15 @@ class Service(object):
         raise NotImplementedError
 
     def get_name(self) -> str:
+        """
+        example:
+
+        -   `AtCoder`
+        -   `Codeforces`
+        -   `PKU JudgeOnline`
+
+        :note: If you want something like identifier (e.g. `atcoder`, `codeforces` or `poj`), you can use a domain obtained from :py:meth:`get_url`.
+        """
         raise NotImplementedError
 
     @classmethod

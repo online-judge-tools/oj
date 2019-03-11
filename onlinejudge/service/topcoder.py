@@ -60,7 +60,7 @@ class TopcoderService(onlinejudge.type.Service):
         return 'https://www.topcoder.com/'
 
     def get_name(self) -> str:
-        return 'topcoder'
+        return 'Topcoder'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['TopcoderService']:

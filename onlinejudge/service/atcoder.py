@@ -101,7 +101,7 @@ class AtCoderService(onlinejudge.type.Service):
         return 'https://atcoder.jp/'
 
     def get_name(self) -> str:
-        return 'atcoder'
+        return 'AtCoder'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['AtCoderService']:

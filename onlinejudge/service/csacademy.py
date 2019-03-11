@@ -23,7 +23,7 @@ class CSAcademyService(onlinejudge.type.Service):
         return 'https://csacademy.com/'
 
     def get_name(self) -> str:
-        return 'csacademy'
+        return 'CS Academy'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['CSAcademyService']:

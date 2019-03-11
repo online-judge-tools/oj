@@ -22,7 +22,7 @@ class POJService(onlinejudge.type.Service):
         return 'http://poj.org/'
 
     def get_name(self) -> str:
-        return 'poj'
+        return 'PKU JudgeOnline'
 
     @classmethod
     def from_url(cls, url: str) -> Optional['POJService']:
