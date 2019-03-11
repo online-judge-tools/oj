@@ -22,7 +22,7 @@ class AtCoderSerivceTest(unittest.TestCase):
         self.assertEqual(contest.get_start_time().year, 2014)
         self.assertEqual(contest.get_start_time().month, 3)
         self.assertEqual(contest.get_start_time().day, 2)
-        self.assertEqual(contest.get_contest_name(), '東京大学プログラミングコンテスト2013')
+        self.assertEqual(contest.get_name(), '東京大学プログラミングコンテスト2013')
         self.assertEqual(contest.get_duration().total_seconds(), 5 * 60 * 60)
         self.assertEqual(contest.get_rated_range(), 'All')
 
@@ -35,8 +35,8 @@ class AtCoderContestTest(unittest.TestCase):
 
     def test_load_details(self):
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/keyence2019')
-        self.assertEqual(contest.get_contest_name(lang='en'), 'KEYENCE Programming Contest 2019')
-        self.assertEqual(contest.get_contest_name(lang='ja'), 'キーエンス プログラミング コンテスト 2019')
+        self.assertEqual(contest.get_name(lang='en'), 'KEYENCE Programming Contest 2019')
+        self.assertEqual(contest.get_name(lang='ja'), 'キーエンス プログラミング コンテスト 2019')
         self.assertEqual(contest.get_start_time().year, 2019)
         self.assertEqual(contest.get_start_time().month, 1)
         self.assertEqual(contest.get_start_time().day, 13)
@@ -46,8 +46,8 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(contest.get_penalty().total_seconds(), 5 * 60)
 
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/dp')
-        self.assertEqual(contest.get_contest_name(lang='ja'), 'Educational DP Contest / DP まとめコンテスト')
-        self.assertEqual(contest.get_contest_name(lang='en'), 'Educational DP Contest')
+        self.assertEqual(contest.get_name(lang='ja'), 'Educational DP Contest / DP まとめコンテスト')
+        self.assertEqual(contest.get_name(lang='en'), 'Educational DP Contest')
         self.assertEqual(contest.get_start_time().year, 2019)
         self.assertEqual(contest.get_start_time().month, 1)
         self.assertEqual(contest.get_start_time().day, 6)
@@ -61,7 +61,7 @@ class AtCoderContestTest(unittest.TestCase):
         problems = contest.list_problems()
         self.assertEqual(len(problems), 7)
         self.assertEqual(problems[0].get_alphabet(), 'A')
-        self.assertEqual(problems[0].get_task_name(), 'Two Abbreviations')
+        self.assertEqual(problems[0].get_name(), 'Two Abbreviations')
         self.assertEqual(problems[0].get_time_limit_msec(), 2000)
         self.assertEqual(problems[0].get_memory_limit_byte(), 1024 * 1000 * 1000)
         self.assertEqual(problems[5].get_alphabet(), 'F')
@@ -89,7 +89,7 @@ class AtCoderProblemTest(unittest.TestCase):
     def test_load_details(self):
         problem = AtCoderProblem.from_url('https://atcoder.jp/contests/abc118/tasks/abc118_a')
         self.assertEqual(problem.get_alphabet(), 'A')
-        self.assertEqual(problem.get_task_name(), 'B +/- A')
+        self.assertEqual(problem.get_name(), 'B +/- A')
         self.assertEqual(problem.get_time_limit_msec(), 2000)
         self.assertEqual(problem.get_memory_limit_byte(), 1024 * 1000 * 1000)
         self.assertEqual(problem.get_score(), 100)
