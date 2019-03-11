@@ -45,7 +45,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   HackerRank
     -   Topcoder (Marathon Match)
     -   Toph (Problem Archive)
--   Generate scanner for input  (experimental)
+-   ~~Generate scanner for input~~  (removed, use [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools))
     -   AtCoder
     -   yukicoder
 -   Test your solution

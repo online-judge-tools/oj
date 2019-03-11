@@ -138,5 +138,16 @@ class YukicoderOfficialAPITest(unittest.TestCase):
         self.assertEqual(data[3]['作問者/url'], '/users/4')
 
 
+class YukicoderProblemGetInputFormatTest(unittest.TestCase):
+    def test_normal(self):
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/1').get_input_format(), '\\(N\\)\n\\(C\\)\n\\(V\\)\n\\(S_1\\ S_2\\ S_3\\ \\dots\\ S_V\\)\n\\(T_1\\ T_2\\ T_3\\ \\dots\\ T_V\\)\n\\(Y_1\\ Y_2\\ Y_3\\ \\dots\\ Y_V\\)\n\\(M_1\\ M_2\\ M_3\\ \\dots\\ M_V\\)\n')
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/2').get_input_format(), 'N\n')
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/3').get_input_format(), 'N\n')
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/128').get_input_format(), 'N\nM')
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/256').get_input_format(), '$N$\n')
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/512').get_input_format(), '$X$ $Y$\n$N$\n$A_1$ $\\cdots$ $A_N$\n')
+        self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/777').get_input_format(), '$N$\n$A_1$ $B_1$ $C_1$\n$A_2$ $B_2$ $C_2$\n…\n$A_N$ $B_N$ $C_N$\n')
+
+
 if __name__ == '__main__':
     unittest.main()
