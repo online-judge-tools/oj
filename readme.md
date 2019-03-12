@@ -136,6 +136,46 @@ $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
 [+] saved to: test/sample-4.out
 ```
 
+## How to use as a library
+
+Read the documents: <https://online-judge-tools.readthedocs.io/en/master/>
+
+## Example to use as a library
+
+The next code lists the shortest submissions for problems of AtCoder Beginner Contest XXX.
+
+``` python
+#!/usr/bin/env python3
+from onlinejudge.service.atcoder import *
+for contest in AtCoderService().iterate_contests():
+    if not contest.contest_id.startswith('abc'):
+        for problem in contest.list_problems():
+            submission = next(problem.iterate_submissions_where(status='AC', order='source_length'))
+            problem_full_name = '{}: {} - {}'.format(contest.get_name(), problem.get_alphabet(), problem.get_name())
+            shortest_info = '({} byte, {})'.format(submission.get_code_size(), submission.get_language_name())
+            print(problem_full_name.ljust(60), submission.get_user_id().ljust(12), shortest_info)
+```
+
+Example output:
+
+```
+AtCoder Beginner Contest 121: A - White Cells                kotatsugame  (26 byte, Perl6 (rakudo-star 2016.01))
+AtCoder Beginner Contest 121: B - Can you solve this?        kotatsugame  (49 byte, Octave (4.0.2))
+AtCoder Beginner Contest 121: C - Energy Drink Collector     x20          (54 byte, Perl (v5.18.2))
+AtCoder Beginner Contest 121: D - XOR World                  climpet      (40 byte, Perl (v5.18.2))
+AtCoder Beginner Contest 120: A - Favorite Sound             kotatsugame  (25 byte, Awk (mawk 1.3.3))
+AtCoder Beginner Contest 120: B - K-th Common Divisor        n4o847       (35 byte, Awk (mawk 1.3.3))
+AtCoder Beginner Contest 120: C - Unification                kotatsugame  (32 byte, Octave (4.0.2))
+AtCoder Beginner Contest 120: D - Decayed Bridges            x20          (154 byte, Perl (v5.18.2))
+AtCoder Beginner Contest 119: A - Still TBD                  morio__      (22 byte, Sed (GNU sed 4.2.2))
+AtCoder Beginner Contest 119: B - Digital Gifts              n4o847       (31 byte, Perl (v5.18.2))
+AtCoder Beginner Contest 119: C - Synthetic Kadomatsu        kotatsugame  (135 byte, Perl (v5.18.2))
+AtCoder Beginner Contest 119: D - Lazy Faith                 kotatsugame  (179 byte, Octave (4.0.2))
+AtCoder Beginner Contest 118: A - B +/- A                    n4o847       (19 byte, Awk (mawk 1.3.3))
+AtCoder Beginner Contest 118: B - Foods Loved by Everyone    kotatsugame  (37 byte, Perl6 (rakudo-star 2016.01))
+...
+```
+
 ## FAQ
 
 -   I cannot install this tool on my Windows machine. How should I do?
