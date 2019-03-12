@@ -10,7 +10,6 @@ import onlinejudge
 import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
-from onlinejudge._implementation.command.code_statistics import code_statistics
 from onlinejudge._implementation.command.download import download
 from onlinejudge._implementation.command.generate_output import generate_output
 from onlinejudge._implementation.command.get_standings import get_standings
@@ -230,11 +229,6 @@ example:
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('judge', help='judge program using standard I/O')
 
-    # code statistics
-    subparser = subparsers.add_parser('code-statistics', aliases=['c/s'], help='print the code statistics used in Anarchy Golf', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
-''')
-    subparser.add_argument('file')
-
     # get standings
     subparser = subparsers.add_parser('get-standings', help='get and print the standings', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 supported services:
@@ -268,8 +262,6 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         generate_output(args)
     elif args.subcommand in ['split-input', 's/i']:
         split_input(args)
-    elif args.subcommand in ['code-statistics', 'c/s']:
-        code_statistics(args)
     elif args.subcommand == 'get-standings':
         get_standings(args)
     else:
