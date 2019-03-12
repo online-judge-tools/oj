@@ -608,6 +608,9 @@ class AtCoderProblem(onlinejudge.type.Problem):
         """
         yield from self.get_contest().iterate_submissions_where(problem_id=self.problem_id, order='created', desc=False, session=session)
 
+    def iterate_submissions_where(self, **kwargs) -> Generator['AtCoderSubmission', None, None]:
+        yield from self.get_contest().iterate_submissions_where(problem_id=self.problem_id, **kwargs)
+
 
 class AtCoderSubmission(onlinejudge.type.Submission):
     """
