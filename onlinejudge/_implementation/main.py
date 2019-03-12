@@ -164,7 +164,7 @@ tips:
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
 
     # split input
-    subparser = subparsers.add_parser('split-input', aliases=['s/i'], help='split a input file which contains many cases, using your implementation', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+    subparser = subparsers.add_parser('split-input', help='split a input file which contains many cases, using your implementation  (experimental)', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 format string for --output:
   %i                    index
 
@@ -230,7 +230,7 @@ example:
     subparser.add_argument('judge', help='judge program using standard I/O')
 
     # get standings
-    subparser = subparsers.add_parser('get-standings', help='get and print the standings', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+    subparser = subparsers.add_parser('get-standings', help='get and print the standings  (experimental)', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 supported services:
   Topcoder (Marathon Match)
 ''')
@@ -260,7 +260,7 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         test_reactive(args)
     elif args.subcommand in ['generate-output', 'g/o']:
         generate_output(args)
-    elif args.subcommand in ['split-input', 's/i']:
+    elif args.subcommand in 'split-input':
         split_input(args)
     elif args.subcommand == 'get-standings':
         get_standings(args)
