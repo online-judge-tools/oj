@@ -284,9 +284,11 @@ class AtCoderContest(object):
         tbody = soup.find('tbody')
         return [AtCoderProblem._from_table_row(tr) for tr in tbody.find_all('tr')]
 
-    def iterate_submissions_with(self, me: bool = False, problem_id: Optional[str] = None, language_id: Optional[LanguageId] = None, status: Optional[str] = None, user_glob: Optional[str] = None, order: Optional[str] = None, desc: bool = False, lang: Optional[str] = None, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
+    def iterate_submissions_where(self, me: bool = False, problem_id: Optional[str] = None, language_id: Optional[LanguageId] = None, status: Optional[str] = None, user_glob: Optional[str] = None, order: Optional[str] = None, desc: bool = False, lang: Optional[str] = None, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
         """
         :note: If you use certain combination of options, then the results may not correct when there are new submissions while crawling.
+        :param status: must be one of `AC`, `WA`, `TLE`, `MLE`, `RE`, `CLE`, `OLE`, `IE`, `WJ`, `WR`, or `Judging`
+        :param order: must be one of `created`, `score`, `source_length`, `time_consumption`, or `memory_consumption`
         """
         assert status in (None, 'AC', 'WA', 'TLE', 'MLE', 'RE', 'CE', 'QLE', 'OLE', 'IE', 'WJ', 'WR', 'Judging')
         assert order in (None, 'created', 'score', 'source_length', 'time_consumption', 'memory_consumption')
@@ -336,7 +338,7 @@ class AtCoderContest(object):
         """
         :note: in implementation, use "ORDER BY created DESC" to list all submissions even when there are new submissions
         """
-        yield from self.iterate_submissions_with(order='created', desc=False, session=session)
+        yield from self.iterate_submissions_where(order='created', desc=False, session=session)
 
 
 class AtCoderProblem(onlinejudge.type.Problem):
@@ -606,7 +608,10 @@ class AtCoderProblem(onlinejudge.type.Problem):
         """
         :note: in implementation, use "ORDER BY created DESC" to list all submissions even when there are new submissions
         """
-        yield from self.get_contest().iterate_submissions_with(problem_id=self.problem_id, order='created', desc=False, session=session)
+        yield from self.get_contest().iterate_submissions_where(problem_id=self.problem_id, order='created', desc=False, session=session)
+
+    def iterate_submissions_where(self, **kwargs) -> Generator['AtCoderSubmission', None, None]:
+        yield from self.get_contest().iterate_submissions_where(problem_id=self.problem_id, **kwargs)
 
 
 class AtCoderSubmission(onlinejudge.type.Submission):
