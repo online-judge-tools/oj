@@ -260,7 +260,7 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         test_reactive(args)
     elif args.subcommand in ['generate-output', 'g/o']:
         generate_output(args)
-    elif args.subcommand in 'split-input':
+    elif args.subcommand == 'split-input':
         split_input(args)
     elif args.subcommand == 'get-standings':
         get_standings(args)
