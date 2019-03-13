@@ -52,7 +52,6 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 -   Test your solution for reactive problem
 -   Generate output files from input and reference implementation
 -   Split an input file with many cases to files
--   Print the code statistics used in Anarchy Golf
 
 ## How to install
 
