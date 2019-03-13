@@ -164,6 +164,17 @@ not conflicted:
 -   [FakePsyho/mmstats](https://github.com/FakePsyho/mmstats) for Topcoder Marathon Match
 -   <https://community.topcoder.com/tc?module=Static&d1=applet&d2=plugins>
 
+## Authors
+
+-   owner: [@kmyk](https://github.com/kmyk) (AtCoder: [kimiyuki](https://atcoder.jp/users/kimiyuki), Codeforces: [kimiyuki](https://codeforces.com/profile/kimiyuki))
+-   collaborator: [@fukatani](https://github.com/fukatani) (AtCoder: [ryoryoryo111](https://atcoder.jp/users/ryoryoryo111))
+
+Also, patches are used sent from
+[@kjnh10](https://github.com/kjnh10),
+[@hachi-88](https://github.com/hachi-88),
+[@Pachicobue](https://github.com/Pachicobue),
+and [@kfaRabi](https://github.com/kfaRabi).
+
 ## License
 
 MIT License
