@@ -231,7 +231,8 @@ class AtCoderContest(object):
         assert query['p1'] == ['248']  # means JST
         return datetime.datetime.strptime(query['iso'][0], '%Y%m%dT%H%M').replace(tzinfo=utils.tzinfo_jst)
 
-    def _load_details(self, session: Optional[requests.Session] = None, lang: Optional[str] = None):
+    def _load_details(self, session: Optional[requests.Session] = None, lang: str = 'en'):
+        assert lang in ('en', 'ja')
         session = session or utils.get_default_session()
         resp = _request('GET', self.get_url(type='beta', lang=lang), session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
