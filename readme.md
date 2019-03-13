@@ -212,7 +212,8 @@ Also, patches are used sent from
 [@kjnh10](https://github.com/kjnh10),
 [@hachi-88](https://github.com/hachi-88),
 [@Pachicobue](https://github.com/Pachicobue),
-and [@kfaRabi](https://github.com/kfaRabi).
+[@kfaRabi](https://github.com/kfaRabi),
+and [@tMasaaa](https://github.com/tMasaaa).
 
 ## License
 

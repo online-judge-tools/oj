@@ -1,5 +1,13 @@
 # Change Log
 
+## 6.0.0 / 2019-03-14
+
+-   [#318](https://github.com/kmyk/online-judge-tools/issues/318) enable to use this project as a library :tada:
+-   [#373](https://github.com/kmyk/online-judge-tools/pull/373) [#367](https://github.com/kmyk/online-judge-tools/pull/367) [#368](https://github.com/kmyk/online-judge-tools/pull/368) [#358](https://github.com/kmyk/online-judge-tools/pull/358) [#343](https://github.com/kmyk/online-judge-tools/pull/343) [#326](https://github.com/kmyk/online-judge-tools/pull/326) [#325](https://github.com/kmyk/online-judge-tools/pull/325) add features to operate things on AtCoder
+-   [#349](https://github.com/kmyk/online-judge-tools/pull/349) [#347](https://github.com/kmyk/online-judge-tools/pull/347) [#342](https://github.com/kmyk/online-judge-tools/pull/342) [#340](https://github.com/kmyk/online-judge-tools/pull/340) [#335](https://github.com/kmyk/online-judge-tools/pull/335) [#324](https://github.com/kmyk/online-judge-tools/pull/324) improve the [API documents](https://online-judge-tools.readthedocs.io/en/master/)
+-   [#384](https://github.com/kmyk/online-judge-tools/pull/384) [#381](https://github.com/kmyk/online-judge-tools/pull/381) remove some subcommands
+-   [#356](https://github.com/kmyk/online-judge-tools/pull/356) fix a bug of `download` from yukicoder ([@tMasaaa](https://github.com/tMasaaa))
+
 ## 0.1.55 / 2019-02-26
 
 -   [#323](https://github.com/kmyk/online-judge-tools/pull/323) support `download` and `submit` for [Toph](https://toph.co/)'s problem archive ([@kfaRabi](https://github.com/kfaRabi))
