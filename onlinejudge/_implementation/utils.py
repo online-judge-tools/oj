@@ -163,6 +163,8 @@ def request(method: str, url: str, session: requests.Session, raise_for_status: 
     assert method in ['GET', 'POST']
     kwargs.setdefault('allow_redirects', True)
     log.status('%s: %s', method, url)
+    if 'data' in kwargs:
+        log.debug('data: %s', repr(kwargs['data']))
     resp = session.request(method, url, **kwargs)
     if resp.url != url:
         log.status('redirected: %s', resp.url)
