@@ -128,7 +128,7 @@ def submit(args: 'argparse.Namespace') -> None:
 
         # submit
         kwargs = {}
-        if problem.get_service().get_name() == 'topcoder':
+        if isinstance(problem, onlinejudge.service.topcoder.TopcoderLongContestProblem):
             if args.full_submission:
                 kwargs['kind'] = 'full'
             else:

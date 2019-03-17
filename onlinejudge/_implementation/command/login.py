@@ -19,7 +19,7 @@ def login(args: 'argparse.Namespace') -> None:
 
     # configure
     kwargs = {}
-    if service.get_name() == 'yukicoder':
+    if isinstance(service, onlinejudge.service.yukicoder.YukicoderService):
         if not args.method:
             args.method = 'github'
         if args.method not in ['github', 'twitter']:
