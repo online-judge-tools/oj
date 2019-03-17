@@ -1,5 +1,10 @@
 # Change Log
 
+## 6.0.1 / 2019-03-18
+
+-   [#393](https://github.com/kmyk/online-judge-tools/issues/393) fix the degression of the `submit` subcommand for Topcoder with `--full-submission`
+-   [#391](https://github.com/kmyk/online-judge-tools/issues/391) fix a bug of `AtCoderContest.list_problems()`
+
 ## 6.0.0 / 2019-03-14
 
 -   [#318](https://github.com/kmyk/online-judge-tools/issues/318) enable to use this project as a library :tada:
