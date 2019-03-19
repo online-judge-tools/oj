@@ -481,7 +481,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
         return None
 
-    def get_input_format(self, session: Optional[requests.Session] = None) -> str:
+    def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
         """
         :raises Exception: if no such problem exists
         """
@@ -508,7 +508,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
                         for it in tag:
                             s += it.string or it  # AtCoder uses <var>...</var> for math symbols
                         return s
-        return ''
+        return None
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         """
