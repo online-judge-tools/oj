@@ -504,10 +504,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
                     if tag is None:
                         break
                     if tag.name in ('pre', 'blockquote'):
-                        s = ''
-                        for it in tag:
-                            s += it.string or it  # AtCoder uses <var>...</var> for math symbols
-                        return s
+                        return tag.decode_contents(formatter='html')
         return None
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:

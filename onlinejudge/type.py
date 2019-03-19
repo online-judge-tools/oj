@@ -111,6 +111,10 @@ class Problem(object):
         raise NotImplementedError
 
     def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
+        """
+        :return: the HTML in the `<pre>` tag as :py:class:`str`
+        """
+
         raise NotImplementedError
 
     @classmethod

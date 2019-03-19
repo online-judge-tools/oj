@@ -177,13 +177,13 @@ class AtCoderSubmissionTest(unittest.TestCase):
 
 class AtCoderProblemGetInputFormatTest(unittest.TestCase):
     def test_normal(self):
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc001/tasks/agc001_d').get_input_format(), 'N M\r\nA_1 A_2 ... A_M\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc002/tasks/agc002_d').get_input_format(), '\r\nN M\r\na_1 b_1\r\na_2 b_2\r\n:\r\na_M b_M\r\nQ\r\nx_1 y_1 z_1\r\nx_2 y_2 z_2\r\n:\r\nx_Q y_Q z_Q\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc003/tasks/agc003_d').get_input_format(), 'N\r\ns_1\r\n:\r\ns_N\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc004/tasks/agc004_d').get_input_format(), 'N K\r\na_1 a_2 ... a_N\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc005/tasks/agc005_d').get_input_format(), 'N K\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc001/tasks/agc001_d').get_input_format(), '<var>N</var> <var>M</var>\r\n<var>A_1</var> <var>A_2</var> <var>...</var> <var>A_M</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc002/tasks/agc002_d').get_input_format(), '\r\n<var>N</var> <var>M</var>\r\n<var>a_1</var> <var>b_1</var>\r\n<var>a_2</var> <var>b_2</var>\r\n<var>:</var>\r\n<var>a_M</var> <var>b_M</var>\r\n<var>Q</var>\r\n<var>x_1</var> <var>y_1</var> <var>z_1</var>\r\n<var>x_2</var> <var>y_2</var> <var>z_2</var>\r\n<var>:</var>\r\n<var>x_Q</var> <var>y_Q</var> <var>z_Q</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc003/tasks/agc003_d').get_input_format(), '<var>N</var>\r\n<var>s_1</var>\r\n:\r\n<var>s_N</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc004/tasks/agc004_d').get_input_format(), '<var>N</var> <var>K</var>\r\n<var>a_1</var> <var>a_2</var> <var>...</var> <var>a_N</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc005/tasks/agc005_d').get_input_format(), '<var>N</var> <var>K</var>\r\n')
 
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/arc083/tasks/arc083_a').get_input_format(), 'A B C D E F\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/arc083/tasks/arc083_a').get_input_format(), '<var>A</var> <var>B</var> <var>C</var> <var>D</var> <var>E</var> <var>F</var>\r\n')
 
     def test_old_problem(self):
         # https://github.com/kmyk/online-judge-tools/issues/380

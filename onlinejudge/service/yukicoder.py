@@ -420,7 +420,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         for h4 in soup.find_all('h4'):
             if h4.string == '入力':
-                return h4.parent.find('pre').string
+                return h4.parent.find('pre').decode_contents(formatter=None)
         return None
 
 
