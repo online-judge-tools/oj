@@ -242,6 +242,12 @@ class AtCoderProblemGetInputFormatTest(unittest.TestCase):
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/dwacon2018-final/tasks/dwacon2018_final_a').get_input_format(), '\r\n<var>H</var> <var>M</var> <var>S</var>\r\n<var>C_1</var> <var>C_2</var>\r\n')
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/dwacon2018-final/tasks/dwacon2018_final_b').get_input_format(), '\r\n<var>N</var> <var>K</var>\r\n<var>v_1</var> <var>...</var> <var>v_N</var>\r\n')
 
+    def test_problem_without_input(self):
+        self.assertIsNone(AtCoderProblem.from_url('https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a').get_input_format())
+
+    def test_problem_without_input_format(self):
+        self.assertIsNone(AtCoderProblem.from_url('https://atcoder.jp/contests/joi2006ho/tasks/joi2006ho_a').get_input_format())
+
 
 if __name__ == '__main__':
     unittest.main()

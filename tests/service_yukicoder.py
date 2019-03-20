@@ -148,6 +148,9 @@ class YukicoderProblemGetInputFormatTest(unittest.TestCase):
         self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/512').get_input_format(), '$X$ $Y$\n$N$\n$A_1$ $\\cdots$ $A_N$\n')
         self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/777').get_input_format(), '$N$\n$A_1$ $B_1$ $C_1$\n$A_2$ $B_2$ $C_2$\n…\n$A_N$ $B_N$ $C_N$\n')
 
+    def test_problem_without_input(self):
+        self.assertIsNone(YukicoderProblem.from_url('https://yukicoder.me/problems/no/3003').get_input_format())
+
 
 if __name__ == '__main__':
     unittest.main()
