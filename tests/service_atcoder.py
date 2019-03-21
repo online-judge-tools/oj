@@ -177,17 +177,76 @@ class AtCoderSubmissionTest(unittest.TestCase):
 
 class AtCoderProblemGetInputFormatTest(unittest.TestCase):
     def test_normal(self):
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc001/tasks/agc001_d').get_input_format(), 'N M\r\nA_1 A_2 ... A_M\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc002/tasks/agc002_d').get_input_format(), '\r\nN M\r\na_1 b_1\r\na_2 b_2\r\n:\r\na_M b_M\r\nQ\r\nx_1 y_1 z_1\r\nx_2 y_2 z_2\r\n:\r\nx_Q y_Q z_Q\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc003/tasks/agc003_d').get_input_format(), 'N\r\ns_1\r\n:\r\ns_N\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc004/tasks/agc004_d').get_input_format(), 'N K\r\na_1 a_2 ... a_N\r\n')
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc005/tasks/agc005_d').get_input_format(), 'N K\r\n')
+        """
+        .. code-block:: html
 
-        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/arc083/tasks/arc083_a').get_input_format(), 'A B C D E F\r\n')
+            <div class="io-style">
+                <div class="part">
+                    <section>
+                        <h3>入力</h3>
+                        <p>入力は以下の形式で標準入力から与えられる。</p>
+                        <pre>
+                            <var>N</var>
+                        </pre>
+                    </section>
+                </div>
+                <div class="part">
+                    ...
+                </div>
+                ...
+            </div>
+        """
+
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc001/tasks/agc001_d').get_input_format(), '<var>N</var> <var>M</var>\r\n<var>A_1</var> <var>A_2</var> <var>...</var> <var>A_M</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc002/tasks/agc002_d').get_input_format(), '\r\n<var>N</var> <var>M</var>\r\n<var>a_1</var> <var>b_1</var>\r\n<var>a_2</var> <var>b_2</var>\r\n<var>:</var>\r\n<var>a_M</var> <var>b_M</var>\r\n<var>Q</var>\r\n<var>x_1</var> <var>y_1</var> <var>z_1</var>\r\n<var>x_2</var> <var>y_2</var> <var>z_2</var>\r\n<var>:</var>\r\n<var>x_Q</var> <var>y_Q</var> <var>z_Q</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc003/tasks/agc003_d').get_input_format(), '<var>N</var>\r\n<var>s_1</var>\r\n:\r\n<var>s_N</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc004/tasks/agc004_d').get_input_format(), '<var>N</var> <var>K</var>\r\n<var>a_1</var> <var>a_2</var> <var>...</var> <var>a_N</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/agc005/tasks/agc005_d').get_input_format(), '<var>N</var> <var>K</var>\r\n')
+
+        self.assertEqual(AtCoderProblem.from_url('https://beta.atcoder.jp/contests/arc083/tasks/arc083_a').get_input_format(), '<var>A</var> <var>B</var> <var>C</var> <var>D</var> <var>E</var> <var>F</var>\r\n')
 
     def test_old_problem(self):
-        # https://github.com/kmyk/online-judge-tools/issues/380
-        pass
+        """
+        :note: https://github.com/kmyk/online-judge-tools/issues/380
+
+        .. code-block:: html
+
+            <h3>入力</h3>
+            <section>
+                入力は以下の形式で与えられる。
+                <pre>
+                    <var>N</var>
+                </pre>
+            </section>
+        """
+
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/arc001/tasks/arc001_1').get_input_format(), '\r\n<var>N</var>\r\n<var>c_1c_2c_3…c_N</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/arc002/tasks/arc002_3').get_input_format(), '\r\n<var>N</var>\r\n<var>c_{1}c_{2}...c_{N}</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/arc034/tasks/arc034_4').get_input_format(), '\r\n<var>A</var> <var>B</var> <var>C</var>\r\n<var>a_1</var> <var>a_2</var> .. <var>a_A</var>\r\n<var>b_1</var> <var>b_2</var> .. <var>b_B</var>\r\n')
+
+    def test_dwacon_problem(self):
+        """
+        :note: https://github.com/kmyk/online-judge-tools/issues/142
+
+        .. code-block:: html
+
+            <h3 id="入力">入力</h3>
+            <p>入力は以下の形式で標準入力から与えられる。</p>
+            <div class="io-style">
+                <pre>
+                    <var>N</var>
+                </pre>
+            </div>
+        """
+
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/dwacon2018-final/tasks/dwacon2018_final_a').get_input_format(), '\r\n<var>H</var> <var>M</var> <var>S</var>\r\n<var>C_1</var> <var>C_2</var>\r\n')
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/dwacon2018-final/tasks/dwacon2018_final_b').get_input_format(), '\r\n<var>N</var> <var>K</var>\r\n<var>v_1</var> <var>...</var> <var>v_N</var>\r\n')
+
+    def test_problem_without_input(self):
+        self.assertIsNone(AtCoderProblem.from_url('https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a').get_input_format())
+
+    def test_problem_without_input_format(self):
+        self.assertIsNone(AtCoderProblem.from_url('https://atcoder.jp/contests/joi2006ho/tasks/joi2006ho_a').get_input_format())
 
 
 if __name__ == '__main__':

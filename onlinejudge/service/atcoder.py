@@ -481,7 +481,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
         return None
 
-    def get_input_format(self, session: Optional[requests.Session] = None) -> str:
+    def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
         """
         :raises Exception: if no such problem exists
         """
@@ -496,19 +496,20 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        for h3 in soup.find_all('h3'):
-            if h3.string in ('入力', 'Input'):
-                tag = h3
-                for _ in range(3):
-                    tag = utils.next_sibling_tag(tag)
-                    if tag is None:
-                        break
-                    if tag.name in ('pre', 'blockquote'):
-                        s = ''
-                        for it in tag:
-                            s += it.string or it  # AtCoder uses <var>...</var> for math symbols
-                        return s
-        return ''
+        for h3 in soup.find_all('h3', text=re.compile(r'^(入力|Input)$')):
+            if h3.parent.name == 'section':
+                section = h3.parent
+            else:
+                section = h3.find_next_sibling('section')
+            if section is None:
+                section = soup.find(class_='io-style')
+            if section is None:
+                log.warning('<section> tag not found. something wrong')
+                return None
+            pre = section.find('pre')
+            if pre is not None:
+                return pre.decode_contents(formatter=None)
+        return None
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         """
