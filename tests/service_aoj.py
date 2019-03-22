@@ -1,6 +1,6 @@
 import unittest
 
-from onlinejudge.service.aoj import AOJProblem, AOJService
+from onlinejudge.service.aoj import AOJArenaProblem, AOJProblem, AOJService
 from onlinejudge.type import TestCase
 
 
@@ -18,6 +18,7 @@ class AOJProblemTest(unittest.TestCase):
         self.assertEqual(AOJProblem.from_url('http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=2256&lang=jp').problem_id, '2256')
         self.assertEqual(AOJProblem.from_url('https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/3/DSL_3_B').problem_id, 'DSL_3_B')
         self.assertEqual(AOJProblem.from_url('https://onlinejudge.u-aizu.ac.jp/challenges/sources/JAG/Spring/2394?year=2011').problem_id, '2394')
+        self.assertIsNone(AOJProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp19Day2/problems/A'))
 
     def test_download_sample_cases(self):
         self.assertEqual(AOJProblem.from_url('http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A').download_sample_cases(), [
@@ -37,3 +38,21 @@ class AOJProblemTest(unittest.TestCase):
         self.assertEqual(AOJProblem.from_url('https://onlinejudge.u-aizu.ac.jp/challenges/sources/JAG/Spring/2394?year=2011').download_sample_cases(), [
             TestCase(name='sample-1', input_name='1', input_data=b'4\n0 0\n10 0\n10 10\n0 10\n3\n0 0\n1 0\n0 1\n0\n', output_name='1', output_data=b'Case 1: 14.142135624\nCase 2: 1.41421356\n'),
         ])
+
+
+class AOJArenaProblemTest(unittest.TestCase):
+    def test_from_url(self):
+        self.assertEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp19Day2/problems/A').arena_id, 'RitsCamp19Day2')
+        self.assertEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp19Day2/problems/A').alphabet, 'A')
+        self.assertEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#ACPC2018Day2/problems/D').alphabet, 'D')
+        self.assertEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#ACPC2018Day2/problems/d').alphabet, 'D')
+        self.assertIsNone(AOJArenaProblem.from_url('http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A'))
+
+    def test_download_sample_cases(self):
+        self.assertEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#yupro/problems/A').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='1', input_data=b'koukyoukoukokukikou\nabrakadabra\nacmicpc\njapaque\nhelloworld\n#\n', output_name='1', output_data=b'0\n2\n4\n5\n7\n'),
+        ])
+
+    @unittest.expectedFailure
+    def test_download_sample_cases_not_registered(self):
+        self.assertNotEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp18Day3/problems/B').download_sample_cases(), [])

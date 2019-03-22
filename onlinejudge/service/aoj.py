@@ -12,6 +12,7 @@ import itertools
 import json
 import posixpath
 import re
+import string
 import urllib.parse
 import zipfile
 from typing import *
@@ -44,6 +45,10 @@ class AOJService(onlinejudge.type.Service):
 
 
 class AOJProblem(onlinejudge.type.Problem):
+    """
+    :ivar problem_id: :py:class:`str` like `DSL_1_A` or `2256`
+    """
+
     def __init__(self, problem_id):
         self.problem_id = problem_id
 
@@ -124,9 +129,62 @@ class AOJProblem(onlinejudge.type.Problem):
             n = m.group(5)
             return cls(n)
 
-        # example: https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp18Day3/problems/B
-        # NOTE: I don't know how to retrieve the problem id
+        return None
 
+    def get_service(self) -> AOJService:
+        return AOJService()
+
+
+class AOJArenaProblem(onlinejudge.type.Problem):
+    """
+    :ivar arena_id: :py:class:`str`. for example, `RitsCamp19Day2`
+    :ivar alphabet: :py:class:`str`
+    """
+
+    def __init__(self, arena_id, alphabet):
+        assert alphabet in string.ascii_uppercase
+        self.arena_id = arena_id
+        self.alphabet = alphabet
+
+        self._problem_id = None  # Optional[str]
+
+    def get_problem_id(self, session: Optional[requests.Session] = None) -> str:
+        """
+        :note: use http://developers.u-aizu.ac.jp/api?key=judgeapi%2Farenas%2F%7BarenaId%7D%2Fproblems_GET
+        """
+
+        if self._problem_id is None:
+            session = session or utils.get_default_session()
+            url = 'https://judgeapi.u-aizu.ac.jp/arenas/{}/problems'.format(self.arena_id)
+            resp = utils.request('GET', url, session=session)
+            problems = json.loads(resp.content.decode(resp.encoding))
+            for problem in problems:
+                if problem['id'] == self.alphabet:
+                    self._problem_id = problem['problemId']
+                    log.debug('problem: %s', problem)
+                    break
+        return self._problem_id
+
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+        log.warning("most of problems in arena have no registered sample cases.")
+        return AOJProblem(self.get_problem_id()).download_sample_cases(session=session)
+
+    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+        return AOJProblem(self.get_problem_id()).download_system_cases(session=session)
+
+    def get_url(self) -> str:
+        return 'https://onlinejudge.u-aizu.ac.jp/services/room.html#{}/problems/{}'.format(self.arena_id, self.alphabet)
+
+    @classmethod
+    def from_url(cls, url: str) -> Optional['AOJArenaProblem']:
+        # example: https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp19Day2/problems/A
+        result = urllib.parse.urlparse(url)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'onlinejudge.u-aizu.ac.jp' \
+                and utils.normpath(result.path) == '/services/room.html':
+            fragment = result.fragment.split('/')
+            if len(fragment) == 3 and fragment[1] == 'problems':
+                return cls(fragment[0], fragment[2].upper())
         return None
 
     def get_service(self) -> AOJService:
@@ -134,4 +192,4 @@ class AOJProblem(onlinejudge.type.Problem):
 
 
 onlinejudge.dispatch.services += [AOJService]
-onlinejudge.dispatch.problems += [AOJProblem]
+onlinejudge.dispatch.problems += [AOJProblem, AOJArenaProblem]

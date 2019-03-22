@@ -68,3 +68,18 @@ class DownloadAOJTest(unittest.TestCase):
                 # '1.out': '8d2f7846dc2fc10ef37dcb548635c788',
             },
             is_system=True)
+
+
+class DownloadAOJArenaTest(unittest.TestCase):
+    def snippet_call_download(self, *args, **kwargs):
+        tests.command_download.snippet_call_download(self, *args, **kwargs)
+
+    def test_call_download_aoj_arena_yupro_d(self):
+        self.snippet_call_download(
+            'https://onlinejudge.u-aizu.ac.jp/services/room.html#yupro/problems/D', [
+                {
+                    "name": "sample-1",
+                    "input": "6/2*(1+2)\n1-1-1\n(1-1-1)/2\n#\n",
+                    "output": "2\n2\n1\n",
+                },
+            ], type='json')
