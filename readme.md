@@ -23,7 +23,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   Anarchy Golf
     -   Codeforces
     -   HackerRank
-    -   Aizu Online Judge
+    -   Aizu Online Judge (including the Arena)
     -   CS Academy
     -   PKU JudgeOnline
     -   Kattis

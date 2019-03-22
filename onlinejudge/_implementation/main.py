@@ -38,7 +38,7 @@ def get_parser() -> argparse.ArgumentParser:
     subparser = subparsers.add_parser('download', aliases=['d', 'dl'], help='download sample cases', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 supported services:
   Anarchy Golf
-  Aizu Online Judge
+  Aizu Online Judge (including the Arena)
   AtCoder
   Codeforces
   yukicoder
