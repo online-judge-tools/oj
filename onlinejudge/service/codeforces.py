@@ -203,7 +203,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                 m = re.match(expr, utils.normpath(result.path))
                 if m:
                     if m.group(2) == '0':
-                        index = 'A'
+                        index = 'A'  # NOTE: This is broken if there was "A1".
                     else:
                         index = m.group(2).upper()
                     return cls(int(m.group(1)), index, kind=kind)
