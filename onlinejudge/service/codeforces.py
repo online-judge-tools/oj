@@ -85,7 +85,10 @@ class CodeforcesProblem(onlinejudge.type.Problem):
 
     def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
-        assert index in string.ascii_uppercase
+        assert 1 <= len(index) <= 2
+        assert index[0] in string.ascii_uppercase
+        if len(index) == 2:
+            assert index[1] in string.digits
         assert kind in (None, 'contest', 'gym', 'problemset')
         self.contest_id = contest_id
         self.index = index
@@ -189,15 +192,21 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'codeforces.com':
+            # "0" is needed. example: https://codeforces.com/contest/1000/problem/0
+            # "[1-9]?" is sometime used. example: https://codeforces.com/contest/1133/problem/F2
+            re_for_index = r'(0|[A-Za-z][1-9]?)'
             table = {}
-            table['contest'] = r'^/contest/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/contest/538/problem/H
-            table['problemset'] = r'^/problemset/problem/([0-9]+)/([0A-Za-z])$'  # example: https://codeforces.com/problemset/problem/700/B
-            table['gym'] = r'^/gym/([0-9]+)/problem/([0A-Za-z])$'  # example: https://codeforces.com/gym/101021/problem/A
-            normalize = (lambda c: c == '0' and 'A' or c.upper())
+            table['contest'] = r'^/contest/([0-9]+)/problem/{}$'.format(re_for_index)  # example: https://codeforces.com/contest/538/problem/H
+            table['problemset'] = r'^/problemset/problem/([0-9]+)/{}$'.format(re_for_index)  # example: https://codeforces.com/problemset/problem/700/B
+            table['gym'] = r'^/gym/([0-9]+)/problem/{}$'.format(re_for_index)  # example: https://codeforces.com/gym/101021/problem/A
             for kind, expr in table.items():
                 m = re.match(expr, utils.normpath(result.path))
                 if m:
-                    return cls(int(m.group(1)), normalize(m.group(2)), kind=kind)
+                    if m.group(2) == '0':
+                        index = 'A'
+                    else:
+                        index = m.group(2).upper()
+                    return cls(int(m.group(1)), index, kind=kind)
         return None
 
 
