@@ -3,7 +3,7 @@
 ## 6.1.0 / 2019-03-22
 
 -   [#380](https://github.com/kmyk/online-judge-tools/issues/380) fix a bug to get input formats from old problems of AtCoder
--   [#371](https://github.com/kmyk/online-judge-tools/issues/371) supprot `download` from AOJ Arena
+-   [#371](https://github.com/kmyk/online-judge-tools/issues/371) support `download` from AOJ Arena
 -   [#370](https://github.com/kmyk/online-judge-tools/issues/370) fix a bug for problems of Codeforces with unusual alphabets like `F1`
 
 ## 6.0.1 / 2019-03-18
