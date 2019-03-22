@@ -139,6 +139,8 @@ class AOJArenaProblem(onlinejudge.type.Problem):
     """
     :ivar arena_id: :py:class:`str`. for example, `RitsCamp19Day2`
     :ivar alphabet: :py:class:`str`
+
+    .. versionadded:: 6.1.0
     """
 
     def __init__(self, arena_id, alphabet):
