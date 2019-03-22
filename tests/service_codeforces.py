@@ -22,3 +22,18 @@ class CodeforcesProblemTest(unittest.TestCase):
         self.assertEqual(CodeforcesProblem.from_url('http://codeforces.com/gym/101021/problem/A').index, 'A')
         self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1080/problem/A').contest_id, 1080)
         self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1080/problem/A').index, 'A')
+        self.assertIsNone(CodeforcesProblem.from_url('https://atcoder.jp/contests/abc120/tasks/abc120_c'))
+
+    def test_from_url_corner_cases(self):
+        # 0
+        self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1105/problem/0').index, 'A')
+        self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1105/problem/1'), None)
+
+        # lower case
+        self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1110/problem/H').index, 'H')
+        self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1110/problem/h').index, 'H')
+
+        # F2
+        self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1133/problem/E').index, 'E')
+        self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1133/problem/F1').index, 'F1')
+        self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1133/problem/F2').index, 'F2')
