@@ -500,6 +500,9 @@ def _AtCoderProblemContent_parse_score(soup: bs4.BeautifulSoup) -> Optional[int]
 def _AtCoderProblemContent_from_html(html: str, problem: 'AtCoderProblem') -> AtCoderProblemContent:
     """
     :param html: must be a HTML of the new (beta) version of AtCoder
+
+    .. versionadded:: 6.2.0
+
     """
 
     soup = bs4.BeautifulSoup(html, utils.html_parser)
@@ -534,6 +537,8 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def download_content(self, session: Optional[requests.Session] = None) -> AtCoderProblemContent:
         """
         :raises Exception: if no such problem exists
+
+        .. versionadded:: 6.2.0
         """
 
         session = session or utils.get_default_session()
@@ -676,6 +681,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def get_score(self, session: Optional[requests.Session] = None) -> Optional[int]:
         """
         :return: :py:data:`None` if the problem has no score  (e.g. https://atcoder.jp/contests/abc012/tasks/abc012_3)
+
         .. deprecated:: 6.2.0
         """
         warnings.warn('deprecated', DeprecationWarning)
