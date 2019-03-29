@@ -85,6 +85,12 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
     def get_service(self) -> TopcoderService:
         return TopcoderService()
 
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+        """
+        :raises NotImplementedError:
+        """
+        raise NotImplementedError
+
     @classmethod
     def from_url(cls, url: str) -> Optional['TopcoderLongContestProblem']:
         # example: https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=16997&pm=14690

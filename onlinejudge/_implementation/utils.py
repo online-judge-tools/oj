@@ -296,8 +296,18 @@ class DummySubmission(Submission):
         self.url = url
         self.problem = problem
 
+    def download_code(self, session: Optional[requests.Session] = None) -> bytes:
+        raise NotImplementedError
+
     def get_url(self) -> str:
         return self.url
 
     def get_problem(self) -> Problem:
         return self.problem
+
+    def get_service(self) -> Service:
+        raise NotImplementedError
+
+    @classmethod
+    def from_url(cls, s: str) -> Optional[Submission]:
+        return None

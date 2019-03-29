@@ -1,4 +1,5 @@
 # Python Version: 3.x
+from abc import ABC, abstractmethod
 from typing import Callable, List, NamedTuple, NewType, Optional, Tuple
 
 import requests
@@ -10,7 +11,7 @@ class LoginError(RuntimeError):
     pass
 
 
-class Service(object):
+class Service(ABC):
     def login(self, get_credentials: CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :param get_credentials: returns a tuple of (username, password)
@@ -21,9 +22,11 @@ class Service(object):
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         raise NotImplementedError
 
+    @abstractmethod
     def get_url(self) -> str:
         raise NotImplementedError
 
+    @abstractmethod
     def get_name(self) -> str:
         """
         example:
@@ -37,6 +40,7 @@ class Service(object):
         raise NotImplementedError
 
     @classmethod
+    @abstractmethod
     def from_url(self, s: str) -> Optional['Service']:
         pass
 
@@ -72,7 +76,8 @@ class SubmissionError(RuntimeError):
     pass
 
 
-class Problem(object):
+class Problem(ABC):
+    @abstractmethod
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         raise NotImplementedError
 
@@ -94,9 +99,11 @@ class Problem(object):
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         raise NotImplementedError
 
+    @abstractmethod
     def get_url(self) -> str:
         raise NotImplementedError
 
+    @abstractmethod
     def get_service(self) -> Service:
         raise NotImplementedError
 
@@ -118,23 +125,29 @@ class Problem(object):
         raise NotImplementedError
 
     @classmethod
+    @abstractmethod
     def from_url(self, s: str) -> Optional['Problem']:
         pass
 
 
-class Submission(object):
+class Submission(ABC):
+    @abstractmethod
     def download_code(self, session: Optional[requests.Session] = None) -> bytes:
         raise NotImplementedError
 
+    @abstractmethod
     def get_url(self) -> str:
         raise NotImplementedError
 
+    @abstractmethod
     def get_problem(self) -> Problem:
         raise NotImplementedError
 
+    @abstractmethod
     def get_service(self) -> Service:
         return self.get_problem().get_service()
 
     @classmethod
+    @abstractmethod
     def from_url(cls, s: str) -> Optional['Submission']:
         pass
