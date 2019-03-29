@@ -72,6 +72,17 @@ class TopcoderService(onlinejudge.type.Service):
         return None
 
 
+TopcoderLongContestProblemOverviewRow = NamedTuple('TopcoderLongContestProblemOverviewRow', [
+    ('rank', int),
+    ('handle', str),
+    ('provisional_rank', int),
+    ('provisional_score', float),
+    ('final_score', float),
+    ('language', str),
+    ('cr', int),
+])
+
+
 class TopcoderLongContestProblem(onlinejudge.type.Problem):
     def __init__(self, rd, cd=None, compid=None, pm=None):
         self.rd = rd
@@ -225,6 +236,40 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
 
         assert header is not None
         return header, rows
+
+    def download_overview(self, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemOverviewRow]:
+        """
+        .. versionadded:: 6.2.0
+            This method may be deleted in future.
+        """
+        session = session or utils.get_default_session()
+
+        # get
+        number = 9999
+        start = 1
+        url = 'https://community.topcoder.com/longcontest/stats/?module=ViewOverview&rd={}&nr={}&sr={}'.format(self.rd, number, start)
+        resp = utils.request('GET', url, session=session)
+
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        table = soup.find('table', class_='stat')
+        overview = []  # type: List[TopcoderLongContestProblemOverviewRow]
+        for tr in table.find_all('tr', class_=re.compile(r'light|dark')):
+            tds = tr.find_all('td')
+            assert len(tds) == 9
+            rank = int(tds[0].text)
+            handle = tds[1].text.strip()
+            provisional_rank = int(tds[2].text)
+            provisional_score = float(tds[3].text)
+            final_score = float(tds[4].text)
+            language = tds[5].text.strip()
+            assert tds[6].text.strip() == 'results'
+            assert tds[7].text.strip() == 'submission history'
+            assert tds[8].text.strip() == 'example history'
+            query = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(tds[6].find('a').attrs['href']).query))
+            self.pm = query['pm']
+            overview += [TopcoderLongContestProblemOverviewRow(rank, handle, provisional_rank, provisional_score, final_score, language, cr=int(query['cr']))]
+        return overview
 
 
 onlinejudge.dispatch.services += [TopcoderService]
