@@ -13,6 +13,7 @@ import posixpath
 import re
 import time
 import urllib.parse
+import xml.etree.ElementTree
 from typing import *
 
 import bs4
@@ -80,6 +81,28 @@ TopcoderLongContestProblemOverviewRow = NamedTuple('TopcoderLongContestProblemOv
     ('final_score', float),
     ('language', str),
     ('cr', int),
+])
+
+TopcoderLongContestProblemIndividualResultsFeedSubmission = NamedTuple('TopcoderLongContestProblemIndividualResultsFeedSubmission', [
+    ('number', int),
+    ('score', float),
+    ('language', str),
+    ('time', str),
+])
+
+TopcoderLongContestProblemIndividualResultsFeedTestCase = NamedTuple('TopcoderLongContestProblemIndividualResultsFeedTestCase', [
+    ('test_case_id', int),
+    ('score', float),
+    ('processing_time', int),
+    ('fatal_error_ind', int),
+])
+
+TopcoderLongContestProblemIndividualResultsFeed = NamedTuple('TopcoderLongContestProblemIndividualResultsFeed', [
+    ('round_id', int),
+    ('coder_id', int),
+    ('handle', str),
+    ('submissions', List[TopcoderLongContestProblemIndividualResultsFeedSubmission]),
+    ('testcases', List[TopcoderLongContestProblemIndividualResultsFeedTestCase]),
 ])
 
 
@@ -270,6 +293,41 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             self.pm = query['pm']
             overview += [TopcoderLongContestProblemOverviewRow(rank, handle, provisional_rank, provisional_score, final_score, language, cr=int(query['cr']))]
         return overview
+
+    def download_individual_results_feed(self, cr: int, session: Optional[requests.Session] = None) -> TopcoderLongContestProblemIndividualResultsFeed:
+        """
+        .. versionadded:: 6.2.0
+            This method may be deleted in future.
+        """
+        session = session or utils.get_default_session()
+
+        # get
+        url = 'https://community.topcoder.com/longcontest/stats/?module=IndividualResultsFeed&rd={}&cr={}'.format(self.rd, cr)
+        resp = utils.request('GET', url, session=session)
+
+        # parse
+        root = xml.etree.ElementTree.fromstring(resp.content.decode(resp.encoding))
+        assert len(list(root)) == 5
+        round_id = int(list(root)[0].text or '')  # NOTE: `or ''` is for the typechecker
+        coder_id = int(list(root)[1].text or '')
+        handle = list(root)[2].text
+        assert handle is not None
+        submissions = []  # type: List[TopcoderLongContestProblemIndividualResultsFeedSubmission]
+        for submission in list(root)[3]:
+            number = int(list(submission)[0].text or '')
+            score = float(list(submission)[1].text or '')
+            language = list(submission)[2].text or ''
+            time = list(submission)[3].text
+            assert time is not None
+            submissions += [TopcoderLongContestProblemIndividualResultsFeedSubmission(number, score, language, time)]
+        testcases = []  # type: List[TopcoderLongContestProblemIndividualResultsFeedTestCase]
+        for testcase in list(root)[4]:
+            test_case_id = int(list(testcase)[0].text or '')
+            score = float(list(testcase)[1].text or '')
+            processing_time = int(list(testcase)[2].text or '')
+            fatal_error_ind = int(list(testcase)[3].text or '')
+            testcases += [TopcoderLongContestProblemIndividualResultsFeedTestCase(test_case_id, score, processing_time, fatal_error_ind)]
+        return TopcoderLongContestProblemIndividualResultsFeed(round_id, coder_id, handle, submissions, testcases)
 
 
 onlinejudge.dispatch.services += [TopcoderService]
