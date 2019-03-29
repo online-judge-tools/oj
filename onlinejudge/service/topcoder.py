@@ -329,6 +329,27 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             testcases += [TopcoderLongContestProblemIndividualResultsFeedTestCase(test_case_id, score, processing_time, fatal_error_ind)]
         return TopcoderLongContestProblemIndividualResultsFeed(round_id, coder_id, handle, submissions, testcases)
 
+    def download_system_test(self, test_case_id: int, session: Optional[requests.Session] = None) -> str:
+        """
+        :raises NotLoggedInError:
+        :note: You need to parse this result manually.
+
+        .. versionadded:: 6.2.0
+            This method may be deleted in future.
+        """
+        session = session or utils.get_default_session()
+
+        # get
+        assert self.pm is not None
+        url = 'https://community.topcoder.com/longcontest/stats/?module=ViewSystemTest&rd={}&pm={}&tid={}'.format(self.rd, self.pm, test_case_id)
+        resp = utils.request('GET', url, session=session)
+
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        if soup.find('form', attrs={'name': 'frmLogin'}):
+            raise NotLoggedInError
+        return soup.find('pre').text
+
 
 onlinejudge.dispatch.services += [TopcoderService]
 onlinejudge.dispatch.problems += [TopcoderLongContestProblem]

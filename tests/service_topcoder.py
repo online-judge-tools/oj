@@ -1,5 +1,7 @@
+import os
 import unittest
 
+import onlinejudge._implementation.utils as utils
 from onlinejudge.service.topcoder import TopcoderLongContestProblem, TopcoderService
 
 
@@ -43,3 +45,43 @@ class TopcoderLongConrestProblemTest(unittest.TestCase):
         self.assertEqual(feed.testcases[0].fatal_error_ind, 0)
         self.assertEqual(len(feed.submissions), 5)
         self.assertEqual(len(feed.testcases), 2000)
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_download_system_test(self):
+        with utils.with_cookiejar(utils.get_default_session()):
+            url = 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17143&pm=14889'
+            tid = 33800773
+            problem = TopcoderLongContestProblem.from_url(url)
+            self.assertEqual(problem.download_system_test(tid), 'seed = 1919427468645\nH = 85\nW = 88\nC = 2\n')
+
+        with utils.with_cookiejar(utils.get_default_session()):
+            url = 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17092&pm=14853'
+            tid = 33796324
+            problem = TopcoderLongContestProblem.from_url(url)
+            self.assertEqual(problem.download_system_test(tid), """\
+Seed = 2917103922548
+
+Coins: 5372
+Max Time: 2988
+Note Time: 5
+Num Machines: 3
+
+Machine 0...
+Wheel 0: ACEEDEDBDGBADCDFGD
+Wheel 1: GGFEFBFDFFDEECFEAG
+Wheel 2: EFCCCAADBDGEGBDCDD
+Expected payout rate: 1.5775034293552812
+
+Machine 1...
+Wheel 0: CDFFDEEEAGGGGGFGGBEFCCFFFD
+Wheel 1: EDCGBGFBBCCGGFGDFBFECGGEFC
+Wheel 2: GEDECEGFDCGDGGCDDCEDGBGEBG
+Expected payout rate: 0.7345243513882568
+
+Machine 2...
+Wheel 0: ABEEDDDCGBG
+Wheel 1: EDEEDADGEAF
+Wheel 2: EBEGEFEGEBF
+Expected payout rate: 0.6160781367392938
+
+""")
