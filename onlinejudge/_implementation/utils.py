@@ -308,6 +308,9 @@ class DummySubmission(Submission):
     def get_service(self) -> Service:
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return '{}({}, problem={})'.format(self.__class__, self.url, self.problem)
+
     @classmethod
     def from_url(cls, s: str) -> Optional[Submission]:
         return None

@@ -86,6 +86,15 @@ class AtCoderProblemTest(unittest.TestCase):
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c').contest_id, 'agc030')
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c').problem_id, 'agc030_c')
 
+    def test_repr(self):
+        self.assertEqual(repr(AtCoderProblem('kupc2014', 'kupc2014_d')), "AtCoderProblem.from_url('https://atcoder.jp/contests/kupc2014/tasks/kupc2014_d')")
+        self.assertEqual(repr(AtCoderProblem('agc030', 'agc030_c')), "AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c')")
+        self.assertEqual(repr(AtCoderProblem('xxxxxx', 'yyyyyy')), "AtCoderProblem.from_url('https://atcoder.jp/contests/xxxxxx/tasks/yyyyyy')")
+
+    def test_eq(self):
+        self.assertEqual(AtCoderProblem.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d'), AtCoderProblem.from_url('https://atcoder.jp/contests/kupc2014/tasks/kupc2014_d'))
+        self.assertNotEqual(AtCoderProblem.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d'), AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c'))
+
     def test_load_details(self):
         problem = AtCoderProblem.from_url('https://atcoder.jp/contests/abc118/tasks/abc118_a')
         self.assertEqual(problem.get_alphabet(), 'A')

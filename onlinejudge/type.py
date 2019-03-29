@@ -39,6 +39,12 @@ class Service(ABC):
         """
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return '{}.from_url({})'.format(self.__class__.__name__, repr(self.get_url()))
+
+    def __eq__(self, other) -> bool:
+        return self.__class__ == other.__class__ and self.get_url() == other.get_url()
+
     @classmethod
     @abstractmethod
     def from_url(self, s: str) -> Optional['Service']:
@@ -77,6 +83,10 @@ class SubmissionError(RuntimeError):
 
 
 class Problem(ABC):
+    """
+    :note: :py:class:`Problem` represents just a URL of a problem, without the data of the problem.
+    """
+
     @abstractmethod
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         raise NotImplementedError
@@ -124,6 +134,12 @@ class Problem(ABC):
 
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return '{}.from_url({})'.format(self.__class__.__name__, repr(self.get_url()))
+
+    def __eq__(self, other) -> bool:
+        return self.__class__ == other.__class__ and self.get_url() == other.get_url()
+
     @classmethod
     @abstractmethod
     def from_url(self, s: str) -> Optional['Problem']:
@@ -146,6 +162,12 @@ class Submission(ABC):
     @abstractmethod
     def get_service(self) -> Service:
         return self.get_problem().get_service()
+
+    def __repr__(self) -> str:
+        return '{}.from_url({})'.format(self.__class__.__name__, repr(self.get_url()))
+
+    def __eq__(self, other) -> bool:
+        return self.__class__ == other.__class__ and self.get_url() == other.get_url()
 
     @classmethod
     @abstractmethod
