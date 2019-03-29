@@ -19,6 +19,7 @@ import json
 import posixpath
 import re
 import urllib.parse
+import warnings
 from typing import *
 
 import bs4
@@ -342,6 +343,177 @@ class AtCoderContest(object):
         yield from self.iterate_submissions_where(order='created', desc=False, session=session)
 
 
+# TODO: use the new style of NamedTuple added from Pyhon 3.6
+AtCoderProblemContentPartial = NamedTuple('AtCoderProblemContentPartial', [
+    ('alphabet', str),
+    ('memory_limit_byte', int),
+    ('name', str),
+    ('problem', 'AtCoderProblem'),
+    ('time_limit_msec', int),
+])
+
+
+def _AtCoderProblemContentPartial_from_row(tr: bs4.Tag):
+    tds = tr.find_all('td')
+    assert 4 <= len(tds) <= 5
+    path = tds[1].find('a')['href']
+    problem = AtCoderProblem.from_url('https://atcoder.jp' + path)
+    assert problem is not None
+    alphabet = tds[0].text
+    name = tds[1].text
+    time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
+    memory_limit_byte = int(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000  # TODO: confirm this is MB truly, not MiB
+    if len(tds) == 5:
+        assert tds[4].text.strip() in ('', 'Submit', '提出')
+
+    self = AtCoderProblemContentPartial(alphabet, memory_limit_byte, name, problem, time_limit_msec)
+    problem._cached_content = self
+    return self
+
+
+# TODO: use the new style of NamedTuple added from Pyhon 3.6
+AtCoderProblemContent = NamedTuple('AtCoderProblemContent', [
+    ('alphabet', str),
+    ('available_languages', Optional[List[Language]]),
+    ('html', str),
+    ('input_format', Optional[str]),
+    ('memory_limit_byte', int),
+    ('name', str),
+    ('problem', 'AtCoderProblem'),
+    ('sample_cases', List[TestCase]),
+    ('score', Optional[int]),
+    ('time_limit_msec', int),
+])
+
+
+def _AtCoderProblemContent_get_tag_lang(tag: bs4.Tag):
+    assert isinstance(tag, bs4.Tag)
+    for parent in tag.parents:
+        for cls in parent.attrs.get('class') or []:
+            if cls.startswith('lang-'):
+                return cls
+
+
+def _AtCoderProblemContent_find_sample_tags(soup: bs4.BeautifulSoup) -> Generator[Tuple[bs4.Tag, bs4.Tag], None, None]:
+    for pre in soup.find_all('pre'):
+        log.debug('pre tag: %s', str(pre))
+        if not pre.string:
+            continue
+        prv = utils.previous_sibling_tag(pre)
+
+        # the first format: h3+pre
+        if prv and prv.name == 'h3' and prv.string:
+            yield (pre, prv)
+
+        else:
+            # ignore tags which are not samples
+            # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
+            while prv is not None:
+                if prv.name == 'pre':
+                    break
+                prv = utils.previous_sibling_tag(prv)
+            if prv is not None:
+                continue
+
+            # the second format: h3+section pre
+            if pre.parent and pre.parent.name == 'section':
+                prv = pre.parent and utils.previous_sibling_tag(pre.parent)
+                if prv and prv.name == 'h3' and prv.string:
+                    yield (pre, prv)
+
+
+def _AtCoderProblemContent_parse_sample_cases(soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
+    samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
+    lang = None
+    for pre, h3 in _AtCoderProblemContent_find_sample_tags(soup):
+        s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
+        name = h3.string
+        l = _AtCoderProblemContent_get_tag_lang(pre)
+        if lang is None:
+            lang = l
+        elif lang != l:
+            log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
+            continue
+        samples.add(s.encode(), name)
+    return samples.get()
+
+
+def _AtCoderProblemContent_parse_input_format(soup: bs4.BeautifulSoup) -> Optional[str]:
+    for h3 in soup.find_all('h3', text=re.compile(r'^(入力|Input)$')):
+        if h3.parent.name == 'section':
+            section = h3.parent
+        else:
+            section = h3.find_next_sibling('section')
+        if section is None:
+            section = soup.find(class_='io-style')
+        if section is None:
+            log.warning('<section> tag not found. something wrong')
+            return None
+        pre = section.find('pre')
+        if pre is not None:
+            return pre.decode_contents(formatter=None)
+    return None
+
+
+def _AtCoderProblemContent_parse_available_languages(soup: bs4.BeautifulSoup, problem: 'AtCoderProblem') -> Optional[List[Language]]:
+    form = soup.find('form', action='/contests/{}/submit'.format(problem.contest_id))
+    if form is None:
+        return None
+    select = form.find('div', id='select-lang').find('select', attrs={'name': 'data.LanguageId'})  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
+    languages = []  # type: List[Language]
+    for option in select.find_all('option'):
+        languages += [Language(option.attrs['value'], option.string)]
+    return languages
+
+
+def _AtCoderProblemContent_parse_partial(soup: bs4.BeautifulSoup, problem: 'AtCoderProblem') -> AtCoderProblemContentPartial:
+    h2 = soup.find('span', class_='h2')
+
+    alphabet, _, name = h2.text.partition(' - ')
+
+    time_limit, memory_limit = h2.find_next_sibling('p').text.split(' / ')
+    for time_limit_prefix in ('実行時間制限: ', 'Time Limit: '):
+        if time_limit.startswith(time_limit_prefix):
+            break
+    else:
+        assert False
+    time_limit_msec = int(float(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' sec')) * 1000)
+
+    for memory_limit_prefix in ('メモリ制限: ', 'Memory Limit: '):
+        if memory_limit.startswith(memory_limit_prefix):
+            break
+    else:
+        assert False
+    memory_limit_byte = int(float(utils.remove_suffix(utils.remove_prefix(memory_limit, memory_limit_prefix), ' MB')) * 1000 * 1000)
+
+    return AtCoderProblemContentPartial(alphabet, memory_limit_byte, name, problem, time_limit_msec)
+
+
+def _AtCoderProblemContent_parse_score(soup: bs4.BeautifulSoup) -> Optional[int]:
+    task_statement = soup.find('div', id='task-statement')
+    p = task_statement.find('p')  # first
+    if p is not None and p.text.startswith('配点 : '):
+        return int(utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点'))
+    return None
+
+
+def _AtCoderProblemContent_from_html(html: str, problem: 'AtCoderProblem') -> AtCoderProblemContent:
+    """
+    :param html: must be a HTML of the new (beta) version of AtCoder
+    """
+
+    soup = bs4.BeautifulSoup(html, utils.html_parser)
+    sample_cases = _AtCoderProblemContent_parse_sample_cases(soup)
+    input_format = _AtCoderProblemContent_parse_input_format(soup)
+    available_languages = _AtCoderProblemContent_parse_available_languages(soup, problem=problem)
+    partial = _AtCoderProblemContent_parse_partial(soup, problem=problem)
+    score = _AtCoderProblemContent_parse_score(soup)
+    return AtCoderProblemContent(partial.alphabet, available_languages, html, input_format, partial.memory_limit_byte, partial.name, problem, sample_cases, score, partial.time_limit_msec)
+
+
+AtCoderProblemContent.from_html = _AtCoderProblemContent_from_html  # type: ignore
+
+
 class AtCoderProblem(onlinejudge.type.Problem):
     """
     :ivar contest_id: :py:class:`str`
@@ -353,90 +525,30 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def __init__(self, contest_id: str, problem_id: str):
         self.contest_id = contest_id
         self.problem_id = problem_id  # NOTE: AtCoder calls this as "task_screen_name"
-        self._task_name = None  # type: Optional[str]
-        self._time_limit_msec = None  # type: Optional[int]
-        self._memory_limit_byte = None  # type: Optional[int]
-        self._alphabet = None  # type: Optional[str]
-        self._score = None  # type: Optional[int]
-        self._score_checked = None  # type: Optional[bool]
+        self._cached_content = None  # type: Union[None, AtCoderProblemContentPartial, AtCoderProblemContent]
 
     @classmethod
     def _from_table_row(cls, tr: bs4.Tag) -> 'AtCoderProblem':
-        tds = tr.find_all('td')
-        assert 4 <= len(tds) <= 5
-        path = tds[1].find('a')['href']
-        self = cls.from_url('https://atcoder.jp' + path)
-        assert self is not None
-        self._alphabet = tds[0].text
-        self._task_name = tds[1].text
-        self._time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
-        self._memory_limit_byte = int(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000  # TODO: confirm this is MB truly, not MiB
-        if len(tds) == 5:
-            assert tds[4].text.strip() in ('', 'Submit', '提出')
-        return self
+        return _AtCoderProblemContentPartial_from_row(tr).problem
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+    def download_content(self, session: Optional[requests.Session] = None) -> AtCoderProblemContent:
         """
         :raises Exception: if no such problem exists
         """
 
         session = session or utils.get_default_session()
-
-        # get
         resp = _request('GET', self.get_url(type='beta'), raise_for_status=False, session=session)
         if _list_alert(resp):
             log.warning('are you logged in?')
         resp.raise_for_status()
+        self._cached_content = _AtCoderProblemContent_from_html(resp.content.decode(resp.encoding), problem=self)
+        return self._cached_content
 
-        # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
-        lang = None
-        for pre, h3 in self._find_sample_tags(soup):
-            s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
-            name = h3.string
-            l = self._get_tag_lang(pre)
-            if lang is None:
-                lang = l
-            elif lang != l:
-                log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
-                continue
-            samples.add(s.encode(), name)
-        return samples.get()
-
-    def _get_tag_lang(self, tag):
-        assert isinstance(tag, bs4.Tag)
-        for parent in tag.parents:
-            for cls in parent.attrs.get('class') or []:
-                if cls.startswith('lang-'):
-                    return cls
-
-    def _find_sample_tags(self, soup) -> Generator[Tuple[bs4.Tag, bs4.Tag], None, None]:
-        for pre in soup.find_all('pre'):
-            log.debug('pre tag: %s', str(pre))
-            if not pre.string:
-                continue
-            prv = utils.previous_sibling_tag(pre)
-
-            # the first format: h3+pre
-            if prv and prv.name == 'h3' and prv.string:
-                yield (pre, prv)
-
-            else:
-                # ignore tags which are not samples
-                # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
-                while prv is not None:
-                    if prv.name == 'pre':
-                        break
-                    prv = utils.previous_sibling_tag(prv)
-                if prv is not None:
-                    continue
-
-                # the second format: h3+section pre
-                if pre.parent and pre.parent.name == 'section':
-                    prv = pre.parent and utils.previous_sibling_tag(pre.parent)
-                    if prv and prv.name == 'h3' and prv.string:
-                        yield (pre, prv)
+    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+        """
+        :raises Exception: if no such problem exists
+        """
+        return self.download_content(session=session).sample_cases
 
     def get_url(self, type: Optional[str] = None, lang: Optional[str] = None) -> str:
         if type is None or type == 'beta':
@@ -485,54 +597,17 @@ class AtCoderProblem(onlinejudge.type.Problem):
         """
         :raises Exception: if no such problem exists
         """
-
-        session = session or utils.get_default_session()
-
-        # get
-        resp = _request('GET', self.get_url(type='beta'), raise_for_status=False, session=session)
-        if _list_alert(resp):
-            log.warning('are you logged in?')
-        resp.raise_for_status()
-
-        # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        for h3 in soup.find_all('h3', text=re.compile(r'^(入力|Input)$')):
-            if h3.parent.name == 'section':
-                section = h3.parent
-            else:
-                section = h3.find_next_sibling('section')
-            if section is None:
-                section = soup.find(class_='io-style')
-            if section is None:
-                log.warning('<section> tag not found. something wrong')
-                return None
-            pre = section.find('pre')
-            if pre is not None:
-                return pre.decode_contents(formatter=None)
-        return None
+        return self.download_content(session=session).input_format
 
     def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
         """
         :raises NotLoggedInError:
         """
-        session = session or utils.get_default_session()
-
-        # get
-        resp = _request('GET', self.get_url(type='beta'), session=session)
-
-        # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        form = soup.find('form', action='/contests/{}/submit'.format(self.contest_id))
-        if form is None:
+        content = self.download_content(session=session)
+        if content.available_languages is None:
             log.error('not logged in')
             raise NotLoggedInError
-
-        # parse
-        select = form.find('div', id='select-lang').find('select', attrs={'name': 'data.LanguageId'})  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
-        languages = []  # type: List[Language]
-        for option in select.find_all('option'):
-            languages += [Language(option.attrs['value'], option.string)]
-        return languages
+        return content.available_languages
 
     def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> 'AtCoderSubmission':
         """
@@ -540,8 +615,8 @@ class AtCoderProblem(onlinejudge.type.Problem):
         :raises SubmissionError:
         """
 
-        assert language_id in [language.id for language in self.get_available_languages(session=session)]
         session = session or utils.get_default_session()
+        assert language_id in [language.id for language in self.get_available_languages(session=session)]
 
         # get
         url = 'https://atcoder.jp/contests/{}/submit'.format(self.contest_id)
@@ -574,38 +649,8 @@ class AtCoderProblem(onlinejudge.type.Problem):
         else:
             raise SubmissionError('it may be a rate limit')
 
-    def _load_details(self, session: Optional[requests.Session] = None) -> None:
-        session = session or utils.get_default_session()
-
-        # get
-        resp = _request('GET', self.get_url(type='beta', lang='ja'), session=session)
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-
-        # parse
-        h2 = soup.find('span', class_='h2')
-        self._alphabet, _, self._task_name = h2.text.partition(' - ')
-        time_limit, memory_limit = h2.find_next_sibling('p').text.split(' / ')
-        self._time_limit_msec = int(utils.remove_suffix(utils.remove_prefix(time_limit, '実行時間制限: '), ' sec')) * 1000
-        self._memory_limit_byte = int(utils.remove_suffix(utils.remove_prefix(memory_limit, 'メモリ制限: '), ' MB')) * 1000 * 1000
-        task_statement = soup.find('div', id='task-statement')
-        p = task_statement.find('p')  # first
-        if p is not None and p.text.startswith('配点 : '):
-            self._score = int(utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点'))
-        self._score_checked = True
-
-    def get_score(self, session: Optional[requests.Session] = None) -> Optional[int]:
-        """
-        :return: :py:data:`None` if the problem has no score  (e.g. https://atcoder.jp/contests/abc012/tasks/abc012_3)
-        """
-        if not self._score_checked:
-            self._load_details(session=session)
-            assert self._score_checked
-        return self._score
-
-    get_name = utils.getter_with_load_details('_task_name', type=str)  # type: Callable[..., str]
-    get_time_limit_msec = utils.getter_with_load_details('_time_limit_msec', type=int)  # type: Callable[..., int]
-    get_memory_limit_byte = utils.getter_with_load_details('_memory_limit_byte', type=int)  # type: Callable[..., int]
-    get_alphabet = utils.getter_with_load_details('_alphabet', type=str)  # type: Callable[..., str]
+    def get_name(self, session: Optional[requests.Session] = None) -> str:
+        return self.download_content(session=session).name
 
     def iterate_submissions(self, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
         """
@@ -615,6 +660,47 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
     def iterate_submissions_where(self, **kwargs) -> Generator['AtCoderSubmission', None, None]:
         yield from self.get_contest().iterate_submissions_where(problem_id=self.problem_id, **kwargs)
+
+    def _get_partial_content(self, session: Optional[requests.Session] = None) -> Union[AtCoderProblemContentPartial, AtCoderProblemContent]:
+        if self._cached_content is None:
+            return self.download_content(session=session)
+        else:
+            return self._cached_content
+
+    def _get_content(self, session: Optional[requests.Session] = None) -> AtCoderProblemContent:
+        if isinstance(self._cached_content, AtCoderProblemContent):
+            return self._cached_content
+        else:
+            return self.download_content(session=session)
+
+    def get_score(self, session: Optional[requests.Session] = None) -> Optional[int]:
+        """
+        :return: :py:data:`None` if the problem has no score  (e.g. https://atcoder.jp/contests/abc012/tasks/abc012_3)
+        .. deprecated:: 6.2.0
+        """
+        warnings.warn('deprecated', DeprecationWarning)
+        return self._get_content(session=session).score
+
+    def get_time_limit_msec(self, session: Optional[requests.Session] = None) -> int:
+        """
+        .. deprecated:: 6.2.0
+        """
+        warnings.warn('deprecated', DeprecationWarning)
+        return self._get_partial_content(session=session).time_limit_msec
+
+    def get_memory_limit_byte(self, session: Optional[requests.Session] = None) -> int:
+        """
+        .. deprecated:: 6.2.0
+        """
+        warnings.warn('deprecated', DeprecationWarning)
+        return self._get_partial_content(session=session).memory_limit_byte
+
+    def get_alphabet(self, session: Optional[requests.Session] = None) -> str:
+        """
+        .. deprecated:: 6.2.0
+        """
+        warnings.warn('deprecated', DeprecationWarning)
+        return self._get_partial_content(session=session).alphabet
 
 
 class AtCoderSubmission(onlinejudge.type.Submission):
