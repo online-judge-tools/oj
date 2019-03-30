@@ -13,6 +13,7 @@ import posixpath
 import re
 import time
 import urllib.parse
+import xml.etree.ElementTree
 from typing import *
 
 import bs4
@@ -74,6 +75,39 @@ class TopcoderService(onlinejudge.type.Service):
                 and result.netloc in ['www.topcoder.com', 'community.topcoder.com']:
             return cls()
         return None
+
+
+TopcoderLongContestProblemOverviewRow = NamedTuple('TopcoderLongContestProblemOverviewRow', [
+    ('rank', int),
+    ('handle', str),
+    ('provisional_rank', int),
+    ('provisional_score', float),
+    ('final_score', float),
+    ('language', str),
+    ('cr', int),
+])
+
+TopcoderLongContestProblemIndividualResultsFeedSubmission = NamedTuple('TopcoderLongContestProblemIndividualResultsFeedSubmission', [
+    ('number', int),
+    ('score', float),
+    ('language', str),
+    ('time', str),
+])
+
+TopcoderLongContestProblemIndividualResultsFeedTestCase = NamedTuple('TopcoderLongContestProblemIndividualResultsFeedTestCase', [
+    ('test_case_id', int),
+    ('score', float),
+    ('processing_time', int),
+    ('fatal_error_ind', int),
+])
+
+TopcoderLongContestProblemIndividualResultsFeed = NamedTuple('TopcoderLongContestProblemIndividualResultsFeed', [
+    ('round_id', int),
+    ('coder_id', int),
+    ('handle', str),
+    ('submissions', List[TopcoderLongContestProblemIndividualResultsFeedSubmission]),
+    ('testcases', List[TopcoderLongContestProblemIndividualResultsFeedTestCase]),
+])
 
 
 class TopcoderLongContestProblem(onlinejudge.type.Problem):
@@ -235,6 +269,100 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
 
         assert header is not None
         return header, rows
+
+    def download_overview(self, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemOverviewRow]:
+        """
+        .. versionadded:: 6.2.0
+            This method may be deleted in future.
+        """
+        session = session or utils.get_default_session()
+
+        # get
+        number = 9999
+        start = 1
+        url = 'https://community.topcoder.com/longcontest/stats/?module=ViewOverview&rd={}&nr={}&sr={}'.format(self.rd, number, start)
+        resp = utils.request('GET', url, session=session)
+
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        table = soup.find('table', class_='stat')
+        overview = []  # type: List[TopcoderLongContestProblemOverviewRow]
+        for tr in table.find_all('tr', class_=re.compile(r'light|dark')):
+            tds = tr.find_all('td')
+            assert len(tds) == 9
+            rank = int(tds[0].text)
+            handle = tds[1].text.strip()
+            provisional_rank = int(tds[2].text)
+            provisional_score = float(tds[3].text)
+            final_score = float(tds[4].text)
+            language = tds[5].text.strip()
+            assert tds[6].text.strip() == 'results'
+            assert tds[7].text.strip() == 'submission history'
+            assert tds[8].text.strip() == 'example history'
+            query = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(tds[6].find('a').attrs['href']).query))
+            self.pm = query['pm']
+            overview += [TopcoderLongContestProblemOverviewRow(rank, handle, provisional_rank, provisional_score, final_score, language, cr=int(query['cr']))]
+        return overview
+
+    def download_individual_results_feed(self, cr: int, session: Optional[requests.Session] = None) -> TopcoderLongContestProblemIndividualResultsFeed:
+        """
+        .. versionadded:: 6.2.0
+            This method may be deleted in future.
+        """
+        session = session or utils.get_default_session()
+
+        # get
+        url = 'https://community.topcoder.com/longcontest/stats/?module=IndividualResultsFeed&rd={}&cr={}'.format(self.rd, cr)
+        resp = utils.request('GET', url, session=session)
+
+        # parse
+        def get_text_at(node: xml.etree.ElementTree.Element, i: int) -> str:
+            text = list(node)[i].text
+            if text is None:
+                raise ValueError
+            return text
+
+        root = xml.etree.ElementTree.fromstring(resp.content.decode(resp.encoding))
+        assert len(list(root)) == 5
+        round_id = int(get_text_at(root, 0))
+        coder_id = int(get_text_at(root, 1))
+        handle = get_text_at(root, 2)
+        submissions = []  # type: List[TopcoderLongContestProblemIndividualResultsFeedSubmission]
+        for submission in list(root)[3]:
+            number = int(get_text_at(submission, 0))
+            score = float(get_text_at(submission, 1))
+            language = get_text_at(submission, 2)
+            time = get_text_at(submission, 3)
+            submissions += [TopcoderLongContestProblemIndividualResultsFeedSubmission(number, score, language, time)]
+        testcases = []  # type: List[TopcoderLongContestProblemIndividualResultsFeedTestCase]
+        for testcase in list(root)[4]:
+            test_case_id = int(get_text_at(testcase, 0))
+            score = float(get_text_at(testcase, 1))
+            processing_time = int(get_text_at(testcase, 2))
+            fatal_error_ind = int(get_text_at(testcase, 3))
+            testcases += [TopcoderLongContestProblemIndividualResultsFeedTestCase(test_case_id, score, processing_time, fatal_error_ind)]
+        return TopcoderLongContestProblemIndividualResultsFeed(round_id, coder_id, handle, submissions, testcases)
+
+    def download_system_test(self, test_case_id: int, session: Optional[requests.Session] = None) -> str:
+        """
+        :raises NotLoggedInError:
+        :note: You need to parse this result manually.
+
+        .. versionadded:: 6.2.0
+            This method may be deleted in future.
+        """
+        session = session or utils.get_default_session()
+
+        # get
+        assert self.pm is not None
+        url = 'https://community.topcoder.com/longcontest/stats/?module=ViewSystemTest&rd={}&pm={}&tid={}'.format(self.rd, self.pm, test_case_id)
+        resp = utils.request('GET', url, session=session)
+
+        # parse
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        if soup.find('form', attrs={'name': 'frmLogin'}):
+            raise NotLoggedInError
+        return soup.find('pre').text
 
 
 onlinejudge.dispatch.services += [TopcoderService]
