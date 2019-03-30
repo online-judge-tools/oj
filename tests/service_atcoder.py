@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from onlinejudge.service.atcoder import AtCoderContest, AtCoderProblem, AtCoderService, AtCoderSubmission
+import requests
+
+from onlinejudge.service.atcoder import AtCoderContest, AtCoderProblem, AtCoderProblemContent, AtCoderService, AtCoderSubmission
+from onlinejudge.type import TestCase
 
 
 class AtCoderSerivceTest(unittest.TestCase):
@@ -85,6 +88,15 @@ class AtCoderProblemTest(unittest.TestCase):
         self.assertEqual(AtCoderProblem.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d').problem_id, 'kupc2014_d')
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c').contest_id, 'agc030')
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c').problem_id, 'agc030_c')
+
+    def test_repr(self):
+        self.assertEqual(repr(AtCoderProblem('kupc2014', 'kupc2014_d')), "AtCoderProblem.from_url('https://atcoder.jp/contests/kupc2014/tasks/kupc2014_d')")
+        self.assertEqual(repr(AtCoderProblem('agc030', 'agc030_c')), "AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c')")
+        self.assertEqual(repr(AtCoderProblem('xxxxxx', 'yyyyyy')), "AtCoderProblem.from_url('https://atcoder.jp/contests/xxxxxx/tasks/yyyyyy')")
+
+    def test_eq(self):
+        self.assertEqual(AtCoderProblem.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d'), AtCoderProblem.from_url('https://atcoder.jp/contests/kupc2014/tasks/kupc2014_d'))
+        self.assertNotEqual(AtCoderProblem.from_url('https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d'), AtCoderProblem.from_url('https://atcoder.jp/contests/agc030/tasks/agc030_c'))
 
     def test_load_details(self):
         problem = AtCoderProblem.from_url('https://atcoder.jp/contests/abc118/tasks/abc118_a')
@@ -173,6 +185,29 @@ class AtCoderSubmissionTest(unittest.TestCase):
         submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/abc100/submissions/4317534')
         self.assertEqual(submission.get_source_code(), b'/9\\|\\B/c:(\r\ncYay!\r\n')
         self.assertEqual(submission.get_code_size(), 19)
+
+
+class AtCoderProblemContentTest(unittest.TestCase):
+    def test_from_html(self):
+        url = 'https://atcoder.jp/contests/abc114/tasks/abc114_d'
+        resp = requests.get(url)
+        html = resp.content.decode(resp.apparent_encoding)
+        content = AtCoderProblemContent.from_html(html, problem=AtCoderProblem.from_url(url))
+
+        self.assertEqual(content.alphabet, 'D')
+        self.assertEqual(content.available_languages, None)
+        self.assertEqual(content.html, html)
+        self.assertEqual(content.input_format, '<var>N</var>\r\n')
+        self.assertEqual(content.memory_limit_byte, 1024 * 1000 * 1000)
+        self.assertEqual(content.name, '756')
+        self.assertEqual(content.problem, AtCoderProblem.from_url(url))
+        self.assertEqual(content.sample_cases, [
+            TestCase(name='sample-1', input_name='入力例 1', input_data=b'9\n', output_name='出力例 1', output_data=b'0\n'),
+            TestCase(name='sample-2', input_name='入力例 2', input_data=b'10\n', output_name='出力例 2', output_data=b'1\n'),
+            TestCase(name='sample-3', input_name='入力例 3', input_data=b'100\n', output_name='出力例 3', output_data=b'543\n'),
+        ])
+        self.assertEqual(content.score, 400)
+        self.assertEqual(content.time_limit_msec, 2 * 1000)
 
 
 class AtCoderProblemGetInputFormatTest(unittest.TestCase):
