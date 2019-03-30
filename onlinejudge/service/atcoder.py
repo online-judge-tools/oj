@@ -399,27 +399,21 @@ def _AtCoderProblemContent_find_sample_tags(soup: bs4.BeautifulSoup) -> Generato
         log.debug('pre tag: %s', str(pre))
         if not pre.string:
             continue
-        prv = utils.previous_sibling_tag(pre)
+
+        def h3_plus(tag):
+            prv = tag.find_previous_sibling()
+            if prv and prv.name == 'h3' and prv.string:
+                yield (pre, prv)
 
         # the first format: h3+pre
-        if prv and prv.name == 'h3' and prv.string:
-            yield (pre, prv)
+        yield from h3_plus(pre)
 
-        else:
+        # the second format: h3+section pre
+        if pre.parent and pre.parent.name == 'section':
             # ignore tags which are not samples
             # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
-            while prv is not None:
-                if prv.name == 'pre':
-                    break
-                prv = utils.previous_sibling_tag(prv)
-            if prv is not None:
-                continue
-
-            # the second format: h3+section pre
-            if pre.parent and pre.parent.name == 'section':
-                prv = pre.parent and utils.previous_sibling_tag(pre.parent)
-                if prv and prv.name == 'h3' and prv.string:
-                    yield (pre, prv)
+            if pre.find_previous_sibling('pre') is None:
+                yield from h3_plus(pre.parent)
 
 
 def _AtCoderProblemContent_parse_sample_cases(soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
