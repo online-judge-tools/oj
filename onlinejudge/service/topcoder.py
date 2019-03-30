@@ -306,26 +306,30 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', url, session=session)
 
         # parse
+        def get_text_at(node: xml.etree.ElementTree.Element, i: int) -> str:
+            text = list(node)[i].text
+            if text is None:
+                raise ValueError
+            return text
+
         root = xml.etree.ElementTree.fromstring(resp.content.decode(resp.encoding))
         assert len(list(root)) == 5
-        round_id = int(list(root)[0].text or '')  # NOTE: `or ''` is for the typechecker
-        coder_id = int(list(root)[1].text or '')
-        handle = list(root)[2].text
-        assert handle is not None
+        round_id = int(get_text_at(root, 0))
+        coder_id = int(get_text_at(root, 1))
+        handle = get_text_at(root, 2)
         submissions = []  # type: List[TopcoderLongContestProblemIndividualResultsFeedSubmission]
         for submission in list(root)[3]:
-            number = int(list(submission)[0].text or '')
-            score = float(list(submission)[1].text or '')
-            language = list(submission)[2].text or ''
-            time = list(submission)[3].text
-            assert time is not None
+            number = int(get_text_at(submission, 0))
+            score = float(get_text_at(submission, 1))
+            language = get_text_at(submission, 2)
+            time = get_text_at(submission, 3)
             submissions += [TopcoderLongContestProblemIndividualResultsFeedSubmission(number, score, language, time)]
         testcases = []  # type: List[TopcoderLongContestProblemIndividualResultsFeedTestCase]
         for testcase in list(root)[4]:
-            test_case_id = int(list(testcase)[0].text or '')
-            score = float(list(testcase)[1].text or '')
-            processing_time = int(list(testcase)[2].text or '')
-            fatal_error_ind = int(list(testcase)[3].text or '')
+            test_case_id = int(get_text_at(testcase, 0))
+            score = float(get_text_at(testcase, 1))
+            processing_time = int(get_text_at(testcase, 2))
+            fatal_error_ind = int(get_text_at(testcase, 3))
             testcases += [TopcoderLongContestProblemIndividualResultsFeedTestCase(test_case_id, score, processing_time, fatal_error_ind)]
         return TopcoderLongContestProblemIndividualResultsFeed(round_id, coder_id, handle, submissions, testcases)
 
