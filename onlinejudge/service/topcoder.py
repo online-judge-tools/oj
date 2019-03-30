@@ -52,9 +52,13 @@ class TopcoderService(onlinejudge.type.Service):
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         """
-        :raises NotImplementedError:
+        .. versionadded:: 6.2.0
         """
-        raise NotImplementedError
+        session = session or utils.get_default_session()
+        url = 'https://community.topcoder.com/longcontest/stats/?module=ViewSystemTest&rd=17143&pm=14889&tid=33800773'
+        resp = utils.request('GET', url, session=session)
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        return soup.find('form', attrs={'name': 'frmLogin'}) is None
 
     def get_url(self) -> str:
         return 'https://www.topcoder.com/'
