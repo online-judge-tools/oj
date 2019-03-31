@@ -77,6 +77,17 @@ class TopcoderService(onlinejudge.type.Service):
         return None
 
 
+TopcoderLongContestProblemStandingsRow = NamedTuple('TopcoderLongContestProblemStandingsRow', [
+    ('handle', str),
+    ('score', Optional[float]),
+    ('rank', Optional[int]),
+    ('last_submission_time', Optional[str]),
+    ('language', Optional[str]),
+    ('example_tests', int),
+    ('submissions', int),
+    ('cr', int),
+])
+
 TopcoderLongContestProblemOverviewRow = NamedTuple('TopcoderLongContestProblemOverviewRow', [
     ('rank', int),
     ('handle', str),
@@ -230,45 +241,50 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             log.failure('%s', messages)
             raise SubmissionError('it may be a rate limit: ' + messages)
 
-    def get_standings(self, session: Optional[requests.Session] = None) -> Tuple[List[str], List[Dict[str, Any]]]:
+    def download_standings(self, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemStandingsRow]:
         """
-        .. deprecated:: 6.0.0
+        :raises Exception: if redirected to `module=ViewOverview` page
+
+        .. versionadded:: 6.2.0
             This method may be deleted in future.
         """
         session = session or utils.get_default_session()
 
-        header = None  # type: Optional[List[str]]
-        rows = []  # type: List[Dict[str, str]]
-        for start in itertools.count(1, 100):
+        rows = []  # type: List[TopcoderLongContestProblemStandingsRow]
+        for start in itertools.count(1):
             # get
-            url = 'https://community.topcoder.com/longcontest/?sc=&sd=&nr=100&sr={}&rd={}&module=ViewStandings'.format(start, self.rd)
-            resp = utils.request('GET', url, session=session)
+            url = 'https://community.topcoder.com/longcontest/?module=ViewStandings&rd={}&nr=100&sr={}'.format(self.rd, start)
+            resp = utils.request('GET', url, allow_redirects=False, session=session)
+            if resp.status_code != 200:
+                raise RuntimeError('failed to get {}'.format(url))
 
             # parse
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             table = soup.find('table', class_='statTable')
-            trs = table.find_all('tr')
-            if header is None:
-                tr = trs[1]
-                header = [td.text.strip() for td in tr.find_all('td')]
-            for tr in trs[2:]:
+            for tr in table.find_all('tr')[2:]:  # NOTE: first two rows are headings
                 row = collections.OrderedDict()  # type: Dict[str, str]
-                for key, td in zip(header, tr.find_all('td')):
-                    value = td.text.strip()
-                    if not value:
-                        value = None
-                    elif value.isdigit():
-                        value = int(value)
-                    row[key] = value
-                rows += [row]
+                tds = tr.find_all('td')
+                texts = [td.text.strip() for td in tds]  # NOTE: some cells may be empty strings
+
+                assert len(texts) == 7
+                handle = texts[0]
+                score = float(texts[1]) if texts[1] else None
+                rank = int(texts[2]) if texts[2] else None
+                last_submission_time = texts[3] or None
+                language = texts[4] or None
+                example_tests = int(tds[5].text)
+                submissions = int(tds[6].text)
+                href = (tds[5].find('a') or tds[6].find('a')).attrs['href']
+                query = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(href).query))
+                self.compid = query['compid']
+                rows += [TopcoderLongContestProblemStandingsRow(handle, score, rank, last_submission_time, language, example_tests, submissions, cr=int(query['cr']))]
 
             # check whether the next page exists
             link = soup.find('a', text='next >>')
             if link is None:
                 break
 
-        assert header is not None
-        return header, rows
+        return rows
 
     def download_overview(self, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemOverviewRow]:
         """

@@ -16,6 +16,11 @@ class TopcoderLongConrestProblemTest(unittest.TestCase):
         self.assertEqual(TopcoderLongContestProblem.from_url('https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17092&pm=14853').rd, 17092)
         self.assertEqual(TopcoderLongContestProblem.from_url('https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17092&pm=14853').pm, 14853)
 
+    # TODO: write a mock test
+    def test_download_standings_expired(self):
+        problem = TopcoderLongContestProblem.from_url('https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17143&pm=14889')
+        self.assertRaises(Exception, problem.download_standings)
+
     def test_download_overview(self):
         problem = TopcoderLongContestProblem.from_url('https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17143&pm=14889')
         overview = problem.download_overview()
