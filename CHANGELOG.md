@@ -1,5 +1,12 @@
 # Change Log
 
+## 6.2.0 / 2019-04-06
+
+-   [#407](https://github.com/kmyk/online-judge-tools/pull/407) update the method to read standings of Topcoder
+-   [#406](https://github.com/kmyk/online-judge-tools/pull/406) add methods to read results of Topcoder
+-   [#292](https://github.com/kmyk/online-judge-tools/pull/292) implement `login --check` for Topcoder
+-   [#402](https://github.com/kmyk/online-judge-tools/pull/402) add a class to represent contents of AtCoder
+
 ## 6.1.0 / 2019-03-22
 
 -   [#380](https://github.com/kmyk/online-judge-tools/issues/380) fix a bug to get input formats from old problems of AtCoder
