@@ -47,17 +47,16 @@ class DownloadAOJTest(unittest.TestCase):
         })
 
     def test_call_download_aoj_system_ITP1_1_B(self):
-        self.snippet_call_download(
-            'http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ITP1_1_B', {
-                'test1.in': 'b026324c6904b2a9cb4b88d6d61c81d1',
-                'test1.out': 'b026324c6904b2a9cb4b88d6d61c81d1',
-                'test2.in': '6d7fce9fee471194aa8b5b6e47267f03',
-                'test2.out': '66a7c1d5cb75ef2542524d888fd32f4a',
-                'test3.in': '9caff0735bc6e80121cedcb98ca51821',
-                'test3.out': 'fef5f767008b27f5c3801382264f46ef',
-                'test4.in': '919d117956d3135c4c683ff021352f5c',
-                'test4.out': 'b39ffd5aa5029d696193c8362dcb1d19',
-            }, is_system=True)
+        self.snippet_call_download('http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ITP1_1_B', {
+            'test1.in': 'b026324c6904b2a9cb4b88d6d61c81d1',
+            'test1.out': 'b026324c6904b2a9cb4b88d6d61c81d1',
+            'test2.in': '6d7fce9fee471194aa8b5b6e47267f03',
+            'test2.out': '66a7c1d5cb75ef2542524d888fd32f4a',
+            'test3.in': '9caff0735bc6e80121cedcb98ca51821',
+            'test3.out': 'fef5f767008b27f5c3801382264f46ef',
+            'test4.in': '919d117956d3135c4c683ff021352f5c',
+            'test4.out': 'b39ffd5aa5029d696193c8362dcb1d19',
+        }, is_system=True)
 
     def test_call_download_aoj_system_1169(self):
         # NOTE: the data exists, but AOJ says "..... (terminated because of the limitation)"
@@ -75,11 +74,10 @@ class DownloadAOJArenaTest(unittest.TestCase):
         tests.command_download.snippet_call_download(self, *args, **kwargs)
 
     def test_call_download_aoj_arena_yupro_d(self):
-        self.snippet_call_download(
-            'https://onlinejudge.u-aizu.ac.jp/services/room.html#yupro/problems/D', [
-                {
-                    "name": "sample-1",
-                    "input": "6/2*(1+2)\n1-1-1\n(1-1-1)/2\n#\n",
-                    "output": "2\n2\n1\n",
-                },
-            ], type='json')
+        self.snippet_call_download('https://onlinejudge.u-aizu.ac.jp/services/room.html#yupro/problems/D', [
+            {
+                "name": "sample-1",
+                "input": "6/2*(1+2)\n1-1-1\n(1-1-1)/2\n#\n",
+                "output": "2\n2\n1\n",
+            },
+        ], type='json')

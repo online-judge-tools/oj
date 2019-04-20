@@ -44,30 +44,29 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_select(self):
-        self.snippet_call_generate_output(
-            args=['-c', 'cat', 'test/sample-1.in', 'test/sample-2.in'], input_files=[
-                {
-                    'path': 'test/sample-1.in',
-                    'data': 'foo\n'
-                },
-                {
-                    'path': 'test/sample-2.in',
-                    'data': 'bar\n'
-                },
-                {
-                    'path': 'test/sample-3.in',
-                    'data': 'baz\n'
-                },
-            ], expected_values=[
-                {
-                    'path': 'test/sample-1.out',
-                    'data': 'foo\n'
-                },
-                {
-                    'path': 'test/sample-2.out',
-                    'data': 'bar\n'
-                },
-            ], disallowed_files=['test/sample-3.out'])
+        self.snippet_call_generate_output(args=['-c', 'cat', 'test/sample-1.in', 'test/sample-2.in'], input_files=[
+            {
+                'path': 'test/sample-1.in',
+                'data': 'foo\n'
+            },
+            {
+                'path': 'test/sample-2.in',
+                'data': 'bar\n'
+            },
+            {
+                'path': 'test/sample-3.in',
+                'data': 'baz\n'
+            },
+        ], expected_values=[
+            {
+                'path': 'test/sample-1.out',
+                'data': 'foo\n'
+            },
+            {
+                'path': 'test/sample-2.out',
+                'data': 'bar\n'
+            },
+        ], disallowed_files=['test/sample-3.out'])
 
     def test_call_generate_output_already_exists(self):
         # Since sample-1.out already exists, sample-1.out will not be updated.
