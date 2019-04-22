@@ -362,7 +362,7 @@ def _AtCoderProblemContentPartial_from_row(tr: bs4.Tag):
     alphabet = tds[0].text
     name = tds[1].text
     time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
-    memory_limit_byte = int(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000  # TODO: confirm this is MB truly, not MiB
+    memory_limit_byte = int(float(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000)  # TODO: confirm this is MB truly, not MiB
     if len(tds) == 5:
         assert tds[4].text.strip() in ('', 'Submit', '提出')
 
