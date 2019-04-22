@@ -72,6 +72,19 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(problems[6].get_alphabet(), 'F2')
         self.assertEqual(problems[6].problem_id, 'agc028_f2')
 
+    def test_list_problems_with_float_values(self):
+        """
+        .. seealso:
+            https://github.com/kmyk/online-judge-tools/issues/412
+        """
+
+        contest = AtCoderContest.from_url('https://atcoder.jp/contests/dwacon2018-final-open')
+        problems = contest.list_problems()
+        self.assertEqual(problems[0].get_time_limit_msec(), 2525)
+        self.assertEqual(problems[0].get_memory_limit_byte(), int(252.525 * 1000 * 1000))
+        self.assertEqual(problems[1].get_time_limit_msec(), 5252)
+        self.assertEqual(problems[1].get_memory_limit_byte(), int(525.252 * 1000 * 1000))
+
     def test_iterate_submissions(self):
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/code-festival-2014-exhibition-open')
         submissions = list(contest.iterate_submissions())
