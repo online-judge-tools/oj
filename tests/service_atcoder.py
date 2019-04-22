@@ -114,6 +114,14 @@ class AtCoderProblemTest(unittest.TestCase):
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/future-contest-2018-final/tasks/future_contest_2018_final_a').get_score(), 50000000)
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/abc001/tasks/abc001_4').get_score(), None)
 
+    def test_get_score_latex(self):
+        """
+        .. seealso::
+            https://github.com/kmyk/online-judge-tools/issues/411
+        """
+
+        self.assertIsNone(AtCoderProblem.from_url('https://atcoder.jp/contests/wupc2019/tasks/wupc2019_a').get_score())
+
     def test_iterate_submissions(self):
         problem = AtCoderProblem.from_url('https://atcoder.jp/contests/abc119/tasks/abc119_c')
         submissions = problem.iterate_submissions()
