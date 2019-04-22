@@ -487,7 +487,13 @@ def _AtCoderProblemContent_parse_score(soup: bs4.BeautifulSoup) -> Optional[int]
     task_statement = soup.find('div', id='task-statement')
     p = task_statement.find('p')  # first
     if p is not None and p.text.startswith('配点 : '):
-        return int(utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点'))
+        score = utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点')
+        try:
+            return int(score)
+        except ValueError:
+            # some problems have scores like "<p>配点 : \(100\) 点</p>", not "<p>配点 : 100 点</p>"
+            # example: https://atcoder.jp/contests/wupc2019/tasks/wupc2019_a
+            pass
     return None
 
 
