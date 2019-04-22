@@ -9,6 +9,7 @@ import json
 import pathlib
 import posixpath
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -280,15 +281,33 @@ def snip_large_file_content(content: bytes, limit: int, head: int, tail: int, bo
     except UnicodeDecodeError as e:
         return str(e)
     font = log.bold if bold else (lambda s: s)
-    lines = text.splitlines(keepends=True)
-    if len(lines) < limit:
-        return font(text)
-    else:
-        return ''.join([
-            font(''.join(lines[:head])),
-            '... ({} lines) ...\n'.format(len(lines[head:-tail])),
-            font(''.join(lines[-tail:])),
-        ])
+    char_in_line, _ = shutil.get_terminal_size()
+
+    def snip_line_based():
+        lines = text.splitlines(keepends=True)
+        if len(lines) < limit:
+            return font(text)
+        else:
+            return ''.join([
+                font(''.join(lines[:head])),
+                '... ({} lines) ...\n'.format(len(lines[head:-tail])),
+                font(''.join(lines[-tail:])),
+            ])
+
+    def snip_char_based():
+        if len(text) < char_in_line * limit:
+            return font(text)
+        else:
+            return ''.join([
+                font(text[:char_in_line * head]),
+                '... ({} chars) ...'.format(len(text[char_in_line * head:-char_in_line * tail])),
+                font(text[-char_in_line * tail:]),
+            ])
+
+    text = snip_line_based()
+    if len(text) > char_in_line * limit:
+        text = snip_char_based()
+    return text
 
 
 class DummySubmission(Submission):
