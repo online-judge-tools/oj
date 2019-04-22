@@ -132,7 +132,7 @@ def textfile(s: str) -> str:  # should have trailing newline
         return s + '\n'
 
 
-def exec_command(command: List[str], timeout: float = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
+def exec_command(command: List[str], timeout: Optional[float] = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
     try:
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
     except FileNotFoundError:
