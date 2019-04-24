@@ -304,10 +304,7 @@ def snip_large_file_content(content: bytes, limit: int, head: int, tail: int, bo
                 font(text[-char_in_line * tail:]),
             ])
 
-    text = snip_line_based()
-    if len(text) > char_in_line * limit:
-        text = snip_char_based()
-    return text
+    return min([font(text), snip_line_based(), snip_char_based()], key=len)
 
 
 class DummySubmission(Submission):
