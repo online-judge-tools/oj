@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.2.1 / 2019-04-24
+
+-   [#314](https://github.com/kmyk/online-judge-tools/issues/314) improve outputs for large files
+-   [#411](https://github.com/kmyk/online-judge-tools/issues/411) [#412](https://github.com/kmyk/online-judge-tools/issues/412) fix degressions of `download` from AtCoder
+-   [#409](https://github.com/kmyk/online-judge-tools/issues/409) remove an unused dependency from `setup.cfg`
+
 ## 6.2.0 / 2019-04-06
 
 -   [#407](https://github.com/kmyk/online-judge-tools/pull/407) update the method to read standings of Topcoder
