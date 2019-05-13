@@ -37,3 +37,15 @@ class CodeforcesProblemTest(unittest.TestCase):
         self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1133/problem/E').index, 'E')
         self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1133/problem/F1').index, 'F1')
         self.assertEqual(CodeforcesProblem.from_url('https://codeforces.com/contest/1133/problem/F2').index, 'F2')
+
+    def test_from_url_subdomains(self):
+        urls = [
+            'https://codeforces.com/contest/1158/problem/C',
+            'https://m1.codeforces.com/contest/1158/problem/C',
+            'https://m2.codeforces.com/contest/1158/problem/C',
+            'https://m3.codeforces.com/contest/1158/problem/C',
+        ]
+        for url in urls:
+            self.assertEqual(CodeforcesProblem.from_url(url).get_url(), url)
+            self.assertEqual(CodeforcesProblem.from_url(url).contest_id, 1158)
+            self.assertEqual(CodeforcesProblem.from_url(url).index, 'C')

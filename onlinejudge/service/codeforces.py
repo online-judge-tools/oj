@@ -3,6 +3,7 @@
 the module for Codeforces (https://codeforces.com/)
 
 :note: There is the offcial API https://codeforces.com/api/help
+:note: The minimalistic versions (https://m1.codeforces.com/, https://m2.codeforces.com/, or https://m3.codeforces.com/) are sometimes used. See https://codeforces.com/blog/entry/63375
 """
 
 import posixpath
@@ -23,12 +24,15 @@ from onlinejudge.type import *
 
 
 class CodeforcesService(onlinejudge.type.Service):
+    def __init__(self, domain='codeforces.com'):
+        self.domain = domain
+
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raises LoginError:
         """
         session = session or utils.get_default_session()
-        url = 'https://codeforces.com/enter'
+        url = 'https://{}/enter'.format(self.domain())
         # get
         resp = utils.request('GET', url, session=session)
         if resp.url != url:  # redirected
@@ -54,12 +58,12 @@ class CodeforcesService(onlinejudge.type.Service):
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
-        url = 'https://codeforces.com/enter'
+        url = 'https://{}/enter'.format(self.domain())
         resp = utils.request('GET', url, session=session, allow_redirects=False)
         return resp.status_code == 302
 
     def get_url(self) -> str:
-        return 'https://codeforces.com/'
+        return 'https://{}/'.format(self.domain)
 
     def get_name(self) -> str:
         return 'Codeforces'
@@ -70,8 +74,8 @@ class CodeforcesService(onlinejudge.type.Service):
         # example: http://codeforces.com/
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc == 'codeforces.com':
-            return cls()
+                and (result.netloc == 'codeforces.com' or result.netloc.endswith('.codeforces.com')):
+            return cls(domain=result.netloc)
         return None
 
 
@@ -83,13 +87,15 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     :ivar kind: :py:class:`str` must be `contest` or `gym`
     """
 
-    def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
+    def __init__(self, contest_id: int, index: str, kind: Optional[str] = None, domain: str = 'codeforces.com'):
         assert isinstance(contest_id, int)
         assert 1 <= len(index) <= 2
         assert index[0] in string.ascii_uppercase
         if len(index) == 2:
             assert index[1] in string.digits
         assert kind in (None, 'contest', 'gym', 'problemset')
+        assert domain == 'codeforces.com' or domain.endswith('.codeforces.com')
+
         self.contest_id = contest_id
         self.index = index
         if kind is None:
@@ -98,6 +104,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             else:
                 kind = 'gym'
         self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
+        self.domain = domain
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.get_default_session()
@@ -179,10 +186,10 @@ class CodeforcesProblem(onlinejudge.type.Problem):
 
     def get_url(self) -> str:
         table = {}
-        table['contest'] = 'https://codeforces.com/contest/{}/problem/{}'
-        table['problemset'] = 'https://codeforces.com/problemset/problem/{}/{}'
-        table['gym'] = 'https://codeforces.com/gym/{}/problem/{}'
-        return table[self.kind].format(self.contest_id, self.index)
+        table['contest'] = 'https://{}/contest/{}/problem/{}'
+        table['problemset'] = 'https://{}/problemset/problem/{}/{}'
+        table['gym'] = 'https://{}/gym/{}/problem/{}'
+        return table[self.kind].format(self.domain, self.contest_id, self.index)
 
     def get_service(self) -> CodeforcesService:
         return CodeforcesService()
@@ -191,7 +198,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     def from_url(cls, url: str) -> Optional['CodeforcesProblem']:
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc == 'codeforces.com':
+                and (result.netloc == 'codeforces.com' or result.netloc.endswith('.codeforces.com')):
             # "0" is needed. example: https://codeforces.com/contest/1000/problem/0
             # "[1-9]?" is sometime used. example: https://codeforces.com/contest/1133/problem/F2
             re_for_index = r'(0|[A-Za-z][1-9]?)'
@@ -206,7 +213,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                         index = 'A'  # NOTE: This is broken if there was "A1".
                     else:
                         index = m.group(2).upper()
-                    return cls(int(m.group(1)), index, kind=kind)
+                    return cls(int(m.group(1)), index, kind=kind, domain=result.netloc)
         return None
 
 
