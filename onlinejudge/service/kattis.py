@@ -1,6 +1,6 @@
 # Python Version: 3.x
 """
-the module for Kattis (http://open.kattis.org/)
+the module for Kattis (https://open.kattis.com/)
 """
 
 import io
@@ -26,7 +26,7 @@ class KattisService(onlinejudge.type.Service):
         :note: sometimes this URL is not correct, i.e. something like https://hanoi18.kattis.com/ exists
         """
 
-        return 'http://open.kattis.org/'
+        return 'https://open.kattis.com/'
 
     def get_name(self) -> str:
         return 'Kattis'
