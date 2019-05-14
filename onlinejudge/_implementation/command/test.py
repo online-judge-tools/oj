@@ -64,12 +64,12 @@ def test(args: 'argparse.Namespace') -> None:
 
     history = []  # type: List[Dict[str, Any]]
     for name, it in sorted(tests.items()):
-        is_printed_input = not args.print_input
+        is_input_printed = False
 
         def print_input():
-            nonlocal is_printed_input
-            if not is_printed_input:
-                is_printed_input = True
+            nonlocal is_input_printed
+            if args.print_input and not is_input_printed:
+                is_input_printed = True
                 with open(it['in'], 'rb') as inf:
                     log.emit('input:\n%s', utils.snip_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
 
@@ -135,7 +135,7 @@ def test(args: 'argparse.Namespace') -> None:
                 assert False
         else:
             if not args.silent:
-                log.emit(utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+                log.emit(('output:\n%s' if is_input_printed else '%s'), utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
         if result == 'AC':
             log.success(log.green('AC'))
             ac_count += 1
