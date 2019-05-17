@@ -22,9 +22,14 @@ import onlinejudge.dispatch
 import onlinejudge.type
 from onlinejudge.type import *
 
+_main_domain = 'codeforces.com'
+_minimalistic_domains = ('m1.codeforces.com', 'm2.codeforces.com', 'm3.codeforces.com')
+_all_domains = (_main_domain, *_minimalistic_domains)
+
 
 class CodeforcesService(onlinejudge.type.Service):
-    def __init__(self, domain='codeforces.com'):
+    def __init__(self, domain: Optional[str] = _main_domain):
+        assert domain in _all_domains
         self.domain = domain
 
     def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
@@ -32,7 +37,7 @@ class CodeforcesService(onlinejudge.type.Service):
         :raises LoginError:
         """
         session = session or utils.get_default_session()
-        url = 'https://{}/enter'.format(self.domain())
+        url = '{}/enter'.format(self._get_base_url())
         # get
         resp = utils.request('GET', url, session=session)
         if resp.url != url:  # redirected
@@ -40,7 +45,12 @@ class CodeforcesService(onlinejudge.type.Service):
             return
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        form = soup.find('form', id='enterForm')
+        if self.domain == _main_domain:
+            form = soup.find('form', id='enterForm')
+        else:
+            forms = soup.find_all('form')
+            assert len(forms) == 1
+            form = forms[0]
         log.debug('form: %s', str(form))
         username, password = get_credentials()
         form = utils.FormSender(form, url=resp.url)
@@ -58,12 +68,16 @@ class CodeforcesService(onlinejudge.type.Service):
 
     def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
-        url = 'https://{}/enter'.format(self.domain())
+        url = '{}/enter'.format(self._get_base_url())
         resp = utils.request('GET', url, session=session, allow_redirects=False)
         return resp.status_code == 302
 
     def get_url(self) -> str:
-        return 'https://{}/'.format(self.domain)
+        if self.domain == _main_domain:
+            protocol = 'https'
+        else:
+            protocol = 'http'
+        return '{}://{}/'.format(protocol, self.domain)
 
     def get_name(self) -> str:
         return 'Codeforces'
@@ -73,10 +87,12 @@ class CodeforcesService(onlinejudge.type.Service):
         # example: https://codeforces.com/
         # example: http://codeforces.com/
         result = urllib.parse.urlparse(url)
-        if result.scheme in ('', 'http', 'https') \
-                and (result.netloc == 'codeforces.com' or result.netloc.endswith('.codeforces.com')):
+        if result.scheme in ('', 'http', 'https') and result.netloc in _all_domains:
             return cls(domain=result.netloc)
         return None
+
+    def _get_base_url(self):
+        return self.get_url()
 
 
 # NOTE: Codeforces has its API: https://codeforces.com/api/help
@@ -87,14 +103,14 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     :ivar kind: :py:class:`str` must be `contest` or `gym`
     """
 
-    def __init__(self, contest_id: int, index: str, kind: Optional[str] = None, domain: str = 'codeforces.com'):
+    def __init__(self, contest_id: int, index: str, kind: Optional[str] = None, domain: str = _main_domain):
         assert isinstance(contest_id, int)
         assert 1 <= len(index) <= 2
         assert index[0] in string.ascii_uppercase
         if len(index) == 2:
             assert index[1] in string.digits
         assert kind in (None, 'contest', 'gym', 'problemset')
-        assert domain == 'codeforces.com' or domain.endswith('.codeforces.com')
+        assert domain in _all_domains
 
         self.contest_id = contest_id
         self.index = index
@@ -107,6 +123,12 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         self.domain = domain
 
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+        """
+        :raises NotImplementedError: if a minimalistic version is used
+        """
+
+        if self.domain != _main_domain:
+            raise NotImplementedError
         session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -151,8 +173,11 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         """
         :raises NotLoggedInError:
         :raises SubmissionError:
+        :raises NotImplementedError: if a minimalistic version is used
         """
 
+        if self.domain != _main_domain:
+            raise NotImplementedError
         session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -186,19 +211,19 @@ class CodeforcesProblem(onlinejudge.type.Problem):
 
     def get_url(self) -> str:
         table = {}
-        table['contest'] = 'https://{}/contest/{}/problem/{}'
-        table['problemset'] = 'https://{}/problemset/problem/{}/{}'
-        table['gym'] = 'https://{}/gym/{}/problem/{}'
-        return table[self.kind].format(self.domain, self.contest_id, self.index)
+        table['contest'] = '{}/contest/{}/problem/{}'
+        table['problemset'] = '{}/problemset/problem/{}/{}'
+        table['gym'] = '{}/gym/{}/problem/{}'
+        return table[self.kind].format(self.get_service()._get_base_url(), self.contest_id, self.index)
 
     def get_service(self) -> CodeforcesService:
-        return CodeforcesService()
+        return CodeforcesService(domain=self.domain)
 
     @classmethod
     def from_url(cls, url: str) -> Optional['CodeforcesProblem']:
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
-                and (result.netloc == 'codeforces.com' or result.netloc.endswith('.codeforces.com')):
+                and result.netloc in _all_domains:
             # "0" is needed. example: https://codeforces.com/contest/1000/problem/0
             # "[1-9]?" is sometime used. example: https://codeforces.com/contest/1133/problem/F2
             re_for_index = r'(0|[A-Za-z][1-9]?)'
