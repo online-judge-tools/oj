@@ -137,7 +137,9 @@ def textfile(s: str) -> str:  # should have trailing newline
 
 def exec_command(command: List[str], timeout: Optional[float] = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
     try:
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, shell=True, preexec_fn=os.setpgrp, **kwargs)
+        if os.name == 'posix':
+            kwargs['preexec_fn'] = os.setpgrp
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, shell=True, **kwargs)
     except FileNotFoundError:
         log.error('No such file or directory: %s', command)
         sys.exit(1)
@@ -148,10 +150,11 @@ def exec_command(command: List[str], timeout: Optional[float] = None, **kwargs) 
         answer, _ = proc.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
         answer = b''
-    try:
-        os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-    except ProcessLookupError:
-        pass
+    if os.name == 'posix':
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+        except ProcessLookupError:
+            pass
     return answer, proc
 
 
