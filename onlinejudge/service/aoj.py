@@ -81,24 +81,16 @@ class AOJProblem(onlinejudge.type.Problem):
         # get testcases via the official API
         testcases = []  # type: List[TestCase]
         for header in header['headers']:
-            # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2F%7Bserial%7D_GET
+            # NOTE: the endpoints are not same to http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2F%7Bserial%7D_GET since the json API often says "..... (terminated because of the limitation)"
             url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}'.format(self.problem_id, header['serial'])
-            resp = utils.request('GET', url, session=session)
-            testcase = json.loads(resp.content.decode(resp.encoding))
-            skipped = False
-            for type in ('in', 'out'):
-                if testcase[type].endswith('..... (terminated because of the limitation)\n'):
-                    log.error('AOJ API says: terminated because of the limitation')
-                    skipped = True
-            if skipped:
-                log.warning("skipped due to the limitation of AOJ API")
-                continue
+            resp_in = utils.request('GET', url + '/in', session=session)
+            resp_out = utils.request('GET', url + '/out', session=session)
             testcases += [TestCase(
                 header['name'],
                 header['name'],
-                testcase['in'].encode(),
+                resp_in.content,
                 header['name'],
-                testcase['out'].encode(),
+                resp_out.content,
             )]
         return testcases
 
