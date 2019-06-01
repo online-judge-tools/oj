@@ -92,8 +92,9 @@ class TophProblem(onlinejudge.type.Problem):
         resp = utils.request('GET', self.get_url(), session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
-        for case in soup.find('table', class_="samples").find('tbody').find_all('tr'):
-            log.debug('case: %s', str(case))
+        for table in soup.find_all('table', class_="samples"):
+            log.debug('table: %s', str(table))
+            case = table.find('tbody').find('tr')
             assert len(list(case.children))
             input_pre, output_pre = list(map(lambda td: td.find('pre'), list(case.children)))
             assert input_pre.name == 'pre'
