@@ -6,12 +6,11 @@ import functools
 import http.client
 import http.cookiejar
 import json
-import os
 import pathlib
 import posixpath
 import re
+import shlex
 import shutil
-import signal
 import subprocess
 import sys
 import time
@@ -135,11 +134,9 @@ def textfile(s: str) -> str:  # should have trailing newline
         return s + '\n'
 
 
-def exec_command(command: List[str], timeout: Optional[float] = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
+def exec_command(command: str, timeout: Optional[float] = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
     try:
-        if os.name == 'posix':
-            kwargs['preexec_fn'] = os.setpgrp
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, shell=True, **kwargs)
+        proc = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
     except FileNotFoundError:
         log.error('No such file or directory: %s', command)
         sys.exit(1)
@@ -149,12 +146,8 @@ def exec_command(command: List[str], timeout: Optional[float] = None, **kwargs) 
     try:
         answer, _ = proc.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
+        proc.terminate()
         answer = b''
-    if os.name == 'posix':
-        try:
-            os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-        except ProcessLookupError:
-            pass
     return answer, proc
 
 
