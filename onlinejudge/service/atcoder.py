@@ -197,7 +197,7 @@ class AtCoderContest(object):
 
         # example: https://atcoder.jp/contests/agc030
         if result.scheme in ('', 'http', 'https') and result.hostname in ('atcoder.jp', 'beta.atcoder.jp'):
-            m = re.match(r'^/contests/([\w\-_]+)/?$.*', utils.normpath(result.path))
+            m = re.match(r'/contests/([\w\-_]+)/?.*', utils.normpath(result.path))
             if m:
                 contest_id = m.group(1)
                 return cls(contest_id)
