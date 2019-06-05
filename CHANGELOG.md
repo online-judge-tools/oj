@@ -1,5 +1,13 @@
 # Change Log
 
+## 6.3.0 / 2019-06-05
+
+-   [#434](https://github.com/kmyk/online-judge-tools/pull/434) fix a confusing behavior of a function ([@kjnh10](https://github.com/kjnh10))
+-   [#430](https://github.com/kmyk/online-judge-tools/issues/430) follow the update of Toph
+-   [#429](https://github.com/kmyk/online-judge-tools/issues/429) fix the degrade about `download`-ing system cases and the limitation of the new API of AOJ
+-   [#427](https://github.com/kmyk/online-judge-tools/issues/427) add `--tle` option to `generate-output` subcommand
+-   [#433](https://github.com/kmyk/online-judge-tools/pull/433) fix the bug that `--tle` option makes detached processes
+
 ## 6.2.1 / 2019-04-24
 
 -   [#314](https://github.com/kmyk/online-judge-tools/issues/314) improve outputs for large files
