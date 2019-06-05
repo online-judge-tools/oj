@@ -9,6 +9,7 @@ import json
 import pathlib
 import posixpath
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -133,9 +134,9 @@ def textfile(s: str) -> str:  # should have trailing newline
         return s + '\n'
 
 
-def exec_command(command: List[str], timeout: Optional[float] = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
+def exec_command(command: str, timeout: Optional[float] = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
     try:
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
+        proc = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
     except FileNotFoundError:
         log.error('No such file or directory: %s', command)
         sys.exit(1)
@@ -145,6 +146,7 @@ def exec_command(command: List[str], timeout: Optional[float] = None, **kwargs) 
     try:
         answer, _ = proc.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
+        proc.terminate()
         answer = b''
     return answer, proc
 

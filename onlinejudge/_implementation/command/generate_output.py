@@ -27,10 +27,14 @@ def generate_output(args: 'argparse.Namespace') -> None:
             continue
         with it['in'].open() as inf:
             begin = time.perf_counter()
-            answer, proc = utils.exec_command(args.command, shell=True, stdin=inf)
+            answer, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
             log.status('time: %f sec', end - begin)
-        if proc.returncode != 0:
+        if proc.returncode is None:
+            log.failure(log.red('TLE'))
+            log.info('skipped.')
+            continue
+        elif proc.returncode != 0:
             log.failure(log.red('RE') + ': return code %d', proc.returncode)
             log.info('skipped.')
             continue

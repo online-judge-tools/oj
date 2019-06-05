@@ -79,7 +79,7 @@ def test(args: 'argparse.Namespace') -> None:
         # run the binary
         with it['in'].open() as inf:
             begin = time.perf_counter()
-            answer_byte, proc = utils.exec_command(args.command, shell=True, stdin=inf, timeout=args.tle)
+            answer_byte, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle)
             end = time.perf_counter()
             elapsed = end - begin
             answer = answer_byte.decode()  # TODO: the `answer` should be bytes, not str
