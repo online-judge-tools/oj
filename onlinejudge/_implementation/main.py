@@ -141,6 +141,7 @@ tips:
     subparser.add_argument('-e', '--error', type=float, help='check as floating point number: correct if its absolute or relative error doesn\'t exceed it')
     subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
     subparser.add_argument('-i', '--print-input', action='store_true', help='print input cases if not AC')
+    subparser.add_argument('-j', '--jobs', type=int, help='run tests in parallel')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
     subparser.add_argument('--json', action='store_true')

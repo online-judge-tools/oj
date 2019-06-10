@@ -1,9 +1,12 @@
 # Python Version: 3.x
+import concurrent.futures
+import contextlib
 import json
 import math
 import pathlib
 import subprocess
 import sys
+import threading
 import time
 from typing import *
 
@@ -118,9 +121,11 @@ def compare_and_report(proc: subprocess.Popen, answer: str, test_input_path: pat
     return status
 
 
-def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, args: 'argparse.Namespace') -> Dict[str, Any]:
-    log.emit('')
-    log.info('%s', test_name)
+def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, lock: Optional[threading.Lock] = None, args: 'argparse.Namespace') -> Dict[str, Any]:
+    # print the header earlier if not in parallel
+    if lock is None:
+        log.emit('')
+        log.info('%s', test_name)
 
     # run the binary
     with test_input_path.open() as inf:
@@ -130,9 +135,15 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
         elapsed = end - begin
         answer = answer_byte.decode()  # TODO: the `answer` should be bytes, not str
         proc.terminate()
-    log.status('time: %f sec', elapsed)
 
-    status = compare_and_report(proc, answer, test_input_path, test_output_path, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip)
+    # lock is require to avoid mixing logs if in parallel
+    with lock or contextlib.ExitStack():
+        if lock is not None:
+            log.emit('')
+            log.info('%s', test_name)
+        log.status('time: %f sec', elapsed)
+
+        status = compare_and_report(proc, answer, test_input_path, test_output_path, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip)
 
     # return the result
     testcase = {
@@ -161,8 +172,17 @@ def test(args: 'argparse.Namespace') -> None:
 
     # run tests
     history = []  # type: List[Dict[str, Any]]
-    for name, paths in sorted(tests.items()):
-        history += [test_single_case(name, paths['in'], paths.get('out'), args=args)]
+    if args.jobs is None:
+        for name, paths in sorted(tests.items()):
+            history += [test_single_case(name, paths['in'], paths.get('out'), args=args)]
+    else:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
+            lock = threading.Lock()
+            futures = []  # type: List[concurrent.futures.Future]
+            for name, paths in sorted(tests.items()):
+                futures += [executor.submit(test_single_case, name, paths['in'], paths.get('out'), lock=lock, args=args)]
+            for future in futures:
+                history += [future.result()]
 
     # summarize
     slowest = -1  # type: Union[int, float]
