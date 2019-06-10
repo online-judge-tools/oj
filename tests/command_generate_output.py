@@ -189,3 +189,31 @@ class GenerateOutputTest(unittest.TestCase):
                 },
             ],
         )
+
+    def test_call_generate_output_in_parallel(self):
+        input_files = []
+        expected_values = []
+        for i in range(1000):
+            name = 'sample-%03d' % i
+            input_files += [{
+                'path': 'test/{}.in'.format(name),
+                'data': str(i),
+            }]
+            if i > 950:
+                input_files += [{
+                    'path': 'test/{}.out'.format(name),
+                    'data': str(i),
+                }]
+            expected_values += [{
+                'path': 'test/{}.in'.format(name),
+                'data': str(i),
+            }]
+            expected_values += [{
+                'path': 'test/{}.out'.format(name),
+                'data': str(i),
+            }]
+        self.snippet_call_generate_output(
+            args=['--jobs', '256', '-c', 'bash -c "sleep 1 && cat"'],
+            input_files=input_files,
+            expected_values=expected_values,
+        )

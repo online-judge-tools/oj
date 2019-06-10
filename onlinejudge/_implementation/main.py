@@ -161,6 +161,7 @@ tips:
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
     subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
     subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
+    subparser.add_argument('-j', '--jobs', type=int, help='run tests in parallel')
     subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of input cases. (if empty: globbed from --format)')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
