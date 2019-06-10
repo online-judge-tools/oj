@@ -48,7 +48,6 @@ def extract_from_zip(zip_data: bytes, format: str, out: str = 'out') -> List[Tes
     names = collections.defaultdict(dict)  # type: Dict[str, Dict[str, Tuple[str, bytes]]]
     with zipfile.ZipFile(io.BytesIO(zip_data)) as fh:
         for filename in fh.namelist():
-            print(filename)
             if filename.endswith('/'):
                 continue
             m = onlinejudge._implementation.format_utils.percentparse(filename, format, table)
