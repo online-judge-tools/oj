@@ -6,8 +6,10 @@ import math
 import pathlib
 import subprocess
 import sys
+import tempfile
 import threading
 import time
+import traceback
 from typing import *
 
 import onlinejudge
@@ -17,6 +19,8 @@ import onlinejudge._implementation.utils as utils
 
 if TYPE_CHECKING:
     import argparse
+
+MEMORY_WARNING = 500  # megabyte
 
 
 def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
@@ -129,12 +133,11 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
 
     # run the binary
     with test_input_path.open() as inf:
-        begin = time.perf_counter()
-        answer_byte, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle)
-        end = time.perf_counter()
-        elapsed = end - begin
-        answer = answer_byte.decode()  # TODO: the `answer` should be bytes, not str
-        proc.terminate()
+        info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle, gnu_time=args.gnu_time)
+        # TODO: the `answer` should be bytes, not str
+        answer = (info['answer'] or b'').decode()  # type: str
+        elapsed = info['elapsed']  # type: float
+        memory = info['memory']  # type: Optional[float]
 
     # lock is require to avoid mixing logs if in parallel
     nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext() after updating Python to 3.7
@@ -143,6 +146,11 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             log.emit('')
             log.info('%s', test_name)
         log.status('time: %f sec', elapsed)
+        if memory:
+            if memory < MEMORY_WARNING:
+                log.status('memory: %f MB', memory)
+            else:
+                log.warning('memory: %f MB', memory)
 
         status = compare_and_report(proc, answer, test_input_path, test_output_path, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip)
 
@@ -153,14 +161,32 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
     }
     if test_output_path:
         testcase['output'] = str(test_output_path.resolve())
-    result = {
+    return {
         'status': status,
         'testcase': testcase,
         'output': answer,
         'exitcode': proc.returncode,
         'elapsed': elapsed,
+        'memory': memory,
     }
-    return result
+
+
+def check_gnu_time(gnu_time: str) -> bool:
+    try:
+        with tempfile.NamedTemporaryFile(delete=True) as fh:
+            proc = subprocess.run([gnu_time, '-f', '%M KB', '-o', fh.name, '--quiet', '--', 'true'])
+            assert proc.returncode == 0
+            with open(fh.name) as fh1:
+                data = fh1.read()
+            int(utils.remove_suffix(data.rstrip(), ' KB'))
+            return True
+    except NameError:
+        raise  # NameError is not a runtime error caused by the environmet, but a coding mistake
+    except AttributeError:
+        raise  # AttributeError is also a mistake
+    except Exception as e:
+        log.debug(traceback.format_exc())
+    return False
 
 
 def test(args: 'argparse.Namespace') -> None:
@@ -170,6 +196,11 @@ def test(args: 'argparse.Namespace') -> None:
     if args.ignore_backup:
         args.test = fmtutils.drop_backup_or_hidden_files(args.test)
     tests = fmtutils.construct_relationship_of_files(args.test, args.directory, args.format)
+
+    # check wheather GNU time is available
+    if not check_gnu_time(args.gnu_time):
+        log.warning('GNU time is not available: %s', args.gnu_time)
+        args.gnu_time = None
 
     # run tests
     history = []  # type: List[Dict[str, Any]]
@@ -186,8 +217,10 @@ def test(args: 'argparse.Namespace') -> None:
                 history += [future.result()]
 
     # summarize
-    slowest = -1  # type: Union[int, float]
+    slowest = -1.0  # type: float
     slowest_name = ''
+    heaviest = -1.0  # type: float
+    heaviest_name = ''
     ac_count = 0
     for result in history:
         if result['status'] == 'AC':
@@ -195,10 +228,18 @@ def test(args: 'argparse.Namespace') -> None:
         if slowest < result['elapsed']:
             slowest = result['elapsed']
             slowest_name = result['testcase']['name']
+        if result['memory'] is not None and heaviest < result['memory']:
+            heaviest = result['memory']
+            heaviest_name = result['testcase']['name']
 
     # print the summary
     log.emit('')
     log.status('slowest: %f sec  (for %s)', slowest, slowest_name)
+    if heaviest >= 0:
+        if heaviest < MEMORY_WARNING:
+            log.status('max memory: %f MB  (for %s)', heaviest, heaviest_name)
+        else:
+            log.warning('max memory: %f MB  (for %s)', heaviest, heaviest_name)
     if ac_count == len(tests):
         log.success('test ' + log.green('success') + ': %d cases', len(tests))
     else:

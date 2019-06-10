@@ -25,9 +25,9 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
 
     # run the command
     with test_input_path.open() as inf:
-        begin = time.perf_counter()
-        answer, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle)
-        end = time.perf_counter()
+        info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle)
+        answer = info['answer']  # type: Optional[bytes]
+        elapsed = info['elapsed']  # type: float
 
     # acquire lock to print logs properly, if in parallel
     nullcontext = contextlib.ExitStack()
@@ -37,7 +37,7 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
             log.info('%s', test_name)
 
         # check the result
-        log.status('time: %f sec', end - begin)
+        log.status('time: %f sec', elapsed)
         if proc.returncode is None:
             log.failure(log.red('TLE'))
             log.info('skipped.')
@@ -46,6 +46,7 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
             log.failure(log.red('RE') + ': return code %d', proc.returncode)
             log.info('skipped.')
             return
+        assert answer is not None
         log.emit(utils.snip_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
 
         # find the destination path
