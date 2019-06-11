@@ -1,6 +1,7 @@
 # Python Version: 3.x
 import collections
 import glob
+import os
 import pathlib
 import re
 import sys
@@ -52,7 +53,7 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
     table = {}
     table['s'] = '*'
     table['e'] = '*'
-    pattern = (glob.escape(str(directory)) + '/' + percentformat(glob.escape(format).replace('\\%', '%'), table))
+    pattern = (glob.escape(str(directory)) + glob.escape(os.path.sep) + percentformat(glob.escape(format).replace('\\%', '%'), table))
     paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
         log.debug('testcase globbed: %s', path)
@@ -63,7 +64,7 @@ def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) 
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
-    pattern = re.compile('^' + re.escape(str(directory.resolve())) + '/' + percentformat(re.escape(format).replace('\\%', '%'), table) + '$')
+    pattern = re.compile('^' + re.escape(str(directory.resolve())) + re.escape(os.path.sep) + percentformat(re.escape(format).replace('\\%', '%'), table) + '$')
     return pattern.match(str(path.resolve()))
 
 
