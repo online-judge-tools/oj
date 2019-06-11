@@ -76,7 +76,7 @@ def path_from_format(directory: pathlib.Path, format: str, name: str, ext: str) 
 
 
 def is_backup_or_hidden_file(path: pathlib.Path) -> bool:
-    basename = path.stem
+    basename = path.name
     return basename.endswith('~') or (basename.startswith('#') and basename.endswith('#')) or basename.startswith('.')
 
 
