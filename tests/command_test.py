@@ -20,7 +20,7 @@ class TestTest(unittest.TestCase):
                 if 'output' in b['testcase']:
                     self.assertEqual(a['testcase']['output'], b['testcase']['output'] % result['tempdir'])
                 self.assertEqual(a['exitcode'], b['exitcode'])
-                self.assertEqual(a['result'], b['result'])
+                self.assertEqual(a['status'], b['status'])
                 self.assertEqual(a['output'], b['output'])
 
     def test_call_test_simple(self):
@@ -45,7 +45,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-1',
                     'input': '%s/test/sample-1.in',
@@ -54,7 +54,7 @@ class TestTest(unittest.TestCase):
                 'output': 'foo\n',
                 'exitcode': 0,
             }, {
-                'result': 'WA',
+                'status': 'WA',
                 'testcase': {
                     'name': 'sample-2',
                     'input': '%s/test/sample-2.in',
@@ -95,7 +95,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-2',
                     'input': '%s/test/sample-2.in',
@@ -103,7 +103,7 @@ class TestTest(unittest.TestCase):
                 'output': 'bar\n',
                 'exitcode': 0,
             }, {
-                'result': 'WA',
+                'status': 'WA',
                 'testcase': {
                     'name': 'sample-3',
                     'input': '%s/test/sample-3.in',
@@ -133,7 +133,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'WA',
+                'status': 'WA',
                 'testcase': {
                     'name': 'sample-1',
                     'input': '%s/test/sample-1.in',
@@ -163,7 +163,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'WA',
+                'status': 'WA',
                 'testcase': {
                     'name': 'sample-1',
                     'input': '%s/test/sample-1.in',
@@ -200,7 +200,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'WA',
+                'status': 'WA',
                 'testcase': {
                     'name': 'sample-1',
                     'input': '%s/test/sample-1.in',
@@ -209,7 +209,7 @@ class TestTest(unittest.TestCase):
                 'output': 'foo\n',
                 'exitcode': 0,
             }, {
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-2',
                     'input': '%s/test/sample-2.in',
@@ -259,7 +259,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-1',
                     'input': '%s/p/o/y/o/sample-1.in',
@@ -292,7 +292,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-1.txt',
                     'input': '%s/yuki/coder/test_in/sample-1.txt',
@@ -333,7 +333,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-2.txt',
                     'input': '%s/yuki/coder/test_in/sample-2.txt',
@@ -341,7 +341,7 @@ class TestTest(unittest.TestCase):
                 'output': 'bar\n',
                 'exitcode': 0,
             }, {
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-3.txt',
                     'input': '%s/yuki/coder/test_in/sample-3.txt',
@@ -374,7 +374,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample.case.1',
                     'input': '%s/a/b/c/test_in/d/sample.case.1/e.case.txt',
@@ -383,7 +383,7 @@ class TestTest(unittest.TestCase):
                 'output': 'foo\n',
                 'exitcode': 0,
             }, {
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample.case.2',
                     'input': '%s/a/b/c/test_in/d/sample.case.2/e.case.txt',
@@ -416,7 +416,7 @@ class TestTest(unittest.TestCase):
                 },
             ],
             expected=[{
-                'result': 'AC',
+                'status': 'AC',
                 'testcase': {
                     'name': '1',
                     'input': '%s/a.*/[abc]/**/***/**/def/test_in/1.txt',
@@ -425,4 +425,33 @@ class TestTest(unittest.TestCase):
                 'output': 'foo\n',
                 'exitcode': 0,
             }],
+        )
+
+    def test_call_test_in_parallel(self):
+        files = []
+        expected = []
+        for i in range(1000):
+            name = 'sample-%03d' % i
+            files += [{
+                'path': 'test/{}.in'.format(name),
+                'data': '{}\n'.format(i),
+            }]
+            files += [{
+                'path': 'test/{}.out'.format(name),
+                'data': '{}\n'.format(i),
+            }]
+            expected += [{
+                'status': 'AC' if i == 1 else 'WA',
+                'testcase': {
+                    'name': name,
+                    'input': '%s/test/{}.in'.format(name),
+                    'output': '%s/test/{}.out'.format(name),
+                },
+                'output': '1\n',
+                'exitcode': 0,
+            }]
+        self.snippet_call_test(
+            args=['--jobs', '256', '--silent', '-c', 'bash -c "sleep 2 && echo 1"'],
+            files=files,
+            expected=expected,
         )
