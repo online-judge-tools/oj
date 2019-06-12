@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     import argparse
 
 MEMORY_WARNING = 500  # megabyte
+MEMORY_PRINT = 100  # megabyte
 
 
 def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
@@ -147,7 +148,10 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             log.info('%s', test_name)
         log.status('time: %f sec', elapsed)
         if memory:
-            if memory < MEMORY_WARNING:
+            if memory < MEMORY_PRINT:
+                if args.print_memory:
+                    log.status('memory: %f MB', memory)
+            elif memory < MEMORY_WARNING:
                 log.status('memory: %f MB', memory)
             else:
                 log.warning('memory: %f MB', memory)
