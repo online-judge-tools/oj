@@ -137,7 +137,8 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
         proc.terminate()
 
     # lock is require to avoid mixing logs if in parallel
-    with lock or contextlib.ExitStack():
+    nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext() after updating Python to 3.7
+    with lock or nullcontext:
         if lock is not None:
             log.emit('')
             log.info('%s', test_name)

@@ -30,7 +30,8 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
         end = time.perf_counter()
 
     # acquire lock to print logs properly, if in parallel
-    with lock or contextlib.ExitStack():
+    nullcontext = contextlib.ExitStack()
+    with lock or nullcontext:
         if lock is not None:
             log.emit('')
             log.info('%s', test_name)
@@ -65,7 +66,8 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
 
 def generate_output_single_case_exists_ok(test_name: str, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, lock: Optional[threading.Lock] = None, args: 'argparse.Namespace') -> None:
     if test_output_path is not None:
-        with lock or contextlib.ExitStack():
+        nullcontext = contextlib.ExitStack()
+        with lock or nullcontext:
             log.emit('')
             log.info('%s', test_name)
             log.info('output file already exists.')
