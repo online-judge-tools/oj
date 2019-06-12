@@ -9,16 +9,19 @@ class TestTest(unittest.TestCase):
         result = tests.utils.run_in_sandbox(args=['-v', 'test', '--json'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(result['proc'].stdout.decode())
-        self.assertEqual(len(data), len(expected))
-        for a, b in zip(data, expected):
-            self.assertEqual(a['testcase']['name'], b['testcase']['name'])
-            self.assertEqual(a['testcase']['input'], b['testcase']['input'] % result['tempdir'])
-            self.assertEqual('output' in a['testcase'], 'output' in b['testcase'])
-            if 'output' in b['testcase']:
-                self.assertEqual(a['testcase']['output'], b['testcase']['output'] % result['tempdir'])
-            self.assertEqual(a['exitcode'], b['exitcode'])
-            self.assertEqual(a['result'], b['result'])
-            self.assertEqual(a['output'], b['output'])
+        if expected is None:
+            return data
+        else:
+            self.assertEqual(len(data), len(expected))
+            for a, b in zip(data, expected):
+                self.assertEqual(a['testcase']['name'], b['testcase']['name'])
+                self.assertEqual(a['testcase']['input'], b['testcase']['input'] % result['tempdir'])
+                self.assertEqual('output' in a['testcase'], 'output' in b['testcase'])
+                if 'output' in b['testcase']:
+                    self.assertEqual(a['testcase']['output'], b['testcase']['output'] % result['tempdir'])
+                self.assertEqual(a['exitcode'], b['exitcode'])
+                self.assertEqual(a['result'], b['result'])
+                self.assertEqual(a['output'], b['output'])
 
     def test_call_test_simple(self):
         self.snippet_call_test(
@@ -169,6 +172,69 @@ class TestTest(unittest.TestCase):
                 'output': 'bar\n',
                 'exitcode': 3,
             }],
+        )
+
+    def test_call_test_ignore_backup(self):
+        self.snippet_call_test(
+            args=['-c', 'cat'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-1.in~',
+                    'data': 'bar\n'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'bar\n'
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'baz\n'
+                },
+                {
+                    'path': 'test/sample-2.in~',
+                    'data': 'bar\n'
+                },
+            ],
+            expected=[{
+                'result': 'WA',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'result': 'AC',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                },
+                'output': 'baz\n',
+                'exitcode': 0,
+            }],
+        )
+
+    @unittest.expectedFailure
+    def test_call_test_no_ignore_backup(self):
+        # it should be reported: [ERROR] unrecognizable file found: test/sample-1.in~
+        self.snippet_call_test(
+            args=['-c', 'cat', '--no-ignore-backup'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-1.in~',
+                    'data': 'bar\n'
+                },
+            ],
+            expected=None,
         )
 
     def test_call_test_dir(self):
