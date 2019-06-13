@@ -361,7 +361,12 @@ def _AtCoderProblemContentPartial_from_row(tr: bs4.Tag):
     assert problem is not None
     alphabet = tds[0].text
     name = tds[1].text
-    time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
+    if tds[2].text.endswith(' msec'):
+        time_limit_msec = int(utils.remove_suffix(tds[2].text, ' msec'))
+    elif tds[2].text.endswith(' sec'):
+        time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
+    else:
+        assert False
     memory_limit_byte = int(float(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000)  # TODO: confirm this is MB truly, not MiB
     if len(tds) == 5:
         assert tds[4].text.strip() in ('', 'Submit', '提出')
@@ -471,7 +476,12 @@ def _AtCoderProblemContent_parse_partial(soup: bs4.BeautifulSoup, problem: 'AtCo
             break
     else:
         assert False
-    time_limit_msec = int(float(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' sec')) * 1000)
+    if time_limit.endswith(' msec'):
+        time_limit_msec = int(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' msec'))
+    elif time_limit.endswith(' sec'):
+        time_limit_msec = int(float(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' sec')) * 1000)
+    else:
+        assert False
 
     for memory_limit_prefix in ('メモリ制限: ', 'Memory Limit: '):
         if memory_limit.startswith(memory_limit_prefix):
