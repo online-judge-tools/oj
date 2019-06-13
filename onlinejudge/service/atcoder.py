@@ -286,7 +286,7 @@ class AtCoderContest(object):
         tbody = soup.find('tbody')
         return [AtCoderProblem._from_table_row(tr) for tr in tbody.find_all('tr')]
 
-    def iterate_submissions_where(self, me: bool = False, problem_id: Optional[str] = None, language_id: Optional[LanguageId] = None, status: Optional[str] = None, user_glob: Optional[str] = None, order: Optional[str] = None, desc: bool = False, lang: Optional[str] = None, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
+    def iterate_submissions_where(self, me: bool = False, problem_id: Optional[str] = None, language_id: Optional[LanguageId] = None, status: Optional[str] = None, user_glob: Optional[str] = None, order: Optional[str] = None, desc: bool = False, lang: Optional[str] = None, pages: Optional[Iterator[int]] = None, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
         """
         :note: If you use certain combination of options, then the results may not correct when there are new submissions while crawling.
         :param status: must be one of `AC`, `WA`, `TLE`, `MLE`, `RE`, `CLE`, `OLE`, `IE`, `WJ`, `WR`, or `Judging`
@@ -316,7 +316,7 @@ class AtCoderContest(object):
 
         # get
         session = session or utils.get_default_session()
-        for page in itertools.count(1):
+        for page in pages or itertools.count(1):
             params_page = ({'page': str(page)} if page >= 2 else {})
             url = base_url + '?' + urllib.parse.urlencode({**params, **params_page})
             resp = _request('GET', url, session=session)
