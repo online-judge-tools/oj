@@ -251,7 +251,7 @@ class AtCoderContest(object):
         _, _, self._can_participate = soup.find('span', text=re.compile(r'^(Can Participate|参加対象): ')).text.partition(': ')
         _, _, self._rated_range = soup.find('span', text=re.compile(r'^(Rated Range|Rated対象): ')).text.partition(': ')
         penalty_text = soup.find('span', text=re.compile(r'^(Penalty|ペナルティ): ')).text
-        m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes|分)', penalty_text)
+        m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes?|分)', penalty_text)
         assert m
         self._penalty = datetime.timedelta(minutes=int(m.group(2)))
 
