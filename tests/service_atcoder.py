@@ -98,6 +98,12 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(problems[3].get_time_limit_msec(), 1000)
         self.assertEqual(problems[4].get_time_limit_msec(), 2000)
 
+    def test_list_problems_memory_limit_is_zero(self):
+        contest = AtCoderContest.from_url('https://atcoder.jp/contests/future-contest-2019-final-open')
+        problems = contest.list_problems()
+        self.assertEqual(problems[0].get_memory_limit_byte(), 1024 * 1000 * 1000)  # 1024 MB
+        self.assertEqual(problems[1].get_memory_limit_byte(), 0)  # 0 KB
+
     def test_iterate_submissions(self):
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/code-festival-2014-exhibition-open')
         submissions = list(contest.iterate_submissions())
@@ -150,7 +156,10 @@ class AtCoderProblemTest(unittest.TestCase):
 
     def test_get_time_limit_is_less_than_msec(self):
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/joi2019ho/tasks/joi2019ho_c').get_time_limit_msec(), 500)
-        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/joi2019ho/tasks/joi2019ho_d').get_time_limit_msec(), 1000)
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/future-contest-2019-qual/tasks/future_contest_2019_qual_b').get_time_limit_msec(), 0)
+
+    def test_get_memory_limit_is_zero(self):
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/future-contest-2019-qual/tasks/future_contest_2019_qual_b').get_memory_limit_byte(), 0)
 
     def test_iterate_submissions(self):
         problem = AtCoderProblem.from_url('https://atcoder.jp/contests/abc119/tasks/abc119_c')
