@@ -142,7 +142,7 @@ tips:
     subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
     subparser.add_argument('-i', '--print-input', action='store_true', help='print input cases if not AC')
     subparser.add_argument('-j', '--jobs', metavar='N', type=int, help='specifies the number of jobs to run simultaneously  (default: no parallelization)')
-    subparser.add_argument('--print-memory', action='store_true', help='print the amount of memory which your program used, even if it is enough small')
+    subparser.add_argument('--print-memory', action='store_true', help='print the amount of memory which your program used, even if it is small enough')
     subparser.add_argument('--gnu-time', help='used to measure memory consumption (default: "time")', default='time')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
