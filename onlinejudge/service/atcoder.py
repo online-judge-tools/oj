@@ -286,11 +286,28 @@ class AtCoderContest(object):
         tbody = soup.find('tbody')
         return [AtCoderProblem._from_table_row(tr) for tr in tbody.find_all('tr')]
 
-    def iterate_submissions_where(self, me: bool = False, problem_id: Optional[str] = None, language_id: Optional[LanguageId] = None, status: Optional[str] = None, user_glob: Optional[str] = None, order: Optional[str] = None, desc: bool = False, lang: Optional[str] = None, pages: Optional[Iterator[int]] = None, session: Optional[requests.Session] = None) -> Generator['AtCoderSubmission', None, None]:
+    def iterate_submissions_where(
+            self,
+            me: bool = False,
+            problem_id: Optional[str] = None,
+            language_id: Optional[LanguageId] = None,
+            status: Optional[str] = None,
+            user_glob: Optional[str] = None,
+            order: Optional[str] = None,
+            desc: bool = False,
+            lang: Optional[str] = None,
+            pages: Optional[Iterator[int]] = None,
+            session: Optional[requests.Session] = None,
+    ) -> Generator['AtCoderSubmission', None, None]:
         """
         :note: If you use certain combination of options, then the results may not correct when there are new submissions while crawling.
         :param status: must be one of `AC`, `WA`, `TLE`, `MLE`, `RE`, `CLE`, `OLE`, `IE`, `WJ`, `WR`, or `Judging`
         :param order: must be one of `created`, `score`, `source_length`, `time_consumption`, or `memory_consumption`
+        :param me: use the `.../submissions/me` page instead of `.../submission`
+        :param user_glob: is used as the value of `f.User` query parameter
+        :param language_id: is used as the value of `f.Language` query parameter
+        :param lang: must be one of `ja`, `en`
+        :param pages: is an iterator to list the page numbers to GET
         """
         assert status in (None, 'AC', 'WA', 'TLE', 'MLE', 'RE', 'CE', 'QLE', 'OLE', 'IE', 'WJ', 'WR', 'Judging')
         assert order in (None, 'created', 'score', 'source_length', 'time_consumption', 'memory_consumption')
