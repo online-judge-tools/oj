@@ -59,6 +59,10 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(contest.get_rated_range(), '-')
         self.assertEqual(contest.get_penalty().total_seconds(), 5 * 60)
 
+    def test_get_penalty_a_singular_form(self):
+        contest = AtCoderContest.from_url('https://atcoder.jp/contests/chokudai_S002')
+        self.assertEqual(contest.get_penalty().total_seconds(), 60)  # Penalty is written as "1 minute", not  "1 minutes"
+
     def test_list_problems(self):
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/agc028')
         problems = contest.list_problems()
