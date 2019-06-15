@@ -830,7 +830,21 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         source_code = soup.find(id='submission-code')
         self._source_code = source_code.text.encode()
 
-        submission_info, test_cases_summary, test_cases_data = soup.find_all('table')
+        # Compile Error
+        compile_error = soup.find('h4', text='Compile Error')
+        if compile_error is None:
+            self.compile_error = ''
+        else:
+            compile_error = compile_error.find_next_sibling('pre')
+            self.compile_error = compile_error.text
+
+        # get tables
+        if compile_error is None:
+            submission_info, test_cases_summary, test_cases_data = soup.find_all('table')
+        else:
+            submission_info, = soup.find_all('table')
+            test_cases_summary = None
+            test_cases_data = None
 
         # Submission Info
         data = {}  # type: Dict[str, str]
@@ -855,19 +869,13 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         if 'Memory' in data:
             self._memory_byte = int(utils.remove_suffix(data['Memory'], ' KB')) * 1000  # TODO: confirm this is KB truly, not KiB
 
-        # Compile Error
-        compile_error = soup.find('h4', text='Compile Error')
-        if compile_error is None:
-            self.compile_error = ''
-        else:
-            compile_error = compile_error.find_next_sibling('pre')
-            self.compile_error = compile_error.text
-
         # Test Cases
-        trs = test_cases_summary.find('tbody').find_all('tr')
-        self._test_sets = [AtCoderSubmissionTestSet._from_table_row(tr) for tr in trs]
-        trs = test_cases_data.find('tbody').find_all('tr')
-        self._test_cases = [AtCoderSubmissionTestCaseResult._from_table_row(tr) for tr in trs]
+        if test_cases_summary is not None:
+            trs = test_cases_summary.find('tbody').find_all('tr')
+            self._test_sets = [AtCoderSubmissionTestSet._from_table_row(tr) for tr in trs]
+        if test_cases_data is not None:
+            trs = test_cases_data.find('tbody').find_all('tr')
+            self._test_cases = [AtCoderSubmissionTestCaseResult._from_table_row(tr) for tr in trs]
 
     def get_problem(self, session: Optional[requests.Session] = None) -> AtCoderProblem:
         if self._problem_id is None:
