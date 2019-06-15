@@ -733,7 +733,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._submission_time = None  # type: Optional[datetime.datetime]
         self._user_id = None  # type: Optional[str]
         self._language_name = None  # type: Optional[str]
-        self._score = None  # type: Optional[int]
+        self._score = None  # type: Optional[float]
         self._code_size = None  # type: Optional[int]
         self._status = None  # type: Optional[str]
         self._exec_time_msec = None  # type: Optional[int]
@@ -756,7 +756,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._problem_id = problem.problem_id
         self._user_id = tds[2].find_all('a')[0]['href'].split('/')[-1]
         self._language_name = tds[3].text
-        self._score = int(tds[4].text)
+        self._score = float(tds[4].text)
         self._code_size = int(utils.remove_suffix(tds[5].text, ' Byte'))
         self._status = tds[6].text
         if len(tds) == 10:
@@ -847,7 +847,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         self._submission_time = datetime.datetime.strptime(data['Submission Time'], '%Y-%m-%d %H:%M:%S+0900').replace(tzinfo=utils.tzinfo_jst)
         self._user_id = data['User']
         self._language_name = data['Language']
-        self._score = int(data['Score'])
+        self._score = float(data['Score'])
         self._code_size = int(utils.remove_suffix(data['Code Size'], ' Byte'))
         self._status = data['Status']
         if 'Exec Time' in data:
@@ -898,7 +898,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
     get_user_id = utils.getter_with_load_details('_user_id', type=str)  # type: Callable[..., str]
     get_submission_time = utils.getter_with_load_details('_submission_time', type=datetime.datetime)  # type: Callable[..., datetime.datetime]
     get_language_name = utils.getter_with_load_details('_language_name', type=str)  # type: Callable[..., str]
-    get_score = utils.getter_with_load_details('_score', type=int)  # type: Callable[..., int]
+    get_score = utils.getter_with_load_details('_score', type=float)  # type: Callable[..., int]
     get_code_size = utils.getter_with_load_details('_code_size', type=int)  # type: Callable[..., int]
     get_status = utils.getter_with_load_details('_status', type=str)  # type: Callable[..., str]
     get_test_sets = utils.getter_with_load_details('_test_sets', type='List[AtCoderSubmissionTestSet]')  # type: Callable[..., List[AtCoderSubmissionTestSet]]
@@ -908,12 +908,12 @@ class AtCoderSubmission(onlinejudge.type.Submission):
 class AtCoderSubmissionTestSet(object):
     """
     :ivar set_name: :py:class:`str`
-    :ivar score: :py:class:`int`
-    :ivar max_score: :py:class:`int`
+    :ivar score: :py:class:`float`
+    :ivar max_score: :py:class:`float`
     :ivar test_case_names: :py:class:`List` [ :py:class:`str` ]
     """
 
-    def __init__(self, set_name: str, score: int, max_score: int, test_case_names: List[str]):
+    def __init__(self, set_name: str, score: float, max_score: float, test_case_names: List[str]):
         self.set_name = set_name
         self.score = score
         self.max_score = max_score
@@ -924,7 +924,7 @@ class AtCoderSubmissionTestSet(object):
         tds = tr.find_all('td')
         assert len(tds) == 3
         set_name = tds[0].text
-        score, max_score = [int(s) for s in tds[1].text.split('/')]
+        score, max_score = [float(s) for s in tds[1].text.split('/')]
         test_case_names = tds[2].text.split(', ')
         return AtCoderSubmissionTestSet(set_name, score, max_score, test_case_names)
 
