@@ -830,21 +830,16 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         source_code = soup.find(id='submission-code')
         self._source_code = source_code.text.encode()
 
-        # Compile Error
-        compile_error = soup.find('h4', text='Compile Error')
-        if compile_error is None:
-            self.compile_error = ''
-        else:
-            compile_error = compile_error.find_next_sibling('pre')
-            self.compile_error = compile_error.text
-
         # get tables
-        if compile_error is None:
-            submission_info, test_cases_summary, test_cases_data = soup.find_all('table')
-        else:
-            submission_info, = soup.find_all('table')
+        tables = soup.find_all('table')
+        if len(tables) == 3:
+            submission_info, test_cases_summary, test_cases_data = tables
+        elif len(tables) == 1:
+            submission_info, = tables
             test_cases_summary = None
             test_cases_data = None
+        else:
+            assert False
 
         # Submission Info
         data = {}  # type: Dict[str, str]
@@ -868,6 +863,14 @@ class AtCoderSubmission(onlinejudge.type.Submission):
             self._exec_time_msec = int(utils.remove_suffix(data['Exec Time'], ' ms'))
         if 'Memory' in data:
             self._memory_byte = int(utils.remove_suffix(data['Memory'], ' KB')) * 1000  # TODO: confirm this is KB truly, not KiB
+
+        # Compile Error
+        compile_error = soup.find('h4', text='Compile Error')
+        if compile_error is None:
+            self.compile_error = ''
+        else:
+            compile_error = compile_error.find_next_sibling('pre')
+            self.compile_error = compile_error.text
 
         # Test Cases
         if test_cases_summary is not None:
