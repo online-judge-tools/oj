@@ -455,3 +455,36 @@ class TestTest(unittest.TestCase):
             files=files,
             expected=expected,
         )
+
+    def test_call_test_large_memory(self):
+        # make a bytes of 100 MB
+        data = self.snippet_call_test(
+            args=['-c', """python -c 'print(len(b"A" * 100000000))'"""],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=None,
+        )
+        for case in data:
+            self.assertEqual(case['status'], 'AC')
+            self.assertGreater(case['memory'], 100)
+            self.assertLess(case['memory'], 1000)
+
+    def test_call_test_small_memory(self):
+        # just print "foo"
+        data = self.snippet_call_test(
+            args=['-c', """python -c 'print("foo")'"""],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=None,
+        )
+        for case in data:
+            self.assertEqual(case['status'], 'AC')
+            self.assertLess(case['memory'], 100)

@@ -13,6 +13,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.parse
 from typing import *
@@ -134,21 +135,43 @@ def textfile(s: str) -> str:  # should have trailing newline
         return s + '\n'
 
 
-def exec_command(command: str, timeout: Optional[float] = None, **kwargs) -> Tuple[bytes, subprocess.Popen]:
-    try:
-        proc = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=sys.stderr, **kwargs)
-    except FileNotFoundError:
-        log.error('No such file or directory: %s', command)
-        sys.exit(1)
-    except PermissionError:
-        log.error('Permission denied: %s', command)
-        sys.exit(1)
-    try:
-        answer, _ = proc.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        proc.terminate()
-        answer = b''
-    return answer, proc
+def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] = None, gnu_time: Optional[str] = None) -> Tuple[Dict[str, Any], subprocess.Popen]:
+    if gnu_time is not None:
+        context = tempfile.NamedTemporaryFile(delete=True)  # type: Any
+    else:
+        context = contextlib.ExitStack()  # TODO: we should use contextlib.nullcontext() if possible
+    with context as fh:
+        command = shlex.split(command_str)
+        if gnu_time is not None:
+            command = [gnu_time, '-f', '%M', '-o', fh.name, '--quiet', '--'] + command
+        begin = time.perf_counter()
+
+        try:
+            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr)
+        except FileNotFoundError:
+            log.error('No such file or directory: %s', command)
+            sys.exit(1)
+        except PermissionError:
+            log.error('Permission denied: %s', command)
+            sys.exit(1)
+        try:
+            answer, _ = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            proc.terminate()
+            answer = None
+
+        end = time.perf_counter()
+        if gnu_time is not None:
+            with open(fh.name) as fh1:
+                memory = int(fh1.read()) / 1000  # type: Optional[float]
+        else:
+            memory = None
+    info = {
+        'answer': answer,  # Optional[byte]
+        'elapsed': end - begin,  # float, in second
+        'memory': memory,  # Optional[float], in megabyte
+    }
+    return info, proc
 
 
 # We should use this instead of posixpath.normpath
