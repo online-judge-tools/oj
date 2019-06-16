@@ -1,5 +1,12 @@
 # Change Log
 
+## 6.4.0 / 2019-06-16
+
+-   [#438](https://github.com/kmyk/online-judge-tools/pull/438) update `setup.cfg` to make `oj.exe` in Windows environments
+-   [#439](https://github.com/kmyk/online-judge-tools/pull/439) make `test` possible to run in parallel with `--jobs N` option
+-   [#442](https://github.com/kmyk/online-judge-tools/pull/442) add a feature to check MLE for `test` using GNU time
+-   [#441](https://github.com/kmyk/online-judge-tools/pull/441) [#443](https://github.com/kmyk/online-judge-tools/pull/443) [#445](https://github.com/kmyk/online-judge-tools/pull/445) [#447](https://github.com/kmyk/online-judge-tools/pull/447) [#448](https://github.com/kmyk/online-judge-tools/pull/448) [#449](https://github.com/kmyk/online-judge-tools/pull/449) [#450](https://github.com/kmyk/online-judge-tools/pull/450) fix many minor bugs
+
 ## 6.3.0 / 2019-06-05
 
 -   [#434](https://github.com/kmyk/online-judge-tools/pull/434) fix a confusing behavior of a function ([@kjnh10](https://github.com/kjnh10))
