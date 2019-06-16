@@ -233,6 +233,10 @@ class AtCoderSubmissionTest(unittest.TestCase):
         self.assertEqual(submission.get_source_code(), b'/9\\|\\B/c:(\r\ncYay!\r\n')
         self.assertEqual(submission.get_code_size(), 19)
 
+    def test_get_score_float(self):
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/pakencamp-2018-day3/submissions/4583531')
+        self.assertAlmostEqual(submission.get_score(), 32.53)
+
 
 class AtCoderProblemContentTest(unittest.TestCase):
     def test_from_html(self):
