@@ -857,7 +857,16 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         source_code = soup.find(id='submission-code')
         self._source_code = source_code.text.encode()
 
-        submission_info, test_cases_summary, test_cases_data = soup.find_all('table')
+        # get tables
+        tables = soup.find_all('table')
+        if len(tables) == 3:
+            submission_info, test_cases_summary, test_cases_data = tables
+        elif len(tables) == 1:
+            submission_info, = tables
+            test_cases_summary = None
+            test_cases_data = None
+        else:
+            assert False
 
         # Submission Info
         data = {}  # type: Dict[str, str]
@@ -891,10 +900,12 @@ class AtCoderSubmission(onlinejudge.type.Submission):
             self.compile_error = compile_error.text
 
         # Test Cases
-        trs = test_cases_summary.find('tbody').find_all('tr')
-        self._test_sets = [AtCoderSubmissionTestSet._from_table_row(tr) for tr in trs]
-        trs = test_cases_data.find('tbody').find_all('tr')
-        self._test_cases = [AtCoderSubmissionTestCaseResult._from_table_row(tr) for tr in trs]
+        if test_cases_summary is not None:
+            trs = test_cases_summary.find('tbody').find_all('tr')
+            self._test_sets = [AtCoderSubmissionTestSet._from_table_row(tr) for tr in trs]
+        if test_cases_data is not None:
+            trs = test_cases_data.find('tbody').find_all('tr')
+            self._test_cases = [AtCoderSubmissionTestCaseResult._from_table_row(tr) for tr in trs]
 
     def get_problem(self, session: Optional[requests.Session] = None) -> AtCoderProblem:
         if self._problem_id is None:

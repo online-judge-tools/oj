@@ -187,8 +187,37 @@ class AtCoderSubmissionTest(unittest.TestCase):
         self.assertEqual(submission.get_language_name(), 'C++14 (GCC 5.4.1)')
         self.assertEqual(submission.get_score(), 800)
         self.assertEqual(submission.get_code_size(), 1457)
+        self.assertEqual(submission.get_status(), 'AC')
         self.assertEqual(submission.get_exec_time_msec(), 85)
         self.assertEqual(submission.get_memory_byte(), 3328 * 1000)
+
+    def test_submission_info_compile_error(self):
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/abc124/submissions/4943518')
+        self.assertEqual(submission.get_submission_time().year, 2019)
+        self.assertEqual(submission.get_submission_time().month, 4)
+        self.assertEqual(submission.get_submission_time().day, 13)
+        self.assertEqual(submission.get_user_id(), 'pekempey')
+        self.assertEqual(submission.get_problem().problem_id, 'abc124_d')
+        self.assertEqual(submission.get_language_name(), 'Rust (1.15.1)')
+        self.assertEqual(submission.get_score(), 0)
+        self.assertEqual(submission.get_code_size(), 787)
+        self.assertEqual(submission.get_status(), 'CE')
+        self.assertEqual(submission.get_exec_time_msec(), None)
+        self.assertEqual(submission.get_memory_byte(), None)
+
+    def test_submission_info_compile_warnings(self):
+        submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/agc032/submissions/4675493')
+        self.assertEqual(submission.get_submission_time().year, 2019)
+        self.assertEqual(submission.get_submission_time().month, 3)
+        self.assertEqual(submission.get_submission_time().day, 23)
+        self.assertEqual(submission.get_user_id(), 'yutaka1999')
+        self.assertEqual(submission.get_problem().problem_id, 'agc032_e')
+        self.assertEqual(submission.get_language_name(), 'C++14 (GCC 5.4.1)')
+        self.assertEqual(submission.get_score(), 0)
+        self.assertEqual(submission.get_code_size(), 1682)
+        self.assertEqual(submission.get_status(), 'WA')
+        self.assertEqual(submission.get_exec_time_msec(), 392)
+        self.assertEqual(submission.get_memory_byte(), 7168 * 1000)
 
     def test_get_test_sets(self):
         submission = AtCoderSubmission.from_url('https://atcoder.jp/contests/arc028/submissions/223928')
