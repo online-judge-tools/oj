@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.4.1 / 2019-06-18
+
+-   [#452](https://github.com/kmyk/online-judge-tools/pull/452) fix a bug of the MLE-checking and RE
+
 ## 6.4.0 / 2019-06-16
 
 -   [#438](https://github.com/kmyk/online-judge-tools/pull/438) update `setup.cfg` to make `oj.exe` in Windows environments

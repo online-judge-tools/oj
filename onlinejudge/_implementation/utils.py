@@ -143,7 +143,7 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
     with context as fh:
         command = shlex.split(command_str)
         if gnu_time is not None:
-            command = [gnu_time, '-f', '%M', '-o', fh.name, '--quiet', '--'] + command
+            command = [gnu_time, '-f', '%M', '-o', fh.name, '--'] + command
         begin = time.perf_counter()
 
         try:
@@ -163,7 +163,7 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
         end = time.perf_counter()
         if gnu_time is not None:
             with open(fh.name) as fh1:
-                memory = int(fh1.read()) / 1000  # type: Optional[float]
+                memory = int(fh1.read().rstrip().splitlines()[-1]) / 1000  # type: Optional[float]
         else:
             memory = None
     info = {

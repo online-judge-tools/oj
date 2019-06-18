@@ -178,11 +178,11 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
 def check_gnu_time(gnu_time: str) -> bool:
     try:
         with tempfile.NamedTemporaryFile(delete=True) as fh:
-            proc = subprocess.run([gnu_time, '-f', '%M KB', '-o', fh.name, '--quiet', '--', 'true'])
+            proc = subprocess.run([gnu_time, '-f', '%M KB', '-o', fh.name, '--', 'true'])
             assert proc.returncode == 0
             with open(fh.name) as fh1:
                 data = fh1.read()
-            int(utils.remove_suffix(data.rstrip(), ' KB'))
+            int(utils.remove_suffix(data.rstrip().splitlines()[-1], ' KB'))
             return True
     except NameError:
         raise  # NameError is not a runtime error caused by the environmet, but a coding mistake
