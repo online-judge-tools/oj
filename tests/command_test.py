@@ -488,3 +488,68 @@ class TestTest(unittest.TestCase):
         for case in data:
             self.assertEqual(case['status'], 'AC')
             self.assertLess(case['memory'], 100)
+
+    def test_call_stderr(self):
+        data = self.snippet_call_test(
+            args=['-c', """bash -c 'echo foo >&2'"""],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                },
+                'output': '',
+                'exitcode': 0,
+            }],
+        )
+
+    def test_call_runtime_error(self):
+        data = self.snippet_call_test(
+            args=['-c', 'false'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'RE',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                },
+                'output': '',
+                'exitcode': 1,
+            }],
+        )
+
+    def test_call_stderr_and_fail(self):
+        data = self.snippet_call_test(
+            args=['-c', """perl -e 'die "good bye"'"""],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': '',
+                'exitcode': 255,
+            }],
+        )
