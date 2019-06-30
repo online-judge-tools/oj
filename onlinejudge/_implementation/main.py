@@ -47,6 +47,7 @@ supported services:
   PKU JudgeOnline
   Kattis
   Toph (Problem Archive)
+  Facebook Hacker Cup
 
 supported services with --system:
   Aizu Online Judge
