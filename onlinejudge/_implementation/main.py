@@ -6,6 +6,8 @@ import sys
 import traceback
 from typing import List, Optional
 
+import requests.exceptions
+
 import onlinejudge
 import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
@@ -254,7 +256,15 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
     log.debug('args: %s', str(args))
 
     if args.subcommand in ['download', 'd', 'dl']:
-        download(args)
+        try:
+            download(args)
+        except onlinejudge.type.NotLoggedInError:
+            log.error('login required')
+            sys.exit(1)
+        except requests.exceptions.HTTPError as e:
+            log.error(str(e))
+            log.debug(traceback.format_exc())
+            sys.exit(1)
     elif args.subcommand in ['login', 'l']:
         login(args)
     elif args.subcommand in ['submit', 's']:
