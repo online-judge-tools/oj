@@ -1,13 +1,10 @@
 # Python Version: 3.x
-import datetime
 import json
 import os
 import pathlib
-import random
 import sys
 from typing import *
 
-import colorama
 import requests.exceptions
 
 import onlinejudge
