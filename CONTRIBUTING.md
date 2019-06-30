@@ -79,6 +79,14 @@ The structure is as follows:
         -   ...
 -   `tests/`
 
+## install
+
+You can install online-judge-tools from your local directory with the following command.
+
+``` sh
+$ pip install -e .[dev,docs]
+```
+
 ## formatter
 
 We use `isort` adn `yapf`.
