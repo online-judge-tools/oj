@@ -1,13 +1,9 @@
 # Python Version: 3.x
-import datetime
 import json
 import os
 import pathlib
-import random
 import sys
 from typing import *
-
-import colorama
 
 import onlinejudge
 import onlinejudge._implementation.download_history
@@ -43,11 +39,7 @@ def download(args: 'argparse.Namespace') -> None:
     # get samples from the server
     with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
         if args.system:
-            try:
-                samples = problem.download_system_cases(session=sess)  # type: ignore
-            except onlinejudge.type.NotLoggedInError:
-                log.error('login required')
-                sys.exit(1)
+            samples = problem.download_system_cases(session=sess)  # type: ignore
         else:
             samples = problem.download_sample_cases(session=sess)  # type: ignore
 
