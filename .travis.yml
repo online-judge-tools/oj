@@ -2,6 +2,9 @@ language: python
 python:
     - 3.5.2
     - 3.6
+os:
+    - linux
+    - windows
 install:
     - pip install -e .[dev,docs]
 script:
