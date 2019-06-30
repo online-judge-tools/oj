@@ -3,6 +3,7 @@ import json
 import os
 import pathlib
 import sys
+import traceback
 from typing import *
 
 import requests.exceptions
@@ -51,6 +52,7 @@ def download(args: 'argparse.Namespace') -> None:
                 samples = problem.download_sample_cases(session=sess)  # type: ignore
     except requests.exceptions.HTTPError as e:
         log.error(str(e))
+        log.debug(traceback.format_exc())
         sys.exit(1)
 
     # append the history for submit command
