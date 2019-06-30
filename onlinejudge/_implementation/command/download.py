@@ -8,6 +8,7 @@ import sys
 from typing import *
 
 import colorama
+import requests.exceptions
 
 import onlinejudge
 import onlinejudge._implementation.download_history
@@ -41,15 +42,19 @@ def download(args: 'argparse.Namespace') -> None:
         args.format = '%b.%e'
 
     # get samples from the server
-    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
-        if args.system:
-            try:
-                samples = problem.download_system_cases(session=sess)  # type: ignore
-            except onlinejudge.type.NotLoggedInError:
-                log.error('login required')
-                sys.exit(1)
-        else:
-            samples = problem.download_sample_cases(session=sess)  # type: ignore
+    try:
+        with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
+            if args.system:
+                try:
+                    samples = problem.download_system_cases(session=sess)  # type: ignore
+                except onlinejudge.type.NotLoggedInError:
+                    log.error('login required')
+                    sys.exit(1)
+            else:
+                samples = problem.download_sample_cases(session=sess)  # type: ignore
+    except requests.exceptions.HTTPError as e:
+        log.error(str(e))
+        sys.exit(1)
 
     # append the history for submit command
     if not args.dry_run and is_default_format:
