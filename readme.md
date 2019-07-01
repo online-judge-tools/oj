@@ -28,6 +28,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   PKU JudgeOnline
     -   Kattis
     -   Toph (Problem Archive)
+    -   Facebook Hacker Cup
 -   Download system test cases
     -   yukicoder
     -   Aizu Online Judge
