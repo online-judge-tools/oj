@@ -257,15 +257,7 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
     log.debug('args: %s', str(args))
 
     if args.subcommand in ['download', 'd', 'dl']:
-        try:
-            download(args)
-        except onlinejudge.type.NotLoggedInError:
-            log.error('login required')
-            sys.exit(1)
-        except requests.exceptions.HTTPError as e:
-            log.error(str(e))
-            log.debug(traceback.format_exc())
-            sys.exit(1)
+        download(args)
     elif args.subcommand in ['login', 'l']:
         login(args)
     elif args.subcommand in ['submit', 's']:
@@ -298,3 +290,10 @@ def main(args: Optional[List[str]] = None) -> None:
         log.error('NotImplementedError')
         log.info('The operation you specified is not supported yet. Pull requests are welcome.')
         log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md')
+    except onlinejudge.type.NotLoggedInError:
+        log.error('login required')
+        sys.exit(1)
+    except requests.exceptions.HTTPError as e:
+        log.error(str(e))
+        log.debug(traceback.format_exc())
+        sys.exit(1)
