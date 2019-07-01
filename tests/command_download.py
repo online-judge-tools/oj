@@ -7,8 +7,8 @@ import unittest
 
 import tests.utils
 
-from onlinejudge._implementation.command.download import download
 import onlinejudge._implementation.utils as utils
+from onlinejudge._implementation.command.download import download
 
 
 def get_files_from_json(samples):
@@ -45,7 +45,6 @@ def snippet_call_download(self, url, files, is_system=False, is_silent=False, ty
 
 
 def snippet_call_download_raises(self, expected_exception, url, is_system=False, is_silent=False):
-    args = argparse.Namespace(url=url, system=is_system, silent=is_silent, format=None, directory=None, dry_run=True,
-                              cookie=utils.default_cookie_path)
+    args = argparse.Namespace(url=url, system=is_system, silent=is_silent, format=None, directory=None, dry_run=True, cookie=utils.default_cookie_path)
     with self.assertRaises(expected_exception):
         download(args)
