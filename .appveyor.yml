@@ -1,6 +1,12 @@
 environment:
-  global:
-    - PYTHON_VERSION: 3.6
+  matrix:
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6.x"
+      PYTHON_ARCH: "32"
+
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.x"
+      PYTHON_ARCH: "64"
 
 install:
   # If there is a newer build queued for the same PR, cancel this one.
@@ -20,6 +26,7 @@ install:
   # about it being out of date.
   - python -m pip install --upgrade pip
   - pip install -e .[dev,docs]
+
 test_script:
   - isort --check-only --diff --recursive oj onlinejudge setup.py tests
   - yapf --diff --recursive oj onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
