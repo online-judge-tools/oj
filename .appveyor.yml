@@ -1,4 +1,5 @@
 environment:
+  matrix:
     - PYTHON: "C:\\Python37"
       PYTHON_VERSION: "3.7.0"
       PYTHON_ARCH: "32"
