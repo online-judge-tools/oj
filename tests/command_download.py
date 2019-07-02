@@ -3,7 +3,6 @@ import hashlib
 import os
 import subprocess
 import sys
-import unittest
 
 import tests.utils
 
