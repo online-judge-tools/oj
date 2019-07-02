@@ -130,5 +130,4 @@ class DownloadAtCoderTest(unittest.TestCase):
         ], type='json')
 
     def test_call_download_invalid_url(self):
-        self.snippet_call_download_raises(requests.exceptions.HTTPError,
-                                          'http://abc001.contest.atcoder.jp/tasks/abc001_100')
+        self.snippet_call_download_raises(requests.exceptions.HTTPError, 'http://abc001.contest.atcoder.jp/tasks/abc001_100')
