@@ -14,16 +14,14 @@ install:
           throw "There are newer queued builds for this pull request, failing early." }
 
   # Check that we have the expected version and architecture for Python
-  - python --version
-  - python -c \"import struct; print(struct.calcsize('P') * 8)\"
+  - python3 --version
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
-  - python -m pip install --upgrade pip
-  - pip install -e .[dev,docs]
+  - python3 -m pip install --upgrade pip
+  - pip3 install -e .[dev,docs]
 test_script:
   - isort --check-only --diff --recursive oj onlinejudge setup.py tests
   - yapf --diff --recursive oj onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
-  - mypy oj onlinejudge setup.py tests
-  - make -C docs html
-  - python setup.py test
+  - mypy3 oj onlinejudge setup.py tests
+  - python3 setup.py test
