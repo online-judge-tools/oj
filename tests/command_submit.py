@@ -1,6 +1,4 @@
 import os
-import subprocess
-import sys
 import time
 import unittest
 
@@ -34,9 +32,8 @@ int main() {
             },
         ]
 
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 'submit', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['submit', '-y', '--no-open', url, 'main.cpp'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_practice_2(self):
@@ -70,9 +67,8 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
             },
         ]
 
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 'submit', '-y', '--no-open', url, 'main.py'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['submit', '-y', '--no-open', url, 'main.py'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_practice_1_with_history(self):
@@ -84,10 +80,9 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
                 'data': 'print<>+(<>=~$",$`+$\'),$",<>'
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 'dl', url], stdout=sys.stdout, stderr=sys.stderr)
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', 'a.pl'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['dl', url], check=True)
+            tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_invalid_url(self):
@@ -135,9 +130,8 @@ class SubmitCodeforcesTest(unittest.TestCase):
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-y', '--no-open', url, 'a.py'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_beta_3_b(self):
@@ -209,9 +203,8 @@ int main() {
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-y', '--no-open', url, 'main.cpp'], check=True)
 
 
 class SubmitYukicoderTest(unittest.TestCase):
@@ -229,9 +222,8 @@ class SubmitYukicoderTest(unittest.TestCase):
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-y', '--no-open', url, 'a.py'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_beta_3_b(self):
@@ -252,9 +244,8 @@ int main() {
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'main.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-y', '--no-open', url, 'main.cpp'], check=True)
 
 
 class SubmitHackerRankTest(unittest.TestCase):
@@ -279,9 +270,8 @@ print(ans)
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-y', '--no-open', url, 'a.py'], check=True)
 
 
 class SubmitTophTest(unittest.TestCase):
@@ -298,9 +288,8 @@ print(s)
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_add_them_up(self):
@@ -315,9 +304,8 @@ print(sum(nums))
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_divisors(self):
@@ -343,9 +331,8 @@ int main()
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-y', '--no-open', url, 'a.cpp'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_is_it_perfect(self):
@@ -417,6 +404,5 @@ int main( int argc , char const *argv[] ) {
                 'data': code
             },
         ]
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files):
-            subprocess.check_call([ojtools, 's', '-y', '--no-open', url, 'a.cpp'], stdout=sys.stdout, stderr=sys.stderr)
+            tests.utils.run(['s', '-y', '--no-open', url, 'a.cpp'], check=True)

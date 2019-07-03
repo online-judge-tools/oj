@@ -1,6 +1,4 @@
 import os
-import subprocess
-import sys
 import unittest
 
 import tests.utils
@@ -8,9 +6,8 @@ import tests.utils
 
 class GenerateOutputTest(unittest.TestCase):
     def snippet_call_generate_output(self, args, input_files, expected_values, disallowed_files=None):
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(input_files) as tempdir:
-            _ = subprocess.check_output([ojtools, 'generate-output'] + args, stderr=sys.stderr)
+            tests.utils.run(['generate-output'] + args, check=True)
             for expect in expected_values:
                 with open(expect['path']) as f:
                     self.assertEqual(''.join(f.readlines()), expect['data'])

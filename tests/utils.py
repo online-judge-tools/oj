@@ -34,10 +34,15 @@ def sandbox(files):
             yield tempdir
 
 
+def run(args, *, env=None, check=False):
+    env = env or dict(os.environ)
+    env['PYTHONPATH'] = str(pathlib.Path(__file__).parent.parent)  # this is required to run in sandboxes
+    return subprocess.run([sys.executable, '-m', 'onlinejudge._implementation.main'] + args, stdout=subprocess.PIPE, stderr=sys.stderr, env=env, check=check)
+
+
 def run_in_sandbox(args, files):
-    ojtools = os.path.abspath('oj')
     with sandbox(files) as tempdir:
-        proc = subprocess.run([ojtools] + args, stdout=subprocess.PIPE, stderr=sys.stderr)
+        proc = run(args)
         return {
             'proc': proc,
             'tempdir': tempdir,

@@ -5,7 +5,7 @@ import unittest
 
 # TODO: these command should be written at once, at only .travis.yml or at only here
 
-paths = ['oj', 'onlinejudge', 'setup.py', 'tests']
+paths = ['onlinejudge', 'setup.py', 'tests']
 
 
 class ContinuousIntegrationTest(unittest.TestCase):

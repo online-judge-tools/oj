@@ -1,6 +1,4 @@
 import os
-import subprocess
-import sys
 import time
 import unittest
 
@@ -9,12 +7,14 @@ import tests.utils
 
 class LoginTest(unittest.TestCase):
     def snippet_call_login_check_failure(self, url):
-        ojtools = os.path.abspath('oj')
         with tests.utils.sandbox(files=[]) as tempdir:
             env = dict(**os.environ)
             env['HOME'] = tempdir
-            proc = subprocess.run([ojtools, 'login', '--check', url], env=env, stdout=sys.stdout, stderr=sys.stderr)
+            proc = tests.utils.run(['login', '--check', url], env=env)
             self.assertEqual(proc.returncode, 1)
+
+    def snippet_call_login_check_success(self, url):
+        tests.utils.run(['login', '--check', url], check=True)
 
     def test_call_login_check_atcoder_failure(self):
         self.snippet_call_login_check_failure('https://atcoder.jp/')
@@ -36,30 +36,24 @@ class LoginTest(unittest.TestCase):
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_login_check_atcoder_success(self):
-        ojtools = os.path.abspath('oj')
-        subprocess.check_call([ojtools, 'login', '--check', 'https://atcoder.jp/'], stdout=sys.stdout, stderr=sys.stderr)
+        self.snippet_call_login_check_success('https://atcoder.jp/')
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_login_check_codeforces_success(self):
-        ojtools = os.path.abspath('oj')
-        subprocess.check_call([ojtools, 'login', '--check', 'https://codeforces.com/'], stdout=sys.stdout, stderr=sys.stderr)
+        self.snippet_call_login_check_success('https://codeforces.com/')
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_login_check_hackerrank_success(self):
-        ojtools = os.path.abspath('oj')
-        subprocess.check_call([ojtools, 'login', '--check', 'https://www.hackerrank.com/'], stdout=sys.stdout, stderr=sys.stderr)
+        self.snippet_call_login_check_success('https://www.hackerrank.com/')
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_login_check_topcoder_success(self):
-        ojtools = os.path.abspath('oj')
-        subprocess.check_call([ojtools, 'login', '--check', 'https://community.topcoder.com/'], stdout=sys.stdout, stderr=sys.stderr)
+        self.snippet_call_login_check_success('https://community.topcoder.com/')
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_login_check_toph_success(self):
-        ojtools = os.path.abspath('oj')
-        subprocess.check_call([ojtools, 'login', '--check', 'https://toph.co/'], stdout=sys.stdout, stderr=sys.stderr)
+        self.snippet_call_login_check_success('https://toph.co/')
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_login_check_yukicoder_success(self):
-        ojtools = os.path.abspath('oj')
-        subprocess.check_call([ojtools, 'login', '--check', 'https://yukicoder.me/'], stdout=sys.stdout, stderr=sys.stderr)
+        self.snippet_call_login_check_success('https://yukicoder.me/')
