@@ -4,7 +4,11 @@ import sys
 import time
 import unittest
 
+import requests.exceptions
 import tests.utils
+
+from onlinejudge._implementation.command.submit import submit
+from onlinejudge._implementation.main import get_parser
 
 
 class SubmitAtCoderTest(unittest.TestCase):
@@ -84,6 +88,34 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
         with tests.utils.sandbox(files):
             subprocess.check_call([ojtools, 'dl', url], stdout=sys.stdout, stderr=sys.stderr)
             subprocess.check_call([ojtools, 's', '-y', '--no-open', 'a.pl'], stdout=sys.stdout, stderr=sys.stderr)
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_invalid_url(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_111'
+        code = '''\
+        #include <bits/stdc++.h>
+        using namespace std;
+        int main() {
+            int a; cin >> a;
+            int b, c; cin >> b >> c;
+            string s; cin >> s;
+            cout << a + b + c << ' ' << s << endl;
+            return 0;
+        }
+        '''
+        files = [
+            {
+                'path': 'main.cpp',
+                'data': code
+            },
+        ]
+
+        with tests.utils.sandbox(files):
+            with self.assertRaises(requests.exceptions.HTTPError):
+                args = ["submit", '-y', '--no-open', url, 'main.cpp']
+                args = get_parser().parse_args(args=args)
+                submit(args)
 
 
 class SubmitCodeforcesTest(unittest.TestCase):

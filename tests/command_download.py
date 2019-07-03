@@ -1,10 +1,14 @@
+import argparse
 import hashlib
 import os
 import subprocess
 import sys
-import unittest
 
 import tests.utils
+
+import onlinejudge._implementation.utils as utils
+from onlinejudge._implementation.command.download import download
+from onlinejudge._implementation.main import get_parser
 
 
 def get_files_from_json(samples):
@@ -38,3 +42,14 @@ def snippet_call_download(self, url, files, is_system=False, is_silent=False, ty
                 with open(os.path.join('test', name)) as fh:
                     result[name] = hashlib.md5(fh.buffer.read()).hexdigest()
         self.assertEqual(files, result)
+
+
+def snippet_call_download_raises(self, expected_exception, url, is_system=False, is_silent=False):
+    args = ["download", url]
+    if is_system:
+        args.append("--system")
+    if is_silent:
+        args.append("--silent")
+    args = get_parser().parse_args(args=args)
+    with self.assertRaises(expected_exception):
+        download(args)

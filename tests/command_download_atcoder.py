@@ -1,11 +1,15 @@
 import unittest
 
+import requests.exceptions
 import tests.command_download
 
 
 class DownloadAtCoderTest(unittest.TestCase):
     def snippet_call_download(self, *args, **kwargs):
         tests.command_download.snippet_call_download(self, *args, **kwargs)
+
+    def snippet_call_download_raises(self, *args, **kwargs):
+        tests.command_download.snippet_call_download_raises(self, *args, **kwargs)
 
     def test_call_download_atcoder_abc001_1(self):
         self.snippet_call_download('http://abc001.contest.atcoder.jp/tasks/abc001_1', {
@@ -124,3 +128,6 @@ class DownloadAtCoderTest(unittest.TestCase):
                 "output": "976668549\n"
             },
         ], type='json')
+
+    def test_call_download_invalid_url(self):
+        self.snippet_call_download_raises(requests.exceptions.HTTPError, 'http://abc001.contest.atcoder.jp/tasks/abc001_100')

@@ -15,7 +15,6 @@ the module for AtCoder (https://atcoder.jp/)
 
 import datetime
 import itertools
-import json
 import posixpath
 import re
 import urllib.parse
@@ -23,7 +22,6 @@ import warnings
 from typing import *
 
 import bs4
-import requests
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.testcase_zipper
