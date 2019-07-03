@@ -190,15 +190,21 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_in_parallel(self):
+        if os.name == 'nt':
+            TOTAL = 50
+            PARALLEL = 8
+        else:
+            TOTAL = 1000
+            PARALLEL = 256
         input_files = []
         expected_values = []
-        for i in range(1000):
+        for i in range(TOTAL):
             name = 'sample-%03d' % i
             input_files += [{
                 'path': 'test/{}.in'.format(name),
                 'data': str(i),
             }]
-            if i > 950:
+            if i > TOTAL * 0.95:
                 input_files += [{
                     'path': 'test/{}.out'.format(name),
                     'data': str(i),
@@ -212,7 +218,7 @@ class GenerateOutputTest(unittest.TestCase):
                 'data': str(i),
             }]
         self.snippet_call_generate_output(
-            args=['--jobs', '256', '-c', tests.utils.python_c("import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())")],
+            args=['--jobs', str(PARALLEL), '-c', tests.utils.python_c("import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())")],
             input_files=input_files,
             expected_values=expected_values,
         )

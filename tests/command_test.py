@@ -402,9 +402,15 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_test_in_parallel(self):
+        if os.name == 'nt':
+            TOTAL = 50
+            PARALLEL = 8
+        else:
+            TOTAL = 1000
+            PARALLEL = 256
         files = []
         expected = []
-        for i in range(1000):
+        for i in range(TOTAL):
             name = 'sample-%03d' % i
             files += [{
                 'path': 'test/{}.in'.format(name),
@@ -425,7 +431,7 @@ class TestTest(unittest.TestCase):
                 'exitcode': 0,
             }]
         self.snippet_call_test(
-            args=['--jobs', '256', '--silent', '-c', tests.utils.python_c("import time; time.sleep(1); print(1)")],
+            args=['--jobs', str(PARALLEL), '--silent', '-c', tests.utils.python_c("import time; time.sleep(1); print(1)")],
             files=files,
             expected=expected,
         )
