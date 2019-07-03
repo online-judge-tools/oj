@@ -297,3 +297,7 @@ def main(args: Optional[List[str]] = None) -> None:
         log.error(str(e))
         log.debug(traceback.format_exc())
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

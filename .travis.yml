@@ -7,9 +7,9 @@ install:
 script:
     - which oj
     - ( cd /tmp ; oj --help )
-    - isort --check-only --diff --recursive oj onlinejudge setup.py tests
-    - yapf --diff --recursive oj onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
-    - mypy oj onlinejudge setup.py tests
+    - isort --check-only --diff --recursive onlinejudge setup.py tests
+    - yapf --diff --recursive onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
+    - mypy onlinejudge setup.py tests
     - make -C docs html
     - python setup.py test
 deploy:
