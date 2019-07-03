@@ -82,6 +82,10 @@ class SubmissionError(RuntimeError):
     pass
 
 
+class SampleParseError(RuntimeError):
+    pass
+
+
 class Problem(ABC):
     """
     :note: :py:class:`Problem` represents just a URL of a problem, without the data of the problem.
