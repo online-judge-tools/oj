@@ -47,3 +47,15 @@ def run_in_sandbox(args, files):
             'proc': proc,
             'tempdir': tempdir,
         }
+
+
+def cat():
+    if os.name == 'nt':
+        return '{} -c "import sys; sys.stdout.write(sys.stdin.read())"'.format(sys.executable)
+    else:
+        return 'cat'
+
+
+def python_c(cmd):
+    assert '"' not in cmd
+    return '{} -c "{}"'.format(sys.executable, cmd)
