@@ -8,16 +8,12 @@ the module for Topcoder (https://www.topcoder.com/)
 
 import collections
 import itertools
-import json
-import posixpath
 import re
-import time
 import urllib.parse
 import xml.etree.ElementTree
 from typing import *
 
 import bs4
-import requests
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils

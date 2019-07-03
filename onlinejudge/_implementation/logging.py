@@ -2,7 +2,7 @@
 import logging
 
 import colorama
-from colorama import Back, Fore, Style
+from colorama import Fore, Style
 
 logger = logging.getLogger(__name__)
 

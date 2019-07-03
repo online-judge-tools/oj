@@ -4,7 +4,6 @@ the module for CS Academy (https://csacademy.com/)
 """
 
 import json
-import posixpath
 import re
 import urllib.parse
 from typing import *
@@ -13,7 +12,6 @@ import requests
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
-import onlinejudge.dispatch
 import onlinejudge.type
 from onlinejudge.type import TestCase
 

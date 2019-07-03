@@ -6,22 +6,16 @@ the module for Aizu Online Judge (http://judge.u-aizu.ac.jp/onlinejudge/)
 :note: There is the offcial API http://developers.u-aizu.ac.jp/index
 """
 
-import collections
-import io
-import itertools
 import json
-import posixpath
 import re
 import string
 import urllib.parse
-import zipfile
 from typing import *
 
 import requests
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
-import onlinejudge.dispatch
 import onlinejudge.type
 from onlinejudge.type import TestCase
 

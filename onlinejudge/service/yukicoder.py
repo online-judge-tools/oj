@@ -6,17 +6,12 @@ the module for yukicoder (https://yukicoder.me/)
 :note: There is the official API https://petstore.swagger.io/?url=https://yukicoder.me/api/swagger.yaml
 """
 
-import collections
-import io
 import json
-import os.path
 import posixpath
-import re
 import urllib.parse
 from typing import *
 
 import bs4
-import requests
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.testcase_zipper
