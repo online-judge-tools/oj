@@ -13,7 +13,6 @@ class LoginTest(unittest.TestCase):
         with tests.utils.sandbox(files=[]) as tempdir:
             env = dict(**os.environ)
             env['HOME'] = tempdir
-            self.assertRaises
             proc = subprocess.run([ojtools, 'login', '--check', url], env=env, stdout=sys.stdout, stderr=sys.stderr)
             self.assertEqual(proc.returncode, 1)
 
