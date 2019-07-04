@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.5.0 / 2019-07-05
+
+-   [#456](https://github.com/kmyk/online-judge-tools/pull/456) support `download` samples from Facebook Hacker Cup
+-   [#453](https://github.com/kmyk/online-judge-tools/pull/453) make an error message better
+-   [#457](https://github.com/kmyk/online-judge-tools/pull/457) add tests about throwing exceptions
+
 ## 6.4.1 / 2019-06-18
 
 -   [#452](https://github.com/kmyk/online-judge-tools/pull/452) fix a bug of the MLE-checking and RE
