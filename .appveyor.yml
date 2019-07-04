@@ -15,6 +15,7 @@ install:
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
   - python -m pip install --upgrade pip
+  - pip install --upgrade setuptools
   - pip install -e .[dev,docs]
 
 test_script:
