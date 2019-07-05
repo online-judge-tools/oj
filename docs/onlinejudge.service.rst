@@ -11,6 +11,7 @@ Submodules
    onlinejudge.service.atcoder
    onlinejudge.service.codeforces
    onlinejudge.service.csacademy
+   onlinejudge.service.facebook
    onlinejudge.service.hackerrank
    onlinejudge.service.kattis
    onlinejudge.service.poj

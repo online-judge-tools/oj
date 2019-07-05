@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 the module for Facebook Hacker Cup (https://www.facebook.com/hackercup/)
+
+.. versionadded:: 6.5.0
 """
 
 import urllib.parse
