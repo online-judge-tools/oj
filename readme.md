@@ -205,6 +205,20 @@ not conflicted:
 -   [FakePsyho/mmstats](https://github.com/FakePsyho/mmstats) for Topcoder Marathon Match
 -   <https://community.topcoder.com/tc?module=Static&d1=applet&d2=plugins>
 
+projects depending on kmyk/online-judge-tools:
+
+1.  wrappers:
+    -   [kjnh10/pcm](https://github.com/kjnh10/pcm)
+    -   [Tatamo/atcoder-cli](https://github.com/Tatamo/atcoder-cli)
+    -   one of my friends uses `oj` via shortcut keys of VSCode
+1.  libraries using this for CI:
+    -   [blue-jam/ProconLibrary](https://github.com/blue-jam/ProconLibrary) uses `oj` for CI
+    -   [kmyk/competitive-programming-library](https://github.com/kmyk/competitive-programming-library) uses `oj` for CI
+1.  others:
+    -   [fukatani/rujaion](https://github.com/fukatani/rujaion) is an IDE for competitive-programming with Rust
+    -   [kmyk/AtCoderProblemsStatic](https://github.com/kmyk/AtCoderProblemsStatic) is a clone of [kenkoooo/AtCoderProblems](https://github.com/kenkoooo/AtCoderProblems)
+    -   [kmyk/atcoder-auto-debugger](https://github.com/kmyk/atcoder-auto-debugger) is a program to analyze submissions for AtCoder and find bugs
+
 ## Authors
 
 -   owner: [@kmyk](https://github.com/kmyk) (AtCoder: [kimiyuki](https://atcoder.jp/users/kimiyuki), Codeforces: [kimiyuki](https://codeforces.com/profile/kimiyuki))
