@@ -1,7 +1,5 @@
 import hashlib
 import os
-import subprocess
-import sys
 
 import tests.utils
 
@@ -26,14 +24,13 @@ def snippet_call_download(self, url, files, is_system=False, is_silent=False, ty
     if type == 'json':
         files = get_files_from_json(files)
 
-    ojtools = os.path.abspath('oj')
     with tests.utils.sandbox([]):
-        cmd = [ojtools, 'download', url]
+        args = ['download', url]
         if is_system:
-            cmd += ['--system']
+            args += ['--system']
         if is_silent:
-            cmd += ['--silent']
-        subprocess.check_call(cmd, stdout=sys.stdout, stderr=sys.stderr)
+            args += ['--silent']
+        tests.utils.run(args, check=True)
         result = {}
         if os.path.exists('test'):
             for name in os.listdir('test'):

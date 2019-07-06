@@ -6,6 +6,7 @@ import functools
 import http.client
 import http.cookiejar
 import json
+import os
 import pathlib
 import posixpath
 import shlex
@@ -142,6 +143,8 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
         command = shlex.split(command_str)
         if gnu_time is not None:
             command = [gnu_time, '-f', '%M', '-o', fh.name, '--'] + command
+        if os.name == 'nt':
+            command = command_str  # type: ignore
         begin = time.perf_counter()
 
         try:
@@ -161,7 +164,7 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
         end = time.perf_counter()
         if gnu_time is not None:
             with open(fh.name) as fh1:
-                memory = int(fh1.read().rstrip().splitlines()[-1]) / 1000  # type: Optional[float]
+                memory = int(fh1.read().splitlines()[-1]) / 1000  # type: Optional[float]
         else:
             memory = None
     info = {
