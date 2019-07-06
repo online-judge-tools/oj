@@ -472,6 +472,28 @@ class TestTest(unittest.TestCase):
             self.assertEqual(case['status'], 'AC')
             self.assertLess(case['memory'], 100)
 
+    @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
+    def test_call_test_memory_limit_error(self):
+        # make a bytes of 100 MB
+        self.snippet_call_test(
+            args=['--mle', '50', '-c', tests.utils.python_c("print(len(b'A' * 100000000))")],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'MLE',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                },
+                'output': '100000000\n',
+                'exitcode': 0,
+            }],
+        )
+
     def test_call_stderr(self):
         data = self.snippet_call_test(
             args=['-c', tests.utils.python_c("import sys; print('foo', file=sys.stderr)")],
