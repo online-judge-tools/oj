@@ -1,7 +1,10 @@
 import json
+import os
+import sys
 import unittest
 
 import tests.utils
+from tests.utils import cat
 
 
 class TestTest(unittest.TestCase):
@@ -15,17 +18,17 @@ class TestTest(unittest.TestCase):
             self.assertEqual(len(data), len(expected))
             for a, b in zip(data, expected):
                 self.assertEqual(a['testcase']['name'], b['testcase']['name'])
-                self.assertEqual(a['testcase']['input'], b['testcase']['input'] % result['tempdir'])
+                self.assertEqual(a['testcase']['input'], b['testcase']['input'].replace('/', os.path.sep) % result['tempdir'])
                 self.assertEqual('output' in a['testcase'], 'output' in b['testcase'])
                 if 'output' in b['testcase']:
-                    self.assertEqual(a['testcase']['output'], b['testcase']['output'] % result['tempdir'])
+                    self.assertEqual(a['testcase']['output'], b['testcase']['output'].replace('/', os.path.sep) % result['tempdir'])
                 self.assertEqual(a['exitcode'], b['exitcode'])
                 self.assertEqual(a['status'], b['status'])
-                self.assertEqual(a['output'], b['output'])
+                self.assertEqual(a['output'].replace(os.linesep, '\n'), b['output'])
 
     def test_call_test_simple(self):
         self.snippet_call_test(
-            args=['-c', 'cat'],
+            args=['-c', cat()],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -67,7 +70,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_select(self):
         self.snippet_call_test(
-            args=['-c', 'cat', 'test/sample-2.in', 'test/sample-3.in', 'test/sample-3.out'],
+            args=['-c', cat(), 'test/sample-2.in', 'test/sample-3.in', 'test/sample-3.out'],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -116,11 +119,11 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_shell(self):
         self.snippet_call_test(
-            args=['-c', './build/foo.sh hoge'],
+            args=['-c', '{} ./build/foo.py hoge'.format(sys.executable)],
             files=[
                 {
-                    'path': 'build/foo.sh',
-                    'data': '#!/bin/sh\necho $1\n',
+                    'path': 'build/foo.py',
+                    'data': 'import sys\nprint(sys.argv[1])\n',
                     'executable': True
                 },
                 {
@@ -144,39 +147,9 @@ class TestTest(unittest.TestCase):
             }],
         )
 
-    def test_call_test_fail(self):
-        self.snippet_call_test(
-            args=['-c', './foo.sh'],
-            files=[
-                {
-                    'path': 'foo.sh',
-                    'data': '#!/bin/sh\necho bar\nexit 3\n',
-                    'executable': True
-                },
-                {
-                    'path': 'test/sample-1.in',
-                    'data': 'foo\n'
-                },
-                {
-                    'path': 'test/sample-1.out',
-                    'data': 'foo\n'
-                },
-            ],
-            expected=[{
-                'status': 'WA',
-                'testcase': {
-                    'name': 'sample-1',
-                    'input': '%s/test/sample-1.in',
-                    'output': '%s/test/sample-1.out',
-                },
-                'output': 'bar\n',
-                'exitcode': 3,
-            }],
-        )
-
     def test_call_test_ignore_backup(self):
         self.snippet_call_test(
-            args=['-c', 'cat'],
+            args=['-c', cat()],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -223,7 +196,7 @@ class TestTest(unittest.TestCase):
     def test_call_test_no_ignore_backup(self):
         # it should be reported: [ERROR] unrecognizable file found: test/sample-1.in~
         self.snippet_call_test(
-            args=['-c', 'cat', '--no-ignore-backup'],
+            args=['-c', cat(), '--no-ignore-backup'],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -239,7 +212,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_dir(self):
         self.snippet_call_test(
-            args=['-c', 'cat', '-d', 'p/o/../../p/o/y/o'],
+            args=['-c', cat(), '-d', 'p/o/../../p/o/y/o'],
             files=[
                 {
                     'path': 'p/o/y/o/sample-1.in',
@@ -272,7 +245,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_format(self):
         self.snippet_call_test(
-            args=['-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s'],
+            args=['-c', cat(), '-d', 'yuki/coder', '-f', 'test_%e/%s'],
             files=[
                 {
                     'path': 'yuki/coder/test_in/sample-1.txt',
@@ -305,7 +278,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_format_select(self):
         self.snippet_call_test(
-            args=['-c', 'cat', '-d', 'yuki/coder', '-f', 'test_%e/%s', 'yuki/coder/test_in/sample-2.txt', 'yuki/coder/test_in/sample-3.txt', 'yuki/coder/test_out/sample-3.txt'],
+            args=['-c', cat(), '-d', 'yuki/coder', '-f', 'test_%e/%s', 'yuki/coder/test_in/sample-2.txt', 'yuki/coder/test_in/sample-3.txt', 'yuki/coder/test_out/sample-3.txt'],
             files=[
                 {
                     'path': 'yuki/coder/test_in/sample-1.txt',
@@ -354,7 +327,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_format_hack(self):
         self.snippet_call_test(
-            args=['-c', 'cat', '-d', 'a/b', '-f', 'c/test_%e/d/%s/e.case.txt'],
+            args=['-c', cat(), '-d', 'a/b', '-f', 'c/test_%e/d/%s/e.case.txt'],
             files=[
                 {
                     'path': 'a/b/c/test_in/d/sample.case.1/e.case.txt',
@@ -394,9 +367,10 @@ class TestTest(unittest.TestCase):
             }],
         )
 
+    @unittest.skipIf(os.name == 'nt', "character '*' is not usable for paths in Windows")
     def test_call_test_re_glob_injection(self):
         self.snippet_call_test(
-            args=['-c', 'cat', '-d', 'a.*/[abc]/**', '-f', '***/**/def/test_%e/%s.txt'],
+            args=['-c', cat(), '-d', 'a.*/[abc]/**', '-f', '***/**/def/test_%e/%s.txt'],
             files=[
                 {
                     'path': 'a.*/[abc]/**/***/**/def/test_in/1.txt',
@@ -428,9 +402,15 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_test_in_parallel(self):
+        if os.name == 'nt':
+            TOTAL = 50
+            PARALLEL = 8
+        else:
+            TOTAL = 1000
+            PARALLEL = 256
         files = []
         expected = []
-        for i in range(1000):
+        for i in range(TOTAL):
             name = 'sample-%03d' % i
             files += [{
                 'path': 'test/{}.in'.format(name),
@@ -451,15 +431,16 @@ class TestTest(unittest.TestCase):
                 'exitcode': 0,
             }]
         self.snippet_call_test(
-            args=['--jobs', '256', '--silent', '-c', 'bash -c "sleep 2 && echo 1"'],
+            args=['--jobs', str(PARALLEL), '--silent', '-c', tests.utils.python_c("import time; time.sleep(1); print(1)")],
             files=files,
             expected=expected,
         )
 
+    @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
     def test_call_test_large_memory(self):
         # make a bytes of 100 MB
         data = self.snippet_call_test(
-            args=['-c', """python -c 'print(len(b"A" * 100000000))'"""],
+            args=['-c', tests.utils.python_c("print(len(b'A' * 100000000))")],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -473,10 +454,11 @@ class TestTest(unittest.TestCase):
             self.assertGreater(case['memory'], 100)
             self.assertLess(case['memory'], 1000)
 
+    @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
     def test_call_test_small_memory(self):
         # just print "foo"
         data = self.snippet_call_test(
-            args=['-c', """python -c 'print("foo")'"""],
+            args=['-c', tests.utils.python_c("print('foo')")],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -491,7 +473,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_stderr(self):
         data = self.snippet_call_test(
-            args=['-c', """bash -c 'echo foo >&2'"""],
+            args=['-c', tests.utils.python_c("import sys; print('foo', file=sys.stderr)")],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -511,7 +493,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_runtime_error(self):
         data = self.snippet_call_test(
-            args=['-c', 'false'],
+            args=['-c', tests.utils.python_c("exit(1)")],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -531,7 +513,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_stderr_and_fail(self):
         data = self.snippet_call_test(
-            args=['-c', """perl -e 'die "good bye"'"""],
+            args=['-c', tests.utils.python_c("import sys; print('good bye', file=sys.stderr); exit(255)")],
             files=[
                 {
                     'path': 'test/sample-1.in',

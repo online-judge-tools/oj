@@ -48,10 +48,12 @@ def percentparse(s: str, format: str, table: Dict[str, str]) -> Optional[Dict[st
 
 
 def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]:
+    if os.name == 'nt':
+        format = format.replace('/', '\\')
     table = {}
     table['s'] = '*'
     table['e'] = '*'
-    pattern = (glob.escape(str(directory)) + glob.escape(os.path.sep) + percentformat(glob.escape(format).replace('\\%', '%'), table))
+    pattern = (glob.escape(str(directory) + os.path.sep) + percentformat(glob.escape(format).replace(glob.escape('%'), '%'), table))
     paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
         log.debug('testcase globbed: %s', path)
@@ -59,10 +61,12 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
 
 
 def match_with_format(directory: pathlib.Path, format: str, path: pathlib.Path) -> Optional[Match[str]]:
+    if os.name == 'nt':
+        format = format.replace('/', '\\')
     table = {}
     table['s'] = '(?P<name>.+)'
     table['e'] = '(?P<ext>in|out)'
-    pattern = re.compile('^' + re.escape(str(directory.resolve())) + re.escape(os.path.sep) + percentformat(re.escape(format).replace('\\%', '%'), table) + '$')
+    pattern = re.compile(re.escape(str(directory.resolve()) + os.path.sep) + percentformat(re.escape(format).replace(re.escape('%'), '%'), table))
     return pattern.match(str(path.resolve()))
 
 

@@ -1,6 +1,7 @@
 # Online Judge Tools
 
 [![Travis](https://img.shields.io/travis/kmyk/online-judge-tools/master.svg)](https://travis-ci.org/kmyk/online-judge-tools)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/f0jfg16ap6g91l40/branch/master?svg=true)](https://ci.appveyor.com/project/kmyk/online-judge-tools)
 [![Documentation Status](https://readthedocs.org/projects/online-judge-tools/badge/?version=master)](https://online-judge-tools.readthedocs.io/en/master/)
 [![PyPI](https://img.shields.io/pypi/pyversions/online-judge-tools.svg)](#)
 [![PyPI](https://img.shields.io/pypi/status/online-judge-tools.svg)](#)
