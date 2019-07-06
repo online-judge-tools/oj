@@ -11,7 +11,6 @@ import requests
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
-import onlinejudge.dispatch
 import onlinejudge.type
 from onlinejudge.type import TestCase
 

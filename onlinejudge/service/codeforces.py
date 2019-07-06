@@ -5,14 +5,12 @@ the module for Codeforces (https://codeforces.com/)
 :note: There is the offcial API https://codeforces.com/api/help
 """
 
-import posixpath
 import re
 import string
 import urllib.parse
 from typing import *
 
 import bs4
-import requests
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.testcase_zipper

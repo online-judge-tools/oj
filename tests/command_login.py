@@ -1,5 +1,4 @@
 import os
-import time
 import unittest
 
 import tests.utils

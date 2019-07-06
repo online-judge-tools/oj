@@ -1,10 +1,8 @@
-import argparse
 import hashlib
 import os
 
 import tests.utils
 
-import onlinejudge._implementation.utils as utils
 from onlinejudge._implementation.command.download import download
 from onlinejudge._implementation.main import get_parser
 
