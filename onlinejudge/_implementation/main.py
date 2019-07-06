@@ -143,6 +143,7 @@ tips:
     subparser.add_argument('-s', '--silent', action='store_true', help='don\'t report output and correct answer even if not AC  (for --mode all)')
     subparser.add_argument('-e', '--error', type=float, help='check as floating point number: correct if its absolute or relative error doesn\'t exceed it')
     subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
+    subparser.add_argument('--mle', type=float, help='set the memory limit (in megabyte) (default: inf)')
     subparser.add_argument('-i', '--print-input', action='store_true', help='print input cases if not AC')
     subparser.add_argument('-j', '--jobs', metavar='N', type=int, help='specifies the number of jobs to run simultaneously  (default: no parallelization)')
     subparser.add_argument('--print-memory', action='store_true', help='print the amount of memory which your program used, even if it is small enough')

@@ -48,7 +48,7 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
     return True
 
 
-def compare_and_report(proc: subprocess.Popen, answer: str, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool) -> str:
+def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool) -> str:
     # prepare the comparing function
     if error:  # float mode
         match = lambda a, b: compare_as_floats(a, b, error)
@@ -78,6 +78,10 @@ def compare_and_report(proc: subprocess.Popen, answer: str, test_input_path: pat
     if proc.returncode is None:
         log.failure(log.red('TLE'))
         status = 'TLE'
+        print_input()
+    elif memory is not None and mle is not None and memory > mle:
+        log.failure(log.red('MLE'))
+        status = 'MLE'
         print_input()
     elif proc.returncode != 0:
         log.failure(log.red('RE') + ': return code %d', proc.returncode)
@@ -156,7 +160,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             else:
                 log.warning('memory: %f MB', memory)
 
-        status = compare_and_report(proc, answer, test_input_path, test_output_path, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip)
+        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip)
 
     # return the result
     testcase = {
@@ -205,6 +209,8 @@ def test(args: 'argparse.Namespace') -> None:
     if not check_gnu_time(args.gnu_time):
         log.warning('GNU time is not available: %s', args.gnu_time)
         args.gnu_time = None
+    if args.mle is not None and args.gnu_time is None:
+        raise RuntimeError('--mle is used but GNU time does not exist')
 
     # run tests
     history = []  # type: List[Dict[str, Any]]
