@@ -8,8 +8,8 @@ from tests.utils import cat
 
 
 class TestTest(unittest.TestCase):
-    def snippet_call_test(self, args, files, expected):
-        result = tests.utils.run_in_sandbox(args=['-v', 'test', '--json'] + args, files=files)
+    def snippet_call_test(self, args, files, expected, verbose=True):
+        result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--json'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(result['proc'].stdout.decode())
         if expected is None:
@@ -434,6 +434,7 @@ class TestTest(unittest.TestCase):
             args=['--jobs', str(PARALLEL), '--silent', '-c', tests.utils.python_c("import time; time.sleep(1); print(1)")],
             files=files,
             expected=expected,
+            verbose=False,
         )
 
     @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
