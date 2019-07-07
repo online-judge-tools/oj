@@ -162,11 +162,13 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
             answer = None
 
         end = time.perf_counter()
+        memory = None  # type: Optional[float]
         if gnu_time is not None:
             with open(fh.name) as fh1:
-                memory = int(fh1.read().splitlines()[-1]) / 1000  # type: Optional[float]
-        else:
-            memory = None
+                reported = fh1.read()
+            log.debug('GNU time says:\n%s', reported)
+            if reported.strip() and reported.splitlines()[-1].isdigit():
+                memory = int(reported.splitlines()[-1]) / 1000
     info = {
         'answer': answer,  # Optional[byte]
         'elapsed': end - begin,  # float, in second
