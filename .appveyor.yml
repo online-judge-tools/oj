@@ -4,6 +4,8 @@ environment:
   matrix:
     - PYTHON: C:\Python35
     - PYTHON: C:\Python36-x64
+    - PYTHON: C:\Python36-x64
+      TEST_OJ_EXE: dist\oj.exe  # for unit tests
 
 install:
   # Prepend newly installed Python to the PATH of this build (this cannot be
