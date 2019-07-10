@@ -252,7 +252,7 @@ supported services:
 def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
     if args.version:
         print('online-judge-tools {}'.format(onlinejudge.__version__))
-        exit(0)
+        sys.exit(0)
     if args.verbose:
         log.setLevel(log.logging.DEBUG)
     log.debug('args: %s', str(args))
