@@ -403,8 +403,8 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_in_parallel(self):
         if os.name == 'nt':
-            TOTAL = 50
-            PARALLEL = 8
+            TOTAL = 10
+            PARALLEL = 2
         else:
             TOTAL = 1000
             PARALLEL = 256
