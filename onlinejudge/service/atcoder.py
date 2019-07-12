@@ -150,7 +150,6 @@ class AtCoderContest(object):
     """
     :ivar contest_id: :py:class:`str`
     """
-
     def __init__(self, contest_id: str):
         if contest_id.startswith('http'):
             # an exception should be raised since mypy cannot check this kind of failure
@@ -559,7 +558,6 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
     :note: AtCoder has problems independently from contests. Therefore the notions `contest_id`, `alphabet`, and `url` don't belong to problems itself.
     """
-
     def __init__(self, contest_id: str, problem_id: str):
         self.contest_id = contest_id
         self.problem_id = problem_id  # NOTE: AtCoder calls this as "task_screen_name"
@@ -749,7 +747,6 @@ class AtCoderSubmission(onlinejudge.type.Submission):
     :ivar contest_id: :py:class:`str`
     :ivar submission_id: :py:class:`str`
     """
-
     def __init__(self, contest_id: str, submission_id: int, problem_id: Optional[str] = None):
         self.contest_id = contest_id
         self.submission_id = submission_id
@@ -948,7 +945,6 @@ class AtCoderSubmissionTestSet(object):
     :ivar max_score: :py:class:`float`
     :ivar test_case_names: :py:class:`List` [ :py:class:`str` ]
     """
-
     def __init__(self, set_name: str, score: float, max_score: float, test_case_names: List[str]):
         self.set_name = set_name
         self.score = score
@@ -972,7 +968,6 @@ class AtCoderSubmissionTestCaseResult(object):
     :ivar exec_time_msec: :py:class:`int` in millisecond
     :ivar memory_byte: :py:class:`int` in byte
     """
-
     def __init__(self, case_name: str, status: str, exec_time_msec: Optional[int], memory_byte: Optional[int]):
         self.case_name = case_name
         self.status = status

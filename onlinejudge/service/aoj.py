@@ -42,7 +42,6 @@ class AOJProblem(onlinejudge.type.Problem):
     """
     :ivar problem_id: :py:class:`str` like `DSL_1_A` or `2256`
     """
-
     def __init__(self, problem_id):
         self.problem_id = problem_id
 
@@ -128,7 +127,6 @@ class AOJArenaProblem(onlinejudge.type.Problem):
 
     .. versionadded:: 6.1.0
     """
-
     def __init__(self, arena_id, alphabet):
         assert alphabet in string.ascii_uppercase
         self.arena_id = arena_id

@@ -274,7 +274,6 @@ def getter_with_load_details(name: str, type: Union[str, type]) -> Callable:
 
     Of course the latter is better when it is used only once, but the former is better when the pattern is repeated.
     """
-
     @functools.wraps(lambda self: getattr(self, name))
     def wrapper(self, session: Optional[requests.Session] = None):
         if getattr(self, name) is None:
