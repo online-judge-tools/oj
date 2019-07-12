@@ -33,12 +33,16 @@ test_script:
   - echo 1 > test\sample-8.in
   - echo 1 > test\sample-9.in
   - echo 1 > test\sample-10.in
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())"'
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())"'
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())"'
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())"'
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())"'
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())"'
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "C:\\Python35\\python.exe -c 'import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'"
 
 artifacts:
   - path: dist\oj.exe
