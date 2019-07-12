@@ -41,4 +41,4 @@ deploy:
   on:
     appveyor_repo_tag: true
     branch: master
-    PYTHON_VERSION: 3.6
+    TEST_OJ_EXE: dist\oj.exe
