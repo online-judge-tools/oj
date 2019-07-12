@@ -24,11 +24,15 @@ test_script:
   - dist\oj.exe --version
   - mkdir test
   - echo 1 > test\sample-1.in
-  - echo 1 > test\sample-1.out
   - echo 1 > test\sample-2.in
-  - echo 1 > test\sample-2.out
   - echo 1 > test\sample-3.in
-  - echo 1 > test\sample-3.out
+  - echo 1 > test\sample-4.in
+  - echo 1 > test\sample-5.in
+  - echo 1 > test\sample-6.in
+  - echo 1 > test\sample-7.in
+  - echo 1 > test\sample-8.in
+  - echo 1 > test\sample-9.in
+  - echo 1 > test\sample-10.in
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c 'C:\\Python35\\python.exe -c "import sys, time; time.sleep(1); sys.stdout.write(sys.stdin.read())'
