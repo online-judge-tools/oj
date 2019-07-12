@@ -38,7 +38,6 @@ class FacebookHackerCupProblem(onlinejudge.type.Problem):
     """
     :ivar problem_id: :py:class:`int`
     """
-
     def __init__(self, *, problem_id: int):
         self.problem_id = problem_id
 

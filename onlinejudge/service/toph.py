@@ -80,7 +80,6 @@ class TophProblem(onlinejudge.type.Problem):
     :ivar problem_id: :py:class:`str`
     :ivar contest_id: :py:class:`Optional` [ :py:class:`str` ]
     """
-
     def __init__(self, problem_id: str, contest_id: Optional[str] = None):
         assert isinstance(problem_id, str)
         if contest_id is not None:

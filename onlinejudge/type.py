@@ -86,7 +86,6 @@ class Problem(ABC):
     """
     :note: :py:class:`Problem` represents just a URL of a problem, without the data of the problem.
     """
-
     @abstractmethod
     def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
         raise NotImplementedError
