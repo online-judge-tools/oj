@@ -16,7 +16,6 @@ install:
   - python -m pip install --upgrade pip
   - pip install --upgrade setuptools
   - pip install -e .[dev,docs]
-  - pyinstaller --name oj --onefile onlinejudge\_implementation\main.py
 
 test_script:
   - dist\oj.exe --version
