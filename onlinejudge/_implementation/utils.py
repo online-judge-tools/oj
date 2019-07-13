@@ -145,6 +145,7 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
             command = [gnu_time, '-f', '%M', '-o', fh.name, '--'] + command
         if os.name == 'nt':
             command = command_str  # type: ignore
+            command = command.encode().decode()  # HACK: for multi thread unstable
         begin = time.perf_counter()
 
         try:
