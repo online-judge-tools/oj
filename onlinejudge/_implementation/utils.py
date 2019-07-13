@@ -147,9 +147,12 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
             command = command_str  # type: ignore
         begin = time.perf_counter()
 
+        encoded_command = []
+        for com in command:
+            encoded_command.append(com.encode())
         try:
             import locale
-            proc = subprocess.Popen(command.encode(), stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr,
+            proc = subprocess.Popen(encoded_command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr,
                                     #encoding=locale.getdefaultlocale()[1]
                                     )
         except FileNotFoundError:
