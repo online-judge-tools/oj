@@ -2,7 +2,6 @@ build: false
 
 environment:
   matrix:
-    - PYTHON: C:\Python35
     - PYTHON: C:\Python36-x64
 
 install:
@@ -16,7 +15,6 @@ install:
   # about it being out of date.
   - python -m pip install --upgrade pip
   - pip install --upgrade setuptools
-  - pip install pyinstaller
   - pip install -e .[dev,docs]
   - pyinstaller --name oj --onefile onlinejudge\_implementation\main.py
 

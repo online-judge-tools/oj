@@ -148,7 +148,9 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
         begin = time.perf_counter()
 
         try:
-            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr)
+            import locale
+            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr,
+                                    encoding=locale.getdefaultlocale()[1])
         except FileNotFoundError:
             log.error('No such file or directory: %s', command)
             sys.exit(1)
@@ -157,7 +159,6 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
             sys.exit(1)
         except ValueError as e:
             print("command is ", command)
-            print(e)
             raise e
         try:
             answer, _ = proc.communicate(timeout=timeout)
