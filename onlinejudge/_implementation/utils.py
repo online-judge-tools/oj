@@ -144,7 +144,7 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
         if gnu_time is not None:
             command = [gnu_time, '-f', '%M', '-o', fh.name, '--'] + command
         if os.name == 'nt':
-            # HACK: for multi thread unstable
+            # HACK: without this encoding and decoding, something randomly fails with multithreading; see https://github.com/kmyk/online-judge-tools/issues/468
             command = command_str.encode().decode()  # type: ignore
         begin = time.perf_counter()
 
