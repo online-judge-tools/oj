@@ -148,8 +148,7 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
         begin = time.perf_counter()
 
         # encoded_command = []
-        for com in command:
-            print(com.encode())
+        print(command.encode())
         try:
             import locale
             proc = subprocess.Popen(command_str, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr,

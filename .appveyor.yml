@@ -31,6 +31,9 @@ test_script:
   # - echo 1 > test\sample-10.in
   - python -m onlinejudge._implementation.main generate-output -c "echo 1"
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "echo 1"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "echo 1"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "echo 1"
+  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "echo 1"
 
 
 artifacts:
