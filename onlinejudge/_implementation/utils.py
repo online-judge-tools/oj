@@ -149,8 +149,9 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
 
         try:
             import locale
-            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr,
-                                    encoding=locale.getdefaultlocale()[1])
+            proc = subprocess.Popen(command.encode(), stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr,
+                                    #encoding=locale.getdefaultlocale()[1]
+                                    )
         except FileNotFoundError:
             log.error('No such file or directory: %s', command)
             sys.exit(1)
