@@ -29,13 +29,7 @@ test_script:
   - echo 1 > test\sample-8.in
   - echo 1 > test\sample-9.in
   # - echo 1 > test\sample-10.in
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
-  - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
+  - python -m onlinejudge._implementation.main generate-output -c dir
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c dir
 
 
