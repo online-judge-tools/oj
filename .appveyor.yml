@@ -29,7 +29,7 @@ test_script:
   - echo 1 > test\sample-8.in
   - echo 1 > test\sample-9.in
   # - echo 1 > test\sample-10.in
-  - python -m onlinejudge._implementation.main generate-output -c "echo 1"
+  # - python -m onlinejudge._implementation.main generate-output -c "echo 1"
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "echo 1"
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "echo 1"
   - python -m onlinejudge._implementation.main generate-output --jobs 8 -c "echo 1"
@@ -51,4 +51,4 @@ deploy:
   on:
     appveyor_repo_tag: true
     branch: master
-    PYTHON_VERSION: 3.6
+    PYTHON_VERSION: 3.64
