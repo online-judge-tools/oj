@@ -155,6 +155,10 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
         except PermissionError:
             log.error('Permission denied: %s', command)
             sys.exit(1)
+        except ValueError as e:
+            print("command is ", command)
+            print(e)
+            raise e
         try:
             answer, _ = proc.communicate(timeout=timeout)
         except subprocess.TimeoutExpired:
