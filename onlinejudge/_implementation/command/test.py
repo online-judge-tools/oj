@@ -3,6 +3,7 @@ import concurrent.futures
 import contextlib
 import json
 import math
+import os
 import pathlib
 import subprocess
 import sys
@@ -218,6 +219,8 @@ def test(args: 'argparse.Namespace') -> None:
         for name, paths in sorted(tests.items()):
             history += [test_single_case(name, paths['in'], paths.get('out'), args=args)]
     else:
+        if os.name == 'nt':
+            log.warning("-j/--jobs opiton is unstable on Windows environmet")
         with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
             lock = threading.Lock()
             futures = []  # type: List[concurrent.futures.Future]
