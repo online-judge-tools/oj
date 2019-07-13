@@ -401,7 +401,6 @@ class TestTest(unittest.TestCase):
             }],
         )
 
-    @unittest.skipIf(os.name == 'nt', "this test randomly fails on Windows environment")
     def test_call_test_in_parallel(self):
         TOTAL = 1000
         PARALLEL = 256
