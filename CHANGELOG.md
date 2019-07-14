@@ -1,5 +1,10 @@
 # Change Log
 
+## 6.6.0 / 2019-07-15
+
+-   [#459](https://github.com/kmyk/online-judge-tools/issues/459) make and distribute portable executables for Windows
+-   [#470](https://github.com/kmyk/online-judge-tools/pull/470) add `--mle` option for `test` subcommand
+
 ## 6.5.0 / 2019-07-05
 
 -   [#456](https://github.com/kmyk/online-judge-tools/pull/456) support `download` samples from Facebook Hacker Cup
