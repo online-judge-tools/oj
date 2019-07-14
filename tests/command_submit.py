@@ -9,6 +9,50 @@ from onlinejudge._implementation.command.submit import submit
 from onlinejudge._implementation.main import get_parser
 
 
+class SubmitArgumentsTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_atcoder_practice_1_with_history(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
+        files = [
+            {
+                'path': 'a.pl',
+                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
+            },
+        ]
+        with tests.utils.sandbox(files):
+            tests.utils.run(['dl', url], check=True)
+            tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_atcoder_invalid_url(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_111'
+        code = '''\
+        #include <bits/stdc++.h>
+        using namespace std;
+        int main() {
+            int a; cin >> a;
+            int b, c; cin >> b >> c;
+            string s; cin >> s;
+            cout << a + b + c << ' ' << s << endl;
+            return 0;
+        }
+        '''
+        files = [
+            {
+                'path': 'main.cpp',
+                'data': code
+            },
+        ]
+
+        with tests.utils.sandbox(files):
+            with self.assertRaises(requests.exceptions.HTTPError):
+                args = ["submit", '-y', '--no-open', url, 'main.cpp']
+                args = get_parser().parse_args(args=args)
+                submit(args)
+
+
 class SubmitAtCoderTest(unittest.TestCase):
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_practice_1(self):
@@ -69,48 +113,6 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
 
         with tests.utils.sandbox(files):
             tests.utils.run(['submit', '-y', '--no-open', url, 'main.py'], check=True)
-
-    @unittest.skipIf('CI' in os.environ, 'login is required')
-    def test_call_submit_practice_1_with_history(self):
-
-        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
-        files = [
-            {
-                'path': 'a.pl',
-                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
-            },
-        ]
-        with tests.utils.sandbox(files):
-            tests.utils.run(['dl', url], check=True)
-            tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
-
-    @unittest.skipIf('CI' in os.environ, 'login is required')
-    def test_call_submit_invalid_url(self):
-
-        url = 'https://atcoder.jp/contests/practice/tasks/practice_111'
-        code = '''\
-        #include <bits/stdc++.h>
-        using namespace std;
-        int main() {
-            int a; cin >> a;
-            int b, c; cin >> b >> c;
-            string s; cin >> s;
-            cout << a + b + c << ' ' << s << endl;
-            return 0;
-        }
-        '''
-        files = [
-            {
-                'path': 'main.cpp',
-                'data': code
-            },
-        ]
-
-        with tests.utils.sandbox(files):
-            with self.assertRaises(requests.exceptions.HTTPError):
-                args = ["submit", '-y', '--no-open', url, 'main.cpp']
-                args = get_parser().parse_args(args=args)
-                submit(args)
 
 
 class SubmitCodeforcesTest(unittest.TestCase):
