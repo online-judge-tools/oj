@@ -24,6 +24,22 @@ class SubmitArgumentsTest(unittest.TestCase):
             tests.utils.run(['dl', url], check=True)
             tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
 
+    @unittest.skipIf('CI' in os.environ or os.name == 'nt', 'login is required')
+    def test_call_submit_atcoder_practice_1_with_open(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
+        files = [
+            {
+                'path': 'a.pl',
+                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
+            },
+        ]
+        with tests.utils.sandbox(files):
+            tests.utils.run(['s', '-y', '--open', '--open-browser', """sh -c 'echo "$@" > url.txt' sh""", url, 'a.pl'], check=True)
+            with open('url.txt') as fh:
+                url = fh.read().strip()
+            self.assertTrue(url.startswith('https://atcoder.jp/contests/practice/submissions/'))
+
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_atcoder_invalid_url(self):
 
