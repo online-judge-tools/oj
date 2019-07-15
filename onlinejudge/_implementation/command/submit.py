@@ -1,6 +1,8 @@
 # Python Version: 3.x
+import os
 import pathlib
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -155,7 +157,11 @@ def submit(args: 'argparse.Namespace') -> None:
                     log.failure('couldn\'t find browsers to open the url. please specify a browser')
             if browser:
                 log.status('open the submission page with: %s', browser)
-                subprocess.check_call([browser, submission.get_url()], stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+                if os.name == 'nt':
+                    command = [browser, submission.get_url()]
+                else:
+                    command = shlex.split(browser) + [submission.get_url()]
+                subprocess.check_call(command, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:

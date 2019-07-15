@@ -9,6 +9,66 @@ from onlinejudge._implementation.command.submit import submit
 from onlinejudge._implementation.main import get_parser
 
 
+class SubmitArgumentsTest(unittest.TestCase):
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_atcoder_practice_1_with_history(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
+        files = [
+            {
+                'path': 'a.pl',
+                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
+            },
+        ]
+        with tests.utils.sandbox(files):
+            tests.utils.run(['dl', url], check=True)
+            tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
+
+    @unittest.skipIf('CI' in os.environ or os.name == 'nt', 'login is required')
+    def test_call_submit_atcoder_practice_1_with_open(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
+        files = [
+            {
+                'path': 'a.pl',
+                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
+            },
+        ]
+        with tests.utils.sandbox(files):
+            tests.utils.run(['s', '-y', '--open', '--open-browser', """sh -c 'echo "$@" > url.txt' sh""", url, 'a.pl'], check=True)
+            with open('url.txt') as fh:
+                url = fh.read().strip()
+            self.assertTrue(url.startswith('https://atcoder.jp/contests/practice/submissions/'))
+
+    @unittest.skipIf('CI' in os.environ, 'login is required')
+    def test_call_submit_atcoder_invalid_url(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_111'
+        code = '''\
+        #include <bits/stdc++.h>
+        using namespace std;
+        int main() {
+            int a; cin >> a;
+            int b, c; cin >> b >> c;
+            string s; cin >> s;
+            cout << a + b + c << ' ' << s << endl;
+            return 0;
+        }
+        '''
+        files = [
+            {
+                'path': 'main.cpp',
+                'data': code
+            },
+        ]
+
+        with tests.utils.sandbox(files):
+            with self.assertRaises(requests.exceptions.HTTPError):
+                args = ["submit", '-y', '--no-open', url, 'main.cpp']
+                args = get_parser().parse_args(args=args)
+                submit(args)
+
+
 class SubmitAtCoderTest(unittest.TestCase):
     @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_practice_1(self):
@@ -69,48 +129,6 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
 
         with tests.utils.sandbox(files):
             tests.utils.run(['submit', '-y', '--no-open', url, 'main.py'], check=True)
-
-    @unittest.skipIf('CI' in os.environ, 'login is required')
-    def test_call_submit_practice_1_with_history(self):
-
-        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
-        files = [
-            {
-                'path': 'a.pl',
-                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
-            },
-        ]
-        with tests.utils.sandbox(files):
-            tests.utils.run(['dl', url], check=True)
-            tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
-
-    @unittest.skipIf('CI' in os.environ, 'login is required')
-    def test_call_submit_invalid_url(self):
-
-        url = 'https://atcoder.jp/contests/practice/tasks/practice_111'
-        code = '''\
-        #include <bits/stdc++.h>
-        using namespace std;
-        int main() {
-            int a; cin >> a;
-            int b, c; cin >> b >> c;
-            string s; cin >> s;
-            cout << a + b + c << ' ' << s << endl;
-            return 0;
-        }
-        '''
-        files = [
-            {
-                'path': 'main.cpp',
-                'data': code
-            },
-        ]
-
-        with tests.utils.sandbox(files):
-            with self.assertRaises(requests.exceptions.HTTPError):
-                args = ["submit", '-y', '--no-open', url, 'main.cpp']
-                args = get_parser().parse_args(args=args)
-                submit(args)
 
 
 class SubmitCodeforcesTest(unittest.TestCase):
@@ -292,22 +310,6 @@ print(s)
             tests.utils.run(['s', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], check=True)
 
     @unittest.skipIf('CI' in os.environ, 'login is required')
-    def test_call_submit_add_them_up(self):
-        url = 'https://toph.co/p/add-them-up'
-        code = '''#!/usr/bin/env python3
-nums = map(int, input().split())
-print(sum(nums))
-'''
-        files = [
-            {
-                'path': 'a.py',
-                'data': code
-            },
-        ]
-        with tests.utils.sandbox(files):
-            tests.utils.run(['s', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], check=True)
-
-    @unittest.skipIf('CI' in os.environ, 'login is required')
     def test_call_submit_divisors(self):
         url = 'https://toph.co/p/divisors'
         code = '''#include<bits/stdc++.h>
@@ -323,79 +325,6 @@ int main()
             cout <<i<<endl;
         }
     }
-}
-'''
-        files = [
-            {
-                'path': 'a.cpp',
-                'data': code
-            },
-        ]
-        with tests.utils.sandbox(files):
-            tests.utils.run(['s', '-y', '--no-open', url, 'a.cpp'], check=True)
-
-    @unittest.skipIf('CI' in os.environ, 'login is required')
-    def test_call_submit_is_it_perfect(self):
-        url = 'https://toph.co/p/is-it-perfect'
-        code = '''#include <bits/stdc++.h>
-using namespace std;
-
-typedef long long int LL;
-const int MOD = 993344777;
-const int N = 1e6 + 1;
-
-int n;
-int a[ N ];
-int cnt[ 62 ];
-int mask[ 62 ];
-vector <int> prime;
-int id[ 62 ];
-LL dp[ 62 ][ ( 1 << 17 ) + 1 ][ 2 ][ 2 ];
-
-bool isprime( int x ) {
-        for( int i = 2; i*i <= x; i++ ) if( x%i == 0 ) return false;
-        return true;
-}
-LL solve( int cur , int msk , int sz , int taken ) {
-        if( cur == 61 ) {
-                if( !taken ) return 0;
-                if( sz&1 ) return msk != 0;
-                else return msk == 0;
-        }
-        if( dp[cur][msk][sz][taken] != -1 ) return dp[cur][msk][sz][taken] ;
-        LL ret = 0;
-        if( cnt[cur] == 0 ) {
-                ret = ( ret%MOD + solve( cur + 1 , msk , sz%2 , taken )%MOD )%MOD;
-        }
-        else {
-                ret = ( ret%MOD + cnt[cur]%MOD * solve( cur + 1 , msk^mask[cur] , (sz%2+1%2)%2 , 1 )%MOD )%MOD;
-                ret = ( ret%MOD + solve( cur + 1 , msk , sz%2 , taken )%MOD )%MOD;
-        }
-        return dp[cur][msk][sz][taken]  = ret%MOD;
-}
-int main( int argc , char const *argv[] ) {
-        scanf("%d",&n);
-        for( int i = 1; i <= n; i++ ) scanf("%d",&a[i]) , cnt[ a[i] ]++;
-        prime.push_back( 2 );
-        int t = 0;
-        id[2] = ++t;
-        for( int i = 3; i <= 60; i += 2 ) {
-                if( isprime( i ) ) prime.push_back( i ) , id[i] = ++t;
-        }
-        for( int i = 1; i <= 60; i++ ) {
-                int num = i;
-                for( auto x : prime ) {
-                        if( num%x == 0 ) {
-                                mask[i] ^= ( 1 << id[x] );
-                                num /= x;
-                                while( num%x == 0 ) num /= x ,  mask[i] ^= ( 1 << id[x] );
-                        }
-                }
-                if( num != 1 ) mask[i] ^= ( 1 << id[num] );
-        }
-        memset( dp , -1 , sizeof( dp ) );
-        cout << solve( 1 , 0 , 0 , 0 )%MOD << endl;
-        return 0;
 }
 '''
         files = [
