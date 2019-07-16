@@ -57,30 +57,28 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 
 ## How to install
 
-from PyPI: <https://pypi.python.org/pypi/online-judge-tools>
+### using compiled binary
+
+The portable executables `oj.exe` for Windows are downloadable from [GitHub releases](https://github.com/kmyk/online-judge-tools/releases).
+
+### from PyPI
+
+The package is <https://pypi.python.org/pypi/online-judge-tools>.
 
 ``` sh
 $ pip3 install online-judge-tools
 ```
 
-or
+It requires Python 3.5 or later.
+It also requires `setuptools` 30.3.0 or later for `setup.cfg`.
+
+### from this repository
 
 ``` sh
-$ pip3 install requests
-$ pip3 install lxml
-$ pip3 install beautifulsoup4
-$ pip3 install colorama
-$ pip3 install sympy
-and
 $ git clone https://github.com/kmyk/online-judge-tools
-$ cat <<EOF > ~/bin/oj
-#!/bin/sh
-exec $PWD/online-judge-tools/oj "\$@"
-EOF
-$ chmod +x ~/bin/oj
+$ cd online-judge-tools
+$ pip3 install -e .
 ```
-
-It requires Python 3.5 or later now
 
 ## How to use
 
@@ -179,8 +177,8 @@ AtCoder Beginner Contest 118: B - Foods Loved by Everyone    kotatsugame  (37 by
 
 ## FAQ
 
--   I cannot install this tool on my Windows machine. How should I do?
-    -   Use Windows Subsystem for Linux (WSL). If your Windows is too and WSL is not supported, you can use virtual machines, MinGW or Cygwin, but you should buy a new machine.
+-   I cannot install this tool. How should I do?
+    -   Check versions of your Python and `setuptools`. Also consider the use of Windows Subsystem for Linux (WSL) if you use Windows environment.
 -   Are there features to manage templates or snippets?
     -   No. They are not the responsibility of this tool. You should use plugins of your editor, like [thinca/vim-template](https://github.com/thinca/vim-template) or [Shougo/deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
 -   I usually make one directory per one contest (or, site). Is there a support for this style?
