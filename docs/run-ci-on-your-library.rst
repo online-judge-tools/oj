@@ -6,7 +6,7 @@ How to run CI on your library for competitive programming (Japanese)
 
 しかしこれはとても面倒な作業です。
 そして、単に忘れてしまったり、「修正は 1 行だけなので提出してテストしなくてもいいかな」などと言い訳して省略されてしまったりします。
-そのようなライブラリにはどうしてもバグが潜んでいることでしょう。
+そのようなライブラリにはきっとバグが潜んでいることでしょう。
 
 ではどうすればよいでしょうか？
 もちろんこれは自動化によって解決できます。
@@ -21,6 +21,7 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
 例えば以下のようなシェルスクリプトを書いておくとよいでしょう。
 まず ``.test.cpp`` という拡張子を持つファイルを作り、その中で ``#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=jp`` のような形で問題を指定しておきます。
 するとこのスクリプトは、そのような拡張子のファイルを探し、自動でコードをコンパイルし、システムテストの入出力を自動で取得し、テストをしてくれます。
+ローカルでの実行なのでサーバには比較的やさしいです。
 
 .. code-block:: bash
 
@@ -58,7 +59,10 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
        done
    fi
 
-(ただし実質的に AOJ にしか対応していないので注意してください。 Codeforces はシステムテストのケースを配布してくれていませんし、 AtCoder は配布してくれてはいますが DropBox 経由なので自動化が困難なためです。)
+ただし実質的に AOJ にしか対応していないので注意してください。
+Codeforces はシステムテストのケースを配布してくれていませんし、 AtCoder は配布してくれてはいますが DropBox 経由なので自動化が困難なためです。
+
+このスクリプトはあくまで一例であり、「Python にも対応させたい」などの要求がある場合は各々で拡張してください。
 
 
 Continuous Integration
@@ -107,7 +111,12 @@ Travis CI のページ https://travis-ci.org/ から登録してライブラリ�
 Examples
 --------
 
-実際に利用されている例として次のふたつを挙げておきます。
+上で説明したものが実際に利用されている例として次のふたつを挙げておきます。
 
--  https://github.com/kmyk/competitive-programming-library
--  https://github.com/beet-aizu/library
+- https://github.com/kmyk/competitive-programming-library
+- https://github.com/beet-aizu/library
+
+他にも CI を回している競プロライブラリはあり、例えば以下が知られています。
+
+- https://github.com/asi1024/competitive-library
+- https://github.com/blue-jam/ProconLibrary
