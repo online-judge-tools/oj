@@ -31,6 +31,7 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
 
    CXX=${CXX:-g++}
    CXXFLAGS="${CXXFLAGS:--std=c++14 -O2 -Wall -g}"
+   ulimit -s unlimited
 
    run() {
        file="$1"
