@@ -63,7 +63,7 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
 ただし実質的に AOJ にしか対応していないので注意してください。
 Codeforces はシステムテストのケースを配布してくれていませんし、 AtCoder は配布してくれてはいますが DropBox 経由なので自動化が困難なためです。
 
-このスクリプトはあくまで一例であり、「Python にも対応させたい」などの要求がある場合は各々で拡張してください。
+このスクリプトはあくまで一例であり、「Python にも対応させたい」「差分だけテストしたい」などの要求がある場合は各々で拡張してください (例: `test.sh <https://github.com/kmyk/competitive-programming-library/blob/master/test.sh>`_)。
 
 
 Continuous Integration
