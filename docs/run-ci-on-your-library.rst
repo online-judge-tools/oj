@@ -30,7 +30,7 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
    which oj > /dev/null
 
    CXX=${CXX:-g++}
-   CXXFLAGS="${CXXFLANGS:--std=c++14 -O2 -Wall -g}"
+   CXXFLAGS="${CXXFLAGS:--std=c++14 -O2 -Wall -g}"
 
    run() {
        file="$1"
