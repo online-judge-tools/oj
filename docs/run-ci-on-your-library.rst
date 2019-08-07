@@ -19,7 +19,7 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
 それらを組み合わせればテストの自動化が可能です。
 
 例えば以下のようなシェルスクリプトを書いておくとよいでしょう。
-まず ``.test.cpp`` という拡張子を持つファイルを作り、その中で ``#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=jp`` のような形で問題を指定しておきます。
+まず ``.test.cpp`` という拡張子を持つファイルを作り、その中で ``#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=jp`` のような形で問題を指定しておきます (例: `union_find_tree.test.cpp <https://github.com/kmyk/competitive-programming-library/blob/d4e35b5afe641bffb18cc2d6404fa1a67765b5ba/data_structure/union_find_tree.test.cpp>`_)。
 するとこのスクリプトは、そのような拡張子のファイルを探し、自動でコードをコンパイルし、システムテストの入出力を自動で取得し、テストをしてくれます。
 ローカルでの実行なのでサーバには比較的やさしいです。
 
@@ -43,7 +43,7 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
                sleep 2
                oj download --system "$url" -d ${dir}/test
            fi
-           oj test -c ${dir}/a.out -d ${dir}/test
+           oj test --tle 10 --c ${dir}/a.out -d ${dir}/test
        else
            ${dir}/a.out
        fi
