@@ -12,6 +12,8 @@ Welcome to online-judge-tools's documentation!
 
    modules
 
+   run-ci-on-your-library
+
 
 Indices and tables
 ==================
