@@ -98,7 +98,7 @@ Travis CI のページ https://travis-ci.org/ から登録してライブラリ�
        - pip3 install -U setuptools
        - pip3 install -U online-judge-tools=='6.*'
    script:
-       - ./test.sh
+       - bash test.sh
 
 
 自動で実行されたテスト結果は Travis CI 上のページ (例: https://travis-ci.org/kmyk/competitive-programming-library) などから見ることができます。
