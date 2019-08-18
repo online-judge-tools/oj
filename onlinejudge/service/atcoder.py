@@ -307,6 +307,7 @@ class AtCoderContest(onlinejudge.type.Contest):
     def list_problems(self, *, session: Optional[requests.Session] = None) -> 'List[AtCoderProblem]':  # type: ignore
         return [content.problem for content in self.list_problem_contents(session=session)]
 
+    # yapf: disable
     def iterate_submission_contents_where(
             self,
             *,
@@ -319,8 +320,9 @@ class AtCoderContest(onlinejudge.type.Contest):
             desc: bool = False,
             lang: Optional[str] = None,
             pages: Optional[Iterator[int]] = None,
-            session: Optional[requests.Session] = None,
+            session: Optional[requests.Session] = None  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
     ) -> Iterator['AtCoderSubmissionContentPartial']:
+        # yapf: enable
         """
         :note: If you use certain combination of options, then the results may not correct when there are new submissions while crawling.
         :param status: must be one of `AC`, `WA`, `TLE`, `MLE`, `RE`, `CLE`, `OLE`, `IE`, `WJ`, `WR`, or `Judging`
