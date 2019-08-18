@@ -41,7 +41,7 @@ class FacebookHackerCupProblem(onlinejudge.type.Problem):
     def __init__(self, *, problem_id: int):
         self.problem_id = problem_id
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
         url_format = 'https://www.facebook.com/hackercup/example/?problem_id={}&type={}'
         resp_in = utils.request('GET', url_format.format(self.problem_id, 'input'), session=session)

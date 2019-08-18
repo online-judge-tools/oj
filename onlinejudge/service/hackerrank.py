@@ -20,7 +20,7 @@ from onlinejudge.type import *
 
 
 class HackerRankService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+    def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raises LoginError:
         """
@@ -55,7 +55,7 @@ class HackerRankService(onlinejudge.type.Service):
             log.failure('You failed to sign in. Wrong user ID or password.')
             raise LoginError('You failed to sign in. Wrong user ID or password.')
 
-    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+    def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
         url = 'https://www.hackerrank.com/auth/login'
         resp = utils.request('GET', url, session=session)
@@ -82,14 +82,14 @@ class HackerRankProblem(onlinejudge.type.Problem):
         self.contest_slug = contest_slug
         self.challenge_slug = challenge_slug
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         """
         :raises NotImplementedError:
         """
         log.warning('use --system option')
         raise NotImplementedError
 
-    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
         # example: https://www.hackerrank.com/rest/contests/hourrank-1/challenges/beautiful-array/download_testcases
         url = 'https://www.hackerrank.com/rest/contests/{}/challenges/{}/download_testcases'.format(self.contest_slug, self.challenge_slug)
@@ -117,13 +117,13 @@ class HackerRankProblem(onlinejudge.type.Problem):
                 and result.netloc in ('hackerrank.com', 'www.hackerrank.com'):
             m = re.match(r'^/contests/([0-9A-Za-z-]+)/challenges/([0-9A-Za-z-]+)$', utils.normpath(result.path))
             if m:
-                return cls(m.group(1), m.group(2))
+                return cls(contest_slug=m.group(1), challenge_slug=m.group(2))
             m = re.match(r'^/challenges/([0-9A-Za-z-]+)$', utils.normpath(result.path))
             if m:
-                return cls('master', m.group(1))
+                return cls(contest_slug='master', challenge_slug=m.group(1))
         return None
 
-    def _get_model(self, session: Optional[requests.Session] = None) -> Dict[str, Any]:
+    def _get_model(self, *, session: Optional[requests.Session] = None) -> Dict[str, Any]:
         """
         :raises SubmissionError:
         """
@@ -140,7 +140,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
             raise SubmissionError
         return it['model']
 
-    def _get_lang_display_mapping(self, session: Optional[requests.Session] = None) -> Dict[str, str]:
+    def _get_lang_display_mapping(self, *, session: Optional[requests.Session] = None) -> Dict[str, str]:
         session = session or utils.get_default_session()
         # get
         url = 'https://hrcdn.net/hackerrank/assets/codeshell/dist/codeshell-cdffcdf1564c6416e1a2eb207a4521ce.js'  # at "Mon Feb  4 14:51:27 JST 2019"
@@ -159,7 +159,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
         log.debug('lang_display_mapping (parsed): %s', lang_display_mapping)
         return lang_display_mapping
 
-    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
+    def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
         session = session or utils.get_default_session()
         info = self._get_model(session=session)
         lang_display_mapping = self._get_lang_display_mapping()
@@ -172,7 +172,7 @@ class HackerRankProblem(onlinejudge.type.Problem):
             result += [Language(lang, descr)]
         return result
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, *, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
         """
         :raises NotLoggedInError:
         :raises SubmissionError:

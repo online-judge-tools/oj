@@ -21,7 +21,7 @@ from onlinejudge.type import *
 
 
 class CodeforcesService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+    def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raises LoginError:
         """
@@ -50,7 +50,7 @@ class CodeforcesService(onlinejudge.type.Service):
             log.failure('Invalid handle or password.')
             raise LoginError('Invalid handle or password.')
 
-    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+    def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
         url = 'https://codeforces.com/enter'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
@@ -73,6 +73,14 @@ class CodeforcesService(onlinejudge.type.Service):
         return None
 
 
+# TODO: use the new style of NamedTuple added from Pyhon 3.6
+CodeforcesProblemContent = NamedTuple('CodeforcesProblemContent', [
+    ('name', str),
+    ('problem', 'CodeforcesProblem'),
+    ('sample_cases', Optional[List[TestCase]]),
+])
+
+
 # NOTE: Codeforces has its API: https://codeforces.com/api/help
 class CodeforcesProblem(onlinejudge.type.Problem):
     """
@@ -80,7 +88,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     :ivar index: :py:class:`str`
     :ivar kind: :py:class:`str` must be `contest` or `gym`
     """
-    def __init__(self, contest_id: int, index: str, kind: Optional[str] = None):
+    def __init__(self, *, contest_id: int, index: str, kind: Optional[str] = None):
         assert isinstance(contest_id, int)
         assert 1 <= len(index) <= 2
         assert index[0] in string.ascii_uppercase
@@ -96,7 +104,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                 kind = 'gym'
         self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -119,7 +127,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             samples.add(s.encode(), title.string)
         return samples.get()
 
-    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
+    def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
         """
         :raises NotLoggedInError:
         """
@@ -137,7 +145,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             languages += [Language(option.attrs['value'], option.string)]
         return languages
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, *, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
         """
         :raises NotLoggedInError:
         :raises SubmissionError:
@@ -203,8 +211,19 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                         index = 'A'  # NOTE: This is broken if there was "A1".
                     else:
                         index = m.group(2).upper()
-                    return cls(int(m.group(1)), index, kind=kind)
+                    return cls(contest_id=int(m.group(1)), index=index, kind=kind)
         return None
+
+    def download_content(self, *, session: Optional[requests.Session] = None) -> CodeforcesProblemContent:
+        try:
+            sample_cases = self.download_sample_cases(session=session)  # type: Optional[List[TestCase]]
+        except SampleParsingError:
+            sample_cases = None
+        return CodeforcesProblemContent(
+            name=self.get_url(),
+            problem=self,
+            sample_cases=sample_cases,
+        )
 
 
 onlinejudge.dispatch.services += [CodeforcesService]
