@@ -113,9 +113,12 @@ class AtCoderContestTest(unittest.TestCase):
         self.assertEqual(submissions[1].get_user_id(), 'snuke')
         self.assertEqual(submissions[1].get_status(), 'WA')
 
-    def test_get_contest_name_without_penalty(self):
+    def test_get_contest_without_penalty(self):
         contest = AtCoderContest.from_url('https://atcoder.jp/contests/otemae2019')
         self.assertEqual(contest.get_name('ja'), '大手前プロコン 2019')
+        self.assertEqual(contest.get_penalty().total_seconds(), 0)  # This contest has no penalty
+        self.assertEqual(contest.get_name('en'), 'Otemae High School Programming Contest 2019')
+        self.assertEqual(contest.get_penalty().total_seconds(), 0)  # This contest has no penalty
 
 
 class AtCoderProblemTest(unittest.TestCase):
