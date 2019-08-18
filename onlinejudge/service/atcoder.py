@@ -247,10 +247,17 @@ class AtCoderContest(object):
             assert False
         _, _, self._can_participate = soup.find('span', text=re.compile(r'^(Can Participate|参加対象): ')).text.partition(': ')
         _, _, self._rated_range = soup.find('span', text=re.compile(r'^(Rated Range|Rated対象): ')).text.partition(': ')
+
         penalty_text = soup.find('span', text=re.compile(r'^(Penalty|ペナルティ): ')).text
-        m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes?|分)', penalty_text)
-        assert m
-        self._penalty = datetime.timedelta(minutes=int(m.group(2)))
+        if lang == 'en' and penalty_text == 'Penalty: None':
+            minutes = 0
+        elif lang == 'ja' and penalty_text == 'ペナルティ: なし':
+            minutes = 0
+        else:
+            m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes?|分)', penalty_text)
+            assert m
+            minutes = int(m.group(2))
+        self._penalty = datetime.timedelta(minutes=minutes)
 
     def get_name(self, lang: str = 'en', session: Optional[requests.Session] = None) -> str:
         if lang == 'en':
