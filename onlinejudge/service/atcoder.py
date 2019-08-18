@@ -249,7 +249,8 @@ class AtCoderContest(object):
         _, _, self._rated_range = soup.find('span', text=re.compile(r'^(Rated Range|Rated対象): ')).text.partition(': ')
         penalty_text = soup.find('span', text=re.compile(r'^(Penalty|ペナルティ): ')).text
         m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes?|分)', penalty_text)
-        self._penalty = 0 if m is None else datetime.timedelta(minutes=int(m.group(2)))
+        minutes = 0 if m is None else int(m.group(2))
+        self._penalty = datetime.timedelta(minutes=minutes)
 
     def get_name(self, lang: str = 'en', session: Optional[requests.Session] = None) -> str:
         if lang == 'en':
