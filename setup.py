@@ -31,7 +31,7 @@ setup(
         'requests >= 2',
     ],
     packages=find_packages(exclude=('tests', 'docs')),
-    entry_poitns={
+    entry_points={
         'console_scripts': [
             'oj = onlinejudge._implementation.main:main',
         ],
