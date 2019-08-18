@@ -5,7 +5,6 @@ the module for Toph (https://toph.co/)
 
 import posixpath
 import re
-import string
 import urllib.parse
 from typing import *
 

@@ -9,11 +9,9 @@ import subprocess
 import sys
 import tempfile
 import threading
-import time
 import traceback
 from typing import *
 
-import onlinejudge
 import onlinejudge._implementation.format_utils as fmtutils
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils

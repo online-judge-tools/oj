@@ -4,10 +4,8 @@ import contextlib
 import os
 import pathlib
 import threading
-import time
 from typing import *
 
-import onlinejudge
 import onlinejudge._implementation.format_utils as fmtutils
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils

@@ -106,6 +106,7 @@ You can run them with the following commands:
 
 ``` sh
 $ mypy oj onlinejudge
+$ pylint --disable=all --enable=unused-import onlinejudge
 $ python3 setup.py test
 ```
 

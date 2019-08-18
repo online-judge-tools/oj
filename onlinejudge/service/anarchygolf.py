@@ -3,14 +3,12 @@
 the module for Anarchy Golf (http://golf.shinh.org/)
 """
 
-import posixpath
 import urllib.parse
 from typing import *
 
 import bs4
 import requests
 
-import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.dispatch

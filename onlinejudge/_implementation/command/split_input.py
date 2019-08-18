@@ -5,7 +5,6 @@ import time
 from typing import *
 from typing.io import *
 
-import onlinejudge
 import onlinejudge._implementation.format_utils as format_utils
 import onlinejudge._implementation.logging as log
 
