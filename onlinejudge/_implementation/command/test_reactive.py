@@ -5,9 +5,7 @@ import subprocess
 import sys
 from typing import *
 
-import onlinejudge
 import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
 
 if TYPE_CHECKING:
     import argparse

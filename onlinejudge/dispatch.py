@@ -19,7 +19,7 @@
     contains classes to use for :py:func:`submission_from_url`
 """
 
-from typing import TYPE_CHECKING, List, Optional, Type
+from typing import List, Optional, Type
 
 import onlinejudge._implementation.logging as log
 from onlinejudge.type import Problem, Service, Submission

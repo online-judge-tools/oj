@@ -7,6 +7,7 @@ install:
 script:
     - which oj
     - ( cd /tmp ; oj --help )
+    - pylint --disable=all --enable=unused-import onlinejudge setup.py tests
     - isort --check-only --diff --recursive onlinejudge setup.py tests
     - yapf --diff --recursive onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
     - mypy onlinejudge setup.py tests

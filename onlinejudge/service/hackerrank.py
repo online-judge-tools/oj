@@ -3,14 +3,9 @@
 the module for HackerRank (https://www.hackerrank.com/)
 """
 
-import datetime
-import io
 import json
-import posixpath
 import re
-import time
 import urllib.parse
-import zipfile
 from typing import *
 
 import bs4

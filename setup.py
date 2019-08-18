@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import imp
-import os
 
 import setuptools
 from pkg_resources import parse_version

@@ -1,4 +1,3 @@
-import os
 import unittest
 
 import tests.command_download
