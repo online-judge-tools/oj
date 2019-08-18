@@ -5,6 +5,7 @@ the module for Codeforces (https://codeforces.com/)
 :note: There is the offcial API https://codeforces.com/api/help
 """
 
+import json
 import re
 import string
 import urllib.parse
@@ -72,12 +73,105 @@ class CodeforcesService(onlinejudge.type.Service):
             return cls()
         return None
 
+    def iterate_contest_contents(self, *, is_gym: bool = False, session: Optional[requests.Session] = None) -> Iterator['CodeforcesContestContent']:
+        session = session or utils.get_default_session()
+        url = 'https://codeforces.com/api/contest.list?gym={}'.format('true' if is_gym else 'false')
+        resp = utils.request('GET', url, session=session)
+        data = json.loads(resp.content.decode(resp.encoding))
+        assert data['status'] == 'OK'
+        for row in data['result']:
+            yield CodeforcesContest._from_json(row)
+
+    def iterate_contests(self, *, is_gym: bool = False, session: Optional[requests.Session] = None) -> Iterator['CodeforcesContest']:
+        for content in self.iterate_contest_contents(is_gym=is_gym, session=session):
+            yield content.contest
+
+
+# TODO: use the new style of NamedTuple added from Pyhon 3.6
+CodeforcesContestContent = NamedTuple('CodeforcesProblemContent', [
+    ('contest', 'CodeforcesContest'),
+    ('duration_seconds', int),
+    ('frozen', bool),
+    ('name', str),
+    ('phase', str),
+    ('relative_time_seconds', int),
+    ('start_time_seconds', int),
+    ('type', str),
+])
+
+
+class CodeforcesContest(onlinejudge.type.Contest):
+    """
+    :ivar contest_id: :py:class:`int`
+    :ivar kind: :py:class:`str` must be `contest` or `gym`
+    """
+    def __init__(self, *, contest_id: int, kind: Optional[str] = None):
+        assert kind in (None, 'contest', 'gym')
+        self.contest_id = contest_id
+        if kind is None:
+            if self.contest_id < 100000:
+                kind = 'contest'
+            else:
+                kind = 'gym'
+        self.kind = kind
+
+    @classmethod
+    def from_url(cls, url: str) -> Optional['CodeforcesContest']:
+        result = urllib.parse.urlparse(url)
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'codeforces.com':
+            table = {}
+            table['contest'] = r'/contest/([0-9]+).*'.format()  # example: https://codeforces.com/contest/538
+            table['gym'] = r'/gym/([0-9]+).*'.format()  # example: https://codeforces.com/gym/101021
+            for kind, expr in table.items():
+                m = re.match(expr, utils.normpath(result.path))
+                if m:
+                    return cls(contest_id=int(m.group(1)), kind=kind)
+        return None
+
+    @classmethod
+    def _from_json(cls, row: Dict[str, Any]) -> CodeforcesContestContent:
+        self = cls(contest_id=row['id'])
+        return CodeforcesContestContent(
+            contest=self,
+            duration_seconds=int(row['durationSeconds']),
+            frozen=row['frozen'],
+            name=row['name'],
+            phase=row['phase'],
+            relative_time_seconds=int(row['relativeTimeSeconds']),
+            start_time_seconds=int(row['startTimeSeconds']),
+            type=row['type'],
+        )
+
+    def list_problem_contents(self, *, session: Optional[requests.Session] = None) -> List['CodeforcesProblemContent']:
+        session = session or utils.get_default_session()
+        url = 'https://codeforces.com/api/contest.standings?contestId={}&from=1&count=1'.format(self.contest_id)
+        resp = utils.request('GET', url, session=session)
+        data = json.loads(resp.content.decode(resp.encoding))
+        assert data['status'] == 'OK'
+        return [CodeforcesProblem._from_json(row) for row in data['result']['problems']]
+
+    # TODO: why is "type: ignore" required?
+    def list_problems(self, *, session: Optional[requests.Session] = None) -> List['CodeforcesProblem']:  # type: ignore
+        return [content.problem for content in self.list_problem_contents(session=session)]
+
+    def download_content(self, *, session: Optional[requests.Session] = None) -> CodeforcesContestContent:
+        session = session or utils.get_default_session()
+        url = 'https://codeforces.com/api/contest.standings?contestId={}&from=1&count=1'.format(self.contest_id)
+        resp = utils.request('GET', url, session=session)
+        data = json.loads(resp.content.decode(resp.encoding))
+        assert data['status'] == 'OK'
+        return CodeforcesContest._from_json(data['result']['contest'])
+
 
 # TODO: use the new style of NamedTuple added from Pyhon 3.6
 CodeforcesProblemContent = NamedTuple('CodeforcesProblemContent', [
     ('name', str),
+    ('points', Optional[int]),
     ('problem', 'CodeforcesProblem'),
-    ('sample_cases', Optional[List[TestCase]]),
+    ('rating', int),
+    ('tags', List[str]),
+    ('type', str),
 ])
 
 
@@ -103,6 +197,18 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             else:
                 kind = 'gym'
         self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
+
+    @classmethod
+    def _from_json(cls, row: Dict[str, Any]) -> CodeforcesProblemContent:
+        self = cls(contest_id=row['contestId'], index=row['index'])
+        return CodeforcesProblemContent(
+            name=row['name'],
+            points=(int(row['points']) if 'points' in row else None),
+            problem=self,
+            rating=int(row['rating']),
+            tags=row['tags'],
+            type=row['type'],
+        )
 
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.get_default_session()
@@ -192,6 +298,10 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     def get_service(self) -> CodeforcesService:
         return CodeforcesService()
 
+    def get_contest(self) -> CodeforcesContest:
+        assert self.kind != 'problemset'
+        return CodeforcesContest(contest_id=self.contest_id, kind=self.kind)
+
     @classmethod
     def from_url(cls, url: str) -> Optional['CodeforcesProblem']:
         result = urllib.parse.urlparse(url)
@@ -215,16 +325,12 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         return None
 
     def download_content(self, *, session: Optional[requests.Session] = None) -> CodeforcesProblemContent:
-        try:
-            sample_cases = self.download_sample_cases(session=session)  # type: Optional[List[TestCase]]
-        except SampleParsingError:
-            sample_cases = None
-        return CodeforcesProblemContent(
-            name=self.get_url(),
-            problem=self,
-            sample_cases=sample_cases,
-        )
+        for content in self.get_contest().list_problem_contents(session=session):
+            if content.problem.get_url() == self.get_url():
+                return content
+        assert False
 
 
 onlinejudge.dispatch.services += [CodeforcesService]
+onlinejudge.dispatch.contests += [CodeforcesContest]
 onlinejudge.dispatch.problems += [CodeforcesProblem]
