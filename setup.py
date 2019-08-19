@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 import imp
 
-import setuptools
-from pkg_resources import parse_version
-from setuptools import setup
-
-if parse_version(setuptools.__version__) < parse_version('30.3.0'):
-    raise RuntimeError('setuptools>=30.3.0 is required for "setup.cfg"')
+from setuptools import find_packages, setup
 
 
 def load_module(module_path):
@@ -27,4 +22,17 @@ setup(
     url=version.__url__,
     license=version.__license__,
     description=version.__description__,
+    install_requires=[
+        'appdirs >= 1',
+        'beautifulsoup4 >= 4',
+        'colorama >= 0.3',
+        'lxml >= 4',
+        'requests >= 2',
+    ],
+    packages=find_packages(exclude=('tests', 'docs')),
+    entry_points={
+        'console_scripts': [
+            'oj = onlinejudge._implementation.main:main',
+        ],
+    },
 )

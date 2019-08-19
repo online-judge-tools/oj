@@ -70,7 +70,6 @@ $ pip3 install online-judge-tools
 ```
 
 It requires Python 3.5 or later.
-It also requires `setuptools` 30.3.0 or later for `setup.cfg`.
 
 ### from this repository
 
@@ -178,7 +177,7 @@ AtCoder Beginner Contest 118: B - Foods Loved by Everyone    kotatsugame  (37 by
 ## FAQ
 
 -   I cannot install this tool. How should I do?
-    -   Check versions of your Python and `setuptools`. Also consider the use of Windows Subsystem for Linux (WSL) if you use Windows environment.
+    -   Check versions of your Python. Also consider the use of Windows Subsystem for Linux (WSL) if you use Windows environment.
 -   Are there features to manage templates or snippets?
     -   No. They are not the responsibility of this tool. You should use plugins of your editor, like [thinca/vim-template](https://github.com/thinca/vim-template) or [Shougo/deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
 -   I usually make one directory per one contest (or, site). Is there a support for this style?
