@@ -227,7 +227,8 @@ Also, patches are used sent from
 [@hachi-88](https://github.com/hachi-88),
 [@Pachicobue](https://github.com/Pachicobue),
 [@kfaRabi](https://github.com/kfaRabi),
-and [@tMasaaa](https://github.com/tMasaaa).
+[@tMasaaa](https://github.com/tMasaaa),
+and [@hamayanhamayan](https://github.com/hamayanhamayan).
 
 ## License
 
