@@ -42,10 +42,10 @@ class AOJProblem(onlinejudge.type.Problem):
     """
     :ivar problem_id: :py:class:`str` like `DSL_1_A` or `2256`
     """
-    def __init__(self, problem_id):
+    def __init__(self, *, problem_id):
         self.problem_id = problem_id
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
         # get samples via the official API
         # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2Fsamples%2F%7BproblemId%7D_GET
@@ -62,7 +62,7 @@ class AOJProblem(onlinejudge.type.Problem):
             )]
         return samples
 
-    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
 
         # get header
@@ -103,7 +103,7 @@ class AOJProblem(onlinejudge.type.Problem):
                 and querystring.get('id') \
                 and len(querystring['id']) == 1:
             n, = querystring['id']
-            return cls(n)
+            return cls(problem_id=n)
 
         # example: https://onlinejudge.u-aizu.ac.jp/challenges/sources/JAG/Prelim/2881
         # example: https://onlinejudge.u-aizu.ac.jp/courses/library/4/CGL/3/CGL_3_B
@@ -112,7 +112,7 @@ class AOJProblem(onlinejudge.type.Problem):
                 and result.netloc == 'onlinejudge.u-aizu.ac.jp' \
                 and m:
             n = m.group(5)
-            return cls(n)
+            return cls(problem_id=n)
 
         return None
 
@@ -127,14 +127,14 @@ class AOJArenaProblem(onlinejudge.type.Problem):
 
     .. versionadded:: 6.1.0
     """
-    def __init__(self, arena_id, alphabet):
+    def __init__(self, *, arena_id, alphabet):
         assert alphabet in string.ascii_uppercase
         self.arena_id = arena_id
         self.alphabet = alphabet
 
         self._problem_id = None  # Optional[str]
 
-    def get_problem_id(self, session: Optional[requests.Session] = None) -> str:
+    def get_problem_id(self, *, session: Optional[requests.Session] = None) -> str:
         """
         :note: use http://developers.u-aizu.ac.jp/api?key=judgeapi%2Farenas%2F%7BarenaId%7D%2Fproblems_GET
         """
@@ -151,12 +151,18 @@ class AOJArenaProblem(onlinejudge.type.Problem):
                     break
         return self._problem_id
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         log.warning("most of problems in arena have no registered sample cases.")
-        return AOJProblem(self.get_problem_id()).download_sample_cases(session=session)
+        return AOJProblem(problem_id=self.get_problem_id()).download_sample_cases(session=session)
 
-    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        return AOJProblem(self.get_problem_id()).download_system_cases(session=session)
+    def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
+        return AOJProblem(problem_id=self.get_problem_id()).download_system_cases(session=session)
+
+    def download_content(self, *, session: Optional[requests.Session] = None):
+        """
+        :raise NotImplementedError:
+        """
+        raise NotImplementedError
 
     def get_url(self) -> str:
         return 'https://onlinejudge.u-aizu.ac.jp/services/room.html#{}/problems/{}'.format(self.arena_id, self.alphabet)
@@ -170,7 +176,7 @@ class AOJArenaProblem(onlinejudge.type.Problem):
                 and utils.normpath(result.path) == '/services/room.html':
             fragment = result.fragment.split('/')
             if len(fragment) == 3 and fragment[1] == 'problems':
-                return cls(fragment[0], fragment[2].upper())
+                return cls(arena_id=fragment[0], alphabet=fragment[2].upper())
         return None
 
     def get_service(self) -> AOJService:

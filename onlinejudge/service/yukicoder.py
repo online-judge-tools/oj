@@ -21,15 +21,15 @@ from onlinejudge.type import *
 
 
 class YukicoderService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> None:
+    def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> None:
         if method == 'github':
-            return self.login_with_github(get_credentials, session=session)
+            return self.login_with_github(get_credentials=get_credentials, session=session)
         elif method == 'twitter':
-            return self.login_with_twitter(get_credentials, session=session)
+            return self.login_with_twitter(get_credentials=get_credentials, session=session)
         else:
             assert False
 
-    def login_with_github(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+    def login_with_github(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raise LoginError:
         """
@@ -62,7 +62,7 @@ class YukicoderService(onlinejudge.type.Service):
             log.failure('You failed to sign in. Wrong user ID or password.')
             raise LoginError
 
-    def login_with_twitter(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+    def login_with_twitter(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raise NotImplementedError: always raised
         """
@@ -71,7 +71,7 @@ class YukicoderService(onlinejudge.type.Service):
         url = 'https://yukicoder.me/auth/twitter'
         raise NotImplementedError
 
-    def is_logged_in(self, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
+    def is_logged_in(self, *, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
         session = session or utils.get_default_session()
         url = 'https://yukicoder.me/auth/github'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
@@ -93,7 +93,7 @@ class YukicoderService(onlinejudge.type.Service):
             return cls()
         return None
 
-    def _issue_official_api(self, api: str, id: Optional[int] = None, name: Optional[str] = None, session: Optional[requests.Session] = None) -> Any:
+    def _issue_official_api(self, api: str, id: Optional[int] = None, name: Optional[str] = None, *, session: Optional[requests.Session] = None) -> Any:
         assert (id is not None) != (name is not None)
         if id is not None:
             assert isinstance(id, int)
@@ -128,7 +128,7 @@ class YukicoderService(onlinejudge.type.Service):
         return self._issue_official_api('solved', *args, **kwargs)
 
     # example: https://yukicoder.me/users/237/favorite
-    def get_user_favorite(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
+    def get_user_favorite(self, id: int, *, session: Optional[requests.Session] = None) -> List[Any]:
         """
         .. deprecated:: 6.0.0
             This method may be deleted in future.
@@ -173,7 +173,7 @@ class YukicoderService(onlinejudge.type.Service):
         return rows
 
     # example: https://yukicoder.me/users/1786/favoriteWiki
-    def get_user_favorite_wiki(self, id: int, session: Optional[requests.Session] = None) -> List[Any]:
+    def get_user_favorite_wiki(self, id: int, *, session: Optional[requests.Session] = None) -> List[Any]:
         """
         .. deprecated:: 6.0.0
             This method may be deleted in future.
@@ -190,7 +190,7 @@ class YukicoderService(onlinejudge.type.Service):
     # example: https://yukicoder.me/submissions?page=4220
     # example: https://yukicoder.me/submissions?page=2192&status=AC
     # NOTE: 1ページしか読まない 全部欲しい場合は呼び出し側で頑張る
-    def get_submissions(self, page: int, status: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
+    def get_submissions(self, *, page: int, status: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
         """
         .. deprecated:: 6.0.0
             This method may be deleted in future.
@@ -216,7 +216,7 @@ class YukicoderService(onlinejudge.type.Service):
 
     # example: https://yukicoder.me/problems?page=2
     # NOTE: loginしてると
-    def get_problems(self, page: int, comp_problem: bool = True, other: bool = False, sort: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
+    def get_problems(self, *, page: int, comp_problem: bool = True, other: bool = False, sort: Optional[str] = None, session: Optional[requests.Session] = None) -> List[Any]:
         """
         .. deprecated:: 6.0.0
             This method may be deleted in future.
@@ -257,7 +257,7 @@ class YukicoderService(onlinejudge.type.Service):
                     row[column] = row[column].text.strip()
         return rows
 
-    def _get_and_parse_the_table(self, url: str, session: Optional[requests.Session] = None) -> Tuple[List[Any], List[Dict[str, bs4.Tag]]]:
+    def _get_and_parse_the_table(self, url: str, *, session: Optional[requests.Session] = None) -> Tuple[List[Any], List[Dict[str, bs4.Tag]]]:
         # get
         session = session or utils.get_default_session()
         resp = utils.request('GET', url, session=session)
@@ -281,14 +281,14 @@ class YukicoderService(onlinejudge.type.Service):
 
 
 class YukicoderProblem(onlinejudge.type.Problem):
-    def __init__(self, problem_no=None, problem_id=None):
+    def __init__(self, *, problem_no=None, problem_id=None):
         assert problem_no or problem_id
         assert not problem_no or isinstance(problem_no, int)
         assert not problem_id or isinstance(problem_id, int)
         self.problem_no = problem_no
         self.problem_id = problem_id
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -303,7 +303,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 samples.add(data.encode(), name)
         return samples.get()
 
-    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         """
         :raises NotLoggedInError:
         """
@@ -328,7 +328,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
         return None
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, *, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> onlinejudge.type.Submission:
         """
         :raises NotLoggedInError:
         """
@@ -362,7 +362,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 log.warning('yukicoder says: "%s"', div.string)
             raise SubmissionError
 
-    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
+    def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
         session = session or utils.get_default_session()
         # get
         # We use the problem page since it is available without logging in
@@ -407,7 +407,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
     def get_service(self) -> YukicoderService:
         return YukicoderService()
 
-    def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
+    def get_input_format(self, *, session: Optional[requests.Session] = None) -> Optional[str]:
         session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)

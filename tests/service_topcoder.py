@@ -36,7 +36,7 @@ class TopcoderLongConrestProblemTest(unittest.TestCase):
     def test_download_individual_results_feed(self):
         problem = TopcoderLongContestProblem.from_url('https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17143&pm=14889')
         cr = 22924522
-        feed = problem.download_individual_results_feed(cr)
+        feed = problem.download_individual_results_feed(cr=cr)
         self.assertEqual(feed.round_id, problem.rd)
         self.assertEqual(feed.coder_id, cr)
         self.assertEqual(feed.handle, 'hakomo')

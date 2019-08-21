@@ -34,10 +34,10 @@ class POJService(onlinejudge.type.Service):
 
 
 class POJProblem(onlinejudge.type.Problem):
-    def __init__(self, problem_id: int):
+    def __init__(self, *, problem_id: int):
         self.problem_id = problem_id
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -99,7 +99,7 @@ class POJProblem(onlinejudge.type.Problem):
             if 'id' in query and len(query['id']) == 1:
                 try:
                     n = int(query['id'][0])
-                    return cls(n)
+                    return cls(problem_id=n)
                 except ValueError:
                     pass
         return None

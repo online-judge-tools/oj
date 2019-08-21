@@ -20,7 +20,7 @@ from onlinejudge.type import *
 
 
 class TophService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+    def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raises LoginError:
         """
@@ -51,7 +51,7 @@ class TophService(onlinejudge.type.Service):
             log.failure('Invalid handle/email or password.')
             raise LoginError('Invalid handle/email or password.')
 
-    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+    def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
         url = 'https://toph.co/login'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
@@ -79,13 +79,13 @@ class TophProblem(onlinejudge.type.Problem):
     :ivar problem_id: :py:class:`str`
     :ivar contest_id: :py:class:`Optional` [ :py:class:`str` ]
     """
-    def __init__(self, problem_id: str, contest_id: Optional[str] = None):
+    def __init__(self, *, problem_id: str, contest_id: Optional[str] = None):
         assert isinstance(problem_id, str)
         if contest_id is not None:
             raise NotImplementedError
         self.problem_id = problem_id
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.get_default_session()
         resp = utils.request('GET', self.get_url(), session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
@@ -103,7 +103,7 @@ class TophProblem(onlinejudge.type.Problem):
             samples.add(output_pre.text.lstrip().encode(), "Output")
         return samples.get()
 
-    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
+    def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
         """
         :raises NotImplementedError:
         """
@@ -120,7 +120,7 @@ class TophProblem(onlinejudge.type.Problem):
             languages += [Language(LanguageId(option.attrs['value']), option.string.strip())]
         return languages
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, *, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> Submission:
         """
         :raises NotImplementedError:
         :raises SubmissionError:
@@ -173,7 +173,7 @@ class TophProblem(onlinejudge.type.Problem):
                 and dirname == '/p' \
                 and basename:
             problem_id = basename
-            return cls(problem_id)
+            return cls(problem_id=problem_id)
 
         return None
 
