@@ -2,8 +2,8 @@
 
 ## 6.6.1 / 2019-08-19
 
--   [#490](https://github.com/kmyk/online-judge-tools/pull/490) enable to install with old setuptools ([@hamayanhamayan](https://github.com/hamayanhamayan))
--   [#487](https://github.com/kmyk/online-judge-tools/issues/487) fix a bug of fetch contest which has no penalty
+-   [#490](https://github.com/kmyk/online-judge-tools/pull/490) enable to install with old setuptools
+-   [#487](https://github.com/kmyk/online-judge-tools/issues/487) fix a bug of fetch contest which has no penalty ([@hamayanhamayan](https://github.com/hamayanhamayan))
 
 ## 6.6.0 / 2019-07-15
 
