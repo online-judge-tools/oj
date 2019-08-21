@@ -443,7 +443,7 @@ AtCoderProblemContent = NamedTuple('AtCoderProblemContent', [
     ('memory_limit_byte', int),
     ('name', str),
     ('problem', 'AtCoderProblem'),
-    ('sample_cases', List[TestCase]),
+    ('sample_cases', Optional[List[TestCase]]),
     ('score', Optional[int]),
     ('time_limit_msec', int),
 ])
@@ -480,6 +480,9 @@ def _AtCoderProblemContent_find_sample_tags(soup: bs4.BeautifulSoup) -> Iterator
 
 
 def _AtCoderProblemContent_parse_sample_cases(soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
+    """
+    :raises SampleParsingError:
+    """
     samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
     lang = None
     for pre, h3 in _AtCoderProblemContent_find_sample_tags(soup):
@@ -586,7 +589,10 @@ def _AtCoderProblemContent_from_html(html: str, *, problem: 'AtCoderProblem', se
     """
 
     soup = bs4.BeautifulSoup(html, utils.html_parser)
-    sample_cases = _AtCoderProblemContent_parse_sample_cases(soup)
+    try:
+        sample_cases = _AtCoderProblemContent_parse_sample_cases(soup)  # type: Optional[List[TestCase]]
+    except SampleParsingError:
+        sample_cases = None
     input_format = _AtCoderProblemContent_parse_input_format(soup)
     available_languages = _AtCoderProblemContent_parse_available_languages(soup, problem=problem)
     partial = _AtCoderProblemContent_parse_partial(soup, problem=problem)
@@ -643,9 +649,13 @@ class AtCoderProblem(onlinejudge.type.Problem):
 
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         """
-        :raises Exception: if no such problem exists
+        :raises requests.exceptions.HTTPError: if no such problem exists
+        :raises SampleParsingError: if parsing failed
         """
-        return self.download_content(session=session).sample_cases
+        session = session or utils.get_default_session()
+        resp = _request('GET', self.get_url(type='beta'), session=session)
+        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        return _AtCoderProblemContent_parse_sample_cases(soup)
 
     def get_url(self, *, type: Optional[str] = None, lang: Optional[str] = None) -> str:
         if type is None or type == 'beta':
