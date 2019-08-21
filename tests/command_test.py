@@ -402,8 +402,8 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_test_in_parallel(self):
-        TOTAL = 1000
-        PARALLEL = 256
+        TOTAL = 100
+        PARALLEL = 32
         files = []
         expected = []
         for i in range(TOTAL):
