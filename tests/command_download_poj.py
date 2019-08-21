@@ -2,8 +2,17 @@ import unittest
 
 import tests.command_download
 
+import onlinejudge._implementation.utils as utils
+
 
 class DownloadPOJTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        session = utils.get_default_session()
+        resp = utils.request('GET', 'http://poj.org/', session)
+        if resp.status_code != 200:
+            raise unittest.SkipTest('poj.org is down now')
+
     def snippet_call_download(self, *args, **kwargs):
         tests.command_download.snippet_call_download(self, *args, **kwargs)
 
