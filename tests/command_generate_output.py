@@ -189,8 +189,8 @@ class GenerateOutputTest(unittest.TestCase):
         )
 
     def test_call_generate_output_in_parallel(self):
-        TOTAL = 1000
-        PARALLEL = 256
+        TOTAL = 100
+        PARALLEL = 32
         input_files = []
         expected_values = []
         for i in range(TOTAL):
