@@ -78,6 +78,10 @@ class HackerRankService(onlinejudge.type.Service):
 
 
 class HackerRankProblem(onlinejudge.type.Problem):
+    """
+    :ivar contest_slug: :py:class:`str`; this is not `contest_id` because HackerRank itself says this as `contest_slug` in a JSON for submissions.
+    :ivar challenge_slug: :py:class:`str`
+    """
     def __init__(self, contest_slug: str, challenge_slug: str):
         self.contest_slug = contest_slug
         self.challenge_slug = challenge_slug
