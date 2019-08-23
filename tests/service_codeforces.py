@@ -20,7 +20,7 @@ class CodeforcesContestTest(unittest.TestCase):
 
     def test_list_problems(self):
         contest = CodeforcesContest.from_url('https://codeforces.com/contest/1157')
-        problems = contest.list_problem_contents()
+        problems = contest.list_problem_data()
         self.assertEqual(len(problems), 8)
         self.assertEqual(problems[0].name, 'Reachable Numbers')
         self.assertEqual(problems[1].problem.index, 'B')
@@ -31,15 +31,15 @@ class CodeforcesContestTest(unittest.TestCase):
         self.assertEqual(problems[6].tags, ['constructive algorithms', 'dp', 'greedy', 'two pointers'])
         self.assertEqual(problems[7].tags, ['brute force', 'constructive algorithms'])
 
-    def test_download_content(self):
+    def test_download_data(self):
         contest = CodeforcesContest.from_url('http://codeforces.com/contest/1200')
-        content = contest.download_content()
-        self.assertEqual(content.duration_seconds, 7200)
-        self.assertEqual(content.frozen, False)
-        self.assertEqual(content.name, 'Codeforces Round #578 (Div. 2)')
-        self.assertEqual(content.phase, 'FINISHED')
-        self.assertEqual(content.start_time_seconds, 1565526900)
-        self.assertEqual(content.type, 'CF')
+        data = contest.download_data()
+        self.assertEqual(data.duration_seconds, 7200)
+        self.assertEqual(data.frozen, False)
+        self.assertEqual(data.name, 'Codeforces Round #578 (Div. 2)')
+        self.assertEqual(data.phase, 'FINISHED')
+        self.assertEqual(data.start_time_seconds, 1565526900)
+        self.assertEqual(data.type, 'CF')
 
 
 class CodeforcesProblemTest(unittest.TestCase):
@@ -70,9 +70,9 @@ class CodeforcesProblemTest(unittest.TestCase):
 
     def test_download_problem(self):
         problem = CodeforcesProblem.from_url('http://codeforces.com/contest/1205/problem/D')
-        content = problem.download_content()
-        self.assertEqual(content.name, 'Almost All')
-        self.assertEqual(content.points, 2000)
-        self.assertEqual(content.rating, 2800)
-        self.assertEqual(content.tags, ['constructive algorithms', 'trees'])
-        self.assertEqual(content.type, 'PROGRAMMING')
+        data = problem.download_data()
+        self.assertEqual(data.name, 'Almost All')
+        self.assertEqual(data.points, 2000)
+        self.assertEqual(data.rating, 2800)
+        self.assertEqual(data.tags, ['constructive algorithms', 'trees'])
+        self.assertEqual(data.type, 'PROGRAMMING')
