@@ -134,7 +134,10 @@ def textfile(s: str) -> str:  # should have trailing newline
         return s + '\n'
 
 
-def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] = None, gnu_time: Optional[str] = None) -> Tuple[Dict[str, Any], subprocess.Popen]:
+def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Optional[bytes] = None, timeout: Optional[float] = None, gnu_time: Optional[str] = None) -> Tuple[Dict[str, Any], subprocess.Popen]:
+    if input is not None:
+        assert stdin is None
+        stdin = subprocess.PIPE  # type: ignore
     if gnu_time is not None:
         context = tempfile.NamedTemporaryFile(delete=True)  # type: Any
     else:
@@ -157,7 +160,7 @@ def exec_command(command_str: str, *, stdin: IO[Any], timeout: Optional[float] =
             log.error('Permission denied: %s', command)
             sys.exit(1)
         try:
-            answer, _ = proc.communicate(timeout=timeout)
+            answer, _ = proc.communicate(input=input, timeout=timeout)
         except subprocess.TimeoutExpired:
             proc.terminate()
             answer = None
