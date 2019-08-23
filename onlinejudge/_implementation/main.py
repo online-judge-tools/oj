@@ -13,6 +13,7 @@ import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
 from onlinejudge._implementation.command.download import download
+from onlinejudge._implementation.command.generate_input import generate_input
 from onlinejudge._implementation.command.generate_output import generate_output
 from onlinejudge._implementation.command.get_standings import get_standings
 from onlinejudge._implementation.command.login import login
@@ -172,6 +173,27 @@ tips:
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
 
+    # generate input
+    subparser = subparsers.add_parser('generate-input', aliases=['g/i'], help='generate input files form given generator', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+format string for --format:
+  %s                    name
+  %e                    extension: "in" or "out"
+  (both %d and %e are required.)
+
+tips:
+  You can do similar things with shell: e.g. `for i in {000..099} ; do ./generate.py > test/random-$i.in ; done`
+''')
+    subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
+    subparser.add_argument('-j', '--jobs', type=int, help='run tests in parallel')
+    subparser.add_argument('--width', type=int, default=3, help='specify the width of indices of cases. (default: 3)')
+    subparser.add_argument('--name', help='specify the base name of cases. (default: "random")')
+    subparser.add_argument('-c', '--command', help='specify your solution to generate output')
+    subparser.add_argument('--hack', help='specify your solution to be compared the reference solution given by --command')
+    subparser.add_argument('generator', type=str, help='your program to generate test cases')
+    subparser.add_argument('count', nargs='?', type=int, help='the number of cases to generate (default: 100)')
+
     # split input
     subparser = subparsers.add_parser('split-input', help='split a input file which contains many cases, using your implementation  (experimental)', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 format string for --output:
@@ -269,6 +291,8 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         test_reactive(args)
     elif args.subcommand in ['generate-output', 'g/o']:
         generate_output(args)
+    elif args.subcommand in ['generate-input', 'g/i']:
+        generate_input(args)
     elif args.subcommand == 'split-input':
         split_input(args)
     elif args.subcommand == 'get-standings':
