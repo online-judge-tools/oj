@@ -5,6 +5,7 @@ the module for Codeforces (https://codeforces.com/)
 :note: There is the offcial API https://codeforces.com/api/help
 """
 
+import datetime
 import json
 import re
 import string
@@ -73,31 +74,90 @@ class CodeforcesService(onlinejudge.type.Service):
             return cls()
         return None
 
-    def iterate_contest_contents(self, *, is_gym: bool = False, session: Optional[requests.Session] = None) -> Iterator['CodeforcesContestContent']:
+    def iterate_contest_data(self, *, is_gym: bool = False, session: Optional[requests.Session] = None) -> Iterator['CodeforcesContestData']:
         session = session or utils.get_default_session()
         url = 'https://codeforces.com/api/contest.list?gym={}'.format('true' if is_gym else 'false')
         resp = utils.request('GET', url, session=session)
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
         data = json.loads(resp.content.decode(resp.encoding))
         assert data['status'] == 'OK'
         for row in data['result']:
-            yield CodeforcesContest._from_json(row)
+            yield CodeforcesContestData._from_json(row, response=resp, session=session, timestamp=timestamp)
 
     def iterate_contests(self, *, is_gym: bool = False, session: Optional[requests.Session] = None) -> Iterator['CodeforcesContest']:
-        for content in self.iterate_contest_contents(is_gym=is_gym, session=session):
-            yield content.contest
+        for data in self.iterate_contest_data(is_gym=is_gym, session=session):
+            yield data.contest
 
 
-# TODO: use the new style of NamedTuple added from Pyhon 3.6
-CodeforcesContestContent = NamedTuple('CodeforcesProblemContent', [
-    ('contest', 'CodeforcesContest'),
-    ('duration_seconds', int),
-    ('frozen', bool),
-    ('name', str),
-    ('phase', str),
-    ('relative_time_seconds', int),
-    ('start_time_seconds', int),
-    ('type', str),
-])
+class CodeforcesContestData(ContestData):
+    # yapf: disable
+    def __init__(
+            self,
+            *,
+            contest: 'CodeforcesContest',
+            duration_seconds: int,
+            frozen: bool,
+            name: str,
+            phase: str,
+            relative_time_seconds: int,
+            response: requests.Response,
+            session: requests.Session,
+            start_time_seconds: int,
+            timestamp: datetime.datetime,
+            type: str  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
+    ):
+        # yapf: enable
+        self._contest = contest
+        self.duration_seconds = duration_seconds
+        self.frozen = frozen
+        self._name = name
+        self.phase = phase
+        self.relative_time_seconds = relative_time_seconds
+        self._response = response
+        self._session = session
+        self.start_time_seconds = start_time_seconds
+        self._timestamp = timestamp
+        self.type = type
+
+    @property
+    def contest(self) -> 'CodeforcesContest':
+        return self._contest
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def json(self) -> bytes:
+        return self._response.content
+
+    @property
+    def response(self) -> requests.Response:
+        return self._response
+
+    @property
+    def session(self) -> requests.Session:
+        return self._session
+
+    @property
+    def timestamp(self) -> datetime.datetime:
+        return self._timestamp
+
+    @classmethod
+    def _from_json(cls, row: Dict[str, Any], *, response: requests.Response, session: requests.Session, timestamp: datetime.datetime) -> 'CodeforcesContestData':
+        return CodeforcesContestData(
+            contest=CodeforcesContest(contest_id=row['id']),
+            duration_seconds=int(row['durationSeconds']),
+            frozen=row['frozen'],
+            name=row['name'],
+            phase=row['phase'],
+            relative_time_seconds=int(row['relativeTimeSeconds']),
+            response=response,
+            session=session,
+            start_time_seconds=int(row['startTimeSeconds']),
+            timestamp=timestamp,
+            type=row['type'],
+        )
 
 
 class CodeforcesContest(onlinejudge.type.Contest):
@@ -115,6 +175,9 @@ class CodeforcesContest(onlinejudge.type.Contest):
                 kind = 'gym'
         self.kind = kind
 
+    def get_url(self) -> str:
+        return 'https://codeforces.com/{}/{}'.format(self.kind, self.contest_id)
+
     @classmethod
     def from_url(cls, url: str) -> Optional['CodeforcesContest']:
         result = urllib.parse.urlparse(url)
@@ -129,50 +192,95 @@ class CodeforcesContest(onlinejudge.type.Contest):
                     return cls(contest_id=int(m.group(1)), kind=kind)
         return None
 
-    @classmethod
-    def _from_json(cls, row: Dict[str, Any]) -> CodeforcesContestContent:
-        self = cls(contest_id=row['id'])
-        return CodeforcesContestContent(
-            contest=self,
-            duration_seconds=int(row['durationSeconds']),
-            frozen=row['frozen'],
-            name=row['name'],
-            phase=row['phase'],
-            relative_time_seconds=int(row['relativeTimeSeconds']),
-            start_time_seconds=int(row['startTimeSeconds']),
-            type=row['type'],
-        )
+    def get_service(self) -> CodeforcesService:
+        return CodeforcesService()
 
-    def list_problem_contents(self, *, session: Optional[requests.Session] = None) -> List['CodeforcesProblemContent']:
+    def list_problem_data(self, *, session: Optional[requests.Session] = None) -> List['CodeforcesProblemData']:
         session = session or utils.get_default_session()
         url = 'https://codeforces.com/api/contest.standings?contestId={}&from=1&count=1'.format(self.contest_id)
         resp = utils.request('GET', url, session=session)
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
         data = json.loads(resp.content.decode(resp.encoding))
         assert data['status'] == 'OK'
-        return [CodeforcesProblem._from_json(row) for row in data['result']['problems']]
+        return [CodeforcesProblemData._from_json(row, response=resp, session=session, timestamp=timestamp) for row in data['result']['problems']]
 
     # TODO: why is "type: ignore" required?
     def list_problems(self, *, session: Optional[requests.Session] = None) -> List['CodeforcesProblem']:  # type: ignore
-        return [content.problem for content in self.list_problem_contents(session=session)]
+        return [data.problem for data in self.list_problem_data(session=session)]
 
-    def download_content(self, *, session: Optional[requests.Session] = None) -> CodeforcesContestContent:
+    def download_data(self, *, session: Optional[requests.Session] = None) -> CodeforcesContestData:
         session = session or utils.get_default_session()
         url = 'https://codeforces.com/api/contest.standings?contestId={}&from=1&count=1'.format(self.contest_id)
         resp = utils.request('GET', url, session=session)
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
         data = json.loads(resp.content.decode(resp.encoding))
         assert data['status'] == 'OK'
-        return CodeforcesContest._from_json(data['result']['contest'])
+        return CodeforcesContestData._from_json(data['result']['contest'], response=resp, session=session, timestamp=timestamp)
 
 
-# TODO: use the new style of NamedTuple added from Pyhon 3.6
-CodeforcesProblemContent = NamedTuple('CodeforcesProblemContent', [
-    ('name', str),
-    ('points', Optional[int]),
-    ('problem', 'CodeforcesProblem'),
-    ('rating', int),
-    ('tags', List[str]),
-    ('type', str),
-])
+class CodeforcesProblemData(ProblemData):
+    # yapf: disable
+    def __init__(
+            self,
+            *,
+            name: str,
+            points: Optional[int],
+            problem: 'CodeforcesProblem',
+            rating: int,
+            response: requests.Response,
+            session: requests.Session,
+            tags: List[str],
+            timestamp: datetime.datetime,
+            type: str  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
+    ):
+        # yapf: enable
+        self._name = name
+        self.points = points
+        self._problem = problem
+        self.rating = rating
+        self._response = response
+        self._session = session
+        self.tags = tags
+        self._timestamp = timestamp
+        self.type = type
+
+    @property
+    def problem(self) -> 'CodeforcesProblem':
+        return self._problem
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def json(self) -> bytes:
+        return self._response.content
+
+    @property
+    def response(self) -> requests.Response:
+        return self._response
+
+    @property
+    def session(self) -> requests.Session:
+        return self._session
+
+    @property
+    def timestamp(self) -> datetime.datetime:
+        return self._timestamp
+
+    @classmethod
+    def _from_json(cls, row: Dict[str, Any], response: requests.Response, session: requests.Session, timestamp: datetime.datetime) -> 'CodeforcesProblemData':
+        return CodeforcesProblemData(
+            name=row['name'],
+            points=(int(row['points']) if 'points' in row else None),
+            problem=CodeforcesProblem(contest_id=row['contestId'], index=row['index']),
+            rating=int(row['rating']),
+            response=response,
+            session=session,
+            tags=row['tags'],
+            timestamp=timestamp,
+            type=row['type'],
+        )
 
 
 # NOTE: Codeforces has its API: https://codeforces.com/api/help
@@ -197,18 +305,6 @@ class CodeforcesProblem(onlinejudge.type.Problem):
             else:
                 kind = 'gym'
         self.kind = kind  # It seems 'gym' is specialized, 'contest' and 'problemset' are the same thing
-
-    @classmethod
-    def _from_json(cls, row: Dict[str, Any]) -> CodeforcesProblemContent:
-        self = cls(contest_id=row['contestId'], index=row['index'])
-        return CodeforcesProblemContent(
-            name=row['name'],
-            points=(int(row['points']) if 'points' in row else None),
-            problem=self,
-            rating=int(row['rating']),
-            tags=row['tags'],
-            type=row['type'],
-        )
 
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.get_default_session()
@@ -324,10 +420,10 @@ class CodeforcesProblem(onlinejudge.type.Problem):
                     return cls(contest_id=int(m.group(1)), index=index, kind=kind)
         return None
 
-    def download_content(self, *, session: Optional[requests.Session] = None) -> CodeforcesProblemContent:
-        for content in self.get_contest().list_problem_contents(session=session):
-            if content.problem.get_url() == self.get_url():
-                return content
+    def download_data(self, *, session: Optional[requests.Session] = None) -> CodeforcesProblemData:
+        for data in self.get_contest().list_problem_data(session=session):
+            if data.problem.get_url() == self.get_url():
+                return data
         assert False
 
 

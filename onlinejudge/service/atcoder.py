@@ -116,7 +116,7 @@ class AtCoderService(onlinejudge.type.Service):
             return cls()
         return None
 
-    def iterate_contest_contents(self, *, lang: str = 'ja', session: Optional[requests.Session] = None) -> Iterator['AtCoderContestContentPartial']:
+    def iterate_contest_data(self, *, lang: str = 'ja', session: Optional[requests.Session] = None) -> Iterator['AtCoderContestData']:
         """
         :param lang: must be `ja` (default) or `en`.
         :note: `lang=ja` is required to see some Japanese-local contests.
@@ -129,9 +129,12 @@ class AtCoderService(onlinejudge.type.Service):
         for page in itertools.count(1):  # 1-based
             if last_page is not None and page > last_page:
                 break
+
             # get
             url = 'https://atcoder.jp/contests/archive?lang={}&page={}'.format(lang, page)
             resp = _request('GET', url, session=session)
+            timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
+
             # parse
             soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
             if last_page is None:
@@ -139,40 +142,154 @@ class AtCoderService(onlinejudge.type.Service):
                 log.debug('last page: %s', last_page)
             tbody = soup.find('tbody')
             for tr in tbody.find_all('tr'):
-                yield AtCoderContest._from_table_row(tr, lang=lang)
+                yield AtCoderContestData._from_table_row(tr, lang=lang, response=resp, session=session, timestamp=timestamp)
 
     def iterate_contests(self, *, lang: str = 'ja', session: Optional[requests.Session] = None) -> Iterator['AtCoderContest']:
-        for content in self.iterate_contest_contents(lang=lang, session=session):
-            yield content.contest
+        for data in self.iterate_contest_data(lang=lang, session=session):
+            yield data.contest
 
     def get_user_history_url(self, user_id: str) -> str:
         return 'https://atcoder.jp/users/{}/history/json'.format(user_id)
 
 
-# TODO: use the new style of NamedTuple added from Pyhon 3.6
-AtCoderContestContentPartial = NamedTuple('AtCoderContestContentPartial', [
-    ('tag', bs4.Tag),
-    ('contest', 'AtCoderContest'),
-    ('lang', str),
-    ('start_time', datetime.datetime),
-    ('name', str),
-    ('duration', datetime.timedelta),
-    ('rated_range', str),
-])
+class AtCoderContestData(ContestData):
+    """
+    :ivar contest: :py:class:`AtCoderContest`
+    :ivar duration: :py:class:`datetime.timedelta`
+    :ivar lang: :py:class:`str`
+    :ivar name: :py:class:`str`
+    :ivar rated_range: :py:class:`str`
+    :ivar start_time: :py:class:`datetime.datetime`
+    """
 
-# TODO: use the new style of NamedTuple added from Pyhon 3.6
-AtCoderContestContent = NamedTuple('AtCoderContestContent', [
-    ('session', requests.Session),
-    ('response', requests.Response),
-    ('contest', 'AtCoderContest'),
-    ('lang', str),
-    ('start_time', datetime.datetime),
-    ('name', str),
-    ('duration', datetime.timedelta),
-    ('rated_range', str),
-    ('can_participate', str),
-    ('penalty', datetime.timedelta),
-])
+    # yapf: disable
+    def __init__(
+            self,
+            *,
+            contest: 'AtCoderContest',
+            duration: datetime.timedelta,
+            lang: str,
+            name: str,
+            rated_range: str,
+            response: requests.Response,
+            session: requests.Session,
+            start_time: datetime.datetime,
+            timestamp: datetime.datetime  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
+    ):
+        # yapf: enable
+        self._contest = contest
+        self.duration = duration
+        self.lang = lang
+        self._name = name
+        self.rated_range = rated_range
+        self._response = response
+        self._session = session
+        self.start_time = start_time
+        self._timestamp = timestamp
+
+    @property
+    def contest(self) -> 'AtCoderContest':
+        return self._contest
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def html(self) -> bytes:
+        return self._response.content
+
+    @property
+    def response(self) -> requests.Response:
+        return self._response
+
+    @property
+    def session(self) -> requests.Session:
+        return self._session
+
+    @property
+    def timestamp(self) -> datetime.datetime:
+        return self._timestamp
+
+    @classmethod
+    def _parse_start_time(cls, url: str) -> datetime.datetime:
+        # TODO: we need to use an ISO-format parser
+        query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+        assert len(query['iso']) == 1
+        assert query['p1'] == ['248']  # means JST
+        return datetime.datetime.strptime(query['iso'][0], '%Y%m%dT%H%M').replace(tzinfo=utils.tzinfo_jst)
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag, *, lang: str, response: requests.Response, session: requests.Session, timestamp: datetime.datetime) -> 'AtCoderContestData':
+        tds = tr.find_all('td')
+        assert len(tds) == 4
+        anchors = [tds[0].find('a'), tds[1].find('a')]
+        contest_path = anchors[1]['href']
+        assert contest_path.startswith('/contests/')
+        contest_id = contest_path[len('/contests/'):]
+
+        name = anchors[1].text
+        start_time = cls._parse_start_time(anchors[0]['href'])
+        hours, minutes = map(int, tds[2].text.split(':'))
+        duration = datetime.timedelta(hours=hours, minutes=minutes)
+        rated_range = tds[3].text
+        return AtCoderContestData(
+            contest=AtCoderContest(contest_id=contest_id),
+            duration=duration,
+            lang=lang,
+            name=name,
+            rated_range=rated_range,
+            session=session,
+            start_time=start_time,
+            response=response,
+            timestamp=timestamp,
+        )
+
+
+class AtCoderContestDetailedData(AtCoderContestData):
+    """
+    :ivar can_participate: :py:class:`str`
+    :ivar penalty: :py:class:`datetime.timedelta`
+    """
+    def __init__(self, *, can_participate: str, penalty: datetime.timedelta, **kwargs):
+        super().__init__(**kwargs)
+        self.can_participate = can_participate
+        self.penalty = penalty
+
+    @classmethod
+    def _from_response(cls, *, contest: 'AtCoderContest', lang: str, session: requests.Session, response: requests.Response, timestamp: datetime.datetime):
+        soup = bs4.BeautifulSoup(response.content.decode(response.encoding), utils.html_parser)
+        name, _, _ = soup.find('title').text.rpartition(' - ')
+        contest_duration = soup.find('small', class_='contest-duration')
+        start_time, end_time = [cls._parse_start_time(a['href']) for a in contest_duration.find_all('a')]
+        duration = end_time - start_time
+        _, _, can_participate = soup.find('span', text=re.compile(r'^(Can Participate|参加対象): ')).text.partition(': ')
+        _, _, rated_range = soup.find('span', text=re.compile(r'^(Rated Range|Rated対象): ')).text.partition(': ')
+
+        penalty_text = soup.find('span', text=re.compile(r'^(Penalty|ペナルティ): ')).text
+        if lang == 'en' and penalty_text == 'Penalty: None':
+            minutes = 0
+        elif lang == 'ja' and penalty_text == 'ペナルティ: なし':
+            minutes = 0
+        else:
+            m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes?|分)', penalty_text)
+            assert m
+            minutes = int(m.group(2))
+        penalty = datetime.timedelta(minutes=minutes)
+
+        return AtCoderContestDetailedData(
+            can_participate=can_participate,
+            contest=contest,
+            duration=duration,
+            lang=lang,
+            name=name,
+            penalty=penalty,
+            rated_range=rated_range,
+            response=response,
+            session=session,
+            start_time=start_time,
+            timestamp=timestamp,
+        )
 
 
 class AtCoderContest(onlinejudge.type.Contest):
@@ -221,94 +338,34 @@ class AtCoderContest(onlinejudge.type.Contest):
 
         return None
 
-    @classmethod
-    def _from_table_row(cls, tr: bs4.Tag, *, lang: str) -> AtCoderContestContentPartial:
-        tds = tr.find_all('td')
-        assert len(tds) == 4
-        anchors = [tds[0].find('a'), tds[1].find('a')]
-        contest_path = anchors[1]['href']
-        assert contest_path.startswith('/contests/')
-        contest_id = contest_path[len('/contests/'):]
-        self = AtCoderContest(contest_id=contest_id)
-        name = anchors[1].text
-        start_time = self._parse_start_time(anchors[0]['href'])
-        hours, minutes = map(int, tds[2].text.split(':'))
-        duration = datetime.timedelta(hours=hours, minutes=minutes)
-        rated_range = tds[3].text
-        return AtCoderContestContentPartial(
-            tag=tr,
-            contest=self,
-            lang=lang,
-            name=name,
-            start_time=start_time,
-            duration=duration,
-            rated_range=rated_range,
-        )
-
-    def _parse_start_time(self, url: str) -> datetime.datetime:
-        # TODO: we need to use an ISO-format parser
-        query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
-        assert len(query['iso']) == 1
-        assert query['p1'] == ['248']  # means JST
-        return datetime.datetime.strptime(query['iso'][0], '%Y%m%dT%H%M').replace(tzinfo=utils.tzinfo_jst)
-
-    def download_content(self, *, session: Optional[requests.Session] = None, lang: str = 'en') -> AtCoderContestContent:
+    def download_data(self, *, session: Optional[requests.Session] = None, lang: str = 'en') -> AtCoderContestDetailedData:
         assert lang in ('en', 'ja')
         session = session or utils.get_default_session()
         resp = _request('GET', self.get_url(type='beta', lang=lang), session=session)
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-
-        name, _, _ = soup.find('title').text.rpartition(' - ')
-        contest_duration = soup.find('small', class_='contest-duration')
-        start_time, end_time = [self._parse_start_time(a['href']) for a in contest_duration.find_all('a')]
-        duration = end_time - start_time
-        _, _, can_participate = soup.find('span', text=re.compile(r'^(Can Participate|参加対象): ')).text.partition(': ')
-        _, _, rated_range = soup.find('span', text=re.compile(r'^(Rated Range|Rated対象): ')).text.partition(': ')
-
-        penalty_text = soup.find('span', text=re.compile(r'^(Penalty|ペナルティ): ')).text
-        if lang == 'en' and penalty_text == 'Penalty: None':
-            minutes = 0
-        elif lang == 'ja' and penalty_text == 'ペナルティ: なし':
-            minutes = 0
-        else:
-            m = re.match(r'(Penalty|ペナルティ): (\d+)( minutes?|分)', penalty_text)
-            assert m
-            minutes = int(m.group(2))
-        penalty = datetime.timedelta(minutes=minutes)
-
-        return AtCoderContestContent(
-            session=session,
-            response=resp,
-            contest=self,
-            lang=lang,
-            start_time=start_time,
-            name=name,
-            duration=duration,
-            rated_range=rated_range,
-            can_participate=can_participate,
-            penalty=penalty,
-        )
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
+        return AtCoderContestDetailedData._from_response(contest=self, lang=lang, session=session, response=resp, timestamp=timestamp)
 
     def get_service(self) -> AtCoderService:
         return AtCoderService()
 
-    def list_problem_contents(self, *, session: Optional[requests.Session] = None) -> List['AtCoderProblemContentPartial']:
+    def list_problem_data(self, *, session: Optional[requests.Session] = None) -> List['AtCoderProblemData']:
         # get
         session = session or utils.get_default_session()
         url = 'https://atcoder.jp/contests/{}/tasks'.format(self.contest_id)
         resp = _request('GET', url, session=session)
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
 
         # parse
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         tbody = soup.find('tbody')
-        return [AtCoderProblem._from_table_row(tr) for tr in tbody.find_all('tr')]
+        return [AtCoderProblemData._from_table_row(tr, session=session, response=resp, timestamp=timestamp) for tr in tbody.find_all('tr')]
 
     # TODO: why does this require "type: ignore"?
     def list_problems(self, *, session: Optional[requests.Session] = None) -> 'List[AtCoderProblem]':  # type: ignore
-        return [content.problem for content in self.list_problem_contents(session=session)]
+        return [data.problem for data in self.list_problem_data(session=session)]
 
     # yapf: disable
-    def iterate_submission_contents_where(
+    def iterate_submission_data_where(
             self,
             *,
             me: bool = False,
@@ -321,7 +378,7 @@ class AtCoderContest(onlinejudge.type.Contest):
             lang: Optional[str] = None,
             pages: Optional[Iterator[int]] = None,
             session: Optional[requests.Session] = None  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
-    ) -> Iterator['AtCoderSubmissionContentPartial']:
+    ) -> Iterator['AtCoderSubmissionData']:
         # yapf: enable
         """
         :note: If you use certain combination of options, then the results may not correct when there are new submissions while crawling.
@@ -361,13 +418,14 @@ class AtCoderContest(onlinejudge.type.Contest):
             params_page = ({'page': str(page)} if page >= 2 else {})
             url = base_url + '?' + urllib.parse.urlencode({**params, **params_page})
             resp = _request('GET', url, session=session)
+            timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
 
-            submissions = list(self._iterate_submission_contents_from_response(resp=resp))
+            submissions = list(self._iterate_submission_data_from_response(resp=resp, session=session, timestamp=timestamp))
             if not submissions:
                 break
             yield from submissions
 
-    def _iterate_submission_contents_from_response(self, *, resp: requests.Response) -> Iterator['AtCoderSubmissionContentPartial']:
+    def _iterate_submission_data_from_response(self, *, resp: requests.Response, session: requests.Session, timestamp: datetime.datetime) -> Iterator['AtCoderSubmissionData']:
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
         tbodies = soup.find_all('tbody')
         if len(tbodies) == 0:
@@ -375,11 +433,11 @@ class AtCoderContest(onlinejudge.type.Contest):
         assert len(tbodies) == 1
         tbody = tbodies[0]
         for tr in tbody.find_all('tr'):
-            yield AtCoderSubmission._from_table_row(tr, contest_id=self.contest_id)
+            yield AtCoderSubmissionData._from_table_row(tr, response=resp, session=session, timestamp=timestamp)
 
     def iterate_submissions_where(self, **kwargs) -> Iterator['AtCoderSubmission']:
-        for content in self.iterate_submission_contents_where(**kwargs):
-            yield content.submission
+        for data in self.iterate_submission_data_where(**kwargs):
+            yield data.submission
 
     def iterate_submissions(self, *, session: Optional[requests.Session] = None) -> Iterator['AtCoderSubmission']:
         """
@@ -388,232 +446,307 @@ class AtCoderContest(onlinejudge.type.Contest):
         yield from self.iterate_submissions_where(order='created', desc=False, session=session)
 
 
-# TODO: use the new style of NamedTuple added from Pyhon 3.6
-AtCoderProblemContentPartial = NamedTuple('AtCoderProblemContentPartial', [
-    ('tag', bs4.Tag),
-    ('alphabet', str),
-    ('memory_limit_byte', int),
-    ('name', str),
-    ('problem', 'AtCoderProblem'),
-    ('time_limit_msec', int),
-])
-
-
-def _AtCoderProblemContentPartial_from_row(tr: bs4.Tag):
-    tds = tr.find_all('td')
-    assert 4 <= len(tds) <= 5
-    path = tds[1].find('a')['href']
-    problem = AtCoderProblem.from_url('https://atcoder.jp' + path)
-    assert problem is not None
-    alphabet = tds[0].text
-    name = tds[1].text
-    if tds[2].text.endswith(' msec'):
-        time_limit_msec = int(utils.remove_suffix(tds[2].text, ' msec'))
-    elif tds[2].text.endswith(' sec'):
-        time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
-    else:
-        assert False
-    if tds[3].text.endswith(' KB'):
-        memory_limit_byte = int(float(utils.remove_suffix(tds[3].text, ' KB')) * 1000)
-    elif tds[3].text.endswith(' MB'):
-        memory_limit_byte = int(float(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000)  # TODO: confirm this is MB truly, not MiB
-    else:
-        assert False
-    if len(tds) == 5:
-        assert tds[4].text.strip() in ('', 'Submit', '提出')
-
-    return AtCoderProblemContentPartial(
-        tag=tr,
-        alphabet=alphabet,
-        memory_limit_byte=memory_limit_byte,
-        name=name,
-        problem=problem,
-        time_limit_msec=time_limit_msec,
-    )
-
-
-# TODO: use the new style of NamedTuple added from Pyhon 3.6
-AtCoderProblemContent = NamedTuple('AtCoderProblemContent', [
-    ('session', Optional[requests.Session]),
-    ('response', Optional[requests.Response]),
-    ('alphabet', str),
-    ('available_languages', Optional[List[Language]]),
-    ('html', str),
-    ('input_format', Optional[str]),
-    ('memory_limit_byte', int),
-    ('name', str),
-    ('problem', 'AtCoderProblem'),
-    ('sample_cases', Optional[List[TestCase]]),
-    ('score', Optional[int]),
-    ('time_limit_msec', int),
-])
-
-
-def _AtCoderProblemContent_get_tag_lang(tag: bs4.Tag):
-    assert isinstance(tag, bs4.Tag)
-    for parent in tag.parents:
-        for cls in parent.attrs.get('class') or []:
-            if cls.startswith('lang-'):
-                return cls
-
-
-def _AtCoderProblemContent_find_sample_tags(soup: bs4.BeautifulSoup) -> Iterator[Tuple[bs4.Tag, bs4.Tag]]:
-    for pre in soup.find_all('pre'):
-        log.debug('pre tag: %s', str(pre))
-        if not pre.string:
-            continue
-
-        def h3_plus(tag):
-            prv = tag.find_previous_sibling()
-            if prv and prv.name == 'h3' and prv.string:
-                yield (pre, prv)
-
-        # the first format: h3+pre
-        yield from h3_plus(pre)
-
-        # the second format: h3+section pre
-        if pre.parent and pre.parent.name == 'section':
-            # ignore tags which are not samples
-            # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
-            if pre.find_previous_sibling('pre') is None:
-                yield from h3_plus(pre.parent)
-
-
-def _AtCoderProblemContent_parse_sample_cases(soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
+class AtCoderProblemData(ProblemData):
     """
-    :raises SampleParsingError:
+    :note: :py:class:`AtCoderProblemData` is obtained the list page (e.g. https://atcoder.jp/contests/agc001/tasks )
+
+    :ivar alphabet: :py:class:`str`
+    :ivar memory_limit_byte: :py:class:`int`
+    :ivar name: :py:class:`str`
+    :ivar problem: :py:class:`AtCoderProblem`
+    :ivar time_limit_msec: :py:class:`str`
     """
-    samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
-    lang = None
-    for pre, h3 in _AtCoderProblemContent_find_sample_tags(soup):
-        s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
-        name = h3.string
-        l = _AtCoderProblemContent_get_tag_lang(pre)
-        if lang is None:
-            lang = l
-        elif lang != l:
-            log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
-            continue
-        samples.add(s.encode(), name)
-    return samples.get()
 
-
-def _AtCoderProblemContent_parse_input_format(soup: bs4.BeautifulSoup) -> Optional[str]:
-    for h3 in soup.find_all('h3', text=re.compile(r'^(入力|Input)$')):
-        if h3.parent.name == 'section':
-            section = h3.parent
+    # yapf: disable
+    def __init__(
+            self,
+            *,
+            alphabet: str,
+            memory_limit_byte: int,
+            name: str,
+            problem: 'AtCoderProblem',
+            response: Optional[requests.Response],
+            session: Optional[requests.Session],
+            time_limit_msec: int,
+            timestamp: Optional[datetime.datetime],
+            html: Optional[bytes] = None  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
+    ):
+        # yapf: enable
+        self.alphabet = alphabet
+        self.memory_limit_byte = memory_limit_byte
+        self._name = name
+        self._problem = problem
+        self._response = response
+        self._session = session
+        self.time_limit_msec = time_limit_msec
+        self._timestamp = timestamp
+        if html is None:
+            assert response is not None
+            self._html = response.content
         else:
-            section = h3.find_next_sibling('section')
-        if section is None:
-            section = soup.find(class_='io-style')
-        if section is None:
-            log.warning('<section> tag not found. something wrong')
-            return None
-        pre = section.find('pre')
-        if pre is not None:
-            return pre.decode_contents(formatter=None)
-    return None
+            self._html = html
+
+    @property
+    def problem(self) -> 'AtCoderProblem':
+        return self._problem
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def html(self) -> bytes:
+        return self._html
+
+    @property
+    def response(self) -> Optional[requests.Response]:
+        return self._response
+
+    @property
+    def session(self) -> Optional[requests.Session]:
+        return self._session
+
+    @property
+    def timestamp(self) -> Optional[datetime.datetime]:
+        return self._timestamp
+
+    @classmethod
+    def _from_table_row(cls, tr: bs4.Tag, *, session: requests.Session, response: requests.Response, timestamp: datetime.datetime) -> 'AtCoderProblemData':
+        tds = tr.find_all('td')
+        assert 4 <= len(tds) <= 5
+        path = tds[1].find('a')['href']
+        problem = AtCoderProblem.from_url('https://atcoder.jp' + path)
+        assert problem is not None
+        alphabet = tds[0].text
+        name = tds[1].text
+        if tds[2].text.endswith(' msec'):
+            time_limit_msec = int(utils.remove_suffix(tds[2].text, ' msec'))
+        elif tds[2].text.endswith(' sec'):
+            time_limit_msec = int(float(utils.remove_suffix(tds[2].text, ' sec')) * 1000)
+        else:
+            assert False
+        if tds[3].text.endswith(' KB'):
+            memory_limit_byte = int(float(utils.remove_suffix(tds[3].text, ' KB')) * 1000)
+        elif tds[3].text.endswith(' MB'):
+            memory_limit_byte = int(float(utils.remove_suffix(tds[3].text, ' MB')) * 1000 * 1000)  # TODO: confirm this is MB truly, not MiB
+        else:
+            assert False
+        if len(tds) == 5:
+            assert tds[4].text.strip() in ('', 'Submit', '提出')
+
+        return AtCoderProblemData(
+            alphabet=alphabet,
+            memory_limit_byte=memory_limit_byte,
+            name=name,
+            problem=problem,
+            response=response,
+            session=session,
+            time_limit_msec=time_limit_msec,
+            timestamp=timestamp,
+        )
+
+    @classmethod
+    def _from_html(cls, html: bytes, *, problem: 'AtCoderProblem', session: Optional[requests.Session] = None, response: Optional[requests.Response] = None, timestamp: Optional[datetime.datetime] = None) -> 'AtCoderProblemData':
+        soup = bs4.BeautifulSoup(html, utils.html_parser)
+        h2 = soup.find('span', class_='h2')
+
+        alphabet, _, name = h2.text.partition(' - ')
+
+        time_limit, memory_limit = h2.find_next_sibling('p').text.split(' / ')
+        for time_limit_prefix in ('実行時間制限: ', 'Time Limit: '):
+            if time_limit.startswith(time_limit_prefix):
+                break
+        else:
+            assert False
+        if time_limit.endswith(' msec'):
+            time_limit_msec = int(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' msec'))
+        elif time_limit.endswith(' sec'):
+            time_limit_msec = int(float(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' sec')) * 1000)
+        else:
+            assert False
+
+        for memory_limit_prefix in ('メモリ制限: ', 'Memory Limit: '):
+            if memory_limit.startswith(memory_limit_prefix):
+                break
+        else:
+            assert False
+        if memory_limit.endswith(' KB'):
+            memory_limit_byte = int(float(utils.remove_suffix(utils.remove_prefix(memory_limit, memory_limit_prefix), ' KB')) * 1000)
+        elif memory_limit.endswith(' MB'):
+            memory_limit_byte = int(float(utils.remove_suffix(utils.remove_prefix(memory_limit, memory_limit_prefix), ' MB')) * 1000 * 1000)
+        else:
+            assert False
+
+        return AtCoderProblemData(
+            alphabet=alphabet,
+            html=html,
+            memory_limit_byte=memory_limit_byte,
+            name=name,
+            problem=problem,
+            response=response,
+            session=session,
+            time_limit_msec=time_limit_msec,
+            timestamp=timestamp,
+        )
 
 
-def _AtCoderProblemContent_parse_available_languages(soup: bs4.BeautifulSoup, problem: 'AtCoderProblem') -> Optional[List[Language]]:
-    form = soup.find('form', action='/contests/{}/submit'.format(problem.contest_id))
-    if form is None:
+class AtCoderProblemDetailedData(AtCoderProblemData):
+    """
+    :note: :py:class:`AtCoderProblemDetailedData` is obtained the problem page (e.g. https://atcoder.jp/contests/agc001/tasks/agc001_a )
+
+    :ivar available_languages: :py:class:`Optional` [ :py:class:`List` [ :py:class:`Language` ] ]
+    :ivar input_format: :py:class:`Optional` [ :py:class:`str` ]
+    :ivar sample_cases: :py:class:`Optional` [ :py:class:`List` [ :py:class:`TestCase` ] ]
+    :ivar score: :py:class:`Optional` [ :py:class:`float` ]
+    """
+
+    # yapf: disable
+    def __init__(
+            self,
+            *,
+            available_languages: Optional[List[Language]],
+            input_format: Optional[str],
+            sample_cases: Optional[List[TestCase]],
+            score: Optional[int],
+            **kwargs  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
+    ):
+        # yapf: enable
+        super().__init__(**kwargs)
+        self.available_languages = available_languages
+        self.input_format = input_format
+        self._sample_cases = sample_cases
+        self.score = score
+
+    @property
+    def sample_cases(self) -> Optional[List[TestCase]]:
+        return self._sample_cases
+
+    @classmethod
+    def _get_tag_lang(cls, tag: bs4.Tag) -> Optional[str]:
+        assert isinstance(tag, bs4.Tag)
+        for parent in tag.parents:
+            for s in parent.attrs.get('class') or []:
+                if s.startswith('lang-'):
+                    return s
         return None
-    select = form.find('div', id='select-lang').find('select', attrs={'name': 'data.LanguageId'})  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
-    languages = []  # type: List[Language]
-    for option in select.find_all('option'):
-        languages += [Language(option.attrs['value'], option.string)]
-    return languages
 
+    @classmethod
+    def _find_sample_tags(cls, soup: bs4.BeautifulSoup) -> Iterator[Tuple[bs4.Tag, bs4.Tag]]:
+        for pre in soup.find_all('pre'):
+            log.debug('pre tag: %s', str(pre))
+            if not pre.string:
+                continue
 
-def _AtCoderProblemContent_parse_partial(soup: bs4.BeautifulSoup, problem: 'AtCoderProblem') -> AtCoderProblemContentPartial:
-    h2 = soup.find('span', class_='h2')
+            def h3_plus(tag):
+                prv = tag.find_previous_sibling()
+                if prv and prv.name == 'h3' and prv.string:
+                    yield (pre, prv)
 
-    alphabet, _, name = h2.text.partition(' - ')
+            # the first format: h3+pre
+            yield from h3_plus(pre)
 
-    time_limit, memory_limit = h2.find_next_sibling('p').text.split(' / ')
-    for time_limit_prefix in ('実行時間制限: ', 'Time Limit: '):
-        if time_limit.startswith(time_limit_prefix):
-            break
-    else:
-        assert False
-    if time_limit.endswith(' msec'):
-        time_limit_msec = int(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' msec'))
-    elif time_limit.endswith(' sec'):
-        time_limit_msec = int(float(utils.remove_suffix(utils.remove_prefix(time_limit, time_limit_prefix), ' sec')) * 1000)
-    else:
-        assert False
+            # the second format: h3+section pre
+            if pre.parent and pre.parent.name == 'section':
+                # ignore tags which are not samples
+                # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
+                if pre.find_previous_sibling('pre') is None:
+                    yield from h3_plus(pre.parent)
 
-    for memory_limit_prefix in ('メモリ制限: ', 'Memory Limit: '):
-        if memory_limit.startswith(memory_limit_prefix):
-            break
-    else:
-        assert False
-    if memory_limit.endswith(' KB'):
-        memory_limit_byte = int(float(utils.remove_suffix(utils.remove_prefix(memory_limit, memory_limit_prefix), ' KB')) * 1000)
-    elif memory_limit.endswith(' MB'):
-        memory_limit_byte = int(float(utils.remove_suffix(utils.remove_prefix(memory_limit, memory_limit_prefix), ' MB')) * 1000 * 1000)
-    else:
-        assert False
+    @classmethod
+    def _parse_sample_cases(cls, soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
+        """
+        :raises SampleParsingError:
+        """
+        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
+        lang = None
+        for pre, h3 in cls._find_sample_tags(soup):
+            s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
+            name = h3.string
+            l = cls._get_tag_lang(pre)
+            if lang is None:
+                lang = l
+            elif lang != l:
+                log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
+                continue
+            samples.add(s.encode(), name)
+        return samples.get()
 
-    return AtCoderProblemContentPartial(
-        alphabet=alphabet,
-        memory_limit_byte=memory_limit_byte,
-        name=name,
-        problem=problem,
-        tag=soup,
-        time_limit_msec=time_limit_msec,
-    )
+    @classmethod
+    def _parse_input_format(cls, soup: bs4.BeautifulSoup) -> Optional[str]:
+        for h3 in soup.find_all('h3', text=re.compile(r'^(入力|Input)$')):
+            if h3.parent.name == 'section':
+                section = h3.parent
+            else:
+                section = h3.find_next_sibling('section')
+            if section is None:
+                section = soup.find(class_='io-style')
+            if section is None:
+                log.warning('<section> tag not found. something wrong')
+                return None
+            pre = section.find('pre')
+            if pre is not None:
+                return pre.decode_contents(formatter=None)
+        return None
 
+    @classmethod
+    def _parse_available_languages(cls, soup: bs4.BeautifulSoup, problem: 'AtCoderProblem') -> Optional[List[Language]]:
+        form = soup.find('form', action='/contests/{}/submit'.format(problem.contest_id))
+        if form is None:
+            return None
+        select = form.find('div', id='select-lang').find('select', attrs={'name': 'data.LanguageId'})  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
+        languages = []  # type: List[Language]
+        for option in select.find_all('option'):
+            languages += [Language(option.attrs['value'], option.string)]
+        return languages
 
-def _AtCoderProblemContent_parse_score(soup: bs4.BeautifulSoup) -> Optional[int]:
-    task_statement = soup.find('div', id='task-statement')
-    p = task_statement.find('p')  # first
-    if p is not None and p.text.startswith('配点 : '):
-        score = utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点')
+    @classmethod
+    def _parse_score(cls, soup: bs4.BeautifulSoup) -> Optional[int]:
+        task_statement = soup.find('div', id='task-statement')
+        p = task_statement.find('p')  # first
+        if p is not None and p.text.startswith('配点 : '):
+            score = utils.remove_suffix(utils.remove_prefix(p.text, '配点 : '), ' 点')
+            try:
+                return int(score)
+            except ValueError:
+                # some problems have scores like "<p>配点 : \(100\) 点</p>", not "<p>配点 : 100 点</p>"
+                # example: https://atcoder.jp/contests/wupc2019/tasks/wupc2019_a
+                pass
+        return None
+
+    @classmethod
+    def from_html(cls, html: bytes, *, problem: 'AtCoderProblem', session: Optional[requests.Session] = None, response: Optional[requests.Response] = None, timestamp: Optional[datetime.datetime] = None) -> 'AtCoderProblemDetailedData':
+        """
+        :param html: must be a HTML of the new (beta) version of AtCoder
+
+        .. versionadded:: 6.2.0
+
+        """
+
+        soup = bs4.BeautifulSoup(html, utils.html_parser)
         try:
-            return int(score)
-        except ValueError:
-            # some problems have scores like "<p>配点 : \(100\) 点</p>", not "<p>配点 : 100 点</p>"
-            # example: https://atcoder.jp/contests/wupc2019/tasks/wupc2019_a
-            pass
-    return None
+            sample_cases = cls._parse_sample_cases(soup)  # type: Optional[List[TestCase]]
+        except SampleParsingError:
+            sample_cases = None
+        input_format = cls._parse_input_format(soup)
+        available_languages = cls._parse_available_languages(soup, problem=problem)
+        score = cls._parse_score(soup)
 
-
-def _AtCoderProblemContent_from_html(html: str, *, problem: 'AtCoderProblem', session: Optional[requests.Session] = None, response: Optional[requests.Response] = None) -> AtCoderProblemContent:
-    """
-    :param html: must be a HTML of the new (beta) version of AtCoder
-
-    .. versionadded:: 6.2.0
-
-    """
-
-    soup = bs4.BeautifulSoup(html, utils.html_parser)
-    try:
-        sample_cases = _AtCoderProblemContent_parse_sample_cases(soup)  # type: Optional[List[TestCase]]
-    except SampleParsingError:
-        sample_cases = None
-    input_format = _AtCoderProblemContent_parse_input_format(soup)
-    available_languages = _AtCoderProblemContent_parse_available_languages(soup, problem=problem)
-    partial = _AtCoderProblemContent_parse_partial(soup, problem=problem)
-    score = _AtCoderProblemContent_parse_score(soup)
-    return AtCoderProblemContent(
-        session=session,
-        response=response,
-        alphabet=partial.alphabet,
-        available_languages=available_languages,
-        html=html,
-        input_format=input_format,
-        memory_limit_byte=partial.memory_limit_byte,
-        name=partial.name,
-        problem=problem,
-        sample_cases=sample_cases,
-        score=score,
-        time_limit_msec=partial.time_limit_msec,
-    )
-
-
-AtCoderProblemContent.from_html = _AtCoderProblemContent_from_html  # type: ignore
+        data = AtCoderProblemData._from_html(html, problem=problem, session=session, response=response, timestamp=timestamp)
+        return AtCoderProblemDetailedData(
+            alphabet=data.alphabet,
+            available_languages=available_languages,
+            html=data.html,
+            input_format=input_format,
+            memory_limit_byte=data.memory_limit_byte,
+            name=data.name,
+            problem=data.problem,
+            response=data.response,
+            sample_cases=sample_cases,
+            score=score,
+            session=data.session,
+            time_limit_msec=data.time_limit_msec,
+            timestamp=data.timestamp,
+        )
 
 
 class AtCoderProblem(onlinejudge.type.Problem):
@@ -626,26 +759,20 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def __init__(self, *, contest_id: str, problem_id: str):
         self.contest_id = contest_id
         self.problem_id = problem_id  # NOTE: AtCoder calls this as "task_screen_name"
-        self._cached_content = None  # type: Union[None, AtCoderProblemContentPartial, AtCoderProblemContent]
 
-    @classmethod
-    def _from_table_row(cls, tr: bs4.Tag) -> 'AtCoderProblemContentPartial':
-        return _AtCoderProblemContentPartial_from_row(tr)
-
-    def download_content(self, *, session: Optional[requests.Session] = None) -> AtCoderProblemContent:
+    def download_data(self, *, session: Optional[requests.Session] = None) -> AtCoderProblemDetailedData:
         """
         :raises Exception: if no such problem exists
-
-        .. versionadded:: 6.2.0
         """
 
         session = session or utils.get_default_session()
         resp = _request('GET', self.get_url(type='beta'), raise_for_status=False, session=session)
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
         if _list_alert(resp):
             log.warning('are you logged in?')
         resp.raise_for_status()
-        self._cached_content = _AtCoderProblemContent_from_html(resp.content.decode(resp.encoding), problem=self, session=session, response=resp)
-        return self._cached_content
+        html = resp.content.decode(resp.encoding).encode()  # ensure UTF-8
+        return AtCoderProblemDetailedData.from_html(html, problem=self, session=session, response=resp, timestamp=timestamp)
 
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         """
@@ -655,7 +782,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
         session = session or utils.get_default_session()
         resp = _request('GET', self.get_url(type='beta'), session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        return _AtCoderProblemContent_parse_sample_cases(soup)
+        return AtCoderProblemDetailedData._parse_sample_cases(soup)
 
     def get_url(self, *, type: Optional[str] = None, lang: Optional[str] = None) -> str:
         if type is None or type == 'beta':
@@ -704,17 +831,17 @@ class AtCoderProblem(onlinejudge.type.Problem):
         """
         :raises Exception: if no such problem exists
         """
-        return self.download_content(session=session).input_format
+        return self.download_data(session=session).input_format
 
     def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
         """
         :raises NotLoggedInError:
         """
-        content = self.download_content(session=session)
-        if content.available_languages is None:
+        data = self.download_data(session=session)
+        if data.available_languages is None:
             log.error('not logged in')
             raise NotLoggedInError
-        return content.available_languages
+        return data.available_languages
 
     def submit_code(self, code: bytes, language_id: LanguageId, *, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> 'AtCoderSubmission':
         """
@@ -746,18 +873,19 @@ class AtCoderProblem(onlinejudge.type.Problem):
         form.set('data.LanguageId', str(language_id))
         form.set('sourceCode', code)
         resp = form.request(session=session)
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
         _list_alert(resp, print_=True)
 
         # result
         if '/submissions/me' in resp.url:
-            submission = next(AtCoderContest(contest_id=self.contest_id)._iterate_submission_contents_from_response(resp=resp)).submission
+            submission = next(AtCoderContest(contest_id=self.contest_id)._iterate_submission_data_from_response(resp=resp, session=session, timestamp=timestamp)).submission
             log.success('success: result: %s', submission.get_url())
             return submission
         else:
             raise SubmissionError('it may be a rate limit')
 
     def get_name(self, *, session: Optional[requests.Session] = None) -> str:
-        return self.download_content(session=session).name
+        return self.download_data(session=session).name
 
     def iterate_submissions(self, *, session: Optional[requests.Session] = None) -> Iterator['AtCoderSubmission']:
         """
@@ -769,58 +897,82 @@ class AtCoderProblem(onlinejudge.type.Problem):
         yield from self.get_contest().iterate_submissions_where(problem_id=self.problem_id, **kwargs)
 
 
-AtCoderSubmissionContentPartial = NamedTuple('AtCoderSubmissionContentPartial', [
-    ('tag', bs4.Tag),
-    ('problem', AtCoderProblem),
-    ('submission', 'AtCoderSubmission'),
-    ('problem_id', str),
-    ('user_id', str),
-    ('language_name', str),
-    ('score', float),
-    ('code_size', int),
-    ('status', str),
-    ('exec_time_msec', Optional[int]),
-    ('memory_byte', Optional[int]),
-])
-
-AtCoderSubmissionContent = NamedTuple('AtCoderSubmissionContent', [
-    ('session', requests.Session),
-    ('response', requests.Response),
-    ('problem', AtCoderProblem),
-    ('submission', 'AtCoderSubmission'),
-    ('problem_id', str),
-    ('source_code', bytes),
-    ('submission_time', datetime.datetime),
-    ('user_id', str),
-    ('language_name', str),
-    ('score', float),
-    ('code_size', int),
-    ('status', str),
-    ('exec_time_msec', Optional[int]),
-    ('memory_byte', Optional[int]),
-    ('compile_error', Optional[str]),
-    ('test_sets', Optional[List['AtCoderSubmissionTestSet']]),
-    ('test_cases', Optional[List['AtCoderSubmissionTestCaseResult']]),
-])
-
-
-class AtCoderSubmission(onlinejudge.type.Submission):
+class AtCoderSubmissionData(SubmissionData):
     """
-    :ivar contest_id: :py:class:`str`
-    :ivar submission_id: :py:class:`str`
+    :ivar alphabet: :py:class:`str`
+    :ivar memory_limit_byte: :py:class:`int`
+    :ivar name: :py:class:`str`
+    :ivar problem: :py:class:`AtCoderProblem`
+    :ivar time_limit_msec: :py:class:`str`
     """
-    def __init__(self, *, contest_id: str, submission_id: int):
-        self.contest_id = contest_id
-        self.submission_id = submission_id
+
+    # yapf: disable
+    def __init__(
+            self,
+            *,
+            code_size: int,
+            exec_time_msec: Optional[int],
+            language_name: str,
+            memory_byte: Optional[int],
+            problem: AtCoderProblem,
+            problem_id: str,
+            response: requests.Response,
+            score: float,
+            session: requests.Session,
+            status: str,
+            submission: 'AtCoderSubmission',
+            submission_time: datetime.datetime,
+            timestamp: datetime.datetime,
+            user_id: str  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
+    ):
+        # yapf: enable
+        self.code_size = code_size
+        self.exec_time_msec = exec_time_msec
+        self.language_name = language_name
+        self.memory_byte = memory_byte
+        self._problem = problem
+        self.problem_id = problem_id
+        self._response = response
+        self.score = score
+        self._session = session
+        self._status = status
+        self._submission = submission
+        self.submission_time = submission_time
+        self._timestamp = timestamp
+        self.user_id = user_id
+
+    @property
+    def status(self) -> str:
+        return self._status
+
+    @property
+    def submission(self) -> 'AtCoderSubmission':
+        return self._submission
+
+    @property
+    def problem(self) -> AtCoderProblem:
+        return AtCoderProblem(problem_id=self.problem_id, contest_id=self.submission.contest_id)
+
+    @property
+    def response(self) -> Optional[requests.Response]:
+        return self._response
+
+    @property
+    def session(self) -> Optional[requests.Session]:
+        return self._session
+
+    @property
+    def timestamp(self) -> Optional[datetime.datetime]:
+        return self._timestamp
 
     @classmethod
-    def _from_table_row(cls, tr: bs4.Tag, *, contest_id: str) -> AtCoderSubmissionContentPartial:
+    def _from_table_row(cls, tr: bs4.Tag, *, session: requests.Session, response: requests.Response, timestamp: datetime.datetime) -> 'AtCoderSubmissionData':
         tds = tr.find_all('td')
         assert len(tds) in (8, 10)
 
-        self = cls.from_url('https://atcoder.jp' + tds[-1].find('a')['href'])
+        submission = AtCoderSubmission.from_url('https://atcoder.jp' + tds[-1].find('a')['href'])
         problem = AtCoderProblem.from_url('https://atcoder.jp' + tds[1].find('a')['href'])
-        assert self is not None
+        assert submission is not None
         assert problem is not None
 
         submission_time = datetime.datetime.strptime(tds[0].text, '%Y-%m-%d %H:%M:%S+0900').replace(tzinfo=utils.tzinfo_jst)
@@ -836,19 +988,55 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         else:
             exec_time_msec = None
             memory_byte = None
-        return AtCoderSubmissionContentPartial(
-            tag=tr,
-            problem=problem,
-            submission=self,
-            problem_id=problem_id,
-            user_id=user_id,
-            language_name=language_name,
-            score=score,
+        return AtCoderSubmissionData(
             code_size=code_size,
-            status=status,
             exec_time_msec=exec_time_msec,
+            language_name=language_name,
             memory_byte=memory_byte,
+            problem_id=problem_id,
+            problem=problem,
+            response=response,
+            score=score,
+            session=session,
+            status=status,
+            submission=submission,
+            submission_time=submission_time,
+            timestamp=timestamp,
+            user_id=user_id,
         )
+
+
+class AtCoderSubmissionDetailedData(AtCoderSubmissionData):
+    # yapf: disable
+    def __init__(
+            self,
+            *,
+            source_code: bytes,
+            compile_error: Optional[str],
+            test_sets: Optional[List['AtCoderSubmissionTestSet']],
+            test_cases: Optional[List['AtCoderSubmissionTestCaseResult']],
+            **kwargs  # TODO: in Python 3.5, you cannnot use both "*" and trailing ","
+    ):
+        # yapf: enable
+        super().__init__(**kwargs)
+        self._source_code = source_code
+        self.compile_error = compile_error
+        self.test_sets = test_sets
+        self.test_cases = test_cases
+
+    @property
+    def source_code(self) -> bytes:
+        return self._source_code
+
+
+class AtCoderSubmission(onlinejudge.type.Submission):
+    """
+    :ivar contest_id: :py:class:`str`
+    :ivar submission_id: :py:class:`str`
+    """
+    def __init__(self, *, contest_id: str, submission_id: int):
+        self.contest_id = contest_id
+        self.submission_id = submission_id
 
     @classmethod
     def from_url(cls, s: str) -> Optional['AtCoderSubmission']:
@@ -901,7 +1089,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         return AtCoderService()
 
     def download_problem(self, *, session: Optional[requests.Session] = None) -> AtCoderProblem:
-        problem_id = self.download_content(session=session).problem_id
+        problem_id = self.download_data(session=session).problem_id
         return AtCoderProblem(contest_id=self.contest_id, problem_id=problem_id)
 
     def get_problem(self) -> AtCoderProblem:
@@ -911,7 +1099,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         """
         raise Exception
 
-    def download_content(self, *, session: Optional[requests.Session] = None) -> AtCoderSubmissionContent:
+    def download_data(self, *, session: Optional[requests.Session] = None) -> AtCoderSubmissionDetailedData:
         """
         :note: `Exec Time` is undefined when the status is `RE` or `TLE`
         :note: `Memory` is undefined when the status is `RE` or `TLE`
@@ -919,6 +1107,7 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         session = session or utils.get_default_session()
         resp = _request('GET', self.get_url(type='beta', lang='en'), session=session)
         soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
+        timestamp = datetime.datetime.now(datetime.timezone.utc).astimezone()
 
         # Submission #N
         id_, = soup.find_all('span', class_='h2')
@@ -988,24 +1177,25 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         else:
             test_cases = None
 
-        return AtCoderSubmissionContent(
-            session=session,
-            response=resp,
-            problem=AtCoderProblem(contest_id=self.contest_id, problem_id=problem_id),
-            submission=self,
-            problem_id=problem_id,
-            source_code=source_code,
-            submission_time=submission_time,
-            user_id=user_id,
-            language_name=language_name,
-            score=score,
+        return AtCoderSubmissionDetailedData(
             code_size=code_size,
-            status=status,
-            exec_time_msec=exec_time_msec,
-            memory_byte=memory_byte,
             compile_error=compile_error,
-            test_sets=test_sets,
+            exec_time_msec=exec_time_msec,
+            language_name=language_name,
+            memory_byte=memory_byte,
+            problem=AtCoderProblem(contest_id=self.contest_id, problem_id=problem_id),
+            problem_id=problem_id,
+            response=resp,
+            score=score,
+            session=session,
+            source_code=source_code,
+            status=status,
+            submission=self,
+            submission_time=submission_time,
             test_cases=test_cases,
+            test_sets=test_sets,
+            timestamp=timestamp,
+            user_id=user_id,
         )
 
 

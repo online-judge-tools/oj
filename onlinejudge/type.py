@@ -1,6 +1,7 @@
 # Python Version: 3.x
+import datetime
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Iterator, List, NamedTuple, NewType, Optional, Tuple
+from typing import Callable, Iterator, List, NamedTuple, NewType, Optional, Tuple
 
 import requests
 
@@ -89,31 +90,115 @@ class SubmissionError(RuntimeError):
     pass
 
 
+class DownloadedData(ABC):
+    """
+    :note: :py:class:`DownloadedData` and its subclasses represent contents which are obtained by network access. The values may depends your session.
+           :py:class:`DownloadedData` とそのサブクラスは、ネットワークアクセスの結果得られるようなデータを表現します。その値はログイン状況などにより接続のたびに変化することがあります。
+    """
+    @property
+    @abstractmethod
+    def url(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def json(self) -> Optional[bytes]:
+        return None
+
+    @property
+    def html(self) -> Optional[bytes]:
+        return None
+
+    @property
+    def timestamp(self) -> Optional[datetime.datetime]:
+        return None
+
+    @property
+    def session(self) -> Optional[requests.Session]:
+        return None
+
+    @property
+    def response(self) -> Optional[requests.Response]:
+        return None
+
+
+class ContestData(DownloadedData):
+    def url(self) -> str:
+        return self.contest.get_url()
+
+    @property
+    @abstractmethod
+    def contest(self) -> 'Contest':
+        raise NotImplementedError
+
+    @property
+    def service(self) -> Service:
+        return self.contest.get_service()
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        raise NotImplementedError
+
+
 class Contest(ABC):
     """
     :note: :py:class:`Contest` represents just a URL of a contest, without the data of the contest.
     """
-    def download_name(self, *, session: Optional[requests.Session] = None) -> str:
-        content = self.download_content(session=session)  # type: Any
-        return content.name
-
     def list_problems(self, *, session: Optional[requests.Session] = None) -> List['Problem']:
-        content = self.download_content(session=session)  # type: Any
-        return content.problems
+        raise NotImplementedError
 
-    def download_content(self, *, session: Optional[requests.Session] = None) -> tuple:
-        """
-        :note: The returned values vary depending on the implementation.
-        """
+    def download_data(self, *, session: Optional[requests.Session] = None) -> ContestData:
         raise NotImplementedError
 
     def iterate_submissions(self, *, session: Optional[requests.Session] = None) -> Iterator['Submission']:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_url(self) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_service(self) -> Service:
         raise NotImplementedError
 
     @classmethod
     @abstractmethod
     def from_url(self, s: str) -> Optional['Contest']:
         pass
+
+
+class ProblemData(DownloadedData):
+    def url(self) -> str:
+        return self.problem.get_url()
+
+    @property
+    @abstractmethod
+    def problem(self) -> 'Problem':
+        raise NotImplementedError
+
+    @property
+    def contest(self) -> Contest:
+        return self.problem.get_contest()
+
+    @property
+    def service(self) -> Service:
+        return self.problem.get_service()
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        """
+        for example of :py:class:`Problem`:
+
+        -   `器物損壊！高橋君`
+        -   `AtCoDeerくんと変なじゃんけん / AtCoDeer and Rock-Paper`
+        -   `Xor Sum`
+        """
+        raise NotImplementedError
+
+    @property
+    def sample_cases(self) -> Optional[List[TestCase]]:
+        raise NotImplementedError
 
 
 class Problem(ABC):
@@ -150,25 +235,14 @@ class Problem(ABC):
     def get_url(self) -> str:
         raise NotImplementedError
 
+    def get_contest(self) -> Contest:
+        raise NotImplementedError
+
     @abstractmethod
     def get_service(self) -> Service:
         raise NotImplementedError
 
-    def download_name(self, *, session: Optional[requests.Session] = None) -> str:
-        """
-        example:
-
-        -   `器物損壊！高橋君`
-        -   `AtCoDeerくんと変なじゃんけん / AtCoDeer and Rock-Paper`
-        -   `Xor Sum`
-        """
-        content = self.download_content(session=session)  # type: Any
-        return content.name
-
-    def download_content(self, *, session: Optional[requests.Session] = None) -> tuple:
-        """
-        :note: The returned values vary depending on the implementation.
-        """
+    def download_data(self, *, session: Optional[requests.Session] = None) -> ProblemData:
         raise NotImplementedError
 
     def __repr__(self) -> str:
@@ -183,15 +257,39 @@ class Problem(ABC):
         pass
 
 
-class Submission(ABC):
-    def download_code(self, *, session: Optional[requests.Session] = None) -> bytes:
-        content = self.download_content(session=session)  # type: Any
-        return content.source_code
+class SubmissionData(DownloadedData):
+    def url(self) -> str:
+        return self.submission.get_url()
 
-    def download_content(self, *, session: Optional[requests.Session] = None) -> tuple:
-        """
-        :note: The returned values vary depending on the implementation.
-        """
+    @property
+    @abstractmethod
+    def submission(self) -> 'Submission':
+        raise NotImplementedError
+
+    @property
+    def problem(self) -> Problem:
+        return self.submission.get_problem()
+
+    @property
+    def contest(self) -> Contest:
+        return self.submission.get_contest()
+
+    @property
+    def service(self) -> Service:
+        return self.submission.get_service()
+
+    @property
+    def source_code(self) -> bytes:
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def status(self) -> str:
+        raise NotImplementedError
+
+
+class Submission(ABC):
+    def download_data(self, *, session: Optional[requests.Session] = None) -> SubmissionData:
         raise NotImplementedError
 
     @abstractmethod
@@ -201,6 +299,9 @@ class Submission(ABC):
     @abstractmethod
     def get_problem(self) -> Problem:
         raise NotImplementedError
+
+    def get_contest(self) -> Contest:
+        return self.get_problem().get_contest()
 
     @abstractmethod
     def get_service(self) -> Service:
