@@ -1,7 +1,7 @@
 # Python Version: 3.x
 import datetime
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Iterator, List, NamedTuple, NewType, Optional, Tuple
+from typing import Callable, Iterator, List, NamedTuple, NewType, Optional, Tuple
 
 import requests
 
