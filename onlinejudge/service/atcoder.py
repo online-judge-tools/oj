@@ -666,7 +666,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             if lang is None:
                 lang = l
             elif lang != l:
-                log.info('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
+                log.debug('skipped due to language: current one is %s, not %s: %s ', lang, l, name)
                 continue
             samples.add(s.encode(), name)
         return samples.get()
