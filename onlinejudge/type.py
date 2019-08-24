@@ -82,7 +82,7 @@ class NotLoggedInError(RuntimeError):
     pass
 
 
-class SampleParsingError(RuntimeError):
+class SampleParseError(RuntimeError):
     pass
 
 
@@ -209,7 +209,7 @@ class Problem(ABC):
     @abstractmethod
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         """
-        :raises SampleParsingError:
+        :raises SampleParseError:
         """
         raise NotImplementedError
 

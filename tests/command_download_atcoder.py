@@ -3,6 +3,8 @@ import unittest
 import requests.exceptions
 import tests.command_download
 
+from onlinejudge.type import SampleParseError
+
 
 class DownloadAtCoderTest(unittest.TestCase):
     def snippet_call_download(self, *args, **kwargs):
@@ -131,3 +133,7 @@ class DownloadAtCoderTest(unittest.TestCase):
 
     def test_call_download_invalid_url(self):
         self.snippet_call_download_raises(requests.exceptions.HTTPError, 'http://abc001.contest.atcoder.jp/tasks/abc001_100')
+
+    def test_call_download_413(self):
+        # This task is not supported.
+        self.snippet_call_download_raises(SampleParseError, 'https://chokudai001.contest.atcoder.jp/tasks/chokudai_001_a')
