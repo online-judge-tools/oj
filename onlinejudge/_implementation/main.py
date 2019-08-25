@@ -15,7 +15,6 @@ import onlinejudge._implementation.utils as utils
 from onlinejudge._implementation.command.download import download
 from onlinejudge._implementation.command.generate_input import generate_input
 from onlinejudge._implementation.command.generate_output import generate_output
-from onlinejudge._implementation.command.get_standings import get_standings
 from onlinejudge._implementation.command.login import login
 from onlinejudge._implementation.command.split_input import split_input, split_input_auto_footer
 from onlinejudge._implementation.command.submit import submit
@@ -260,14 +259,6 @@ example:
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('judge', help='judge program using standard I/O')
 
-    # get standings
-    subparser = subparsers.add_parser('get-standings', help='get and print the standings  (experimental)', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
-supported services:
-  Topcoder (Marathon Match)
-''')
-    subparser.add_argument('url')
-    subparser.add_argument('-f', '--format', choices=['csv', 'tsv', 'json'], default='tsv', help='default: tsv')
-
     return parser
 
 
@@ -295,8 +286,6 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         generate_input(args)
     elif args.subcommand == 'split-input':
         split_input(args)
-    elif args.subcommand == 'get-standings':
-        get_standings(args)
     else:
         parser.print_help(file=sys.stderr)
         sys.exit(1)
