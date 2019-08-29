@@ -655,7 +655,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
     @classmethod
     def _parse_sample_cases(cls, soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
         """
-        :raises SampleParsingError:
+        :raises SampleParseError:
         """
         samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         lang = None
@@ -725,7 +725,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
         soup = bs4.BeautifulSoup(html, utils.html_parser)
         try:
             sample_cases = cls._parse_sample_cases(soup)  # type: Optional[List[TestCase]]
-        except SampleParsingError:
+        except SampleParseError:
             sample_cases = None
         input_format = cls._parse_input_format(soup)
         available_languages = cls._parse_available_languages(soup, problem=problem)
@@ -777,7 +777,7 @@ class AtCoderProblem(onlinejudge.type.Problem):
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         """
         :raises requests.exceptions.HTTPError: if no such problem exists
-        :raises SampleParsingError: if parsing failed
+        :raises SampleParseError: if parsing failed
         """
         session = session or utils.get_default_session()
         resp = _request('GET', self.get_url(type='beta'), session=session)
