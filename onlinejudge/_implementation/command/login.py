@@ -87,24 +87,26 @@ def login(args: 'argparse.Namespace') -> None:
                 sys.exit(1)
 
         else:
-            if args.use_browser in ('never', 'fallback'):
-                try:
-                    login_with_password(service, username=args.username, password=args.password, session=session)
-                except NotImplementedError:
-                    pass
-                except onlinejudge.type.LoginError:
-                    sys.exit(1)
-                else:
-                    return
-
-            if args.use_browser in ('always', 'fallback'):
+            if args.use_browser in ('always', 'auto'):
                 try:
                     login_with_browser(service, session=session)
                 except ImportError:
-                    log.error('selenium is not installed: try $ pip3 install selenium')
+                    log.error('Selenium is not installed: try $ pip3 install selenium')
                     pass
                 except WebDriverException as e:
                     log.error('%s', e)
+                    pass
+                else:
+                    return
+
+            if args.use_browser in ('never', 'auto'):
+                if args.use_browser == 'auto':
+                    log.warning('use CUI login since Selenium fails')
+                try:
+                    login_with_password(service, username=args.username, password=args.password, session=session)
+                except NotImplementedError as e:
+                    log.error('%s', e)
+                except onlinejudge.type.LoginError:
                     pass
                 else:
                     return
