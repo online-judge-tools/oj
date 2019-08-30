@@ -89,6 +89,9 @@ class AtCoderService(onlinejudge.type.Service):
             log.failure('Username or Password is incorrect.')
             raise LoginError
 
+    def get_url_of_login_page(self) -> str:
+        return 'https://atcoder.jp/login'
+
     def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
         url = 'https://atcoder.jp/contests/practice/submit'

@@ -52,6 +52,9 @@ class CodeforcesService(onlinejudge.type.Service):
             log.failure('Invalid handle or password.')
             raise LoginError('Invalid handle or password.')
 
+    def get_url_of_login_page(self) -> str:
+        return 'https://codeforces.com/enter'
+
     def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
         url = 'https://codeforces.com/enter'

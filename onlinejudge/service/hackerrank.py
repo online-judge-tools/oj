@@ -20,40 +20,8 @@ from onlinejudge.type import *
 
 
 class HackerRankService(onlinejudge.type.Service):
-    def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
-        """
-        :raises LoginError:
-        """
-
-        session = session or utils.get_default_session()
-        url = 'https://www.hackerrank.com/auth/login'
-        # get
-        resp = utils.request('GET', url, session=session)
-        if resp.url != url:
-            log.info('You have already signed in.')
-            return
-        # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        csrftoken = soup.find('meta', attrs={'name': 'csrf-token'}).attrs['content']
-        tag = soup.find('input', attrs={'name': 'username'})
-        while tag.name != 'form':
-            tag = tag.parent
-        form = tag
-        # post
-        username, password = get_credentials()
-        form = utils.FormSender(form, url=resp.url)
-        form.set('login', username)
-        form.set('password', password)
-        form.set('remember_me', 'true')
-        form.set('fallback', 'true')
-        resp = form.request(session, method='POST', action='/rest/auth/login', headers={'X-CSRF-Token': csrftoken})
-        resp.raise_for_status()
-        # result
-        if '/auth' not in resp.url:
-            log.success('You signed in.')
-        else:
-            log.failure('You failed to sign in. Wrong user ID or password.')
-            raise LoginError('You failed to sign in. Wrong user ID or password.')
+    def get_url_of_login_page(self) -> str:
+        return 'https://www.hackerrank.com/auth/login'
 
     def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
