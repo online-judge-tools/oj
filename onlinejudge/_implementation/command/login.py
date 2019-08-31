@@ -72,6 +72,15 @@ def login_with_browser(service: onlinejudge.type.Service, *, session: requests.S
         session.cookies.set_cookie(cookie)  # type: ignore
 
 
+def is_logged_in_with_message(service: onlinejudge.type.Service, *, session: requests.Session) -> bool:
+    if service.is_logged_in(session=session):
+        log.info('You have already signed in.')
+        return True
+    else:
+        log.warning('You are not signed in.')
+        return False
+
+
 def login(args: 'argparse.Namespace') -> None:
     service = onlinejudge.dispatch.service_from_url(args.url)
     if service is None:
@@ -79,36 +88,41 @@ def login(args: 'argparse.Namespace') -> None:
 
     with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as session:
 
-        if args.check:
-            if service.is_logged_in(session=session):
-                log.info('You have already signed in.')
-            else:
-                log.info('You are not signed in.')
+        if is_logged_in_with_message(service, session=session):
+            return
+        else:
+            if args.check:
                 sys.exit(1)
 
-        else:
-            if args.use_browser in ('always', 'auto'):
-                try:
-                    login_with_browser(service, session=session)
-                except ImportError:
-                    log.error('Selenium is not installed: try $ pip3 install selenium')
-                    pass
-                except WebDriverException as e:
-                    log.error('%s', e)
-                    pass
-                else:
+        if args.use_browser in ('always', 'auto'):
+            try:
+                login_with_browser(service, session=session)
+            except ImportError:
+                log.error('Selenium is not installed: try $ pip3 install selenium')
+                pass
+            except WebDriverException as e:
+                log.error('%s', e)
+                pass
+            else:
+                if is_logged_in_with_message(service, session=session):
                     return
-
-            if args.use_browser in ('never', 'auto'):
-                if args.use_browser == 'auto':
-                    log.warning('use CUI login since Selenium fails')
-                try:
-                    login_with_password(service, username=args.username, password=args.password, session=session)
-                except NotImplementedError as e:
-                    log.error('%s', e)
-                except onlinejudge.type.LoginError:
-                    pass
                 else:
-                    return
+                    sys.exit(1)
 
-            sys.exit(1)
+        if args.use_browser in ('never', 'auto'):
+            if args.use_browser == 'auto':
+                log.warning('use CUI login since Selenium fails')
+            try:
+                login_with_password(service, username=args.username, password=args.password, session=session)
+            except NotImplementedError as e:
+                log.error('%s', e)
+                pass
+            except onlinejudge.type.LoginError:
+                sys.exit(1)
+            else:
+                if is_logged_in_with_message(service, session=session):
+                    return
+                else:
+                    sys.exit(1)
+
+        sys.exit(1)
