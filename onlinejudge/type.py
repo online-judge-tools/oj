@@ -1,4 +1,11 @@
 # Python Version: 3.x
+"""
+the module containing base types
+
+:note: Some methods are not implemented in subclasses.
+    Please check the definitions of subclasses under :py:mod:`onlinejudge.service`.
+"""
+
 import datetime
 from abc import ABC, abstractmethod
 from typing import Callable, Iterator, List, NamedTuple, NewType, Optional, Tuple
@@ -21,6 +28,9 @@ class Service(ABC):
         raise NotImplementedError
 
     def get_url_of_login_page(self) -> str:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
     def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
@@ -55,6 +65,9 @@ class Service(ABC):
         pass
 
     def iterate_contests(self, *, session: Optional[requests.Session] = None) -> Iterator['Contest']:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
 
@@ -65,6 +78,9 @@ TestCase = NamedTuple('TestCase', [
     ('output_name', str),
     ('output_data', bytes),
 ])
+"""
+.. versionchanged:: 7.0.0
+"""
 
 LanguageId = NewType('LanguageId', str)
 """
@@ -86,6 +102,9 @@ class NotLoggedInError(RuntimeError):
 
 
 class SampleParseError(RuntimeError):
+    """
+    .. versionadded:: 7.0.0
+    """
     pass
 
 
@@ -97,6 +116,8 @@ class DownloadedData(ABC):
     """
     :note: :py:class:`DownloadedData` and its subclasses represent contents which are obtained by network access. The values may depends your session.
            :py:class:`DownloadedData` とそのサブクラスは、ネットワークアクセスの結果得られるようなデータを表現します。その値はログイン状況などにより接続のたびに変化することがあります。
+
+    .. versionadded:: 7.0.0
     """
     @property
     @abstractmethod
@@ -125,6 +146,9 @@ class DownloadedData(ABC):
 
 
 class ContestData(DownloadedData):
+    """
+    .. versionadded:: 7.0.0
+    """
     def url(self) -> str:
         return self.contest.get_url()
 
@@ -146,6 +170,8 @@ class ContestData(DownloadedData):
 class Contest(ABC):
     """
     :note: :py:class:`Contest` represents just a URL of a contest, without the data of the contest.
+
+    .. versionadded:: 7.0.0
     """
     def list_problems(self, *, session: Optional[requests.Session] = None) -> List['Problem']:
         raise NotImplementedError
@@ -154,6 +180,9 @@ class Contest(ABC):
         raise NotImplementedError
 
     def iterate_submissions(self, *, session: Optional[requests.Session] = None) -> Iterator['Submission']:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -171,6 +200,9 @@ class Contest(ABC):
 
 
 class ProblemData(DownloadedData):
+    """
+    .. versionadded:: 7.0.0
+    """
     def url(self) -> str:
         return self.problem.get_url()
 
@@ -213,6 +245,8 @@ class Problem(ABC):
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         """
         :raises SampleParseError:
+
+        .. versionchanged:: 7.0.0
         """
         raise NotImplementedError
 
@@ -246,6 +280,9 @@ class Problem(ABC):
         raise NotImplementedError
 
     def download_data(self, *, session: Optional[requests.Session] = None) -> ProblemData:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
     def __repr__(self) -> str:
@@ -261,6 +298,9 @@ class Problem(ABC):
 
 
 class SubmissionData(DownloadedData):
+    """
+    .. versionadded:: 7.0.0
+    """
     def url(self) -> str:
         return self.submission.get_url()
 
@@ -293,6 +333,9 @@ class SubmissionData(DownloadedData):
 
 class Submission(ABC):
     def download_data(self, *, session: Optional[requests.Session] = None) -> SubmissionData:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
     @abstractmethod
