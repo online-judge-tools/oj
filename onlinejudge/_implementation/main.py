@@ -81,16 +81,12 @@ supported services:
   Topcoder
   HackerRank
   Toph
-
-strings for --method:
-  github                for yukicoder, login via github (default)
-  twitter               for yukicoder, login via twitter (not implementated yet)
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-u', '--username')
     subparser.add_argument('-p', '--password')
     subparser.add_argument('--check', action='store_true', help='check whether you are logged in or not')
-    subparser.add_argument('--method')
+    subparser.add_argument('--use-browser', choices=('always', 'auto', 'never'), default='auto', help='specify whether it uses a GUI web browser to login or not  (default: auto)')
 
     # submit
     subparser = subparsers.add_parser('submit', aliases=['s'], help='submit your solution', formatter_class=argparse.RawTextHelpFormatter, epilog='''\

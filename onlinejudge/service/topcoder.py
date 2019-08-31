@@ -47,6 +47,9 @@ class TopcoderService(onlinejudge.type.Service):
             log.failure('Failure')
             raise LoginError
 
+    def get_url_of_login_page(self):
+        return 'https://accounts.topcoder.com/member'
+
     def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         """
         .. versionadded:: 6.2.0

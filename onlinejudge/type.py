@@ -20,6 +20,9 @@ class Service(ABC):
         """
         raise NotImplementedError
 
+    def get_url_of_login_page(self) -> str:
+        raise NotImplementedError
+
     def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         raise NotImplementedError
 

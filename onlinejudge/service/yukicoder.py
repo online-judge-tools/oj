@@ -21,55 +21,8 @@ from onlinejudge.type import *
 
 
 class YukicoderService(onlinejudge.type.Service):
-    def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None, method: Optional[str] = None) -> None:
-        if method == 'github':
-            return self.login_with_github(get_credentials=get_credentials, session=session)
-        elif method == 'twitter':
-            return self.login_with_twitter(get_credentials=get_credentials, session=session)
-        else:
-            assert False
-
-    def login_with_github(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
-        """
-        :raise LoginError:
-        """
-
-        session = session or utils.get_default_session()
-        url = 'https://yukicoder.me/auth/github'
-        # get
-        resp = utils.request('GET', url, session=session)
-        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
-            log.info('You have already signed in.')
-            return
-        # redirect to github.com
-        # parse
-        soup = bs4.BeautifulSoup(resp.content.decode(resp.encoding), utils.html_parser)
-        form = soup.find('form')
-        if not form:
-            log.error('form not found')
-            raise LoginError('something wrong')
-        log.debug('form: %s', str(form))
-        # post
-        username, password = get_credentials()
-        form = utils.FormSender(form, url=resp.url)
-        form.set('login', username)
-        form.set('password', password)
-        resp = form.request(session)
-        resp.raise_for_status()
-        if urllib.parse.urlparse(resp.url).hostname == 'yukicoder.me':
-            log.success('You signed in.')
-        else:
-            log.failure('You failed to sign in. Wrong user ID or password.')
-            raise LoginError
-
-    def login_with_twitter(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
-        """
-        :raise NotImplementedError: always raised
-        """
-
-        session = session or utils.get_default_session()
-        url = 'https://yukicoder.me/auth/twitter'
-        raise NotImplementedError
+    def get_url_of_login_page(self):
+        return self.get_url()
 
     def is_logged_in(self, *, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
         session = session or utils.get_default_session()
