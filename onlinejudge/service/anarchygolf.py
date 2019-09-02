@@ -33,10 +33,10 @@ class AnarchyGolfService(onlinejudge.type.Service):
 
 
 class AnarchyGolfProblem(onlinejudge.type.Problem):
-    def __init__(self, problem_id: str):
+    def __init__(self, *, problem_id: str):
         self.problem_id = problem_id
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         session = session or utils.get_default_session()
         # get
         resp = utils.request('GET', self.get_url(), session=session)
@@ -81,7 +81,7 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
                 and result.netloc == 'golf.shinh.org' \
                 and utils.normpath(result.path) == '/p.rb' \
                 and result.query:
-            return cls(result.query)
+            return cls(problem_id=result.query)
         return None
 
 

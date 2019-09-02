@@ -68,3 +68,8 @@ def cat():
 def python_c(cmd):
     assert '"' not in cmd
     return '{} -c "{}"'.format(sys.executable, cmd)
+
+
+def python_script(path):
+    assert '"' not in path
+    return '{} "{}"'.format(sys.executable, path)

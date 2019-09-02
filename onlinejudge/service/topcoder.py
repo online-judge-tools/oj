@@ -23,7 +23,7 @@ from onlinejudge.type import *
 
 
 class TopcoderService(onlinejudge.type.Service):
-    def login(self, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+    def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :raises LoginError:
         """
@@ -47,7 +47,10 @@ class TopcoderService(onlinejudge.type.Service):
             log.failure('Failure')
             raise LoginError
 
-    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+    def get_url_of_login_page(self):
+        return 'https://accounts.topcoder.com/member'
+
+    def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         """
         .. versionadded:: 6.2.0
         """
@@ -118,7 +121,7 @@ TopcoderLongContestProblemIndividualResultsFeed = NamedTuple('TopcoderLongContes
 
 
 class TopcoderLongContestProblem(onlinejudge.type.Problem):
-    def __init__(self, rd, cd=None, compid=None, pm=None):
+    def __init__(self, *, rd, cd=None, compid=None, pm=None):
         self.rd = rd
         self.cd = cd
         self.compid = compid
@@ -130,7 +133,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
     def get_service(self) -> TopcoderService:
         return TopcoderService()
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[onlinejudge.type.TestCase]:
         """
         :raises NotImplementedError:
         """
@@ -155,7 +158,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
                 return cls(**kwargs)
         return None
 
-    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
+    def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
         session = session or utils.get_default_session()
 
         return [
@@ -166,7 +169,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             Language(LanguageId('6'), 'Python 2'),
         ]
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
+    def submit_code(self, code: bytes, language_id: LanguageId, *, filename: Optional[str] = None, session: Optional[requests.Session] = None, kind: str = 'example') -> onlinejudge.type.Submission:
         """
         :param kind: must be one of `example` (default) or `full`
         :raises NotLoggedInError:
@@ -237,7 +240,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             log.failure('%s', messages)
             raise SubmissionError('it may be a rate limit: ' + messages)
 
-    def download_standings(self, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemStandingsRow]:
+    def download_standings(self, *, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemStandingsRow]:
         """
         :raises Exception: if redirected to `module=ViewOverview` page
 
@@ -282,7 +285,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
 
         return rows
 
-    def download_overview(self, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemOverviewRow]:
+    def download_overview(self, *, session: Optional[requests.Session] = None) -> List[TopcoderLongContestProblemOverviewRow]:
         """
         .. versionadded:: 6.2.0
             This method may be deleted in future.
@@ -316,7 +319,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             overview += [TopcoderLongContestProblemOverviewRow(rank, handle, provisional_rank, provisional_score, final_score, language, cr=int(query['cr']))]
         return overview
 
-    def download_individual_results_feed(self, cr: int, session: Optional[requests.Session] = None) -> TopcoderLongContestProblemIndividualResultsFeed:
+    def download_individual_results_feed(self, *, cr: int, session: Optional[requests.Session] = None) -> TopcoderLongContestProblemIndividualResultsFeed:
         """
         .. versionadded:: 6.2.0
             This method may be deleted in future.
@@ -355,7 +358,7 @@ class TopcoderLongContestProblem(onlinejudge.type.Problem):
             testcases += [TopcoderLongContestProblemIndividualResultsFeedTestCase(test_case_id, score, processing_time, fatal_error_ind)]
         return TopcoderLongContestProblemIndividualResultsFeed(round_id, coder_id, handle, submissions, testcases)
 
-    def download_system_test(self, test_case_id: int, session: Optional[requests.Session] = None) -> str:
+    def download_system_test(self, *, test_case_id: int, session: Optional[requests.Session] = None) -> str:
         """
         :raises NotLoggedInError:
         :note: You need to parse this result manually.

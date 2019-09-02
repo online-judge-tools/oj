@@ -1,6 +1,14 @@
 # Python Version: 3.x
+"""
+the module containing base types
+
+:note: Some methods are not implemented in subclasses.
+    Please check the definitions of subclasses under :py:mod:`onlinejudge.service`.
+"""
+
+import datetime
 from abc import ABC, abstractmethod
-from typing import Callable, List, NamedTuple, NewType, Optional, Tuple
+from typing import Callable, Iterator, List, NamedTuple, NewType, Optional, Tuple
 
 import requests
 
@@ -12,14 +20,20 @@ class LoginError(RuntimeError):
 
 
 class Service(ABC):
-    def login(self, get_credentials: CredentialsProvider, session: Optional[requests.Session] = None) -> None:
+    def login(self, *, get_credentials: CredentialsProvider, session: Optional[requests.Session] = None) -> None:
         """
         :param get_credentials: returns a tuple of (username, password)
         :raises LoginError:
         """
         raise NotImplementedError
 
-    def is_logged_in(self, session: Optional[requests.Session] = None) -> bool:
+    def get_url_of_login_page(self) -> str:
+        """
+        .. versionadded:: 7.0.0
+        """
+        raise NotImplementedError
+
+    def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         raise NotImplementedError
 
     @abstractmethod
@@ -50,14 +64,23 @@ class Service(ABC):
     def from_url(self, s: str) -> Optional['Service']:
         pass
 
+    def iterate_contests(self, *, session: Optional[requests.Session] = None) -> Iterator['Contest']:
+        """
+        .. versionadded:: 7.0.0
+        """
+        raise NotImplementedError
+
 
 TestCase = NamedTuple('TestCase', [
     ('name', str),
     ('input_name', str),
     ('input_data', bytes),
-    ('output_name', Optional[str]),
-    ('output_data', Optional[bytes]),
+    ('output_name', str),
+    ('output_data', bytes),
 ])
+"""
+.. versionchanged:: 7.0.0
+"""
 
 LanguageId = NewType('LanguageId', str)
 """
@@ -78,34 +101,88 @@ class NotLoggedInError(RuntimeError):
     pass
 
 
+class SampleParseError(RuntimeError):
+    """
+    .. versionadded:: 7.0.0
+    """
+    pass
+
+
 class SubmissionError(RuntimeError):
     pass
 
 
-class Problem(ABC):
+class DownloadedData(ABC):
     """
-    :note: :py:class:`Problem` represents just a URL of a problem, without the data of the problem.
+    :note: :py:class:`DownloadedData` and its subclasses represent contents which are obtained by network access. The values may depends your session.
+           :py:class:`DownloadedData` とそのサブクラスは、ネットワークアクセスの結果得られるようなデータを表現します。その値はログイン状況などにより接続のたびに変化することがあります。
+
+    .. versionadded:: 7.0.0
     """
+    @property
     @abstractmethod
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def url(self) -> str:
         raise NotImplementedError
 
-    def download_system_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
-        """
-        :raises NotLoggedInError:
-        """
+    @property
+    def json(self) -> Optional[bytes]:
+        return None
+
+    @property
+    def html(self) -> Optional[bytes]:
+        return None
+
+    @property
+    def timestamp(self) -> Optional[datetime.datetime]:
+        return None
+
+    @property
+    def session(self) -> Optional[requests.Session]:
+        return None
+
+    @property
+    def response(self) -> Optional[requests.Response]:
+        return None
+
+
+class ContestData(DownloadedData):
+    """
+    .. versionadded:: 7.0.0
+    """
+    def url(self) -> str:
+        return self.contest.get_url()
+
+    @property
+    @abstractmethod
+    def contest(self) -> 'Contest':
         raise NotImplementedError
 
-    def submit_code(self, code: bytes, language_id: LanguageId, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> 'Submission':
-        """
-        :param code:
-        :arg language_id: :py:class:`LanguageId`
-        :raises NotLoggedInError:
-        :raises SubmissionError:
-        """
+    @property
+    def service(self) -> Service:
+        return self.contest.get_service()
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
         raise NotImplementedError
 
-    def get_available_languages(self, session: Optional[requests.Session] = None) -> List[Language]:
+
+class Contest(ABC):
+    """
+    :note: :py:class:`Contest` represents just a URL of a contest, without the data of the contest.
+
+    .. versionadded:: 7.0.0
+    """
+    def list_problems(self, *, session: Optional[requests.Session] = None) -> List['Problem']:
+        raise NotImplementedError
+
+    def download_data(self, *, session: Optional[requests.Session] = None) -> ContestData:
+        raise NotImplementedError
+
+    def iterate_submissions(self, *, session: Optional[requests.Session] = None) -> Iterator['Submission']:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -116,9 +193,37 @@ class Problem(ABC):
     def get_service(self) -> Service:
         raise NotImplementedError
 
-    def get_name(self) -> str:
+    @classmethod
+    @abstractmethod
+    def from_url(self, s: str) -> Optional['Contest']:
+        pass
+
+
+class ProblemData(DownloadedData):
+    """
+    .. versionadded:: 7.0.0
+    """
+    def url(self) -> str:
+        return self.problem.get_url()
+
+    @property
+    @abstractmethod
+    def problem(self) -> 'Problem':
+        raise NotImplementedError
+
+    @property
+    def contest(self) -> Contest:
+        return self.problem.get_contest()
+
+    @property
+    def service(self) -> Service:
+        return self.problem.get_service()
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
         """
-        example:
+        for example of :py:class:`Problem`:
 
         -   `器物損壊！高橋君`
         -   `AtCoDeerくんと変なじゃんけん / AtCoDeer and Rock-Paper`
@@ -126,11 +231,58 @@ class Problem(ABC):
         """
         raise NotImplementedError
 
-    def get_input_format(self, session: Optional[requests.Session] = None) -> Optional[str]:
-        """
-        :return: the HTML in the `<pre>` tag as :py:class:`str`
-        """
+    @property
+    def sample_cases(self) -> Optional[List[TestCase]]:
+        raise NotImplementedError
 
+
+class Problem(ABC):
+    """
+    :note: :py:class:`Problem` represents just a URL of a problem, without the data of the problem.
+           :py:class:`Problem` はちょうど問題の URL のみを表現します。キャッシュや内部状態は持ちません。
+    """
+    @abstractmethod
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
+        """
+        :raises SampleParseError:
+
+        .. versionchanged:: 7.0.0
+        """
+        raise NotImplementedError
+
+    def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
+        """
+        :raises NotLoggedInError:
+        """
+        raise NotImplementedError
+
+    def submit_code(self, code: bytes, language_id: LanguageId, *, filename: Optional[str] = None, session: Optional[requests.Session] = None) -> 'Submission':
+        """
+        :param code:
+        :arg language_id: :py:class:`LanguageId`
+        :raises NotLoggedInError:
+        :raises SubmissionError:
+        """
+        raise NotImplementedError
+
+    def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_url(self) -> str:
+        raise NotImplementedError
+
+    def get_contest(self) -> Contest:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_service(self) -> Service:
+        raise NotImplementedError
+
+    def download_data(self, *, session: Optional[requests.Session] = None) -> ProblemData:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
     def __repr__(self) -> str:
@@ -145,9 +297,45 @@ class Problem(ABC):
         pass
 
 
-class Submission(ABC):
+class SubmissionData(DownloadedData):
+    """
+    .. versionadded:: 7.0.0
+    """
+    def url(self) -> str:
+        return self.submission.get_url()
+
+    @property
     @abstractmethod
-    def download_code(self, session: Optional[requests.Session] = None) -> bytes:
+    def submission(self) -> 'Submission':
+        raise NotImplementedError
+
+    @property
+    def problem(self) -> Problem:
+        return self.submission.get_problem()
+
+    @property
+    def contest(self) -> Contest:
+        return self.submission.get_contest()
+
+    @property
+    def service(self) -> Service:
+        return self.submission.get_service()
+
+    @property
+    def source_code(self) -> bytes:
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def status(self) -> str:
+        raise NotImplementedError
+
+
+class Submission(ABC):
+    def download_data(self, *, session: Optional[requests.Session] = None) -> SubmissionData:
+        """
+        .. versionadded:: 7.0.0
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -157,6 +345,9 @@ class Submission(ABC):
     @abstractmethod
     def get_problem(self) -> Problem:
         raise NotImplementedError
+
+    def get_contest(self) -> Contest:
+        return self.get_problem().get_contest()
 
     @abstractmethod
     def get_service(self) -> Service:

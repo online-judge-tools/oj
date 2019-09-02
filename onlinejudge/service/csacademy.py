@@ -34,11 +34,11 @@ class CSAcademyService(onlinejudge.type.Service):
 
 
 class CSAcademyProblem(onlinejudge.type.Problem):
-    def __init__(self, contest_name: str, task_name: str):
+    def __init__(self, *, contest_name: str, task_name: str):
         self.contest_name = contest_name
         self.task_name = task_name
 
-    def download_sample_cases(self, session: Optional[requests.Session] = None) -> List[TestCase]:
+    def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
         base_url = self.get_url()
 
@@ -115,7 +115,7 @@ class CSAcademyProblem(onlinejudge.type.Problem):
                 and result.netloc in ('csacademy.com', 'www.csacademy.com'):
             m = re.match(r'^/contest/([0-9A-Za-z_-]+)/task/([0-9A-Za-z_-]+)(|/statement|/solution|/discussion|/statistics|/submissions)/?$', utils.normpath(result.path))
             if m:
-                return cls(m.group(1), m.group(2))
+                return cls(contest_name=m.group(1), task_name=m.group(2))
         return None
 
 

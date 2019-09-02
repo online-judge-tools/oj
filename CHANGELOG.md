@@ -1,5 +1,14 @@
 # Change Log
 
+## 7.0.0 / 2019-09-01
+
+-   [#508](https://github.com/kmyk/online-judge-tools/pull/508) enable to `login` with GUI browers
+-   [#505](https://github.com/kmyk/online-judge-tools/pull/505) remove `get-standings` subcommand
+-   [#503](https://github.com/kmyk/online-judge-tools/pull/503) add `generate-input` subcommand
+-   [#492](https://github.com/kmyk/online-judge-tools/pull/492) add `CodeforcesContest` class
+-   [#484](https://github.com/kmyk/online-judge-tools/pull/484) make some breaking changes in the interface as a library
+-   [#461](https://github.com/kmyk/online-judge-tools/pull/461) increase a stability of `download` subcommand
+
 ## 6.6.1 / 2019-08-19
 
 -   [#490](https://github.com/kmyk/online-judge-tools/pull/490) enable to install with old setuptools

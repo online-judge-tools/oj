@@ -22,7 +22,7 @@
 from typing import List, Optional, Type
 
 import onlinejudge._implementation.logging as log
-from onlinejudge.type import Problem, Service, Submission
+from onlinejudge.type import Contest, Problem, Service, Submission
 
 submissions = []  # type: List[Type['Submission']]
 
@@ -58,6 +58,19 @@ def problem_from_url(url: str) -> Optional[Problem]:
     if submission is not None:
         return submission.get_problem()
     log.failure('unknown problem: %s', url)
+    return None
+
+
+contests = []  # type: List[Type['Contest']]
+
+
+def contest_from_url(url: str) -> Optional[Contest]:
+    for cls in contests:
+        contest = cls.from_url(url)
+        if contest is not None:
+            log.status('contest recognized: %s: %s', str(contest), url)
+            return contest
+    log.failure('unknown contest: %s', url)
     return None
 
 

@@ -33,9 +33,9 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 -   Download system test cases
     -   yukicoder
     -   Aizu Online Judge
--   Login
+-   Login (with CUI and/or GUI)
     -   AtCoder
-    -   yukicoder (via github.com or [session token](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md))
+    -   yukicoder
     -   Codeforces
     -   HackerRank
     -   Topcoder
@@ -52,6 +52,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   yukicoder
 -   Test your solution
 -   Test your solution for reactive problem
+-   Generate input files from generators
 -   Generate output files from input and reference implementation
 -   Split an input file with many cases to files
 
@@ -185,7 +186,7 @@ AtCoder Beginner Contest 118: B - Foods Loved by Everyone    kotatsugame  (37 by
 -   Can I specify problems by their IDs or names, instead of URLs?
     -   No. I have tried it once, but it is actually not so convenient and only increases the maintenance cost.
 -   I don't want to give my password to this program.
-    -   You can use this giving only your session tokens. Please see [here](https://github.com/kmyk/online-judge-tools/blob/master/LOGIN_WITH_COOKIES.md).
+    -   This program stores only your session tokens. Use `oj login --use-brower=always ...` and read [onlinejudge/_implementation/command/login.py](https://github.com/kmyk/online-judge-tools/blob/master/onlinejudge/_implementation/command/login.py).
 
 For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) or other SNSs.
 
