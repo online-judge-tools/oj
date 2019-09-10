@@ -28,7 +28,7 @@ class AtCoderSerivceTest(unittest.TestCase):
         self.assertEqual(data.start_time.day, 2)
         self.assertEqual(data.name, '東京大学プログラミングコンテスト2013')
         self.assertEqual(data.duration.total_seconds(), 5 * 60 * 60)
-        self.assertEqual(data.rated_range, 'All')
+        self.assertEqual(data.rated_range, '-')
 
 
 class AtCoderContestTest(unittest.TestCase):
