@@ -638,7 +638,11 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
         for pre in soup.find_all('pre'):
             log.debug('pre tag: %s', str(pre))
             if not pre.string:
-                continue
+                if len(pre.contents):
+                    # <pre> element is not a sample but the input format
+                    continue
+                # the sample is an empty string, so set pre.string as '' instead of None
+                pre.string = ''
 
             def h3_plus(tag):
                 prv = tag.find_previous_sibling()
