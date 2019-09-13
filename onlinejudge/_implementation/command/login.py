@@ -55,7 +55,7 @@ def login_with_browser(service: onlinejudge.type.Service, *, session: requests.S
         while driver.current_url:
             cookies = driver.get_cookies()
             time.sleep(0.1)
-    except selenium.common.exceptions.NoSuchWindowException:
+    except selenium.common.exceptions.WebDriverException:
         pass  # the window is closed
 
     # set cookies to the requests.Session
