@@ -12,6 +12,7 @@ Welcome to online-judge-tools's documentation!
 
    modules
 
+   introduction.ja
    run-ci-on-your-library
 
 
