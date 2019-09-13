@@ -1,7 +1,8 @@
-import os
 import unittest
 
 import tests.command_download
+
+from onlinejudge.service.yukicoder import YukicoderService
 
 
 class DownloadYukicoderTest(unittest.TestCase):
@@ -18,7 +19,7 @@ class DownloadYukicoderTest(unittest.TestCase):
             'sample-1.out': '3bb50ff8eeb7ad116724b56a820139fa',
         })
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(YukicoderService()), 'login is required')
     def test_call_download_yukicoder_no_8_system(self):
         self.snippet_call_download('https://yukicoder.me/problems/no/8', {
             '01.txt.in': '04e90eb0c4a65eefa084dfea8e89de9f',

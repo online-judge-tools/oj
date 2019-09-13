@@ -73,3 +73,12 @@ def python_c(cmd):
 def python_script(path):
     assert '"' not in path
     return '{} "{}"'.format(sys.executable, path)
+
+
+def is_logged_in(service, memo={}):
+    # functools.lru_cache is unusable since Service are unhashable
+    url = service.get_url()
+    if url not in memo:
+        proc = run(['login', '--check', url])
+        memo[url] = proc.returncode == 0
+    return memo[url]

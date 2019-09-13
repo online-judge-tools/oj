@@ -1,15 +1,20 @@
-import os
 import unittest
 
 import tests.utils
+
+from onlinejudge.service.atcoder import AtCoderService
+from onlinejudge.service.codeforces import CodeforcesService
+from onlinejudge.service.hackerrank import HackerRankService
+from onlinejudge.service.topcoder import TopcoderService
+from onlinejudge.service.toph import TophService
+from onlinejudge.service.yukicoder import YukicoderService
 
 
 class LoginTest(unittest.TestCase):
     def snippet_call_login_check_failure(self, url):
         with tests.utils.sandbox(files=[]) as tempdir:
-            env = dict(**os.environ)
-            env['HOME'] = tempdir
-            proc = tests.utils.run(['login', '--check', url], env=env)
+            path = 'cookie.jar'  # use dummy cookie to check in an empty state
+            proc = tests.utils.run(['--cookie', path, 'login', '--check', url])
             self.assertEqual(proc.returncode, 1)
 
     def snippet_call_login_check_success(self, url):
@@ -33,26 +38,26 @@ class LoginTest(unittest.TestCase):
     def test_call_login_check_yukicoder_failure(self):
         self.snippet_call_login_check_failure('https://yukicoder.me/')
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
     def test_call_login_check_atcoder_success(self):
         self.snippet_call_login_check_success('https://atcoder.jp/')
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(CodeforcesService()), 'login is required')
     def test_call_login_check_codeforces_success(self):
         self.snippet_call_login_check_success('https://codeforces.com/')
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(HackerRankService()), 'login is required')
     def test_call_login_check_hackerrank_success(self):
         self.snippet_call_login_check_success('https://www.hackerrank.com/')
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(TopcoderService()), 'login is required')
     def test_call_login_check_topcoder_success(self):
         self.snippet_call_login_check_success('https://community.topcoder.com/')
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(TophService()), 'login is required')
     def test_call_login_check_toph_success(self):
         self.snippet_call_login_check_success('https://toph.co/')
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(YukicoderService()), 'login is required')
     def test_call_login_check_yukicoder_success(self):
         self.snippet_call_login_check_success('https://yukicoder.me/')
