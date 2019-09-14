@@ -1,4 +1,3 @@
-import os
 import time
 import unittest
 
@@ -7,10 +6,15 @@ import tests.utils
 
 from onlinejudge._implementation.command.submit import submit
 from onlinejudge._implementation.main import get_parser
+from onlinejudge.service.atcoder import AtCoderService
+from onlinejudge.service.codeforces import CodeforcesService
+from onlinejudge.service.hackerrank import HackerRankService
+from onlinejudge.service.toph import TophService
+from onlinejudge.service.yukicoder import YukicoderService
 
 
 class SubmitArgumentsTest(unittest.TestCase):
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
     def test_call_submit_atcoder_practice_1_with_history(self):
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
@@ -24,7 +28,7 @@ class SubmitArgumentsTest(unittest.TestCase):
             tests.utils.run(['dl', url], check=True)
             tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
 
-    @unittest.skipIf('CI' in os.environ or os.name == 'nt', 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
     def test_call_submit_atcoder_practice_1_with_open(self):
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
@@ -40,7 +44,7 @@ class SubmitArgumentsTest(unittest.TestCase):
                 url = fh.read().strip()
             self.assertTrue(url.startswith('https://atcoder.jp/contests/practice/submissions/'))
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
     def test_call_submit_atcoder_invalid_url(self):
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_111'
@@ -70,7 +74,7 @@ class SubmitArgumentsTest(unittest.TestCase):
 
 
 class SubmitAtCoderTest(unittest.TestCase):
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
     def test_call_submit_practice_1(self):
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
@@ -95,7 +99,7 @@ int main() {
         with tests.utils.sandbox(files):
             tests.utils.run(['submit', '-y', '--no-open', url, 'main.cpp'], check=True)
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
     def test_call_submit_practice_2(self):
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_2'
@@ -132,7 +136,7 @@ print('!', ''.join(quick_sort(string.ascii_uppercase[: n])))
 
 
 class SubmitCodeforcesTest(unittest.TestCase):
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(CodeforcesService()), 'login is required')
     def test_call_submit_beta_1_a(self):
 
         url = 'https://codeforces.com/contest/1/problem/A'
@@ -151,7 +155,7 @@ class SubmitCodeforcesTest(unittest.TestCase):
         with tests.utils.sandbox(files):
             tests.utils.run(['s', '-y', '--no-open', url, 'a.py'], check=True)
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(CodeforcesService()), 'login is required')
     def test_call_submit_beta_3_b(self):
 
         url = 'https://codeforces.com/contest/3/problem/B'
@@ -226,7 +230,7 @@ int main() {
 
 
 class SubmitYukicoderTest(unittest.TestCase):
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(YukicoderService()), 'login is required')
     def test_call_submit_9000(self):
 
         url = 'https://yukicoder.me/problems/no/9000'
@@ -243,7 +247,7 @@ class SubmitYukicoderTest(unittest.TestCase):
         with tests.utils.sandbox(files):
             tests.utils.run(['s', '-y', '--no-open', url, 'a.py'], check=True)
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(YukicoderService()), 'login is required')
     def test_call_submit_beta_3_b(self):
 
         url = 'https://yukicoder.me/problems/527'
@@ -267,7 +271,7 @@ int main() {
 
 
 class SubmitHackerRankTest(unittest.TestCase):
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(HackerRankService()), 'login is required')
     def test_call_submit_worldcodesprint_mars_exploration(self):
         url = 'https://www.hackerrank.com/contests/worldcodesprint/challenges/mars-exploration'
         code = '''#!/usr/bin/env python3
@@ -293,7 +297,7 @@ print(ans)
 
 
 class SubmitTophTest(unittest.TestCase):
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(TophService()), 'login is required')
     def test_call_submit_copycat(self):
         url = 'https://toph.co/p/copycat'
         code = '''#!/usr/bin/env python3
@@ -309,7 +313,7 @@ print(s)
         with tests.utils.sandbox(files):
             tests.utils.run(['s', '-l', '58482c1804469e2585024324', '-y', '--no-open', url, 'a.py'], check=True)
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(TophService()), 'login is required')
     def test_call_submit_divisors(self):
         url = 'https://toph.co/p/divisors'
         code = '''#include<bits/stdc++.h>

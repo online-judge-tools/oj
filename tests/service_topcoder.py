@@ -1,5 +1,6 @@
-import os
 import unittest
+
+import tests.utils
 
 import onlinejudge._implementation.utils as utils
 from onlinejudge.service.topcoder import TopcoderLongContestProblem, TopcoderService
@@ -51,7 +52,7 @@ class TopcoderLongConrestProblemTest(unittest.TestCase):
         self.assertEqual(len(feed.submissions), 5)
         self.assertEqual(len(feed.testcases), 2000)
 
-    @unittest.skipIf('CI' in os.environ, 'login is required')
+    @unittest.skipIf(not tests.utils.is_logged_in(TopcoderService()), 'login is required')
     def test_download_system_test(self):
         with utils.with_cookiejar(utils.get_default_session()):
             url = 'https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17143&pm=14889'
