@@ -107,14 +107,19 @@ You can run them with the following commands:
 ``` sh
 $ mypy oj onlinejudge
 $ pylint --disable=all --enable=unused-import onlinejudge
-$ python3 setup.py test
+$ pytest tests/*.py -v  # if you use linux
+```
+
+If you use Windows PowerShell:
+```
+$ pytest -v $(dir tests/*.py | % {$_.FullName})
 ```
 
 テストは開発の際には機能ごとに単体で実行すると楽です。
 例えば `download` コマンドの AtCoder に関してのテストの実行は次でできます。
 
 ```
-$ python3 setup.py test -s tests.command_download_atcoder.DownloadAtCoderTest
+$ pytest tests/command_download_atcoder.py -v
 ```
 
 ## CI

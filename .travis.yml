@@ -12,7 +12,7 @@ script:
     - yapf --diff --recursive onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
     - mypy onlinejudge setup.py tests
     - make -C docs html
-    - python setup.py test
+    - pytest tests/*.py -v
 deploy:
     provider: pypi
     user: kimiyuki
