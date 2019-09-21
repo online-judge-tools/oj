@@ -114,7 +114,6 @@ supported services:
     subparser.add_argument('-G', '--golf', action='store_true', help='now equivalent to --format-dos2unix --format-rstrip')
     subparser.add_argument('--no-open', action='store_false', dest='open')
     subparser.add_argument('--open', action='store_true', default=True, help='open the result page after submission (default)')
-    subparser.add_argument('--open-browser')
     subparser.add_argument('-w', '--wait', metavar='SECOND', type=float, default=3, help='sleep before submitting')
     subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
     subparser.add_argument('--full-submission', action='store_true', help='for Topcoder Marathon Match. use this to do "Submit", the default behavier is "Test Examples".')

@@ -1,12 +1,9 @@
 # Python Version: 3.x
-import os
 import pathlib
 import re
-import shlex
-import shutil
-import subprocess
 import sys
 import time
+import webbrowser
 from typing import *
 
 import onlinejudge
@@ -17,8 +14,6 @@ from onlinejudge.type import *
 
 if TYPE_CHECKING:
     import argparse
-
-default_url_opener = ['sensible-browser', 'xdg-open', 'open']
 
 
 def submit(args: 'argparse.Namespace') -> None:
@@ -146,22 +141,11 @@ def submit(args: 'argparse.Namespace') -> None:
 
         # show result
         if args.open:
-            if args.open_browser:
-                browser = args.open_browser
-            else:
-                for browser in default_url_opener:
-                    if shutil.which(browser):
-                        break
-                else:
-                    browser = None
-                    log.failure('couldn\'t find browsers to open the url. please specify a browser')
-            if browser:
-                log.status('open the submission page with: %s', browser)
-                if os.name == 'nt':
-                    command = [browser, submission.get_url()]
-                else:
-                    command = shlex.split(browser) + [submission.get_url()]
-                subprocess.check_call(command, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+            browser = webbrowser.get()
+            log.status('open the submission page with: %s', browser.name)
+            opened = browser.open_new_tab(submission.get_url())
+            if not opened:
+                log.failure('failed to open the url. please set the $BROWSER envvar')
 
 
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
