@@ -42,4 +42,6 @@ class DownloadYukicoderTest(unittest.TestCase):
             '09.txt.out': 'a3d50a58dc67267b5e4619ecf73b2dcc',
             '10.txt.in': '735f5246a7bde15f85ae368917eee087',
             '10.txt.out': 'a3d50a58dc67267b5e4619ecf73b2dcc',
+            '99_system_test1.txt.in': '1e5aa1c7ed5de43807f7ceae3ab60b82',
+            '99_system_test1.txt.out': '03a0df412a4b34652f3ef094e6dd4eda',
         }, is_system=True)

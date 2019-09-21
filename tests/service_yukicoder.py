@@ -117,7 +117,7 @@ class YukicoderOfficialAPITest(unittest.TestCase):
         self.assertEqual(len(it), 1)
         it = it[0]
         self.assertEqual(it['問題名'], 'あばばばば')
-        self.assertEqual(it['レベル'], '1.5')
+        self.assertEqual(it['レベル'], '1')
 
     def test_get_user_favorite_wiki_10(self):
         data = YukicoderService().get_user_favorite_wiki(id=10)
