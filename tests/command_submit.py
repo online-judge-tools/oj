@@ -1,3 +1,4 @@
+import os
 import time
 import unittest
 
@@ -15,19 +16,20 @@ from onlinejudge.service.yukicoder import YukicoderService
 
 class SubmitArgumentsTest(unittest.TestCase):
     @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
-    def test_call_submit_atcoder_practice_1_with_history(self):
+    def test_call_submit_atcoder_practice_2_with_history(self):
 
-        url = 'https://atcoder.jp/contests/practice/tasks/practice_1'
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_2'
         files = [
             {
-                'path': 'a.pl',
-                'data': 'print<>+(<>=~$",$`+$\'),$",<>'
+                'path': 'a.cpp',
+                'data': 'compile error'
             },
         ]
         with tests.utils.sandbox(files):
             tests.utils.run(['dl', url], check=True)
-            tests.utils.run(['s', '-y', '--no-open', 'a.pl'], check=True)
+            tests.utils.run(['s', '-y', '--no-open', 'a.cpp'], check=True)
 
+    @unittest.skipIf(os.name == 'nt', "shell script doesn't work on Windows")
     @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
     def test_call_submit_atcoder_practice_1_with_open(self):
 
@@ -37,9 +39,17 @@ class SubmitArgumentsTest(unittest.TestCase):
                 'path': 'a.pl',
                 'data': 'print<>+(<>=~$",$`+$\'),$",<>'
             },
+            {
+                'path': 'browse.sh',
+                'data': '#!/bin/sh\necho "$@" > url.txt\n',
+                'executable': True,
+            },
         ]
-        with tests.utils.sandbox(files):
-            tests.utils.run(['s', '-y', '--open', '--open-browser', """sh -c 'echo "$@" > url.txt' sh""", url, 'a.pl'], check=True)
+        with tests.utils.sandbox(files) as tempdir:
+            env = dict(os.environ)
+            env['BROWSER'] = os.path.join(tempdir, 'browse.sh')
+
+            tests.utils.run(['s', '-y', '--open', url, 'a.pl'], env=env, check=True)
             with open('url.txt') as fh:
                 url = fh.read().strip()
             self.assertTrue(url.startswith('https://atcoder.jp/contests/practice/submissions/'))
