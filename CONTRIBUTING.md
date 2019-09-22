@@ -117,8 +117,6 @@ $ python3 setup.py test
 $ python3 setup.py test -s tests.command_download_atcoder.DownloadAtCoderTest
 ```
 
-なお `python3 setup.py test` は formatter が利用されているかの確認もするように設定されています。
-
 ## CI
 
 Travis CI will run automatically when you commit or send PR on `master` or `develop` branch.
