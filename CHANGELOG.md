@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.1.0 / 2019-09-22
+
+-   [#521](https://github.com/kmyk/online-judge-tools/pull/521) fix a problem of `submit` about web browsers on Windows
+-   [#517](https://github.com/kmyk/online-judge-tools/pull/517) fix a problem of `login` about WebDriver on Windows
+-   [#511](https://github.com/kmyk/online-judge-tools/pull/511) add [introduction.ja.html](https://online-judge-tools.readthedocs.io/en/master/introduction.ja.html) document
+
 ## 7.0.0 / 2019-09-01
 
 -   [#508](https://github.com/kmyk/online-judge-tools/pull/508) enable to `login` with GUI browers
