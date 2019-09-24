@@ -85,7 +85,11 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
 
             # generate test cases
             log.status('$ ./generate.py problems.toml -p %s', self.problem_id)
-            subprocess.check_call([sys.executable, 'generate.py', 'problems.toml', '-p', self.problem_id], stdout=sys.stdout, stderr=sys.stderr)
+            try:
+                subprocess.check_call([sys.executable, 'generate.py', 'problems.toml', '-p', self.problem_id], stdout=sys.stdout, stderr=sys.stderr)
+            except subprocess.CalledProcessError:
+                log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
+                raise
 
     def _get_problem_directory_path(self):
         path = self._get_cloned_repository_path()
