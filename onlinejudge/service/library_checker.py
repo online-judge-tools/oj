@@ -62,6 +62,12 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
     def _generate_test_cases_in_cloned_repository(self):
         path = self._get_cloned_repository_path()
 
+        try:
+            subprocess.check_call(['git', '--version'], stdout=sys.stdout, stderr=sys.stderr)
+        except FileNotFoundError:
+            log.error('git command not found')
+            raise
+
         # init the problem repository
         if not path.exists():
             url = 'https://github.com/yosupo06/library-checker-problems'
