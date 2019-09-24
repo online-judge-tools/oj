@@ -72,7 +72,7 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         if not path.exists():
             url = 'https://github.com/yosupo06/library-checker-problems'
             log.status('$ git clone %s %s', url, path)
-            subprocess.check_call(['git', 'clone', url, path], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stdout, stderr=sys.stderr)
 
         log.status('$ cd %s', path)
         with utils.chdir(path):
