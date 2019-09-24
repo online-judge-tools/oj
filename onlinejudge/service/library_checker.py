@@ -60,6 +60,9 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         return utils.cache_dir / 'library-checker-problems'
 
     def _generate_test_cases_in_cloned_repository(self):
+        if sys.version_info < (3, 6):
+            raise RuntimeError("generate.py doesn't work on Python 3.5 or older")
+
         path = self._get_cloned_repository_path()
 
         try:
