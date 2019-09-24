@@ -28,6 +28,7 @@ setup(
         'colorama >= 0.3',
         'lxml >= 4',
         'requests >= 2',
+        'toml >= 0.10',
     ],
     packages=find_packages(exclude=('tests', 'docs')),
     entry_points={
