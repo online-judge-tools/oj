@@ -3,6 +3,7 @@
 the module for yosupo's Library Checker (https://judge.yosupo.jp)
 """
 
+import os
 import re
 import subprocess
 import sys
@@ -60,9 +61,6 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         return utils.cache_dir / 'library-checker-problems'
 
     def _generate_test_cases_in_cloned_repository(self):
-        if sys.version_info < (3, 6):
-            raise RuntimeError("generate.py doesn't work on Python 3.5 or older")
-
         path = self._get_cloned_repository_path()
 
         try:
@@ -84,6 +82,10 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
             subprocess.check_call(['git', 'pull'], stdout=sys.stdout, stderr=sys.stderr)
 
             # generate test cases
+            if sys.version_info < (3, 6):
+                log.warning("generate.py may not work on Python 3.5 or older")
+            if os.name == 'nt':
+                log.warning("generate.py may not work on Windows")
             log.status('$ ./generate.py problems.toml -p %s', self.problem_id)
             try:
                 subprocess.check_call([sys.executable, 'generate.py', 'problems.toml', '-p', self.problem_id], stdout=sys.stdout, stderr=sys.stderr)

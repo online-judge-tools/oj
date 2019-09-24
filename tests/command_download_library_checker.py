@@ -1,10 +1,11 @@
+import os
 import sys
 import unittest
 
 import tests.command_download
 
 
-@unittest.skipIf(sys.version_info < (3, 6), "the generate.py requires versions >= 3.6")
+@unittest.skipIf(sys.version_info < (3, 6) or os.name == 'nt', "the generate.py requires versions >= 3.6 and Unix environment")
 class DownloadLibraryCheckerTest(unittest.TestCase):
     def snippet_call_download(self, *args, **kwargs):
         tests.command_download.snippet_call_download(self, *args, **kwargs)
