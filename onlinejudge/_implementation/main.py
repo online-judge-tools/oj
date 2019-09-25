@@ -50,10 +50,12 @@ supported services:
   Kattis
   Toph (Problem Archive)
   Facebook Hacker Cup
+  Library Checker (https://judge.yosupo.jp/)
 
 supported services with --system:
   Aizu Online Judge
   yukicoder
+  Library Checker (https://judge.yosupo.jp/)
 
 format string for --format:
   %i                    index: 1, 2, 3, ...

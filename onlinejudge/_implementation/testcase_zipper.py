@@ -37,7 +37,7 @@ class SampleZipper(object):
         return self._testcases
 
 
-def extract_from_zip(zip_data: bytes, format: str, out: str = 'out') -> List[TestCase]:
+def extract_from_files(files: Iterator[Tuple[str, bytes]], format: str = '%s.%e', out: str = 'out') -> List[TestCase]:
     """
     :param out: is the extension for output files. This is used when the zip-file contains files like `sample-1.ans` instead of `sample-1.out`.
     """
@@ -47,14 +47,11 @@ def extract_from_zip(zip_data: bytes, format: str, out: str = 'out') -> List[Tes
         'e': r'(in|{})'.format(out),
     }
     names = collections.defaultdict(dict)  # type: Dict[str, Dict[str, Tuple[str, bytes]]]
-    with zipfile.ZipFile(io.BytesIO(zip_data)) as fh:
-        for filename in fh.namelist():
-            if filename.endswith('/'):  # TODO: use `fh.getinfo(filename).is_dir()` after we stop supporting Python 3.5
-                continue
-            m = onlinejudge._implementation.format_utils.percentparse(filename, format, table)
-            assert m
-            assert m['e'] not in names[m['s']]
-            names[m['s']][m['e']] = (filename, fh.read(filename))
+    for filename, content in files:
+        m = onlinejudge._implementation.format_utils.percentparse(filename, format, table)
+        assert m
+        assert m['e'] not in names[m['s']]
+        names[m['s']][m['e']] = (filename, content)
     testcases = []  # type: List[TestCase]
     for name in sorted(names.keys()):
         data = names[name]
@@ -64,3 +61,14 @@ def extract_from_zip(zip_data: bytes, format: str, out: str = 'out') -> List[Tes
         else:
             testcases += [TestCase(name, *data['in'], *data[out])]
     return testcases
+
+
+def extract_from_zip(zip_data: bytes, format: str, out: str = 'out') -> List[TestCase]:
+    def iterate():
+        with zipfile.ZipFile(io.BytesIO(zip_data)) as fh:
+            for filename in fh.namelist():
+                if filename.endswith('/'):  # TODO: use `fh.getinfo(filename).is_dir()` after we stop supporting Python 3.5
+                    continue
+                yield filename, fh.read(filename)
+
+    return extract_from_files(iterate(), format=format, out=out)
