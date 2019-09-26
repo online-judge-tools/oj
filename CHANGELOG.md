@@ -2,7 +2,7 @@
 
 ## 7.2.0 / 2019-09-26
 
--   [#527](https://github.com/kmyk/online-judge-tools/pull/527) suppoert `download` from [Library Checker](https://judge.yosupo.jp/)
+-   [#527](https://github.com/kmyk/online-judge-tools/pull/527) support `download` from [Library Checker](https://judge.yosupo.jp/)
 
 ## 7.1.0 / 2019-09-22
 
