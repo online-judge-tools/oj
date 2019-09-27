@@ -124,7 +124,7 @@ $ pytest tests/command_download_atcoder.py -v
 
 ## CI
 
-Travis CI and Appveyor will run automatically when you commit or send PR on `master` or `develop` branch.
+Travis CI and AppVeyor will run automatically when you commit or send PR on `master` or `develop` branch.
 The same test as that by `python3 setup.py test` is executed.
 
 `master` `develop` に関する commit や pull request について CI が走ります。
