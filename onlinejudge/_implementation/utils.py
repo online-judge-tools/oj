@@ -159,11 +159,11 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         except PermissionError:
             log.error('Permission denied: %s', command)
             sys.exit(1)
+        answer = None  # type: Optional[bytes]
         try:
             answer, _ = proc.communicate(input=input, timeout=timeout)
         except subprocess.TimeoutExpired:
             proc.terminate()
-            answer = None
 
         end = time.perf_counter()
         memory = None  # type: Optional[float]
