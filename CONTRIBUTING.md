@@ -130,6 +130,15 @@ The same test as that by `python3 setup.py test` is executed.
 `master` `develop` に関する commit や pull request について CI が走ります。
 `python3 setup.py test` の実行によるものと同等のテストが行われます。
 
+## Measurement Test Coverage
+
+Coveralls will be run when CI on your PR passed.
+For reliability, higher test coverage is desirable. 
+Therefore, if you add new feature and unittest is not covered your feature, reviewer may ask you to add unittests to increase test coverage.
+
+We also welcome PR to add unittests for uncovered areas.
+However, there are some areas that are not covered due to the difficulty of testing on CI, such as features that require login.
+
 ## deployment
 
 Travis CI から PyPI 上へ upload を仕掛けるように設定されています。
