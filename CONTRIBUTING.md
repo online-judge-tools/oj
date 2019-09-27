@@ -89,7 +89,7 @@ $ pip install -e .[dev,docs]
 
 ## formatter
 
-We use `isort` adn `yapf`.
+We use `isort` and `yapf`.
 You can run them with the following commands:
 
 ``` sh
