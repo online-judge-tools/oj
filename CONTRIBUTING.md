@@ -132,9 +132,9 @@ The same test as that by `python3 setup.py test` is executed.
 
 ## Measurement Test Coverage
 
-Coveralls will be run when CI on your PR passed.
+Coveralls will run when CI passed on your PR.
 For reliability, higher test coverage is desirable. 
-Therefore, if you add new feature and unittest is not covered your feature, reviewer may ask you to add unittests to increase test coverage.
+Therefore, when you add a new feature and but unittests are not covered your feature, reviewers may ask you to add unittests to increase test coverage.
 
 We also welcome PR to add unittests for uncovered areas.
 However, there are some areas that are not covered due to the difficulty of testing on CI, such as features that require login.
