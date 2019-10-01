@@ -89,7 +89,7 @@ $ pip install -e .[dev,docs]
 
 ## formatter
 
-We use `isort` adn `yapf`.
+We use `isort` and `yapf`.
 You can run them with the following commands:
 
 ``` sh
@@ -124,11 +124,20 @@ $ pytest tests/command_download_atcoder.py -v
 
 ## CI
 
-Travis CI will run automatically when you commit or send PR on `master` or `develop` branch.
+Travis CI and AppVeyor will run automatically when you commit or send PR on `master` or `develop` branch.
 The same test as that by `python3 setup.py test` is executed.
 
 `master` `develop` に関する commit や pull request について CI が走ります。
 `python3 setup.py test` の実行によるものと同等のテストが行われます。
+
+## Measurement Test Coverage
+
+Coveralls will run when CI passed on your PR.
+For reliability, higher test coverage is desirable. 
+Therefore, when you add a new feature and but unittests are not covered your feature, reviewers may ask you to add unittests to increase test coverage.
+
+We also welcome PR to add unittests for uncovered areas.
+However, there are some areas that are not covered due to the difficulty of testing on CI, such as features that require login.
 
 ## deployment
 
