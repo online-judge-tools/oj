@@ -46,6 +46,14 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-2.out',
                     'data': 'foo\n'
                 },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foobar \n'
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foobar\n'
+                },
             ],
             expected=[{
                 'status': 'AC',
@@ -64,6 +72,40 @@ class TestTest(unittest.TestCase):
                     'output': '%s/test/sample-2.out',
                 },
                 'output': 'bar\n',
+                'exitcode': 0,
+            }, {
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foobar \n',
+                'exitcode': 0,
+            }],
+        )
+
+    def test_call_test_norstrip(self):
+        self.snippet_call_test(
+            args=['-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo \n'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo \n',
                 'exitcode': 0,
             }],
         )
