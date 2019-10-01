@@ -68,6 +68,48 @@ class TestTest(unittest.TestCase):
             }],
         )
 
+    def test_call_test_float(self):
+        self.snippet_call_test(
+            args=['-c', cat(), '-e', '0.1'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '1.0\n'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': '1.0001\n'
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': '1.0\n'
+                },
+                {
+                    'path': 'test/sample-2.out',
+                    'data': '1.2\n'
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': '1.0\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                    'output': '%s/test/sample-2.out',
+                },
+                'output': '1.0\n',
+                'exitcode': 0,
+            }],
+        )
+
     def test_call_test_select(self):
         self.snippet_call_test(
             args=['-c', cat(), 'test/sample-2.in', 'test/sample-3.in', 'test/sample-3.out'],
