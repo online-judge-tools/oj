@@ -4,7 +4,7 @@ import sys
 import unittest
 
 import tests.utils
-from tests.utils import cat
+from tests.utils import cat, sleep_1sec
 
 
 class TestTest(unittest.TestCase):
@@ -516,6 +516,34 @@ class TestTest(unittest.TestCase):
             expected=expected,
             verbose=False,
         )
+
+    def test_call_test_tle(self):
+        data = self.snippet_call_test(
+            args=['-c', sleep_1sec(), '-t', '0.1'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=None,
+        )
+        for case in data:
+            self.assertEqual(case['status'], 'TLE')
+
+    def test_call_test_not_tle(self):
+        data = self.snippet_call_test(
+            args=['-c', sleep_1sec(), '-t', '2.0'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=None,
+        )
+        for case in data:
+            self.assertEqual(case['status'], 'AC')
 
     @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
     def test_call_test_large_memory(self):
