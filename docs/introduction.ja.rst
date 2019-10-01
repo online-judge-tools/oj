@@ -365,7 +365,7 @@ online-judge-tools には、これを助ける機能もあります。
 --------------------------
 
 オンラインジャッジのサーバーと通信を行なうような機能については利用できるサービスが制限されることがあります。
-``v7.0.0`` (2019-09-01) 時点での対応サービスは以下のようになります。
+``v7.2.0`` (2019-09-27) 時点での対応サービスは以下のようになります。
 
 サンプルのダウンロード (``oj d``):
 
@@ -381,6 +381,7 @@ online-judge-tools には、これを助ける機能もあります。
 -  `PKU JudgeOnline <http://poj.org/>`_
 -  `Toph (Problem Archive) <https://toph.co/>`_
 -  `yukicoder <https://yukicoder.me/>`_
+-  `Library Checker <https://judge.yosupo.jp>`_
 
 ログイン (``oj login``):
 
