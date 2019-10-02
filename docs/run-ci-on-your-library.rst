@@ -27,7 +27,7 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
 
    #!/bin/bash
    set -e
-   which oj > /dev/null
+   oj --version
 
    CXX=${CXX:-g++}
    CXXFLAGS="${CXXFLAGS:--std=c++14 -O2 -Wall -g}"
