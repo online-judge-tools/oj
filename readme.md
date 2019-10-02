@@ -195,9 +195,8 @@ For other questions, use [Gitter](https://gitter.im/online-judge-tools/community
 
 conflicted:
 
--   [dj3500/hightail](https://github.com/dj3500/hightail) (GUI-based; I have never used)
--   [nodchip/OnlineJudgeHelper](https://github.com/nodchip/OnlineJudgeHelper) (buggy, not recommended)
--   [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools) (well-tested, but restricted to AtCoder)
+-   [nodchip/OnlineJudgeHelper](https://github.com/nodchip/OnlineJudgeHelper)
+-   [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools)
 
 not conflicted:
 
