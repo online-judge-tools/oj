@@ -64,6 +64,7 @@ def cat():
     else:
         return 'cat'
 
+
 def sleep_1sec():
     if os.name == 'nt':
         return '{} -c "import time; time.sleep(1)"'.format(sys.executable)
