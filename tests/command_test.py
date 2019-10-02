@@ -4,7 +4,7 @@ import sys
 import unittest
 
 import tests.utils
-from tests.utils import cat
+from tests.utils import cat, sleep_1sec
 
 
 class TestTest(unittest.TestCase):
@@ -46,6 +46,14 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-2.out',
                     'data': 'foo\n'
                 },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foobar \n'
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foobar\n'
+                },
             ],
             expected=[{
                 'status': 'AC',
@@ -64,6 +72,40 @@ class TestTest(unittest.TestCase):
                     'output': '%s/test/sample-2.out',
                 },
                 'output': 'bar\n',
+                'exitcode': 0,
+            }, {
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foobar \n',
+                'exitcode': 0,
+            }],
+        )
+
+    def test_call_test_norstrip(self):
+        self.snippet_call_test(
+            args=['-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo \n'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo \n',
                 'exitcode': 0,
             }],
         )
@@ -474,6 +516,34 @@ class TestTest(unittest.TestCase):
             expected=expected,
             verbose=False,
         )
+
+    def test_call_test_tle(self):
+        data = self.snippet_call_test(
+            args=['-c', sleep_1sec(), '-t', '0.1'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=None,
+        )
+        for case in data:
+            self.assertEqual(case['status'], 'TLE')
+
+    def test_call_test_not_tle(self):
+        data = self.snippet_call_test(
+            args=['-c', sleep_1sec(), '-t', '2.0'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=None,
+        )
+        for case in data:
+            self.assertEqual(case['status'], 'AC')
 
     @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
     def test_call_test_large_memory(self):
