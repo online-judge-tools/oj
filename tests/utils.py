@@ -60,7 +60,7 @@ def run_in_sandbox(args, files):
 
 def cat():
     if os.name == 'nt':
-        return '{} -c "import sys; sys.stdout.write(sys.stdin.read())"'.format(sys.executable)
+        return '{} -c "import sys; sys.stdout.buffer.write(sys.stdin.buffer.read())"'.format(sys.executable)
     else:
         return 'cat'
 

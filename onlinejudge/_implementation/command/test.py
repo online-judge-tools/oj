@@ -89,8 +89,8 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
 
     # check WA or not
     if test_output_path is not None:
-        with test_output_path.open() as outf:
-            expected = outf.read()
+        with test_output_path.open('rb') as outf:
+            expected = outf.read().decode()
         # compare
         if mode == 'all':
             if not match(answer, expected):

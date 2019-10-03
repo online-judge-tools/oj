@@ -158,19 +158,19 @@ class TestTest(unittest.TestCase):
             files=[
                 {
                     'path': 'test/sample-1.in',
-                    'data': 'foo\nfoobar\n'
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
                 },
                 {
                     'path': 'test/sample-1.out',
-                    'data': 'foo\nfoobar\n'
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
                 },
                 {
                     'path': 'test/sample-2.in',
-                    'data': 'bar\nfoobar\n'
+                    'data': 'bar\nfoobar\n'.replace('\n', os.linesep)
                 },
                 {
                     'path': 'test/sample-2.out',
-                    'data': 'bar\nbarbar\n'
+                    'data': 'bar\nbarbar\n'.replace('\n', os.linesep)
                 },
             ],
             expected=[{
@@ -180,7 +180,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-1.in',
                     'output': '%s/test/sample-1.out',
                 },
-                'output': 'foo\nfoobar\n',
+                'output': 'foo\nfoobar\n'.replace('\n', os.linesep),
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -189,7 +189,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-2.in',
                     'output': '%s/test/sample-2.out',
                 },
-                'output': 'bar\nfoobar\n',
+                'output': 'bar\nfoobar\n'.replace('\n', os.linesep),
                 'exitcode': 0,
             }],
         )
