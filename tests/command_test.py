@@ -152,6 +152,90 @@ class TestTest(unittest.TestCase):
             }],
         )
 
+    def test_call_test_multiline_all(self):
+        self.snippet_call_test(
+            args=['-c', cat(), '-m', 'all'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'bar\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-2.out',
+                    'data': 'bar\nbarbar\n'.replace('\n', os.linesep)
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\nfoobar\n'.replace('\n', os.linesep),
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                    'output': '%s/test/sample-2.out',
+                },
+                'output': 'bar\nfoobar\n'.replace('\n', os.linesep),
+                'exitcode': 0,
+            }],
+        )
+
+    def test_call_test_multiline_line(self):
+        self.snippet_call_test(
+            args=['-c', cat(), '-m', 'line'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\nfoobar\n'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\nfoobar\n'
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'bar\nfoobar\n'
+                },
+                {
+                    'path': 'test/sample-2.out',
+                    'data': 'bar\nbarbar\n'
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\nfoobar\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                    'output': '%s/test/sample-2.out',
+                },
+                'output': 'bar\nfoobar\n',
+                'exitcode': 0,
+            }],
+        )
+
     def test_call_test_select(self):
         self.snippet_call_test(
             args=['-c', cat(), 'test/sample-2.in', 'test/sample-3.in', 'test/sample-3.out'],
