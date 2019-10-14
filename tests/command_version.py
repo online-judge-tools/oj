@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import tests.utils
@@ -6,9 +7,9 @@ import onlinejudge
 
 
 class PrintVersionTest(unittest.TestCase):
-    def version_test(self):
-        result = tests.utils.run_in_sandbox(args=['--version'])
-        self.assertTrue(result['proc'].stdout == 'online-judge-tools {}'.format(onlinejudge.__version__))
+    def test_version(self):
+        result = tests.utils.run_in_sandbox(args=['--version'], files=[])
+        self.assertEqual(result['proc'].stdout, 'online-judge-tools {}\n'.format(onlinejudge.__version__).replace('\n', os.linesep).encode())
 
-        result = tests.utils.run_in_sandbox(args=['-version, test'])
-        self.assertTrue(result['proc'].stdout == 'online-judge-tools {}'.format(onlinejudge.__version__))
+        result = tests.utils.run_in_sandbox(args=['--version', 'test'], files=[])
+        self.assertEqual(result['proc'].stdout, 'online-judge-tools {}\n'.format(onlinejudge.__version__).replace('\n', os.linesep).encode())
