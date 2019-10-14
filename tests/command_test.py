@@ -130,6 +130,30 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-2.out',
                     'data': '1.2\n'
                 },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-4.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-4.out',
+                    'data': 'bar\n'
+                },
+                {
+                    'path': 'test/sample-5.in',
+                    'data': '1.0\n2.0\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-5.out',
+                    'data': '1.0\n'.replace('\n', os.linesep)
+                },
             ],
             expected=[{
                 'status': 'AC',
@@ -148,6 +172,33 @@ class TestTest(unittest.TestCase):
                     'output': '%s/test/sample-2.out',
                 },
                 'output': '1.0\n',
+                'exitcode': 0,
+            }, {
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-4',
+                    'input': '%s/test/sample-4.in',
+                    'output': '%s/test/sample-4.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-5',
+                    'input': '%s/test/sample-5.in',
+                    'output': '%s/test/sample-5.out',
+                },
+                'output': '1.0\n2.0\n'.replace('\n', os.linesep),
                 'exitcode': 0,
             }],
         )
@@ -214,6 +265,22 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-2.out',
                     'data': 'bar\nbarbar\n'
                 },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'bar\nfoobar\n'
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'bar\nfoobar\nbar\n'
+                },
+                {
+                    'path': 'test/sample-4.in',
+                    'data': 'bar\nfoobar\nbar\n'
+                },
+                {
+                    'path': 'test/sample-4.out',
+                    'data': 'bar\nfoobar\n'
+                },
             ],
             expected=[{
                 'status': 'AC',
@@ -232,6 +299,24 @@ class TestTest(unittest.TestCase):
                     'output': '%s/test/sample-2.out',
                 },
                 'output': 'bar\nfoobar\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'bar\nfoobar\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-4',
+                    'input': '%s/test/sample-4.in',
+                    'output': '%s/test/sample-4.out',
+                },
+                'output': 'bar\nfoobar\nbar\n',
                 'exitcode': 0,
             }],
         )
