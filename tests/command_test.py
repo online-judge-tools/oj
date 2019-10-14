@@ -146,6 +146,14 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-4.out',
                     'data': 'bar\n'
                 },
+                {
+                    'path': 'test/sample-5.in',
+                    'data': '1.0\n2.0\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-5.out',
+                    'data': '1.0\n'.replace('\n', os.linesep)
+                },
             ],
             expected=[{
                 'status': 'AC',
@@ -182,6 +190,15 @@ class TestTest(unittest.TestCase):
                     'output': '%s/test/sample-4.out',
                 },
                 'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-5',
+                    'input': '%s/test/sample-5.in',
+                    'output': '%s/test/sample-5.out',
+                },
+                'output': '1.0\n2.0\n'.replace('\n', os.linesep),
                 'exitcode': 0,
             }],
         )
