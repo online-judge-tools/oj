@@ -8,14 +8,14 @@ from onlinejudge._implementation import utils
 
 
 class PrintVersionTest(unittest.TestCase):
-    def version_test(self):
+    def test_version(self):
         result = tests.utils.run_in_sandbox(args=['--version'])
         self.assertTrue(result['proc'].stdout == 'online-judge-tools {}'.format(onlinejudge.__version__))
 
         result = tests.utils.run_in_sandbox(args=['-version, test'])
         self.assertTrue(result['proc'].stdout == 'online-judge-tools {}'.format(onlinejudge.__version__))
 
-    def get_latest_version_test(self):
+    def test_get_latest_version(self):
         version_cache_path = utils.cache_dir / "pypi.json"
 
         # without cache
