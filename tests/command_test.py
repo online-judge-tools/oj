@@ -130,6 +130,22 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-2.out',
                     'data': '1.2\n'
                 },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-4.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-4.out',
+                    'data': 'bar\n'
+                },
             ],
             expected=[{
                 'status': 'AC',
@@ -148,6 +164,24 @@ class TestTest(unittest.TestCase):
                     'output': '%s/test/sample-2.out',
                 },
                 'output': '1.0\n',
+                'exitcode': 0,
+            }, {
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-4',
+                    'input': '%s/test/sample-4.in',
+                    'output': '%s/test/sample-4.out',
+                },
+                'output': 'foo\n',
                 'exitcode': 0,
             }],
         )
