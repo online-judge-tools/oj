@@ -13,7 +13,7 @@ script:
     - yapf --diff --recursive onlinejudge setup.py tests | tee yapf.patch && test ! -s yapf.patch
     - mypy onlinejudge setup.py tests
     - make -C docs html
-    - pytest tests/*.py -v --cov-report term-missing --cov=onlinejudge
+    - pytest tests/*.py -v --cov=onlinejudge
 after_success:
     - coveralls
 deploy:
