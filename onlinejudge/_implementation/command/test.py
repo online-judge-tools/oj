@@ -188,7 +188,7 @@ def check_gnu_time(gnu_time: str) -> bool:
             int(utils.remove_suffix(data.rstrip().splitlines()[-1], ' KB'))
             return True
     except NameError:
-        raise  # NameError is not a runtime error caused by the environmet, but a coding mistake
+        raise  # NameError is not a runtime error caused by the environment, but a coding mistake
     except AttributeError:
         raise  # AttributeError is also a mistake
     except Exception as e:
