@@ -46,7 +46,6 @@ class YukicoderProblemTest(unittest.TestCase):
             TestCase(name='sample-4', input_name='サンプル4 入力', input_data=b'1 1\n2\n', output_name='サンプル4 出力', output_data=b'-1\n'),
         ])
 
-    @unittest.expectedFailure
     def test_donwload_sample_cases_issue_192(self):
         # see https://github.com/kmyk/online-judge-tools/issues/192
         self.assertEqual(YukicoderProblem.from_url('https://yukicoder.me/problems/no/750').download_sample_cases(), [

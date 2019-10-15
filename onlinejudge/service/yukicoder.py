@@ -277,7 +277,16 @@ class YukicoderProblem(onlinejudge.type.Problem):
         if prv.name == 'h6' and tag.parent.name == 'div' and tag.parent['class'] == ['paragraph'] and pprv.name == 'h5':
             log.debug('h6: %s', str(prv))
             log.debug('name.encode(): %s', prv.string.encode())
-            s = tag.string or ''  # tag.string for the tag "<pre></pre>" returns None
+
+            # tag.string for the tag below returns None
+            # - "<pre></pre>"
+            # - "<pre>6<br />1 1<br />7 4<br />0 5<br />1 3<br />-8 9<br />5 1</pre>"
+            # for more details, see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#string
+            if tag.string is not None:
+                s = tag.string
+            else:
+                s = bs4.NavigableString(''.join(string + '\n' for string in tag.strings))
+
             return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
         return None
 
