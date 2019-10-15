@@ -26,8 +26,6 @@ class DispatchTest(unittest.TestCase):
     def test_contest_from_url(self):
         contest = dispatch.contest_from_url('https://atcoder.jp/contests/agc030')
         self.assertTrue(isinstance(contest.get_service(), service.atcoder.AtCoderService))
-        with self.assertRaises(ValueError):
-            dispatch.contest_from_url('https://atcoder.jp/contests/agc039')
 
 
 class InvalidDispatchTest(unittest.TestCase):
