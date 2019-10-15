@@ -131,6 +131,26 @@ class DownloadAtCoderTest(unittest.TestCase):
             },
         ], type='json')
 
+    def test_call_download_atcoder_agc036_b(self):
+        self.snippet_call_download('https://atcoder.jp/contests/agc036/tasks/agc036_b', [
+            {
+                "input": "3 2\n1 2 3\n",
+                "output": "2 3\n"
+            },
+            {
+                "input": "5 10\n1 2 3 2 3\n",
+                "output": "3\n"
+            },
+            {
+                "input": "6 1000000000000\n1 1 2 2 3 3\n",
+                "output": "\n"
+            },
+            {
+                "input": "11 97\n3 1 4 1 5 9 2 6 5 3 5\n",
+                "output": "9 2 6\n"
+            },
+        ], type='json')
+
     def test_call_download_invalid_url(self):
         self.snippet_call_download_raises(requests.exceptions.HTTPError, 'http://abc001.contest.atcoder.jp/tasks/abc001_100')
 
