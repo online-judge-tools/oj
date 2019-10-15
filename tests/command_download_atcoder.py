@@ -148,7 +148,7 @@ class DownloadAtCoderTest(unittest.TestCase):
             {
                 "input": "11 97\n3 1 4 1 5 9 2 6 5 3 5\n",
                 "output": "9 2 6\n"
-            }
+            },
         ], type='json')
 
     def test_call_download_invalid_url(self):
