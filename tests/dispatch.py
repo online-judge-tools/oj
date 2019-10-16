@@ -31,6 +31,7 @@ class DispatchAtCoderTest(unittest.TestCase):
     def test_service_from_url(self):
         service1 = dispatch.service_from_url('https://atcoder.jp/')
         self.assertTrue(isinstance(service1, service.atcoder.AtCoderService))
+        self.assertEqual(service1.get_name(), 'AtCoder')
         self.assertEqual(service1.get_url_of_login_page(), 'https://atcoder.jp/login')
         self.assertEqual(service1.get_user_history_url(22), 'https://atcoder.jp/users/22/history/json')
 
@@ -45,9 +46,11 @@ class DispatchCodeForcesTest(unittest.TestCase):
         contest = dispatch.contest_from_url('https://codeforces.com/contest/1244')
         self.assertTrue(isinstance(contest, service.codeforces.CodeforcesContest))
         self.assertTrue(isinstance(contest.get_service(), service.codeforces.CodeforcesService))
+        self.assertEqual(contest.get_url(), 'https://codeforces.com/contest/1244')
 
     def test_service_from_url(self):
         service1 = dispatch.service_from_url('https://codeforces.com/')
+        self.assertEqual(service1.get_name(), 'Codeforces')
         self.assertTrue(isinstance(service1, service.codeforces.CodeforcesService))
         self.assertEqual(service1.get_url_of_login_page(), 'https://codeforces.com/enter')
 
