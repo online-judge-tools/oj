@@ -229,7 +229,9 @@ Also, patches are used sent from
 [@Pachicobue](https://github.com/Pachicobue),
 [@kfaRabi](https://github.com/kfaRabi),
 [@tMasaaa](https://github.com/tMasaaa),
-and [@hamayanhamayan](https://github.com/hamayanhamayan).
+[@hamayanhamayan](https://github.com/hamayanhamayan),
+[@yoshrc](https://github.com/yoshrc),
+and [@kawacchu](https://github.com/kawacchu).
 
 ## License
 

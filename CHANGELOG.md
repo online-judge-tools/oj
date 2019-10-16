@@ -1,5 +1,13 @@
 # Change Log
 
+# 7.2.1 / 2019-10-18
+
+-   [#557](https://github.com/kmyk/online-judge-tools/pull/557) fix a bug if `dispatch` invalid URL
+-   [#554](https://github.com/kmyk/online-judge-tools/pull/554) fix a problem of `download` part of AtCoder problem ([@yoshrc](https://github.com/yoshrc))
+-   [#552](https://github.com/kmyk/online-judge-tools/pull/552) fix a problem of `download` part of yukicoder problem ([@kawacchu](https://github.com/kawacchu))
+-   [#549](https://github.com/kmyk/online-judge-tools/pull/549) fix a bug of `dispatch` AtCoder contest
+-   [#538](https://github.com/kmyk/online-judge-tools/issues/538) add many unittests for minor options
+
 ## 7.2.0 / 2019-09-26
 
 -   [#527](https://github.com/kmyk/online-judge-tools/pull/527) support `download` from [Library Checker](https://judge.yosupo.jp/)
