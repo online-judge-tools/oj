@@ -1260,3 +1260,4 @@ class AtCoderSubmissionTestCaseResult(object):
 onlinejudge.dispatch.services += [AtCoderService]
 onlinejudge.dispatch.problems += [AtCoderProblem]
 onlinejudge.dispatch.submissions += [AtCoderSubmission]
+onlinejudge.dispatch.contests += [AtCoderContest]
