@@ -64,6 +64,7 @@ class InvalidDispatchTest(unittest.TestCase):
 
     def test_contest_from_url(self):
         self.assertIsNone(dispatch.contest_from_url('https://atcoder.jp/'))
+        self.assertIsNone(dispatch.contest_from_url('https://'))
 
     def test_service_from_url(self):
         self.assertIsNone(dispatch.service_from_url('https://www.yahoo.co.jp/'))

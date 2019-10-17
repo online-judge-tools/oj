@@ -326,6 +326,8 @@ class AtCoderContest(onlinejudge.type.Contest):
         """
 
         result = urllib.parse.urlparse(url)
+        if result.hostname is None:
+            return None
 
         # example: https://kupc2014.contest.atcoder.jp/tasks/kupc2014_d
         if result.scheme in ('', 'http', 'https') and result.hostname.endswith('.contest.atcoder.jp'):
