@@ -8,7 +8,7 @@ the module containing base types
 
 import datetime
 from abc import ABC, abstractmethod
-from typing import Callable, Iterator, List, NamedTuple, NewType, Optional, Tuple
+from typing import Callable, Iterator, List, NamedTuple, NewType, Optional, Sequence, Tuple
 
 import requests
 
@@ -173,7 +173,7 @@ class Contest(ABC):
 
     .. versionadded:: 7.0.0
     """
-    def list_problems(self, *, session: Optional[requests.Session] = None) -> List['Problem']:
+    def list_problems(self, *, session: Optional[requests.Session] = None) -> Sequence['Problem']:
         raise NotImplementedError
 
     def download_data(self, *, session: Optional[requests.Session] = None) -> ContestData:
