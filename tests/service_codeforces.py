@@ -18,7 +18,7 @@ class CodeforcesContestTest(unittest.TestCase):
         self.assertEqual(CodeforcesContest.from_url('http://codeforces.com/gym/101025').contest_id, 101025)
         self.assertIsNone(CodeforcesContest.from_url('https://atcoder.jp/contests/abc120'))
 
-    def test_list_problems(self):
+    def test_list_problems_data(self):
         contest = CodeforcesContest.from_url('https://codeforces.com/contest/1157')
         problems = contest.list_problem_data()
         self.assertEqual(len(problems), 8)
@@ -30,6 +30,14 @@ class CodeforcesContestTest(unittest.TestCase):
         self.assertEqual(problems[5].problem.index, 'E')
         self.assertEqual(problems[6].tags, ['constructive algorithms', 'dp', 'greedy', 'two pointers'])
         self.assertEqual(problems[7].tags, ['brute force', 'constructive algorithms'])
+
+    def test_list_problems(self):
+        contest = CodeforcesContest.from_url('https://codeforces.com/contest/1157')
+        problems = contest.list_problems()
+        self.assertEqual(len(problems), 8)
+        self.assertEqual(problems[0].get_url(), 'https://codeforces.com/contest/1157/problem/A')
+        self.assertEqual(problems[6].get_url(), 'https://codeforces.com/contest/1157/problem/F')
+        self.assertEqual(problems[7].download_data().tags, ['brute force', 'constructive algorithms'])
 
     def test_download_data(self):
         contest = CodeforcesContest.from_url('http://codeforces.com/contest/1200')
