@@ -50,6 +50,23 @@ def next_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
     return tag
 
 
+# remove all HTML tag without interpretation (except <br>)
+# using DFS(Depth First Search)
+def parse_content(parent: Union[bs4.NavigableString, bs4.Tag]) -> bs4.NavigableString:
+    res = ''
+    if isinstance(parent, bs4.NavigableString):
+        return parent
+    else:
+        children = parent.contents
+        if len(children) == 0:
+            html_tag = str(parent)
+            return bs4.NavigableString('\n') if 'br' in html_tag else bs4.NavigableString('')
+        else:
+            for child in children:
+                res += parse_content(child)
+    return bs4.NavigableString(res)
+
+
 def new_session_with_our_user_agent() -> requests.Session:
     session = requests.Session()
     session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
