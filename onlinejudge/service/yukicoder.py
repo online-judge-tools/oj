@@ -255,7 +255,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 data, name = it
                 samples.add(data.encode(), name)
         return samples.get()
-    
+
     def get_handmade_sample_cases(self, *, html: str) -> List[TestCase]:
         # parse
         soup = bs4.BeautifulSoup(html, utils.html_parser)
@@ -267,7 +267,6 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 data, name = it
                 samples.add(data.encode(), name)
         return samples.get()
-
 
     def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         """
@@ -371,7 +370,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
                     return cls(problem_id=int(n))
             return cls()
         return None
-    
+
     @classmethod
     def from_nothing(cls) -> Optional['YukicoderProblem']:
         # to test handmade sample cases (like https://github.com/kmyk/online-judge-tools/issues/553)
