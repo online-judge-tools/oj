@@ -7,11 +7,11 @@ the module for yukicoder (https://yukicoder.me/)
 """
 
 import json
+import posixpath
 import urllib.parse
 from typing import *
 
 import bs4
-import posixpath
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.testcase_zipper
