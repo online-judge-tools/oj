@@ -255,6 +255,19 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 data, name = it
                 samples.add(data.encode(), name)
         return samples.get()
+    
+    def get_handmade_sample_cases(self, *, html: str) -> List[TestCase]:
+        # parse
+        soup = bs4.BeautifulSoup(html, utils.html_parser)
+        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
+        for pre in soup.select('.sample pre'):
+            log.debug('pre %s', str(pre))
+            it = self._parse_sample_tag(pre)
+            if it is not None:
+                data, name = it
+                samples.add(data.encode(), name)
+        return samples.get()
+
 
     def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         """
@@ -278,14 +291,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
             log.debug('h6: %s', str(prv))
             log.debug('name.encode(): %s', prv.string.encode())
 
-            # tag.string for the tag below returns None
-            # - "<pre></pre>"
-            # - "<pre>6<br />1 1<br />7 4<br />0 5<br />1 3<br />-8 9<br />5 1</pre>"
-            # for more details, see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#string
-            if tag.string is not None:
-                s = tag.string
-            else:
-                s = bs4.NavigableString(''.join(string + '\n' for string in tag.strings))
+            s = utils.parse_content(tag)
 
             return utils.textfile(s.lstrip()), pprv.string + ' ' + prv.string
         return None
@@ -365,6 +371,12 @@ class YukicoderProblem(onlinejudge.type.Problem):
                     return cls(problem_id=int(n))
             return cls()
         return None
+    
+    @classmethod
+    def from_nothing(cls) -> Optional['YukicoderProblem']:
+        # to test handmade sample cases (like https://github.com/kmyk/online-judge-tools/issues/553)
+        n = -1
+        return cls(problem_no=int(n))
 
     def get_service(self) -> YukicoderService:
         return YukicoderService()
