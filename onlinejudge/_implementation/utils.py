@@ -8,7 +8,6 @@ import http.cookiejar
 import json
 import os
 import pathlib
-import posixpath
 import shlex
 import shutil
 import subprocess
@@ -21,6 +20,7 @@ from typing.io import *
 
 import appdirs
 import bs4
+import posixpath
 
 import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
