@@ -57,6 +57,56 @@ class YukicoderProblemTest(unittest.TestCase):
             TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'3\n1 8 3\n2\n6 10\n', output_name='サンプル1 出力', output_data=b'5 72\n'),
             TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'2\n-1 1\n3\n-1 1 -1\n', output_name='サンプル2 出力', output_data=b'-1 1\n'),
         ])
+    
+    def test_download_handmade_cases_issue_553(self):
+        # see https://github.com/kmyk/online-judge-tools/issues/553
+        handmade_html = """
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+</head>
+<body>
+<div class="block">
+    <div class="sample">
+        <h5 class="underline">サンプル1</h5>
+        <div class="paragraph">
+            <h6>入力</h6>
+            <pre><strong>3<br/>1</strong> 2<br/>3 4<br/>5 6</pre>
+            <h6>出力</h6>
+            <pre>0<br/><br/><br/><br/><br/>0</pre>
+        </div>
+    </div>
+
+    <div class="sample">
+        <h5 class="underline">サンプル2</h5>
+        <div class="paragraph">
+            <h6>入力</h6>
+            <pre>1 1 1
+1 <strong><mark>0</mark></strong> 1
+1 1 1</pre>
+            <h6>出力</h6>
+            <pre><s>0</s></pre>
+        </div>
+    </div>
+
+    <div class="sample">
+        <h5 class="underline">サンプル3</h5>
+        <div class="paragraph">
+            <h6>入力</h6>
+            <pre><i></i></pre>
+            <h6>出力</h6>
+            <pre><i><strong>We<br/><mark>Love</mark><br/><s>Competitive</s><br/>Programming!</strong></i></pre>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+"""
+        self.assertEqual(YukicoderProblem.from_nothing().get_handmade_sample_cases(html=handmade_html), [
+            TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'3\n1 2\n3 4\n5 6\n', output_name='サンプル1 出力', output_data=b'0\n\n\n\n\n0\n'),
+            TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'1 1 1\n1 0 1\n1 1 1\n', output_name='サンプル2 出力', output_data=b'0\n'),
+            TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'\n', output_name='サンプル3 出力', output_data=b'We\nLove\nCompetitive\nProgramming!\n'),
+        ])
 
 
 class YukicoderOfficialAPITest(unittest.TestCase):
