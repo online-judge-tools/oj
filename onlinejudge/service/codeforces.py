@@ -207,9 +207,8 @@ class CodeforcesContest(onlinejudge.type.Contest):
         assert data['status'] == 'OK'
         return [CodeforcesProblemData._from_json(row, response=resp, session=session, timestamp=timestamp) for row in data['result']['problems']]
 
-    # TODO: why is "type: ignore" required?
-    def list_problems(self, *, session: Optional[requests.Session] = None) -> List['CodeforcesProblem']:  # type: ignore
-        return [data.problem for data in self.list_problem_data(session=session)]
+    def list_problems(self, *, session: Optional[requests.Session] = None) -> Sequence['CodeforcesProblem']:
+        return tuple([data.problem for data in self.list_problem_data(session=session)])
 
     def download_data(self, *, session: Optional[requests.Session] = None) -> CodeforcesContestData:
         session = session or utils.get_default_session()

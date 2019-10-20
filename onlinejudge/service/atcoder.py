@@ -365,9 +365,8 @@ class AtCoderContest(onlinejudge.type.Contest):
         tbody = soup.find('tbody')
         return [AtCoderProblemData._from_table_row(tr, session=session, response=resp, timestamp=timestamp) for tr in tbody.find_all('tr')]
 
-    # TODO: why does this require "type: ignore"?
-    def list_problems(self, *, session: Optional[requests.Session] = None) -> 'List[AtCoderProblem]':  # type: ignore
-        return [data.problem for data in self.list_problem_data(session=session)]
+    def list_problems(self, *, session: Optional[requests.Session] = None) -> Sequence['AtCoderProblem']:
+        return tuple([data.problem for data in self.list_problem_data(session=session)])
 
     # yapf: disable
     def iterate_submission_data_where(
