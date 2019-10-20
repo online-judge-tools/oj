@@ -58,7 +58,7 @@ class YukicoderProblemTest(unittest.TestCase):
             TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'2\n-1 1\n3\n-1 1 -1\n', output_name='サンプル2 出力', output_data=b'-1 1\n'),
         ])
 
-    def test_download_handmade_cases_issue_553(self):
+    def test_get_handmade_cases_issue_553(self):
         # see https://github.com/kmyk/online-judge-tools/issues/553
         handmade_html = """
 <!DOCTYPE html>
