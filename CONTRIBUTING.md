@@ -114,7 +114,7 @@ We use static type checking and unit testing.
 You can run them with the following commands:
 
 ``` sh
-$ mypy oj onlinejudge
+$ mypy onlinejudge setup.py tests
 $ pylint --disable=all --enable=unused-import onlinejudge
 $ pytest tests/*.py -v  # if you use linux
 ```
