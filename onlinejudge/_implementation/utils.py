@@ -51,10 +51,13 @@ def next_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
 
 
 # remove all HTML tag without interpretation (except <br>)
+# remove all comment
 # using DFS(Depth First Search)
-def parse_content(parent: Union[bs4.NavigableString, bs4.Tag]) -> bs4.NavigableString:
+def parse_content(parent: Union[bs4.NavigableString, bs4.Tag, bs4.Comment]) -> bs4.NavigableString:
     res = ''
-    if isinstance(parent, bs4.NavigableString):
+    if isinstance(parent, bs4.Comment):
+        pass
+    elif isinstance(parent, bs4.NavigableString):
         return parent
     else:
         children = parent.contents
