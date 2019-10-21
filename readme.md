@@ -59,7 +59,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 
 ## How to install
 
-### using compiled binary
+### using the compiled binary
 
 The portable executables `oj.exe` for Windows are downloadable from [GitHub releases](https://github.com/kmyk/online-judge-tools/releases).
 
@@ -178,12 +178,12 @@ AtCoder Beginner Contest 118: B - Foods Loved by Everyone    kotatsugame  (37 by
 
 ## FAQ
 
--   I cannot install this tool. How should I do?
-    -   Check versions of your Python. Also consider the use of Windows Subsystem for Linux (WSL) if you use Windows environment.
+-   I cannot install this tool. How should I do it?
+    -   Check versions of your Python. Also, consider the use of Windows Subsystem for Linux (WSL) if you use the Windows environment.
 -   Are there features to manage templates or snippets?
     -   No. They are not the responsibility of this tool. You should use plugins of your editor, like [thinca/vim-template](https://github.com/thinca/vim-template) or [Shougo/deoplete.nvim](https://github.com/Shougo/deoplete.nvim).
--   I usually make one directory per one contest (or, site). Is there a support for this style?
-    -   Yes. You can use `--directory` (`-d`) option. However, I recommend to make one directory per one problem.
+-   I usually make one directory per one contest (or, site). Is there support for this style?
+    -   Yes. You can use the `--directory` (`-d`) option. However, I recommend making one directory per problem.
 -   Can I specify problems by their IDs or names, instead of URLs?
     -   No. I have tried it once, but it is actually not so convenient and only increases the maintenance cost.
 -   I don't want to give my password to this program.
