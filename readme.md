@@ -231,7 +231,9 @@ Also, patches are used sent from
 [@tMasaaa](https://github.com/tMasaaa),
 [@hamayanhamayan](https://github.com/hamayanhamayan),
 [@yoshrc](https://github.com/yoshrc),
-and [@kawacchu](https://github.com/kawacchu).
+[@kawacchu](https://github.com/kawacchu),
+[@pieceofeden](https://github.com/pieceofeden),
+and [@nishanth2143](https://github.com/nishanth2143).
 
 ## License
 

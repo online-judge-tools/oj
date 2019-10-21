@@ -1,5 +1,10 @@
 # Change Log
 
+# 7.2.2 / 2019-10-23
+
+-   [#561](https://github.com/kmyk/online-judge-tools/pull/561) fix a potential bug of yukicoder problems
+-   [#560](https://github.com/kmyk/online-judge-tools/pull/560) fix a bug of Codeforces.list_problems
+
 # 7.2.1 / 2019-10-18
 
 -   [#557](https://github.com/kmyk/online-judge-tools/pull/557) fix a bug if `dispatch` invalid URL
