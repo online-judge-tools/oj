@@ -111,14 +111,14 @@ $ pytest tests/*.py -v  # if you use linux
 ```
 
 If you use Windows PowerShell:
-```
+``` sh
 $ pytest -v $(dir tests/*.py | % {$_.FullName})
 ```
 
-テストは開発の際には機能ごとに単体で実行すると楽です。
-例えば `download` コマンドの AtCoder に関してのテストの実行は次でできます。
+When developing, it is easy to run the test separately for each module.
+You can run tests of downloading AtCoder with the following commands:
 
-```
+``` sh
 $ pytest tests/command_download_atcoder.py -v
 ```
 
