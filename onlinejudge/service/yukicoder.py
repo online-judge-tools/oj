@@ -256,18 +256,6 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 samples.add(data.encode(), name)
         return samples.get()
 
-    def get_handmade_sample_cases(self, *, html: str) -> List[TestCase]:
-        # parse
-        soup = bs4.BeautifulSoup(html, utils.html_parser)
-        samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
-        for pre in soup.select('.sample pre'):
-            log.debug('pre %s', str(pre))
-            it = self._parse_sample_tag(pre)
-            if it is not None:
-                data, name = it
-                samples.add(data.encode(), name)
-        return samples.get()
-
     def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         """
         :raises NotLoggedInError:
@@ -370,12 +358,6 @@ class YukicoderProblem(onlinejudge.type.Problem):
                     return cls(problem_id=int(n))
             return cls()
         return None
-
-    @classmethod
-    def from_nothing(cls) -> Optional['YukicoderProblem']:
-        # to test handmade sample cases (like https://github.com/kmyk/online-judge-tools/issues/553)
-        n = -1
-        return cls(problem_no=int(n))
 
     def get_service(self) -> YukicoderService:
         return YukicoderService()

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
 
+from tests.utils import get_handmade_sample_cases
+
 from onlinejudge.service.yukicoder import YukicoderProblem, YukicoderService
 from onlinejudge.type import *
 
@@ -98,14 +100,25 @@ class YukicoderProblemTest(unittest.TestCase):
             <pre><i><strong>We<br/><mark>Love</mark><br/><s>Competitive</s><br/>Programming!</strong></i></pre>
         </div>
     </div>
+
+    <div class="sample">
+        <h5 class="underline">サンプル4</h5>
+        <div class="paragraph">
+            <h6>入力</h6>
+            <pre></pre>
+            <h6>出力</h6>
+            <pre>A<-- comment1 -->B<!-- comment2 -->C</pre>
+        </div>
+    </div>
 </div>
 </body>
 </html>
 """
-        self.assertEqual(YukicoderProblem.from_nothing().get_handmade_sample_cases(html=handmade_html), [
+        self.assertEqual(get_handmade_sample_cases(YukicoderProblem(problem_no=5555), html=handmade_html), [
             TestCase(name='sample-1', input_name='サンプル1 入力', input_data=b'3\n1 2\n3 4\n5 6\n', output_name='サンプル1 出力', output_data=b'0\n\n\n\n\n0\n'),
             TestCase(name='sample-2', input_name='サンプル2 入力', input_data=b'1 1 1\n1 0 1\n1 1 1\n', output_name='サンプル2 出力', output_data=b'0\n'),
             TestCase(name='sample-3', input_name='サンプル3 入力', input_data=b'\n', output_name='サンプル3 出力', output_data=b'We\nLove\nCompetitive\nProgramming!\n'),
+            TestCase(name='sample-4', input_name='サンプル4 入力', input_data=b'\n', output_name='サンプル4 出力', output_data=b'ABC\n'),
         ])
 
 
