@@ -24,7 +24,8 @@ PR is always welcome.
 However, please note that PR is not always merged as it is.
 To improve PR quality, reviewers may ask you change requests.
 
--   Test your PR branch on local by `python3 setup.py test`.
+-   Create your branch from `master`.
+-   Test your PR branch on local by `pytest tests/*.py -v`.
 -   Write code easy to understand.
     -   Don't make diff which is unnecessary for the purpose of PR.
     -   Split commits appropriately.
@@ -41,7 +42,8 @@ WIP PR is also useful to have discussions based on a concrete code.
 ただし常にそのまま merge されるとは限らないので注意してください。
 なにかまずいところがあっても修正を要求するだけなので質は問いません (なにか分からないところがあればとりあえずできたところまでで投げてくれてもよいです) が、以下に従っておくと merge されるまでの時間は短くなるでしょう。
 
--   手元でテストをする (`python3 setup.py test` を実行する)
+-   `master`ブランチからブランチを切る
+-   手元でテストをする (`pytest tests/*.py -v` を実行する)
     -   CI が通らない限りは merge はできません
 -   レビュアーにやさしいコードを書く
     -   変更箇所はPRの目的に沿った必要最低限のものにする
