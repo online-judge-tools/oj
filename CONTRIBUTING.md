@@ -31,6 +31,10 @@ To improve PR quality, reviewers may ask you change requests.
     -   Comment on the code where you are not confident of.
 -   If you want to add a feature, it would be better to discuss before writing code.
     -   because your feature is not always merged.
+    
+Even if your code is not complete, you can send a pull request as a work-in-progress PR by putting the [WIP] prefix to the PR title.
+If you write a precise explanation about the PR, maintainers and other contributors can join the discussion about how to proceed the PR.
+WIP PR is also useful to have discussions based on a concrete code.
 
 基本的にはどんなものでも歓迎します。
 
@@ -46,6 +50,9 @@ To improve PR quality, reviewers may ask you change requests.
 -   機能追加をする場合は事前に確認をする
     -   「そういう機能は入れません」で弾かれてせっかくの実装が無駄になるとお互いに不幸なためです
 
+もしあなたのPRが完成されていない場合でも、[WIP]とタイトルにつけてPRを送って頂いて構いません。
+やりたいことをわかりやすくかいていただければ、メンテナや他の開発者がどうやってマージまで進めていくか相談に乗ることができます。
+WIPなPRはコードをベースに議論していくこたができるという点で有用です。
 
 # Internal Structure / 内部構造
 
