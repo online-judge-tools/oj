@@ -21,10 +21,10 @@ Sample case test
 
 Do you test with sample cases before submission?
 Have you ever been troublesome and omitted?
-You should always test before submitting, since submitting an implementation that doesn't even fit the sample will only incur a penalty.
-It is also useful for debugging, and you should try the sample case every time you rewrite your program.
+You should always test before submitting, since submitting an implementation that doesn't even pass the sample cases will only incur a wrong answer penalty.
+It is also useful for debugging, and testing your program with the sample cases every time you rewrite is good practice.
 
-However, "open the problem page, copy the sample input, run the program and paste it there, and compare the output result with the sample output" for the number of sample cases, it is quite troublesome to do this each time is.
+However, "open the problem page, copy the sample input, run the program and paste it into shell, and compare the output result with the sample output" for the number of sample cases, it is quite troublesome.
 Doing the tedious work manually is easy to omit or mistake.
 This problem can be solved by automation.
 
@@ -100,7 +100,7 @@ Submit
 ----
 
 When submitting your implemented solution, you have to select "Problem to be submitted to the program" and "Implement language of the program to be submitted" with the mouse, copy and paste the source code into the text box, and press the send button. This series of operations is troublesome.
-Have you ever experienced a penalty when you made a mistake in selecting the “submission issue” and “submission language” at the time of submission?
+Have you ever experienced a penalty when you made a mistake in selecting the “submission issue” or “submission language” at the time of submission?
 If you have any such experience, we recommend automating the submission.
 
 By online-judge-tools, you can automate submissions.
@@ -160,7 +160,7 @@ If you want to submit the file to the problem https://codeforces.com/contest/120
 If `Selenium <https://www.seleniumhq.org/>`_ is installed (``apt install python3-selenium firefox-geckodriver`` etc. is executed), the GUI browser will start, so please login normally on it.
 (If you don't have Selenium, you will be asked for your username and password directly on the CUI.)
 
-Executed ``oj d URL`` before in the same directory. If there is, simply ``oj s main.cpp`` will guess the URL and submit it.
+If you already executed ``oj d URL`` in the same directory, ``oj s main.cpp`` will guess the URL and submit it.
 In order to prevent URL specification mistakes, we recommend using this labor-saving form.
 The language is automatically recognized and set appropriately.
 

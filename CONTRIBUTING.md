@@ -24,20 +24,26 @@ PR is always welcome.
 However, please note that PR is not always merged as it is.
 To improve PR quality, reviewers may ask you change requests.
 
--   Test your PR branch on local by `python3 setup.py test`.
+-   Create your branch from `master`.
+-   Test your PR branch on local by `pytest tests/*.py -v`.
 -   Write code easy to understand.
     -   Don't make diff which is unnecessary for the purpose of PR.
     -   Split commits appropriately.
     -   Comment on the code where you are not confident of.
 -   If you want to add a feature, it would be better to discuss before writing code.
     -   because your feature is not always merged.
+    
+Even if your code is not complete, you can send a pull request as a work-in-progress PR by putting the [WIP] prefix to the PR title.
+If you write a precise explanation about the PR, maintainers and other contributors can join the discussion about how to proceed the PR.
+WIP PR is also useful to have discussions based on a concrete code.
 
 基本的にはどんなものでも歓迎します。
 
 ただし常にそのまま merge されるとは限らないので注意してください。
 なにかまずいところがあっても修正を要求するだけなので質は問いません (なにか分からないところがあればとりあえずできたところまでで投げてくれてもよいです) が、以下に従っておくと merge されるまでの時間は短くなるでしょう。
 
--   手元でテストをする (`python3 setup.py test` を実行する)
+-   `master`ブランチからブランチを切る
+-   手元でテストをする (`pytest tests/*.py -v` を実行する)
     -   CI が通らない限りは merge はできません
 -   レビュアーにやさしいコードを書く
     -   変更箇所はPRの目的に沿った必要最低限のものにする
@@ -46,6 +52,9 @@ To improve PR quality, reviewers may ask you change requests.
 -   機能追加をする場合は事前に確認をする
     -   「そういう機能は入れません」で弾かれてせっかくの実装が無駄になるとお互いに不幸なためです
 
+もしあなたのPRが完成されていない場合でも、[WIP]とタイトルにつけてPRを送って頂いて構いません。
+やりたいことをわかりやすくかいていただければ、メンテナや他の開発者がどうやってマージまで進めていくか相談に乗ることができます。
+WIPなPRはコードをベースに議論していくこたができるという点で有用です。
 
 # Internal Structure / 内部構造
 
@@ -105,20 +114,20 @@ We use static type checking and unit testing.
 You can run them with the following commands:
 
 ``` sh
-$ mypy oj onlinejudge
+$ mypy onlinejudge setup.py tests
 $ pylint --disable=all --enable=unused-import onlinejudge
 $ pytest tests/*.py -v  # if you use linux
 ```
 
 If you use Windows PowerShell:
-```
+``` sh
 $ pytest -v $(dir tests/*.py | % {$_.FullName})
 ```
 
-テストは開発の際には機能ごとに単体で実行すると楽です。
-例えば `download` コマンドの AtCoder に関してのテストの実行は次でできます。
+When developing, it is easy to run the test separately for each module.
+You can run tests of downloading AtCoder with the following commands:
 
-```
+``` sh
 $ pytest tests/command_download_atcoder.py -v
 ```
 
