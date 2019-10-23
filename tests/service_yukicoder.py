@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from tests.utils import get_handmade_sample_cases
+from tests.implementation_utils import get_handmade_sample_cases
 
 from onlinejudge.service.yukicoder import YukicoderProblem, YukicoderService
 from onlinejudge.type import *
