@@ -2,8 +2,10 @@
 
 # 7.2.2 / 2019-10-23
 
--   [#561](https://github.com/kmyk/online-judge-tools/pull/561) fix a potential bug of yukicoder problems
--   [#560](https://github.com/kmyk/online-judge-tools/pull/560) fix a bug of Codeforces.list_problems
+-   [#561](https://github.com/kmyk/online-judge-tools/pull/561) fix a potential bug of yukicoder problems ([@kawacchu](https://github.com/kawacchu))
+-   [#560](https://github.com/kmyk/online-judge-tools/pull/560) fix a bug of `CodeforceContest.list_problems`
+-   [#562](https://github.com/kmyk/online-judge-tools/pull/562) add [the English translation](https://online-judge-tools.readthedocs.io/en/master/introduction.en.html) of introduction document ([@pieceofeden](https://github.com/pieceofeden))
+-   [#567](https://github.com/kmyk/online-judge-tools/pull/567) improve English of `readme.md` ([@nishanth2143](https://github.com/nishanth2143))
 
 # 7.2.1 / 2019-10-18
 
