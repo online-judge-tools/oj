@@ -636,29 +636,38 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
 
     @classmethod
     def _find_sample_tags(cls, soup: bs4.BeautifulSoup) -> Iterator[Tuple[bs4.Tag, bs4.Tag]]:
-        for pre in soup.find_all('pre'):
+        def tag_plus(tag, expected_prv, expected_strings):
+            prv = tag.find_previous_sibling()
+            if prv and prv.name == expected_prv and prv.string and any(s in prv.string for s in expected_strings):
+                yield (pre, prv)
+
+        expected_strings = ['入力例', '出力例', 'Sample Input', 'Sample Output']
+        finished = False
+
+        # the first format: p+pre
+        # this format uses 'literal-block' in its page
+        # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
+        for pre in soup.find_all('pre', 'literal-block'):
+            finished = True
             log.debug('pre tag: %s', str(pre))
-            if not pre.string:
-                if len(pre.contents):
-                    # <pre> element is not a sample but the input format
-                    continue
-                # the sample is an empty string, so set pre.string as '' instead of None
-                pre.string = ''
+            yield from tag_plus(tag=pre, expected_prv='p', expected_strings=expected_strings)
+        if finished: return
 
-            def h3_plus(tag):
-                prv = tag.find_previous_sibling()
-                if prv and prv.name == 'h3' and prv.string:
-                    yield (pre, prv)
+        # the second format: h3+section pre
+        # this format uses 'prettyprint linenums' in its page
+        # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
+        for pre in soup.find_all('pre', 'prettyprint linenums'):
+            finished = True
+            log.debug('pre tag: %s', str(pre))
+            yield from tag_plus(tag=pre.parent, expected_prv='h3', expected_strings=expected_strings)
+        if finished: return
 
-            # the first format: h3+pre
-            yield from h3_plus(pre)
-
-            # the second format: h3+section pre
-            if pre.parent and pre.parent.name == 'section':
-                # ignore tags which are not samples
-                # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
-                if pre.find_previous_sibling('pre') is None:
-                    yield from h3_plus(pre.parent)
+        # the third format: h3+pre
+        # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
+        for pre in soup.find_all('pre'):
+            finished = True
+            log.debug('pre tag: %s', str(pre))
+            yield from tag_plus(tag=pre, expected_prv='h3', expected_strings=expected_strings)
 
     @classmethod
     def _parse_sample_cases(cls, soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
@@ -668,7 +677,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
         samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         lang = None
         for pre, h3 in cls._find_sample_tags(soup):
-            s = utils.textfile(utils.dos2unix(pre.string.lstrip()))
+            s = utils.textfile(utils.dos2unix(utils.parse_content(pre).lstrip()))
             name = h3.string
             l = cls._get_tag_lang(pre)
             if lang is None:

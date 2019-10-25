@@ -282,7 +282,8 @@ class AtCoderSubmissionTest(unittest.TestCase):
 
 
 class AtCoderProblemDataTest(unittest.TestCase):
-    def test_from_html(self):
+    # test the third format (stated in AtCoderProblemDetailedData)
+    def test_from_html_1(self):
         url = 'https://atcoder.jp/contests/abc114/tasks/abc114_d'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -301,6 +302,92 @@ class AtCoderProblemDataTest(unittest.TestCase):
             TestCase(name='sample-3', input_name='入力例 3', input_data=b'100\n', output_name='出力例 3', output_data=b'543\n'),
         ])
         self.assertEqual(data.score, 400)
+        self.assertEqual(data.time_limit_msec, 2 * 1000)
+
+    # test the second format (stated in AtCoderProblemDetailedData)
+    def test_from_html_2(self):
+        url = 'https://atcoder.jp/contests/abc003/tasks/abc003_4'
+        resp = requests.get(url)
+        html = resp.content.decode(resp.apparent_encoding)
+        data = AtCoderProblemDetailedData.from_html(html, problem=AtCoderProblem.from_url(url))
+
+        self.assertEqual(data.alphabet, 'D')
+        self.assertEqual(data.available_languages, None)
+        self.assertEqual(data.html, html)
+        self.assertEqual(data.input_format, '\r\n<var>R</var> <var>C</var>\r\n<var>X</var> <var>Y</var>\r\n<var>D</var> <var>L</var>\r\n')
+        self.assertEqual(data.memory_limit_byte, 64 * 1000 * 1000)
+        self.assertEqual(data.name, 'AtCoder社の冬')
+        self.assertEqual(data.problem, AtCoderProblem.from_url(url))
+        self.assertEqual(data.sample_cases, [
+            TestCase(name='sample-1', input_name='入力例 1', input_data=b'3 2\n2 2\n2 2\n', output_name='出力例 1', output_data=b'12\n'),
+            TestCase(name='sample-2', input_name='入力例 2', input_data=b'4 5\n3 1\n3 0\n', output_name='出力例 2', output_data=b'10\n'),
+            TestCase(name='sample-3', input_name='入力例 3', input_data=b'23 18\n15 13\n100 95\n', output_name='出力例 3', output_data=b'364527243\n'),
+            TestCase(name='sample-4', input_name='入力例 4', input_data=b'30 30\n24 22\n145 132\n', output_name='出力例 4', output_data=b'976668549\n'),
+        ])
+        self.assertEqual(data.score, None)
+        self.assertEqual(data.time_limit_msec, 2 * 1000)
+
+    # test the second format (stated in AtCoderProblemDetailedData)
+    # (see https://github.com/kmyk/online-judge-tools/issues/106)
+    def test_from_html_3(self):
+        url = 'https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1'
+        resp = requests.get(url)
+        html = resp.content.decode(resp.apparent_encoding)
+        data = AtCoderProblemDetailedData.from_html(html, problem=AtCoderProblem.from_url(url))
+
+        self.assertEqual(data.alphabet, 'A')
+        self.assertEqual(data.available_languages, None)
+        self.assertEqual(data.html, html)
+        #self.assertEqual(data.input_format, '\r\n<var>R</var> <var>C</var>\r\n<var>X</var> <var>Y</var>\r\n<var>D</var> <var>L</var>\r\n')
+        self.assertEqual(data.memory_limit_byte, 300 * 1000 * 1000)
+        self.assertEqual(data.name, 'プログラミングコンテスト')
+        self.assertEqual(data.problem, AtCoderProblem.from_url(url))
+        self.assertEqual(data.sample_cases, [
+            TestCase(name='sample-1', input_name='入力例 1:', input_data=b'3 4\n1 0 1 0\n1 1 1 0\n0 0 0 1\n', output_name='入力例 1 に対する出力例:', output_data=b'3\n'),
+            TestCase(name='sample-2', input_name='入力例 2:', input_data=b'3 4\n1 1 1 1\n1 1 1 1\n1 1 1 1\n', output_name='入力例 2 に対する出力例:', output_data=b'4\n'),
+            TestCase(name='sample-3', input_name='入力例 3:', input_data=b'1 1\n0\n', output_name='入力例 3 に対する出力例:', output_data=b'0\n'),
+        ])
+        self.assertEqual(data.score, None)
+        self.assertEqual(data.time_limit_msec, 1 * 1000)
+
+    # deal with empty output case (see https://github.com/kmyk/online-judge-tools/issues/507)
+    def test_from_html_4(self):
+        url = 'https://atcoder.jp/contests/agc036/tasks/agc036_b'
+        resp = requests.get(url)
+        html = resp.content.decode(resp.apparent_encoding)
+        data = AtCoderProblemDetailedData.from_html(html, problem=AtCoderProblem.from_url(url))
+
+        self.assertEqual(data.alphabet, 'B')
+        self.assertEqual(data.available_languages, None)
+        self.assertEqual(data.html, html)
+        self.assertEqual(data.input_format, '<var>N</var> <var>K</var>\r\n<var>A_0</var> <var>A_1</var> <var>\cdots</var> <var>A_{N-1}</var>\r\n')
+        self.assertEqual(data.memory_limit_byte, 1024 * 1000 * 1000)
+        self.assertEqual(data.name, 'Do Not Duplicate')
+        self.assertEqual(data.problem, AtCoderProblem.from_url(url))
+        self.assertEqual(data.sample_cases, [
+            TestCase(name='sample-1', input_name='入力例 1', input_data=b'3 2\n1 2 3\n', output_name='出力例 1', output_data=b'2 3\n'),
+            TestCase(name='sample-2', input_name='入力例 2', input_data=b'5 10\n1 2 3 2 3\n', output_name='出力例 2', output_data=b'3\n'),
+            TestCase(name='sample-3', input_name='入力例 3', input_data=b'6 1000000000000\n1 1 2 2 3 3\n', output_name='出力例 3', output_data=b'\n'),
+            TestCase(name='sample-4', input_name='入力例 4', input_data=b'11 97\n3 1 4 1 5 9 2 6 5 3 5\n', output_name='出力例 4', output_data=b'9 2 6\n'),
+        ])
+        self.assertEqual(data.score, 700)
+        self.assertEqual(data.time_limit_msec, 2 * 1000)
+
+    def test_from_html_5(self):
+        url = 'https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a'
+        resp = requests.get(url)
+        html = resp.content.decode(resp.apparent_encoding)
+        data = AtCoderProblemDetailedData.from_html(html, problem=AtCoderProblem.from_url(url))
+
+        self.assertEqual(data.alphabet, 'A')
+        self.assertEqual(data.available_languages, None)
+        self.assertEqual(data.html, html)
+        self.assertEqual(data.input_format, None)
+        self.assertEqual(data.memory_limit_byte, 64 * 1000 * 1000)
+        self.assertEqual(data.name, '天下一株式会社採用情報')
+        self.assertEqual(data.problem, AtCoderProblem.from_url(url))
+        self.assertEqual(data.sample_cases, [])
+        self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
 
