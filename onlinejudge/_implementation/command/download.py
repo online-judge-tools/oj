@@ -71,9 +71,6 @@ def download(args: 'argparse.Namespace') -> None:
                 continue
             if path.exists():
                 log.warning('file already exists: %s', path)
-                if not args.overwrite:
-                    log.warning('skipped')
-                    continue
             path.parent.mkdir(parents=True, exist_ok=True)
             with path.open('wb') as fh:
                 fh.write(data)
