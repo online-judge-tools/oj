@@ -307,6 +307,9 @@ def main(args: Optional[List[str]] = None) -> None:
         log.error(str(e))
         log.debug(traceback.format_exc())
         sys.exit(1)
+    except requests.exceptions.InvalidURL as e:
+        log.error(str(e))
+        sys.exit(1)
     except onlinejudge.type.SampleParseError:
         log.error('Failed to parse sample.')
         sys.exit(1)

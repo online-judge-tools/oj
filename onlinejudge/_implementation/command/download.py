@@ -2,8 +2,9 @@
 import json
 import os
 import pathlib
-import sys
 from typing import *
+
+import requests.exceptions
 
 import onlinejudge
 import onlinejudge._implementation.download_history
@@ -29,7 +30,7 @@ def download(args: 'argparse.Namespace') -> None:
     # prepare values
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
-        sys.exit(1)
+        raise requests.exceptions.InvalidURL('The contest "%s" is not supported' % args.url)
     is_default_format = args.format is None and args.directory is None  # must be here since args.directory and args.format are overwritten
     if args.directory is None:
         args.directory = pathlib.Path('test')
