@@ -39,9 +39,9 @@ def download(args: 'argparse.Namespace') -> None:
     # get samples from the server
     with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
         if args.system:
-            samples = problem.download_system_cases(session=sess)  # type: ignore
+            samples = problem.download_system_cases(session=sess)
         else:
-            samples = problem.download_sample_cases(session=sess)  # type: ignore
+            samples = problem.download_sample_cases(session=sess)
 
     # append the history for submit command
     if not args.dry_run and is_default_format:
