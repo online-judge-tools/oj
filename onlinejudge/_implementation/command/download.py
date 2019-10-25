@@ -70,7 +70,7 @@ def download(args: 'argparse.Namespace') -> None:
             if args.dry_run:
                 continue
             if path.exists():
-                log.warning('file already exists: %s', path)
+                raise FileExistsError('Failed to download since file already exists: ' + str(path))
             path.parent.mkdir(parents=True, exist_ok=True)
             with path.open('wb') as fh:
                 fh.write(data)

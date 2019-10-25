@@ -310,6 +310,9 @@ def main(args: Optional[List[str]] = None) -> None:
     except onlinejudge.type.SampleParseError:
         log.error('Failed to parse sample.')
         sys.exit(1)
+    except FileExistsError as e:
+        log.error(str(e))
+        sys.exit(1)
 
 
 if __name__ == '__main__':
