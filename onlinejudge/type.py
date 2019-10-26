@@ -343,10 +343,6 @@ class Submission(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_problem(self) -> Problem:
-        raise NotImplementedError
-
-    @abstractmethod
     def download_problem(self) -> Problem:
         raise NotImplementedError
 

@@ -1099,13 +1099,6 @@ class AtCoderSubmission(onlinejudge.type.Submission):
         problem_id = self.download_data(session=session).problem_id
         return AtCoderProblem(contest_id=self.contest_id, problem_id=problem_id)
 
-    def get_problem(self) -> AtCoderProblem:
-        """
-        :raises Exception:
-        :note: There is no way to reconstruct problem_id without networking
-        """
-        raise Exception
-
     def download_data(self, *, session: Optional[requests.Session] = None) -> AtCoderSubmissionDetailedData:
         """
         :note: `Exec Time` is undefined when the status is `RE` or `TLE`

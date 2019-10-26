@@ -22,8 +22,6 @@ class DispatchAtCoderTest(unittest.TestCase):
         submission = dispatch.submission_from_url('https://atcoder.jp/contests/agc039/submissions/7874055')
         self.assertIsInstance(submission, service.atcoder.AtCoderSubmission)
         self.assertIsInstance(submission.get_service(), service.atcoder.AtCoderService)
-        with self.assertRaises(Exception):
-            submission.get_problem()
         problem = submission.download_problem()
         self.assertEqual(problem.contest_id, "agc039")
         self.assertEqual(problem.problem_id, "agc039_b")
