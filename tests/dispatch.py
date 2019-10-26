@@ -13,6 +13,11 @@ class DispatchAtCoderTest(unittest.TestCase):
         self.assertEqual(problem.download_input_format(), '\r\n<var>N</var>\r\n<var>c_1c_2c_3…c_N</var>\r\n')
         self.assertEqual(problem.get_name(), 'センター採点')
 
+    def test_problem_from_url_via_submission(self):
+        problem = dispatch.problem_from_url('https://atcoder.jp/contests/abc143/submissions/8059168')
+        self.assertTrue(isinstance(problem, service.atcoder.AtCoderProblem))
+        self.assertEqual(problem.get_url(), 'https://atcoder.jp/contests/abc143/tasks/abc143_c')
+
     def test_submission_from_url(self):
         submission = dispatch.submission_from_url('https://atcoder.jp/contests/agc039/submissions/7874055')
         self.assertIsInstance(submission, service.atcoder.AtCoderSubmission)

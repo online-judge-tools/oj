@@ -346,6 +346,10 @@ class Submission(ABC):
     def get_problem(self) -> Problem:
         raise NotImplementedError
 
+    @abstractmethod
+    def download_problem(self) -> Problem:
+        raise NotImplementedError
+
     def get_contest(self) -> Contest:
         return self.get_problem().get_contest()
 
