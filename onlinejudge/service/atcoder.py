@@ -13,7 +13,6 @@ the module for AtCoder (https://atcoder.jp/)
 :note: Some methods not inherited from classes :py:mod:`onlinejudge.type` may be modified in future, because the specification is not fixed yet.
 """
 
-import datetime
 import itertools
 import posixpath
 import re
