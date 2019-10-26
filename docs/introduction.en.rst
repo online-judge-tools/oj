@@ -1,11 +1,11 @@
 Introduction to online-judge-tools (English)
-=============================================
+============================================
 
 online-judge-tools is a tool for automating typical tasks that exist in competitive programming.
 
 
 Install
-------------
+-------
 
 If Python is installed, you can install it with just the following command.
 
@@ -17,7 +17,7 @@ Linux or Mac OS is recommended for the OS, but it also works on Windows.
 
 
 Sample case test
-----------------------
+----------------
 
 Do you test with sample cases before submission?
 Have you ever been troublesome and omitted?
@@ -97,7 +97,7 @@ Run ``oj d --help`` or ``oj t --help`` to see other features.
 
 
 Submit
-----
+------
 
 When submitting your implemented solution, you have to select "Problem to be submitted to the program" and "Implement language of the program to be submitted" with the mouse, copy and paste the source code into the text box, and press the send button. This series of operations is troublesome.
 Have you ever experienced a penalty when you made a mistake in selecting the “submission issue” or “submission language” at the time of submission?
@@ -166,7 +166,7 @@ The language is automatically recognized and set appropriately.
 
 
 Stress test
---------------
+-----------
 
 What should I do when I get a situation where I implemented and submitted the sample because it matched, but it turned out to be WA or RE, but I don't know the cause at all?
 This can be debugged using a randomly generated case.
@@ -290,7 +290,7 @@ There are also more efficient options such as ``--hack`` and parallelization opt
 
 
 Test for special forms of problem
-------------------------------
+---------------------------------
 
 -   Error judge
 
@@ -405,7 +405,7 @@ Download system case (``oj d --system``):
 
 
 Missing features
---------------
+----------------
 
 To explain what online-judge-tools is, we need to say what we can do, but that is not enough.
 You should also say "what you can't do".
