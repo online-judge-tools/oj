@@ -644,30 +644,31 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
         expected_strings = ['入力例', '出力例', 'Sample Input', 'Sample Output']
         finished = False
 
-        # the first format: p+pre
-        # this format uses 'literal-block' in its page
-        # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
-        for pre in soup.find_all('pre', 'literal-block'):
-            finished = True
-            log.debug('pre tag: %s', str(pre))
-            yield from tag_plus(tag=pre, expected_prv='p', expected_strings=expected_strings)
-        if finished: return
+        if not finished:
+            # the first format: p+pre
+            # this format uses 'literal-block' in its page
+            # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
+            for pre in soup.find_all('pre', 'literal-block'):
+                finished = True
+                log.debug('pre tag: %s', str(pre))
+                yield from tag_plus(tag=pre, expected_prv='p', expected_strings=expected_strings)
 
-        # the second format: h3+section pre
-        # this format uses 'prettyprint linenums' in its page
-        # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
-        for pre in soup.find_all('pre', 'prettyprint linenums'):
-            finished = True
-            log.debug('pre tag: %s', str(pre))
-            yield from tag_plus(tag=pre.parent, expected_prv='h3', expected_strings=expected_strings)
-        if finished: return
+        if not finished:
+            # the second format: h3+section pre
+            # this format uses 'prettyprint linenums' in its page
+            # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
+            for pre in soup.find_all('pre', 'prettyprint linenums'):
+                finished = True
+                log.debug('pre tag: %s', str(pre))
+                yield from tag_plus(tag=pre.parent, expected_prv='h3', expected_strings=expected_strings)
 
-        # the third format: h3+pre
-        # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
-        for pre in soup.find_all('pre'):
-            finished = True
-            log.debug('pre tag: %s', str(pre))
-            yield from tag_plus(tag=pre, expected_prv='h3', expected_strings=expected_strings)
+        if not finished:
+            # the third format: h3+pre
+            # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
+            for pre in soup.find_all('pre'):
+                finished = True
+                log.debug('pre tag: %s', str(pre))
+                yield from tag_plus(tag=pre, expected_prv='h3', expected_strings=expected_strings)
 
     @classmethod
     def _parse_sample_cases(cls, soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
