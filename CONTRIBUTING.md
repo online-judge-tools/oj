@@ -54,7 +54,7 @@ WIP PR is also useful to have discussions based on a concrete code.
 
 もしあなたのPRが完成されていない場合でも、[WIP]とタイトルにつけてPRを送って頂いて構いません。
 やりたいことをわかりやすくかいていただければ、メンテナや他の開発者がどうやってマージまで進めていくか相談に乗ることができます。
-WIPなPRはコードをベースに議論していくこたができるという点で有用です。
+WIPなPRはコードをベースに議論していくことができるという点で有用です。
 
 # Internal Structure / 内部構造
 
