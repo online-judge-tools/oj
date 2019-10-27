@@ -338,7 +338,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.alphabet, 'A')
         self.assertEqual(data.available_languages, None)
         self.assertEqual(data.html, html)
-        #self.assertEqual(data.input_format, '\r\n<var>R</var> <var>C</var>\r\n<var>X</var> <var>Y</var>\r\n<var>D</var> <var>L</var>\r\n')
+        #self.assertEqual(data.input_format, '')
         self.assertEqual(data.memory_limit_byte, 300 * 1000 * 1000)
         self.assertEqual(data.name, 'プログラミングコンテスト')
         self.assertEqual(data.problem, AtCoderProblem.from_url(url))
@@ -389,6 +389,99 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.sample_cases, [])
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
+
+    # (see https://github.com/kmyk/online-judge-tools/issues/414)
+    def test_from_html_6(self):
+        url = 'https://atcoder.jp/contests/fuka5/tasks/fuka_graphcut'
+        resp = requests.get(url)
+        html = resp.content.decode(resp.apparent_encoding)
+        data = AtCoderProblemDetailedData.from_html(html, problem=AtCoderProblem.from_url(url))
+
+        self.assertEqual(data.alphabet, 'G')
+        self.assertEqual(data.available_languages, None)
+        self.assertEqual(data.html, html)
+        #self.assertEqual(data.input_format, '')
+        self.assertEqual(data.memory_limit_byte, 256 * 1000 * 1000)
+        self.assertEqual(data.name, 'Graph Cut')
+        self.assertEqual(data.problem, AtCoderProblem.from_url(url))
+        self.assertEqual(data.sample_cases, [
+            TestCase(name='sample-1', input_name='Sample Input', input_data=b'10 10 0.4000 0.20\n\
+.##...###.\n\
+.##.####..\n\
+.######...\n\
+.#.#.####.\n\
+######....\n\
+##.##.....\n\
+....#.....\n\
+..####.#..\n\
+.#####.##.\n\
+.#####.##.\n\
+25 38 0.5 0.24\n\
+...........#...............#..........\n\
+...........###..........####..........\n\
+....##.....#####.......####...........\n\
+.....##.....###############.....##....\n\
+............#####.###.#####......#....\n\
+............#########.####............\n\
+.....##......#########.###............\n\
+....##......#####.#########........#..\n\
+....#......##.##..####..####..........\n\
+.......#...###########.#####...#......\n\
+.......##.##################..##......\n\
+........#####.####.##.######.##.......\n\
+..........####################........\n\
+.........##.##..########..#####.......\n\
+.......######....##..#....###.##......\n\
+......###.####...##.##..#####.##.#....\n\
+....###..##..#...#####..#..########...\n\
+..####..###.....#######......#######..\n\
+...#######......#######........###....\n\
+..####.........##.######........###...\n\
+...............###...###..............\n\
+..............#######..#...#...##.....\n\
+.........#....##########...#....#.....\n\
+..#.....##.....########...............\n\
+...............########...............\n\
+0 0 0 0\n', output_name='Sample Output', output_data=b'11.200000\n\
+.##...###.\n\
+.##.####..\n\
+.######...\n\
+.######...\n\
+######....\n\
+##.##.....\n\
+....#.....\n\
+..####....\n\
+.#####.##.\n\
+.#####.##.\n\
+73.540000\n\
+...........#...............#..........\n\
+...........###..........####..........\n\
+...........#####.......####...........\n\
+............###############...........\n\
+............###############...........\n\
+............##############............\n\
+.............#############............\n\
+............###############...........\n\
+...........#################..........\n\
+.......#...#################...#......\n\
+.......##.##################..##......\n\
+........####################.##.......\n\
+..........####################........\n\
+.........#####..########..#####.......\n\
+.......######....#####....######......\n\
+......########...#####..########.#....\n\
+....#######..#...#####..#..########...\n\
+..#########.....#######......#######..\n\
+...#######......#######........###....\n\
+..####.........#########........###...\n\
+...............#########..............\n\
+..............##########..............\n\
+..............##########..............\n\
+...............########...............\n\
+...............########...............\n'),
+        ])
+        self.assertEqual(data.score, None)
+        self.assertEqual(data.time_limit_msec, 5 * 1000)
 
 
 class AtCoderProblemGetInputFormatTest(unittest.TestCase):
