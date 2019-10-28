@@ -50,7 +50,7 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
 
 def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
     # prepare the comparing function
-    if judge is not None:
+    if judge is not None: # special judge mode
         def match(command_output, _):
             input = test_input_path.read_text()
             stdin = tempfile.TemporaryFile()
