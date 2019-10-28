@@ -148,6 +148,7 @@ tips:
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
     subparser.add_argument('--json', action='store_true')
+    subparser.add_argument('--special-judge', dest='judge', default=None, help='a command to judge your solution. (note. use stdin to input of judge command, 1.input of testcase, 2.output of your solution)')
     subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
 
     # generate output

@@ -47,9 +47,13 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
     return True
 
 
-def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool) -> str:
+def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
     # prepare the comparing function
-    if error:  # float mode
+    if judge is not None:
+        print(judge)
+        def match(a, _):
+            return False
+    elif error:  # float mode
         match = lambda a, b: compare_as_floats(a, b, error)
     else:
         rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
@@ -159,7 +163,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             else:
                 log.warning('memory: %f MB', memory)
 
-        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip)
+        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
 
     # return the result
     testcase = {
