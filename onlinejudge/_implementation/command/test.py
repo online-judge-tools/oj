@@ -1,6 +1,7 @@
 # Python Version: 3.x
 import concurrent.futures
 import contextlib
+import io
 import json
 import math
 import os
@@ -50,9 +51,13 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
 def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
     # prepare the comparing function
     if judge is not None:
-        print(judge)
-        def match(a, _):
-            return False
+        def match(command_output, _):
+            input = test_input_path.read_text()
+            stdin = tempfile.TemporaryFile()
+            stdin.write((input.rstrip('\n') + '\n' + command_output).encode('utf-8'))
+            info, proc = utils.exec_command(judge, stdin=stdin)
+            stdin.close()
+            return proc.returncode == 0
     elif error:  # float mode
         match = lambda a, b: compare_as_floats(a, b, error)
     else:
