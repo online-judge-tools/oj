@@ -203,6 +203,65 @@ class TestTest(unittest.TestCase):
             }],
         )
 
+    def test_call_test_special_judge(self):
+        self.snippet_call_test(
+            args=['-c', 'echo foo'.format(sys.executable), '--special-judge', 'bash -c \'test $(wc -l) -eq 3\''.format(sys.executable)],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-2.out',
+                    'data': 'foo\nbarbar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foo\nfoobar\nfoofoofoo\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foo\nfoobar\nfoofoofoo\n'.replace('\n', os.linesep)
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\n'.replace('\n', os.linesep),
+                'exitcode': 0,
+            }, {
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                    'output': '%s/test/sample-2.out',
+                },
+                'output': 'foo\n'.replace('\n', os.linesep),
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foo\n'.replace('\n', os.linesep),
+                'exitcode': 0,
+            }],
+        )
+
     def test_call_test_multiline_all(self):
         self.snippet_call_test(
             args=['-c', cat(), '-m', 'all'],
