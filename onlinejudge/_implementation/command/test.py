@@ -1,7 +1,6 @@
 # Python Version: 3.x
 import concurrent.futures
 import contextlib
-import io
 import json
 import math
 import os
