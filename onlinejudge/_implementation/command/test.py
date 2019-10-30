@@ -56,12 +56,11 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
 
         def match(a, b):
             input = test_input_path.read_text()
-            stdin = tempfile.TemporaryFile()
-            stdin.write((input.rstrip('\n') + '\n' + a).encode('utf-8'))
-            stdin.seek(0)
-            info, proc = utils.exec_command(judge, stdin=stdin)
-            stdin.close()
-            return proc.returncode == 0
+            with tempfile.TemporaryFile() as stdin
+                stdin.write((input.rstrip('\n') + '\n' + a).encode('utf-8'))
+                stdin.seek(0)
+                info, proc = utils.exec_command(judge, stdin=stdin)
+                return proc.returncode == 0
     else:
         rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
 
