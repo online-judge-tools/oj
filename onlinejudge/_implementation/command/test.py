@@ -56,7 +56,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
 
         def match(a, b):
             input = test_input_path.read_text()
-            with tempfile.TemporaryFile() as stdin
+            with tempfile.TemporaryFile() as stdin:
                 stdin.write((input.rstrip('\n') + '\n' + a).encode('utf-8'))
                 stdin.seek(0)
                 info, proc = utils.exec_command(judge, stdin=stdin)
