@@ -142,7 +142,7 @@ def submit(args: 'argparse.Namespace') -> None:
         # show result
         if args.open:
             browser = webbrowser.get()
-            log.status('open the submission page with: %s', browser.name)
+            log.status('open the submission page with: %s', browser.name if hasattr(browser, 'name') else browser._name)
             opened = browser.open_new_tab(submission.get_url())
             if not opened:
                 log.failure('failed to open the url. please set the $BROWSER envvar')
