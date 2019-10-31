@@ -102,8 +102,8 @@ We use `isort` and `yapf`.
 You can run them with the following commands:
 
 ``` sh
-$ isort --recursive oj onlinejudge
-$ yapf --in-place --recursive oj onlinejudge
+$ isort --recursive onlinejudge tests
+$ yapf --in-place --recursive onlinejudge tests
 ```
 
 The line width is set as infinity.
