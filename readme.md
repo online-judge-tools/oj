@@ -3,12 +3,10 @@
 [![Travis](https://img.shields.io/travis/kmyk/online-judge-tools/master.svg)](https://travis-ci.org/kmyk/online-judge-tools)
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/f0jfg16ap6g91l40/branch/master?svg=true)](https://ci.appveyor.com/project/kmyk/online-judge-tools)
 [![Documentation Status](https://readthedocs.org/projects/online-judge-tools/badge/?version=master)](https://online-judge-tools.readthedocs.io/en/master/)
-[![PyPI](https://img.shields.io/pypi/pyversions/online-judge-tools.svg)](#)
-[![PyPI](https://img.shields.io/pypi/status/online-judge-tools.svg)](#)
 [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools)
-[![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)](#)
 [![Downloads](https://pepy.tech/badge/online-judge-tools)](https://pepy.tech/project/online-judge-tools)
-[![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)](https://github.com/kmyk/online-judge-tools/blob/master/LICENSE)
+[![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community)
 
 Tools for online judge services. Downloading sample cases, Testing/Submitting your code, and various utilities.
 
@@ -65,7 +63,7 @@ The portable executables `oj.exe` for Windows are downloadable from [GitHub rele
 
 ### from PyPI
 
-The package is <https://pypi.python.org/pypi/online-judge-tools>.
+The package is <https://pypi.python.org/pypi/online-judge-tools> [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools).
 
 ``` sh
 $ pip3 install online-judge-tools
@@ -138,7 +136,7 @@ $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
 
 ## How to use as a library
 
-Read the documents: <https://online-judge-tools.readthedocs.io/en/master/>
+Read the documents: <https://online-judge-tools.readthedocs.io/en/master/> [![Documentation Status](https://readthedocs.org/projects/online-judge-tools/badge/?version=master)](https://online-judge-tools.readthedocs.io/en/master/)
 
 ## Example to use as a library
 
@@ -189,7 +187,7 @@ AtCoder Beginner Contest 118: B - Foods Loved by Everyone    kotatsugame  (37 by
 -   I don't want to give my password to this program.
     -   This program stores only your session tokens. Use `oj login --use-brower=always ...` and read [onlinejudge/_implementation/command/login.py](https://github.com/kmyk/online-judge-tools/blob/master/onlinejudge/_implementation/command/login.py).
 
-For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) or other SNSs.
+For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) [![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community) or other SNSs.
 
 ## Related Tools
 
