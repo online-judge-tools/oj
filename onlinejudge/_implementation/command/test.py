@@ -57,11 +57,13 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
 
         def match(a, b):
             input = test_input_path.read_bytes()
-            with tempfile.NamedTemporaryFile() as user_output:
-                user_output.write(a.rstrip(rstrip_targets).encode())
-                user_output.seek(0)
-                info, proc = utils.exec_command('{} {} {} {}'.format(judge, str(test_input_path.resolve()), user_output.name, str(test_output_path.resolve())))
-                return proc.returncode == 0
+            user_output = tempfile.NamedTemporaryFile(delete=False)
+            user_output.write(a.rstrip(rstrip_targets).encode())
+            user_output.seek(0)
+            info, proc = utils.exec_command('{} {} {} {}'.format(judge, str(test_input_path.resolve()), user_output.name, str(test_output_path.resolve())))
+            user_output.close()
+            os.unlink(user_output.name)
+            return proc.returncode == 0
     else:
 
         def match(a, b):
