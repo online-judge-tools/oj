@@ -131,7 +131,7 @@ def submit(args: 'argparse.Namespace') -> None:
             else:
                 kwargs['kind'] = 'example'
         try:
-            submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess, **kwargs)  # type: ignore
+            submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess, **kwargs)
         except NotLoggedInError:
             log.failure('login required')
             sys.exit(1)
