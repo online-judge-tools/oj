@@ -204,7 +204,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_test_special_judge(self):
-        def assert_line_count(expected: int)->str:
+        def assert_line_count(expected: int) -> str:
             return '{} -c "import sys; assert len(sys.stdin.readlines()) == {}"'.format(sys.executable, expected)
 
         self.snippet_call_test(
