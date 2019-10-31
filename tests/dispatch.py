@@ -58,6 +58,7 @@ class DispatchCodeForcesTest(unittest.TestCase):
 class InvalidDispatchTest(unittest.TestCase):
     def test_problem_from_url(self):
         self.assertIsNone(dispatch.problem_from_url('https://atcoder.jp/contests/agc039'))
+        self.assertIsNone(dispatch.problem_from_url("https://yukicoder.me/contests/241/"))
 
     def test_submission_from_url(self):
         self.assertIsNone(dispatch.submission_from_url('https://atcoder.jp/contests/agc039'))
