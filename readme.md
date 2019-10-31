@@ -218,22 +218,20 @@ projects depending on kmyk/online-judge-tools:
     -   [kmyk/AtCoderProblemsStatic](https://github.com/kmyk/AtCoderProblemsStatic) is a clone of [kenkoooo/AtCoderProblems](https://github.com/kenkoooo/AtCoderProblems)
     -   [kmyk/atcoder-auto-debugger](https://github.com/kmyk/atcoder-auto-debugger) is a program to analyze submissions for AtCoder and find bugs
 
-## Authors
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md)
+
+### Hall-Of-Fame
+
+[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/0)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/0)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/1)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/1)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/2)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/2)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/3)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/3)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/4)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/4)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/5)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/5)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/6)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/6)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/7)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/7)
+
+For the full list of contibutors, see [CHANGELOG.md](https://github.com/kmyk/online-judge-tools/blob/master/CHANGELOG.md) or [the contributors page](https://github.com/kmyk/online-judge-tools/graphs/contributors) of GitHub.
+
+### maintainers
 
 -   owner: [@kmyk](https://github.com/kmyk) (AtCoder: [kimiyuki](https://atcoder.jp/users/kimiyuki), Codeforces: [kimiyuki](https://codeforces.com/profile/kimiyuki))
 -   collaborator: [@fukatani](https://github.com/fukatani) (AtCoder: [ryoryoryo111](https://atcoder.jp/users/ryoryoryo111))
-
-Also, patches are used sent from
-[@kjnh10](https://github.com/kjnh10),
-[@hachi-88](https://github.com/hachi-88),
-[@Pachicobue](https://github.com/Pachicobue),
-[@kfaRabi](https://github.com/kfaRabi),
-[@tMasaaa](https://github.com/tMasaaa),
-[@hamayanhamayan](https://github.com/hamayanhamayan),
-[@yoshrc](https://github.com/yoshrc),
-[@kawacchu](https://github.com/kawacchu),
-[@pieceofeden](https://github.com/pieceofeden),
-and [@nishanth2143](https://github.com/nishanth2143).
 
 ## License
 
