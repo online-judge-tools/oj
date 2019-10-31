@@ -205,7 +205,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_special_judge(self):
         self.snippet_call_test(
-            args=['-c', 'echo foo', '--special-judge', 'bash -c \'test $(wc -l) -eq 3\''],
+            args=['-c', 'echo foo', '--judge-command', 'bash -c \'test $(wc -l) -eq 3\''],
             files=[
                 {
                     'path': 'test/sample-1.in',
