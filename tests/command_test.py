@@ -232,7 +232,7 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-2.out',
                     'data': 'foo\nfoo\nfoo\nbar\n'.replace('\n', os.linesep)
                 },
-                                {
+                {
                     'path': 'test/sample-3.in',
                     'data': 'foofoobar\n'.replace('\n', os.linesep)
                 },
@@ -240,7 +240,6 @@ class TestTest(unittest.TestCase):
                     'path': 'test/sample-3.out',
                     'data': 'foo\nfoo\nfoo\n'.replace('\n', os.linesep)
                 },
-
             ],
             expected=[{
                 'status': 'AC',
@@ -251,8 +250,7 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'foo\n'.replace('\n', os.linesep),
                 'exitcode': 0,
-            },
-            {
+            }, {
                 'status': 'WA',
                 'testcase': {
                     'name': 'sample-2',
@@ -261,8 +259,7 @@ class TestTest(unittest.TestCase):
                 },
                 'output': 'foo\n'.replace('\n', os.linesep),
                 'exitcode': 0,
-            },
-            {
+            }, {
                 'status': 'WA',
                 'testcase': {
                     'name': 'sample-3',
@@ -272,7 +269,6 @@ class TestTest(unittest.TestCase):
                 'output': 'foo\n'.replace('\n', os.linesep),
                 'exitcode': 0,
             }],
-
         )
 
     def test_call_test_multiline_all(self):
