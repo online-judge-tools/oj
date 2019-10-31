@@ -48,6 +48,8 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
 
 
 def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
+    rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
+
     # prepare the comparing function
     if error is not None:  # float mode
         match = lambda a, b: compare_as_floats(a, b, error)
@@ -56,12 +58,11 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
         def match(a, b):
             input = test_input_path.read_text()
             with tempfile.TemporaryFile() as stdin:
-                stdin.write((input.rstrip('\n') + '\n' + a).encode('utf-8'))
+                stdin.write((input.rstrip(rstrip_targets) + '\n' + a).replace('\n', os.linesep).encode('utf-8'))
                 stdin.seek(0)
                 info, proc = utils.exec_command(judge, stdin=stdin)
                 return proc.returncode == 0
     else:
-        rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
 
         def match(a, b):
             if a == b:
