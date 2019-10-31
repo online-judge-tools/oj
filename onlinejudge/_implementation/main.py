@@ -68,7 +68,6 @@ format string for --format:
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (default: "sample-%%i.%%e" if not --system)')  # default must be None for --system
     subparser.add_argument('-d', '--directory', type=pathlib.Path, help='a directory name for test cases (default: test/)')  # default must be None for guessing in submit command
-    subparser.add_argument('--overwrite', action='store_true')
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
     subparser.add_argument('-s', '--silent', action='store_true')
@@ -308,8 +307,14 @@ def main(args: Optional[List[str]] = None) -> None:
         log.error(str(e))
         log.debug(traceback.format_exc())
         sys.exit(1)
+    except requests.exceptions.InvalidURL as e:
+        log.error(str(e))
+        sys.exit(1)
     except onlinejudge.type.SampleParseError:
         log.error('Failed to parse sample.')
+        sys.exit(1)
+    except FileExistsError as e:
+        log.error(str(e))
         sys.exit(1)
 
 

@@ -48,3 +48,36 @@ def snippet_call_download_raises(self, expected_exception, url, is_system=False,
     args = get_parser().parse_args(args=args)
     with self.assertRaises(expected_exception):
         download(args)
+
+
+def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_silent=False, type='files'):
+    assert type in 'files' or 'json'
+    if type == 'json':
+        files = get_files_from_json(files)
+
+    with tests.utils.sandbox([]):
+        args = ['download', url1]
+        if is_system:
+            args += ['--system']
+        if is_silent:
+            args += ['--silent']
+        args = get_parser().parse_args(args=args)
+        download(args)
+
+        args = ['download', url2]
+        if is_system:
+            args += ['--system']
+        if is_silent:
+            args += ['--silent']
+        args = get_parser().parse_args(args=args)
+        # download from url2 should be aborted.
+        with self.assertRaises(FileExistsError):
+            download(args)
+
+        # check download from url1 is not overwritten
+        result = {}
+        if os.path.exists('test'):
+            for name in os.listdir('test'):
+                with open(os.path.join('test', name)) as fh:
+                    result[name] = hashlib.md5(fh.buffer.read()).hexdigest()
+        self.assertEqual(files, result)

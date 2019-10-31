@@ -2,8 +2,9 @@
 import json
 import os
 import pathlib
-import sys
 from typing import *
+
+import requests.exceptions
 
 import onlinejudge
 import onlinejudge._implementation.download_history
@@ -29,7 +30,7 @@ def download(args: 'argparse.Namespace') -> None:
     # prepare values
     problem = onlinejudge.dispatch.problem_from_url(args.url)
     if problem is None:
-        sys.exit(1)
+        raise requests.exceptions.InvalidURL('The contest "%s" is not supported' % args.url)
     is_default_format = args.format is None and args.directory is None  # must be here since args.directory and args.format are overwritten
     if args.directory is None:
         args.directory = pathlib.Path('test')
@@ -70,10 +71,7 @@ def download(args: 'argparse.Namespace') -> None:
             if args.dry_run:
                 continue
             if path.exists():
-                log.warning('file already exists: %s', path)
-                if not args.overwrite:
-                    log.warning('skipped')
-                    continue
+                raise FileExistsError('Failed to download since file already exists: ' + str(path))
             path.parent.mkdir(parents=True, exist_ok=True)
             with path.open('wb') as fh:
                 fh.write(data)
