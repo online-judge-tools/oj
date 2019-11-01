@@ -211,7 +211,7 @@ class TestTest(unittest.TestCase):
             return tests.utils.python_c('import sys\n{}{}{}'.format(assert_line_count('sys.argv[1]', testcase_input), assert_line_count('sys.argv[2]', user_output), assert_line_count('sys.argv[3]', testcase_output)))
 
         def echo(sentence: str) -> str:
-            return tests.utils.python_c("import os, sys; sys.stdout.buffer.write(('{}' + os.linesep).encode('utf8'))".format(sentence))
+            return tests.utils.python_c("import os, sys; sys.stdout.buffer.write(('{}' + os.linesep).encode())".format(sentence))
 
         self.snippet_call_test(
             args=['-c', echo('foo'), '--judge-command', assert_each_line_count(2, 1, 3)],
