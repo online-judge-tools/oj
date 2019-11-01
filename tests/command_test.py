@@ -248,7 +248,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-1.in',
                     'output': '%s/test/sample-1.out',
                 },
-                'output': 'foo\n'.replace('\n', os.linesep),
+                'output': 'foo\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -257,7 +257,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-2.in',
                     'output': '%s/test/sample-2.out',
                 },
-                'output': 'foo\n'.replace('\n', os.linesep),
+                'output': 'foo\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -266,7 +266,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-3.in',
                     'output': '%s/test/sample-3.out',
                 },
-                'output': 'foo\n'.replace('\n', os.linesep),
+                'output': 'foo\n',
                 'exitcode': 0,
             }],
         )
