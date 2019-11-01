@@ -54,12 +54,6 @@ def problem_from_url(url: str) -> Optional[Problem]:
         if problem is not None:
             log.status('problem recognized: %s: %s', str(problem), url)
             return problem
-    submission = submission_from_url(url)
-    if submission is not None:
-        try:
-            return submission.download_problem()
-        except NotImplementedError:
-            pass
     log.failure('unknown problem: %s', url)
     return None
 

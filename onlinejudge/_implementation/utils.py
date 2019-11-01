@@ -370,7 +370,7 @@ class DummySubmission(Submission):
     def get_url(self) -> str:
         return self.url
 
-    def download_problem(self) -> Problem:
+    def download_problem(self, *, session: Optional[requests.Session] = None) -> Problem:
         raise NotImplementedError
 
     def get_service(self) -> Service:

@@ -335,7 +335,7 @@ class Submission(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download_problem(self) -> Problem:
+    def download_problem(self, *, session: Optional[requests.Session] = None) -> Problem:
         raise NotImplementedError
 
     @abstractmethod
