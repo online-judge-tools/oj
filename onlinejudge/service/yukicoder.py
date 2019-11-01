@@ -353,10 +353,9 @@ class YukicoderProblem(onlinejudge.type.Problem):
                 pass
             if n is not None:
                 if dirname == '/problems/no':
-                    return cls(problem_no=int(n))
+                    return cls(problem_no=n)
                 if dirname == '/problems':
-                    return cls(problem_id=int(n))
-            return cls()
+                    return cls(problem_id=n)
         return None
 
     def get_service(self) -> YukicoderService:
