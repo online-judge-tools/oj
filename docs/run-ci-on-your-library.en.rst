@@ -104,7 +104,7 @@ You can use Travis CI, one of the CI services.
 
    before_install:
        - pip3 install -U setuptools
-       - pip3 install -U online-judge-tools=='6.*'
+       - pip3 install -U online-judge-tools=='7.*'
    script:
        - bash test.sh
 
