@@ -327,8 +327,8 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
-    # test the second format (stated in AtCoderProblemDetailedData)
-    # (see https://github.com/kmyk/online-judge-tools/issues/106)
+    # test the first format (stated in AtCoderProblemDetailedData)
+    # see https://github.com/kmyk/online-judge-tools/issues/106
     def test_from_html_3(self):
         url = 'https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1'
         resp = requests.get(url)
@@ -350,7 +350,8 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 1 * 1000)
 
-    # deal with empty output case (see https://github.com/kmyk/online-judge-tools/issues/507)
+    # deal with empty output case
+    # see https://github.com/kmyk/online-judge-tools/issues/507
     def test_from_html_4(self):
         url = 'https://atcoder.jp/contests/agc036/tasks/agc036_b'
         resp = requests.get(url)
@@ -373,6 +374,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, 700)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
+    # test when there are no sample cases
     def test_from_html_5(self):
         url = 'https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a'
         resp = requests.get(url)
