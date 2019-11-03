@@ -24,7 +24,7 @@ class YukicoderService(onlinejudge.type.Service):
     def get_url_of_login_page(self):
         return self.get_url()
 
-    def is_logged_in(self, *, session: Optional[requests.Session] = None, method: Optional[str] = None) -> bool:
+    def is_logged_in(self, *, session: Optional[requests.Session] = None) -> bool:
         session = session or utils.get_default_session()
         url = 'https://yukicoder.me/auth/github'
         resp = utils.request('GET', url, session=session, allow_redirects=False)
@@ -50,8 +50,8 @@ class YukicoderService(onlinejudge.type.Service):
         assert (id is not None) != (name is not None)
         if id is not None:
             assert isinstance(id, int)
-            sometihng = {'user': '', 'solved': 'id/'}[api]
-            url = 'https://yukicoder.me/api/v1/{}/{}{}'.format(api, sometihng, id)
+            something = {'user': '', 'solved': 'id/'}[api]
+            url = 'https://yukicoder.me/api/v1/{}/{}{}'.format(api, something, id)
         else:
             assert name is not None
             url = 'https://yukicoder.me/api/v1/{}/name/{}'.format(api, urllib.parse.quote(name))
