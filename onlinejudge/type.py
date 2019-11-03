@@ -362,4 +362,4 @@ class Submission(ABC):
     @classmethod
     @abstractmethod
     def from_url(cls, s: str) -> Optional['Submission']:
-        pass
+        raise NotImplementedError
