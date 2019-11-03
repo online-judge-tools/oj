@@ -300,11 +300,10 @@ online-judge-tools には、これを助ける機能もあります。
 -   解が複数ある問題
 
    ジャッジ側のプログラムを自作して、解答の正否の判定に用いることができます。
-   たとえば問題 https://atcoder.jp/contests/abc074/tasks/arc083_a であれば、次のようなジャッジ側プログラムを書いて ``judge.py`` という名前で保存し、 ``oj --judge-command ./judge.py`` とすればテストが実行されます。
+   たとえば問題 https://atcoder.jp/contests/abc074/tasks/arc083_a であれば、次のようなジャッジ側プログラムを書いて ``judge.py`` という名前で保存し、 ``oj t --judge-command "python3 judge.py"`` とすればテストが実行されます。
 
    .. code-block:: python
 
-      #!/usr/bin/env python3
       import sys
       # input
       with open(sys.argv[1]) as testcase:
