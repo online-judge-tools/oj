@@ -283,7 +283,7 @@ class AtCoderSubmissionTest(unittest.TestCase):
 
 class AtCoderProblemDataTest(unittest.TestCase):
     # test the third format (stated in AtCoderProblemDetailedData)
-    def test_from_html_1(self):
+    def test_from_html_third_format(self):
         url = 'https://atcoder.jp/contests/abc114/tasks/abc114_d'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -305,7 +305,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
     # test the second format (stated in AtCoderProblemDetailedData)
-    def test_from_html_2(self):
+    def test_from_html_second_format(self):
         url = 'https://atcoder.jp/contests/abc003/tasks/abc003_4'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -329,7 +329,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
 
     # test the first format (stated in AtCoderProblemDetailedData)
     # see https://github.com/kmyk/online-judge-tools/issues/106
-    def test_from_html_3(self):
+    def test_from_html_first_format(self):
         url = 'https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -352,7 +352,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
 
     # deal with empty output case
     # see https://github.com/kmyk/online-judge-tools/issues/507
-    def test_from_html_4(self):
+    def test_from_html_with_empty_output(self):
         url = 'https://atcoder.jp/contests/agc036/tasks/agc036_b'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -375,7 +375,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
     # test when there are no sample cases
-    def test_from_html_5(self):
+    def test_from_html_without_sample_cases(self):
         url = 'https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -392,8 +392,8 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
-    # (see https://github.com/kmyk/online-judge-tools/issues/414)
-    def test_from_html_6(self):
+    # see https://github.com/kmyk/online-judge-tools/issues/414
+    def test_from_html_issue_414(self):
         url = 'https://atcoder.jp/contests/fuka5/tasks/fuka_graphcut'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
