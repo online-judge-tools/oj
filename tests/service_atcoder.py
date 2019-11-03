@@ -282,29 +282,27 @@ class AtCoderSubmissionTest(unittest.TestCase):
 
 
 class AtCoderProblemDataTest(unittest.TestCase):
-    # test the third format (stated in AtCoderProblemDetailedData)
-    def test_from_html_third_format(self):
-        url = 'https://atcoder.jp/contests/abc114/tasks/abc114_d'
+    def test_from_html_first_format(self):
+        url = 'https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
         data = AtCoderProblemDetailedData.from_html(html, problem=AtCoderProblem.from_url(url))
 
-        self.assertEqual(data.alphabet, 'D')
+        self.assertEqual(data.alphabet, 'A')
         self.assertEqual(data.available_languages, None)
         self.assertEqual(data.html, html)
-        self.assertEqual(data.input_format, '<var>N</var>\r\n')
-        self.assertEqual(data.memory_limit_byte, 1024 * 1000 * 1000)
-        self.assertEqual(data.name, '756')
+        self.assertEqual(data.input_format, None)
+        self.assertEqual(data.memory_limit_byte, 300 * 1000 * 1000)
+        self.assertEqual(data.name, 'プログラミングコンテスト')
         self.assertEqual(data.problem, AtCoderProblem.from_url(url))
         self.assertEqual(data.sample_cases, [
-            TestCase(name='sample-1', input_name='入力例 1', input_data=b'9\n', output_name='出力例 1', output_data=b'0\n'),
-            TestCase(name='sample-2', input_name='入力例 2', input_data=b'10\n', output_name='出力例 2', output_data=b'1\n'),
-            TestCase(name='sample-3', input_name='入力例 3', input_data=b'100\n', output_name='出力例 3', output_data=b'543\n'),
+            TestCase(name='sample-1', input_name='入力例 1:', input_data=b'3 4\n1 0 1 0\n1 1 1 0\n0 0 0 1\n', output_name='入力例 1 に対する出力例:', output_data=b'3\n'),
+            TestCase(name='sample-2', input_name='入力例 2:', input_data=b'3 4\n1 1 1 1\n1 1 1 1\n1 1 1 1\n', output_name='入力例 2 に対する出力例:', output_data=b'4\n'),
+            TestCase(name='sample-3', input_name='入力例 3:', input_data=b'1 1\n0\n', output_name='入力例 3 に対する出力例:', output_data=b'0\n'),
         ])
-        self.assertEqual(data.score, 400)
-        self.assertEqual(data.time_limit_msec, 2 * 1000)
+        self.assertEqual(data.score, None)
+        self.assertEqual(data.time_limit_msec, 1 * 1000)
 
-    # test the second format (stated in AtCoderProblemDetailedData)
     def test_from_html_second_format(self):
         url = 'https://atcoder.jp/contests/abc003/tasks/abc003_4'
         resp = requests.get(url)
@@ -327,31 +325,27 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
-    # test the first format (stated in AtCoderProblemDetailedData)
-    # see https://github.com/kmyk/online-judge-tools/issues/106
-    def test_from_html_first_format(self):
-        url = 'https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1'
+    def test_from_html_third_format(self):
+        url = 'https://atcoder.jp/contests/abc114/tasks/abc114_d'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
         data = AtCoderProblemDetailedData.from_html(html, problem=AtCoderProblem.from_url(url))
 
-        self.assertEqual(data.alphabet, 'A')
+        self.assertEqual(data.alphabet, 'D')
         self.assertEqual(data.available_languages, None)
         self.assertEqual(data.html, html)
-        self.assertEqual(data.input_format, None)
-        self.assertEqual(data.memory_limit_byte, 300 * 1000 * 1000)
-        self.assertEqual(data.name, 'プログラミングコンテスト')
+        self.assertEqual(data.input_format, '<var>N</var>\r\n')
+        self.assertEqual(data.memory_limit_byte, 1024 * 1000 * 1000)
+        self.assertEqual(data.name, '756')
         self.assertEqual(data.problem, AtCoderProblem.from_url(url))
         self.assertEqual(data.sample_cases, [
-            TestCase(name='sample-1', input_name='入力例 1:', input_data=b'3 4\n1 0 1 0\n1 1 1 0\n0 0 0 1\n', output_name='入力例 1 に対する出力例:', output_data=b'3\n'),
-            TestCase(name='sample-2', input_name='入力例 2:', input_data=b'3 4\n1 1 1 1\n1 1 1 1\n1 1 1 1\n', output_name='入力例 2 に対する出力例:', output_data=b'4\n'),
-            TestCase(name='sample-3', input_name='入力例 3:', input_data=b'1 1\n0\n', output_name='入力例 3 に対する出力例:', output_data=b'0\n'),
+            TestCase(name='sample-1', input_name='入力例 1', input_data=b'9\n', output_name='出力例 1', output_data=b'0\n'),
+            TestCase(name='sample-2', input_name='入力例 2', input_data=b'10\n', output_name='出力例 2', output_data=b'1\n'),
+            TestCase(name='sample-3', input_name='入力例 3', input_data=b'100\n', output_name='出力例 3', output_data=b'543\n'),
         ])
-        self.assertEqual(data.score, None)
-        self.assertEqual(data.time_limit_msec, 1 * 1000)
+        self.assertEqual(data.score, 400)
+        self.assertEqual(data.time_limit_msec, 2 * 1000)
 
-    # deal with empty output case
-    # see https://github.com/kmyk/online-judge-tools/issues/507
     def test_from_html_with_empty_output(self):
         url = 'https://atcoder.jp/contests/agc036/tasks/agc036_b'
         resp = requests.get(url)
@@ -374,7 +368,6 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, 700)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
-    # test when there are no sample cases
     def test_from_html_without_sample_cases(self):
         url = 'https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a'
         resp = requests.get(url)
@@ -392,7 +385,6 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
-    # see https://github.com/kmyk/online-judge-tools/issues/414
     def test_from_html_issue_414(self):
         url = 'https://atcoder.jp/contests/fuka5/tasks/fuka_graphcut'
         resp = requests.get(url)
