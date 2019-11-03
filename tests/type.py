@@ -1,6 +1,7 @@
 import unittest
 
 from onlinejudge.dispatch import problem_from_url, service_from_url, submission_from_url
+from onlinejudge.service import atcoder
 from onlinejudge.type import Problem, Service, Submission
 
 
@@ -22,3 +23,9 @@ class TypeTest(unittest.TestCase):
     def test_submission_eq(self):
         self.assertEqual(submission_from_url('https://atcoder.jp/contests/abc143/submissions/8264863'), submission_from_url('https://atcoder.jp/contests/abc143/submissions/8264863'))
         self.assertNotEqual(submission_from_url('https://atcoder.jp/contests/abc143/submissions/8264863'), submission_from_url('https://atcoder.jp/contests/abc143/submissions/8264897'))
+
+    def test_download_contest(self):
+        submission = submission_from_url('https://atcoder.jp/contests/abc143/submissions/8059104')
+        contest = submission.download_contest()
+        self.assertIsInstance(contest, atcoder.AtCoderContest)
+        self.assertEqual(contest.contest_id, 'abc143')

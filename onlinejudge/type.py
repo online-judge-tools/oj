@@ -338,6 +338,9 @@ class Submission(ABC):
     def download_problem(self, *, session: Optional[requests.Session] = None) -> Problem:
         raise NotImplementedError
 
+    def download_contest(self) -> Contest:
+        return self.download_problem().get_contest()
+
     @abstractmethod
     def get_service(self) -> Service:
         raise NotImplementedError
