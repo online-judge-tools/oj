@@ -299,7 +299,8 @@ online-judge-tools には、これを助ける機能もあります。
 
 -   解が複数ある問題
 
-   ジャッジ側のプログラムを自作して、解答の正否の判定に用いることができます。
+   実装したプログラムの中で `assert <https://cpprefjp.github.io/reference/cassert/assert.html>`_ を用いることで、解答の正当性を簡易にチェックすることが可能です。
+   複雑なチェックが必要な場合や想定解答の内容をチェックに用いたい場合は、ジャッジ側のプログラムを自作して解答の正否の判定に用いることができます。
    たとえば問題 https://atcoder.jp/contests/abc074/tasks/arc083_a であれば、次のようなジャッジ側プログラムを書いて ``judge.py`` という名前で保存し、 ``oj t --judge-command "python3 judge.py"`` とすればテストが実行されます。
 
    .. code-block:: python
