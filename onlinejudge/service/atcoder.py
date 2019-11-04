@@ -641,7 +641,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             if prv and prv.name == expected_prv and prv.string and any(s in prv.string for s in expected_strings):
                 yield (pre, prv)
 
-        expected_strings = ['入力例', '出力例', 'Sample Input', 'Sample Output']
+        expected_strings = ('入力例', '出力例', 'Sample Input', 'Sample Output')
 
         if soup.find('pre', 'literal-block'):
             # the first format: p+pre
