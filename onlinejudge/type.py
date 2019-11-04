@@ -310,14 +310,6 @@ class SubmissionData(DownloadedData):
         raise NotImplementedError
 
     @property
-    def problem(self) -> Problem:
-        return self.submission.get_problem()
-
-    @property
-    def contest(self) -> Contest:
-        return self.submission.get_contest()
-
-    @property
     def service(self) -> Service:
         return self.submission.get_service()
 
@@ -343,15 +335,15 @@ class Submission(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_problem(self) -> Problem:
+    def download_problem(self, *, session: Optional[requests.Session] = None) -> Problem:
         raise NotImplementedError
 
-    def get_contest(self) -> Contest:
-        return self.get_problem().get_contest()
+    def download_contest(self) -> Contest:
+        return self.download_problem().get_contest()
 
     @abstractmethod
     def get_service(self) -> Service:
-        return self.get_problem().get_service()
+        raise NotImplementedError
 
     def __repr__(self) -> str:
         return '{}.from_url({})'.format(self.__class__.__name__, repr(self.get_url()))

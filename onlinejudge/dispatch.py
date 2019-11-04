@@ -54,9 +54,6 @@ def problem_from_url(url: str) -> Optional[Problem]:
         if problem is not None:
             log.status('problem recognized: %s: %s', str(problem), url)
             return problem
-    submission = submission_from_url(url)
-    if submission is not None:
-        return submission.get_problem()
     log.failure('unknown problem: %s', url)
     return None
 
