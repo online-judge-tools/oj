@@ -96,7 +96,7 @@ Travis CI のページ https://travis-ci.org/ から登録してライブラリ�
 
    before_install:
        - pip3 install -U setuptools
-       - pip3 install -U online-judge-tools=='6.*'
+       - pip3 install -U online-judge-tools=='7.*'
    script:
        - bash test.sh
 

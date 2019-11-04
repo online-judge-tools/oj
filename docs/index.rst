@@ -12,9 +12,10 @@ Welcome to online-judge-tools's documentation!
 
    modules
 
-   introduction.ja
    introduction.en
-   run-ci-on-your-library
+   introduction.ja
+   run-ci-on-your-library.en
+   run-ci-on-your-library.ja
 
 
 Indices and tables
