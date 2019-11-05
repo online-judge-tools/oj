@@ -650,6 +650,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             for pre in soup.find_all('pre', 'literal-block'):
                 log.debug('pre tag: %s', str(pre))
                 yield from tag_plus(tag=pre, expected_prv='p', expected_strings=expected_strings)
+
         elif soup.find('pre', 'prettyprint linenums'):
             # the second format: h3+section pre
             # this format uses 'prettyprint linenums' in its page
@@ -657,6 +658,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             for pre in soup.find_all('pre', 'prettyprint linenums'):
                 log.debug('pre tag: %s', str(pre))
                 yield from tag_plus(tag=pre.parent, expected_prv='h3', expected_strings=expected_strings)
+
         elif soup.find('pre'):
             # the third format: h3+pre
             # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
