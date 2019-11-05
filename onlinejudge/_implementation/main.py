@@ -303,24 +303,7 @@ def main(args: Optional[List[str]] = None) -> None:
         log.info('The operation you specified is not supported yet. Pull requests are welcome.')
         log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md')
         sys.exit(1)
-    except onlinejudge.type.NotLoggedInError as e:
-        log.debug('\n' + traceback.format_exc())
-        log.error(str(e))
-        sys.exit(1)
-    except requests.exceptions.HTTPError as e:
-        log.debug('\n' + traceback.format_exc())
-        log.error(str(e))
-        log.debug(traceback.format_exc())
-        sys.exit(1)
-    except requests.exceptions.InvalidURL as e:
-        log.debug('\n' + traceback.format_exc())
-        log.error(str(e))
-        sys.exit(1)
-    except onlinejudge.type.SampleParseError as e:
-        log.debug('\n' + traceback.format_exc())
-        log.error(str(e))
-        sys.exit(1)
-    except FileExistsError as e:
+    except Exception as e:
         log.debug('\n' + traceback.format_exc())
         log.error(str(e))
         sys.exit(1)
