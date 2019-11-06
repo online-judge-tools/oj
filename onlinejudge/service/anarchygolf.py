@@ -61,9 +61,9 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
             while nxt and nxt.string.strip() == '':
                 nxt = nxt.next_sibling
             if nxt.name == 'pre':
-                s = utils.textfile(utils.dos2unix(nxt.string.lstrip()))
+                s = utils.textfile(utils.dos2unix(utils.parse_content(nxt).lstrip()))
             else:
-                s = ''
+                s = utils.textfile('')
             return s, name
         return None
 
