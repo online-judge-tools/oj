@@ -1,5 +1,13 @@
 # Change Log
 
+# 7.3.0 / 2019-11-8
+-   [#591](https://github.com/kmyk/online-judge-tools/pull/591) add English translation of `run-ci-on-your-library.rst`
+-   [#585](https://github.com/kmyk/online-judge-tools/pull/585) fix a bug of opening browser in OSX ([@ganow](https://github.com/ganow))
+-   [#582](https://github.com/kmyk/online-judge-tools/pull/582) replace `Submission.get_problem` with `Submission.download_problem` of API
+-   [#581](https://github.com/kmyk/online-judge-tools/pull/581) fix a bug of `download` for problems of UTPC2011 by improving parse method for AtCoder ([@kawacchu](https://github.com/kawacchu))
+-   [#589](https://github.com/kmyk/online-judge-tools/pull/589) fix a bug of `dispatch` yukicoder URL
+-   [#575](https://github.com/kmyk/online-judge-tools/pull/575) remove `--overwrite` option from `download` subcommand and now abort downloading if samples already exist
+
 # 7.2.2 / 2019-10-23
 
 -   [#561](https://github.com/kmyk/online-judge-tools/pull/561) fix a potential bug of yukicoder problems ([@kawacchu](https://github.com/kawacchu))
