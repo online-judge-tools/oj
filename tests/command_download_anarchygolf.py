@@ -29,7 +29,7 @@ class DownloadAnarchyGolfTest(unittest.TestCase):
 
     def test_call_download_anarchygolf_hello_world(self):
         self.snippet_call_download('http://golf.shinh.org/p.rb?hello+world', {
-            'sample-1.in': '68b329da9893e34099c7d8ad5cb9c940',
+            'sample-1.in': 'd41d8cd98f00b204e9800998ecf8427e',
             'sample-1.out': '746308829575e17c3331bbcb00c0898b',
         })
 
