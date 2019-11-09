@@ -11,7 +11,6 @@ class AnarchyGolfServiceTest(unittest.TestCase):
 
 
 class AnarchyGolfProblemTest(unittest.TestCase):
-    @unittest.expectedFailure
     def test_download_sample_cases(self):
         self.assertEqual(AnarchyGolfProblem.from_url('http://golf.shinh.org/p.rb?last+non+zero').download_sample_cases(), [
             TestCase(name='sample-1', input_name='Sample input', input_data=b'537 527 61 983 69 479 339 179 809 82 766 204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 179 763 79 267 940 466 53 262 0 0 0 0 0 0 0 0 0 0 723 593 150 520 602 434 802 773 407 380 921 0 0 0 0 0 0 0 0 0 0 294 231 504 438 697 446 417 645 559 991 832 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 193 692 62 186 882 336 968 779 941 226 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 93 448 57 617 183 0 0 0 0 0 0 0 0 0 0 957 585 604 817 942 246 454 613 672 21 241 242 0 0 0 0 0 0 0 0 0 0 210 949 377 814 166 729 872 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 403 333 306 775 302 369 479 206 0 0 0 0 0 0 0 0 0 0 0 0 484 70 678 849 996 112 216 635 0 0 0 0 0 0 0 0 0 0 0 971 602 824 881 0 0 0 0 0 0 0 269 931 202 318 0 0 0 0 0 0 0 0 0 0 0 0 0 0', output_name='Sample output', output_data=b'204 262 921 832 226 183 242 872 206 635 881 318'),
@@ -24,7 +23,6 @@ class AnarchyGolfProblemTest(unittest.TestCase):
             TestCase(name='sample-3', input_name='Sample input', input_data=b'shinichiro.h', output_name='Sample output', output_data=b'Hello, shinichiro.h!\n'),
         ])
 
-    @unittest.expectedFailure
     def test_download_sample_cases_issue_155(self):
         self.assertEqual(AnarchyGolfProblem.from_url('http://golf.shinh.org/p.rb?Digit+Octagon').download_sample_cases(), [
             TestCase(name='sample-1', input_name='Sample input', input_data=b'', output_name='Sample output', output_data=b'       11111111\

@@ -17,7 +17,6 @@ class DownloadAnarchyGolfTest(unittest.TestCase):
             'sample-3.out': 'fcbee46b3b888607abe720d598c75b17',
         })
 
-    @unittest.expectedFailure
     def test_call_download_anarchygolf_simple_language(self):
         self.snippet_call_download('http://golf.shinh.org/p.rb?simple+language', {
             'sample-1.in': 'fa50b8b616463173474302ca3e63586b',
