@@ -60,10 +60,13 @@ class AnarchyGolfProblem(onlinejudge.type.Problem):
             nxt = tag.next_sibling
             while nxt and nxt.string.strip() == '':
                 nxt = nxt.next_sibling
+
+            # This implementation is discussed in https://github.com/kmyk/online-judge-tools/pull/599
             if nxt.name == 'pre':
-                s = utils.textfile(utils.dos2unix(nxt.string.lstrip()))
-            else:
-                s = ''
+                s = utils.dos2unix(nxt.string[1:])
+            elif nxt.name == 'p':
+                s = ''  # *NOTHING* means that the empty string "" is input, not "\n".
+
             return s, name
         return None
 

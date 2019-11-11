@@ -9,22 +9,22 @@ class DownloadAnarchyGolfTest(unittest.TestCase):
 
     def test_call_download_anarchygolf_the_b_programming_language(self):
         self.snippet_call_download('http://golf.shinh.org/p.rb?The+B+Programming+Language', {
-            'sample-3.out': 'fcbee46b3b888607abe720d598c75b17',
+            'sample-1.in': '3de90f793f16fad76da1527e09b8e528',
+            'sample-1.out': 'f67b46b3c53308d8a6414b20092a2220',
             'sample-2.in': '810d1189284ef048fc30f80ba7a22c6d',
             'sample-2.out': 'd4e62449830b2a986024d914b194f129',
             'sample-3.in': '7361217616875a437a3d6b41612dacbb',
-            'sample-1.in': '3de90f793f16fad76da1527e09b8e528',
-            'sample-1.out': 'f67b46b3c53308d8a6414b20092a2220',
+            'sample-3.out': 'fcbee46b3b888607abe720d598c75b17',
         })
 
     def test_call_download_anarchygolf_simple_language(self):
         self.snippet_call_download('http://golf.shinh.org/p.rb?simple+language', {
-            'sample-3.out': 'c4211571f7a72cfad092b4dac7b15144',
-            'sample-2.in': '10e10b554ef9bc07d56a514d2f6dab26',
-            'sample-2.out': '48a24b70a0b376535542b996af517398',
-            'sample-3.in': 'f201f3f6606e56f561f8452c9a60210b',
-            'sample-1.in': '9b3c9ece5285bb1bcd1164cec8aa4243',
-            'sample-1.out': '48a24b70a0b376535542b996af517398',
+            'sample-1.in': 'fa50b8b616463173474302ca3e63586b',
+            'sample-1.out': 'a87ff679a2f3e71d9181a67b7542122c',
+            'sample-2.in': '99f5fea6d83f6e55f7d7bca6f7fd1fa3',
+            'sample-2.out': 'a87ff679a2f3e71d9181a67b7542122c',
+            'sample-3.in': '2959791426cb059fce835d1062b655b3',
+            'sample-3.out': '0e04717a220a3bd93e92aceb18d71638',
         })
 
     def test_call_download_anarchygolf_hello_world(self):
