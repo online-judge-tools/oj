@@ -1,6 +1,7 @@
 # Change Log
 
-# 7.3.0 / 2019-11-8
+## 7.3.0 / 2019-11-8
+
 -   [#591](https://github.com/kmyk/online-judge-tools/pull/591) add English translation of `run-ci-on-your-library.rst`
 -   [#585](https://github.com/kmyk/online-judge-tools/pull/585) fix a bug of opening browser in OSX ([@ganow](https://github.com/ganow))
 -   [#582](https://github.com/kmyk/online-judge-tools/pull/582) replace `Submission.get_problem` with `Submission.download_problem` of API
@@ -8,14 +9,14 @@
 -   [#589](https://github.com/kmyk/online-judge-tools/pull/589) fix a bug of `dispatch` yukicoder URL
 -   [#575](https://github.com/kmyk/online-judge-tools/pull/575) remove `--overwrite` option from `download` subcommand and now abort downloading if samples already exist
 
-# 7.2.2 / 2019-10-23
+## 7.2.2 / 2019-10-23
 
 -   [#561](https://github.com/kmyk/online-judge-tools/pull/561) fix a potential bug of yukicoder problems ([@kawacchu](https://github.com/kawacchu))
 -   [#560](https://github.com/kmyk/online-judge-tools/pull/560) fix a bug of `CodeforceContest.list_problems`
 -   [#562](https://github.com/kmyk/online-judge-tools/pull/562) add [the English translation](https://online-judge-tools.readthedocs.io/en/master/introduction.en.html) of introduction document ([@pieceofeden](https://github.com/pieceofeden))
 -   [#567](https://github.com/kmyk/online-judge-tools/pull/567) improve English of `readme.md` ([@nishanth2143](https://github.com/nishanth2143))
 
-# 7.2.1 / 2019-10-18
+## 7.2.1 / 2019-10-18
 
 -   [#557](https://github.com/kmyk/online-judge-tools/pull/557) fix a bug if `dispatch` invalid URL
 -   [#554](https://github.com/kmyk/online-judge-tools/pull/554) fix a problem of `download` part of AtCoder problem ([@yoshrc](https://github.com/yoshrc))
