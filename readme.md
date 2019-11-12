@@ -230,6 +230,7 @@ For the full list of contibutors, see [CHANGELOG.md](https://github.com/kmyk/onl
 
 -   owner: [@kmyk](https://github.com/kmyk) (AtCoder: [kimiyuki](https://atcoder.jp/users/kimiyuki), Codeforces: [kimiyuki](https://codeforces.com/profile/kimiyuki))
 -   collaborator: [@fukatani](https://github.com/fukatani) (AtCoder: [ryoryoryo111](https://atcoder.jp/users/ryoryoryo111))
+-   collaborator: [@kawacchu](https://github.com/kawacchu) (AtCoder: [kawacchu](https://atcoder.jp/users/kawacchu))
 
 ## License
 
