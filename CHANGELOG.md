@@ -1,6 +1,6 @@
 # Change Log
 
-## ?.?.?
+## Unreleased
 
 -   [@kawacchu](https://github.com/kawacchu) (AtCoder: [kawacchu](https://atcoder.jp/users/kawacchu)) joined as a maintainer :tada:
 
