@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+-   [@kawacchu](https://github.com/kawacchu) (AtCoder: [kawacchu](https://atcoder.jp/users/kawacchu)) joined as a maintainer :tada:
+
 ## 7.3.0 / 2019-11-8
 
 -   [#591](https://github.com/kmyk/online-judge-tools/pull/591) add English translation of `run-ci-on-your-library.rst`
