@@ -75,6 +75,7 @@ class AOJProblem(onlinejudge.type.Problem):
         testcases = []  # type: List[TestCase]
         for header in header['headers']:
             # NOTE: the endpoints are not same to http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2F%7BproblemId%7D%2F%7Bserial%7D_GET since the json API often says "..... (terminated because of the limitation)"
+            # NOTE: even when using https://judgedat.u-aizu.ac.jp/testcases/PROBLEM_ID/SERIAL, there is the 1G limit (see https://twitter.com/beet_aizu/status/1194947611100188672)
             url = 'https://judgedat.u-aizu.ac.jp/testcases/{}/{}'.format(self.problem_id, header['serial'])
             resp_in = utils.request('GET', url + '/in', session=session)
             resp_out = utils.request('GET', url + '/out', session=session)
