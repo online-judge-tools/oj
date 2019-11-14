@@ -333,7 +333,8 @@ def snip_large_file_content(content: bytes, limit: int, head: int, tail: int, bo
     except UnicodeDecodeError as e:
         return str(e)
     font = log.bold if bold else (lambda s: s)
-    char_in_line, _ = shutil.get_terminal_size(fallback=(80, 24))  # fallback is required for Circle CI. see https://github.com/kmyk/online-judge-tools/issues/609
+    char_in_line, _ = shutil.get_terminal_size()
+    char_in_line = max(char_in_line, 40)
 
     def snip_line_based():
         lines = text.splitlines(keepends=True)
