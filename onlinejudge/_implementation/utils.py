@@ -334,7 +334,7 @@ def snip_large_file_content(content: bytes, limit: int, head: int, tail: int, bo
         return str(e)
     font = log.bold if bold else (lambda s: s)
     char_in_line, _ = shutil.get_terminal_size()
-    char_in_line = max(char_in_line, 40)
+    char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
 
     def snip_line_based():
         lines = text.splitlines(keepends=True)
