@@ -171,7 +171,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
     with test_input_path.open() as inf:
         info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle, gnu_time=args.gnu_time)
         # TODO: the `answer` should be bytes, not str
-        answer = (info['answer'] or b'').decode()  # type: str
+        answer = (info['answer'] or b'').decode(errors='replace')  # type: str
         elapsed = info['elapsed']  # type: float
         memory = info['memory']  # type: Optional[float]
 
