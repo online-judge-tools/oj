@@ -23,12 +23,10 @@ class DownloadCodeforcesTest(unittest.TestCase):
             'sample-1.out': '166a3645f3c31595526624ce003b41fc',
         })
 
-    def test_call_download_codeforces_gym_101021_a(self):
-        self.snippet_call_download('http://codeforces.com/gym/101021/problem/A', {
-            'sample-1.in': '4dfb06c20503a3f0dbe0fb29dd52d304',
-            'sample-2.out': '614a0c8025f8bbcf46b8ba0ff9fd61d1',
-            'sample-2.in': 'dcfe1f14721a0e141c2e31adeebe7a53',
-            'sample-1.out': '45778e8e2d350841cf68711ece5cb9e1',
+    def test_call_download_codeforces_gym_101020_a(self):
+        self.snippet_call_download('http://codeforces.com/gym/101020/problem/A', {
+            'sample-1.in': 'b0ac927b004db8ba5fb728ddfb1204a2',
+            'sample-1.out': '4f169be502e0be327c1453647d9c8e50',
         })
 
     def test_call_download_codeforces_contest_1080_a(self):
