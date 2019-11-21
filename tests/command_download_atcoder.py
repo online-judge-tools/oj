@@ -151,6 +151,23 @@ class DownloadAtCoderTest(unittest.TestCase):
             },
         ], type='json')
 
+    def test_call_download_atcoder_tenka1_2014_qualA_e(self):
+        # This problem uses an unusual HTML markup; see https://github.com/kmyk/online-judge-tools/issues/618
+        self.snippet_call_download('https://atcoder.jp/contests/tenka1-2014-quala/tasks/tenka1_2014_qualA_e', [
+            {
+                "input": "5 3\nAAB\nABB\nCDE\nFFH\nGHH\n2\n1 1\n2 3\n",
+                "output": "15\n7\n"
+            },
+            {
+                "input": "2 2\nAB\nBA\n2\n1 1\n2 1\n",
+                "output": "2\n2\n"
+            },
+            {
+                "input": "5 5\nAABAA\nACDEA\nAFGHA\nAIJKA\nAAAAA\n1\n3 1\n",
+                "output": "25\n"
+            },
+        ], type='json')
+
     def test_call_download_invalid_url(self):
         self.snippet_call_download_raises(requests.exceptions.HTTPError, 'http://abc001.contest.atcoder.jp/tasks/abc001_100')
 
