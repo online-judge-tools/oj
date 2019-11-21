@@ -646,7 +646,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             log.debug('pre tag: %s', str(pre))
 
             # the standard format: #task-statement h3+pre
-            # used by AtCoder's JavaScript
+            # used by AtCoder's JavaScript, sometimes used with .prettyprint
             # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
             # NOTE: The AtCoder's JavaScript (at https://atcoder.jp/public/js/contest.js?v=201911110917 version) supports:
             #     -   "#task-statement h3+pre" format for Copy buttons of <h3> and <pre> tags
