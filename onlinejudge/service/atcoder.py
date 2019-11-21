@@ -635,35 +635,53 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
 
     @classmethod
     def _find_sample_tags(cls, soup: bs4.BeautifulSoup) -> Iterator[Tuple[bs4.Tag, bs4.Tag]]:
-        def tag_plus(tag, expected_prv, expected_strings):
-            prv = tag.find_previous_sibling()
-            if prv and prv.name == expected_prv and prv.string and any(s in prv.string for s in expected_strings):
-                yield (pre, prv)
+        # the standard format used by AtCoder's JavaScript
+        # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
+        # NOTE: The AtCoder's JavaScript (at https://atcoder.jp/public/js/contest.js?v=201911110917 version) supports:
+        #     -   "#task-statement h3+pre" format for Copy buttons of <h3> and <pre> tags
+        #     -   "pre.prettyprint" format for Copy buttons of <pre> tags
+        h3_plus_pre_selector = '#task-statement h3+pre'
+
+        # a old format, partially supported by AtCoder's JavaScript
+        # NOTE: The relaxed format "#task-statement h3+section>pre" may cause false-positive.
+        # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
+        h3_plus_section_prettyprint_selector = '#task-statement h3+section>pre.prettyprint'
+
+        # a very old format, entirely unsupported by AtCoder's JavaScript
+        # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
+        p_plus_literal_block_selector = '#task-statement p+pre.literal-block'
+
+        selectors = [h3_plus_pre_selector, h3_plus_section_prettyprint_selector, p_plus_literal_block_selector]
 
         expected_strings = ('入力例', '出力例', 'Sample Input', 'Sample Output')
 
-        if soup.find('pre', 'literal-block'):
-            # the first format: p+pre
-            # this format uses 'literal-block' in its page
-            # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
-            for pre in soup.find_all('pre', 'literal-block'):
-                log.debug('pre tag: %s', str(pre))
-                yield from tag_plus(tag=pre, expected_prv='p', expected_strings=expected_strings)
+        def get_header(pre, tag, expected_tag_name):
+            if tag and tag.name == expected_tag_name and tag.string and any(s in tag.string for s in expected_strings):
+                return tag
+            return None
 
-        elif soup.find('pre', 'prettyprint linenums'):
-            # the second format: h3+section pre
-            # this format uses 'prettyprint linenums' in its page
-            # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
-            for pre in soup.find_all('pre', 'prettyprint linenums'):
-                log.debug('pre tag: %s', str(pre))
-                yield from tag_plus(tag=pre.parent, expected_prv='h3', expected_strings=expected_strings)
+        for pre in soup.select(','.join(selectors)):
+            log.debug('pre tag: %s', str(pre))
 
-        elif soup.find('pre'):
-            # the third format: h3+pre
-            # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
-            for pre in soup.find_all('pre'):
-                log.debug('pre tag: %s', str(pre))
-                yield from tag_plus(tag=pre, expected_prv='h3', expected_strings=expected_strings)
+            # h3+pre
+            h3 = get_header(pre, tag=pre.find_previous_sibling(), expected_tag_name='h3')
+            if h3:
+                yield (pre, h3)
+                continue
+
+            if 'prettyprint' in pre.attrs.get('class', []) and pre.parent.name == 'section':
+                # h3+section>pre.prettyprint
+                h3 = get_header(pre, tag=pre.parent.find_previous_sibling(), expected_tag_name='h3')
+                if h3:
+                    yield (pre, h3)
+                    continue
+
+            if 'literal-block' in pre.attrs.get('class', []):
+                # p+pre.literal-block
+                p = get_header(pre, tag=pre.find_previous_sibling(), expected_tag_name='p')
+                if p:
+                    yield (pre, p)
+                    continue
 
     @classmethod
     def _parse_sample_cases(cls, soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
