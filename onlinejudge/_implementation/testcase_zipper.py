@@ -19,12 +19,14 @@ class SampleZipper(object):
     def add(self, content: bytes, name: str) -> None:
         if self._dangling is None:
             if re.search('output', name, re.IGNORECASE) or re.search('出力', name):
-                log.warning('strange name for input string: %s', name)
+                log.error('strange name for input string: %s', name)
+                raise SampleParseError()
             self._dangling = (name, content)
         else:
             if re.search('input', name, re.IGNORECASE) or re.search('入力', name):
                 if not (re.search('output', name, re.IGNORECASE) or re.search('出力', name)):  # to ignore titles like "Output for Sample Input 1"
-                    log.warning('strange name for output string: %s', name)
+                    log.error('strange name for output string: %s', name)
+                    raise SampleParseError()
             index = len(self._testcases)
             input_name, input_content = self._dangling
             self._testcases += [TestCase('sample-{}'.format(index + 1), input_name, input_content, name, content)]

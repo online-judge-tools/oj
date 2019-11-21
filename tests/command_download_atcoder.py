@@ -157,3 +157,8 @@ class DownloadAtCoderTest(unittest.TestCase):
     def test_call_download_413(self):
         # This task is not supported.
         self.snippet_call_download_raises(SampleParseError, 'https://chokudai001.contest.atcoder.jp/tasks/chokudai_001_a')
+
+    def test_call_download_atcoder_s8pc_4_d(self):
+        # HTML is broken and impossible to recognize samples
+        # see https://github.com/kmyk/online-judge-tools/issues/615
+        self.snippet_call_download_raises(SampleParseError, 'https://atcoder.jp/contests/s8pc-4/tasks/s8pc_4_d')
