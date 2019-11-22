@@ -282,7 +282,7 @@ class AtCoderSubmissionTest(unittest.TestCase):
 
 
 class AtCoderProblemDataTest(unittest.TestCase):
-    def test_from_html_first_format(self):
+    def test_from_html_very_old(self):
         url = 'https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -303,7 +303,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 1 * 1000)
 
-    def test_from_html_second_format(self):
+    def test_from_html_old(self):
         url = 'https://atcoder.jp/contests/abc003/tasks/abc003_4'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
@@ -325,7 +325,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 2 * 1000)
 
-    def test_from_html_third_format(self):
+    def test_from_html_standard(self):
         url = 'https://atcoder.jp/contests/abc114/tasks/abc114_d'
         resp = requests.get(url)
         html = resp.content.decode(resp.apparent_encoding)
