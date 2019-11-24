@@ -324,8 +324,8 @@ online-judge-tools には、これを助ける機能もあります。
       assert (e_sugar > 0 and y_sugar == 0) is False
 
    ジャッジ側のプログラムは、テストケースの入力、解答（あなたのプログラムの出力）、想定解答をファイル入力を用いて取得することができます。
-   judgeのコマンドは ``<command> <testcase> <your_output> <expected_output>`` のように実行され、 ``<command>`` には引数で指定したジャッジの実行コマンドが入ります。
-   ``<testcase>`` , ``<your_output>`` , ``<expected_output>`` にはそれぞれ、テストケースの入力、解答、想定解答が格納されたファイルのパスが入ります。
+   judgeのコマンドは ``<command> <input> <your_output> <expected_output>`` のように実行され、 ``<command>`` には引数で指定したジャッジの実行コマンドが入ります。
+   ``<input>`` , ``<your_output>`` , ``<expected_output>`` にはそれぞれ、テストケースの入力、解答、想定解答が格納されたファイルのパスが入ります。
    サンプルに示すようにコマンドライン引数を用いて各ファイルを読み込み、解答の正否を判定してください。
    ジャッジプログラムの終了コードが0になった場合に正答(AC)となり、それ以外は誤答(WA)となります。
 
