@@ -57,13 +57,29 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
 
         def match(a, b):
             input = test_input_path.read_bytes()
+            # On Windows, a temp file is not created if we use "with" statement,
             user_output = tempfile.NamedTemporaryFile(delete=False)
-            user_output.write(a.rstrip(rstrip_targets).encode())
-            user_output.seek(0)
-            info, proc = utils.exec_command('{} {} {} {}'.format(judge, str(test_input_path.resolve()), user_output.name, str(test_output_path.resolve())))
-            user_output.close()
-            os.unlink(user_output.name)
-            return proc.returncode == 0
+            judge_result = False
+            try:
+                user_output.write(a.rstrip(rstrip_targets).encode())
+                user_output.seek(0)
+
+                arg0 = judge
+                arg1 = str(test_input_path.resolve())
+                arg2 = user_output.name
+                arg3 = str(test_output_path.resolve() or '')
+
+                actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)
+                if not silent:
+                    log.emit(actual_command)
+                info, proc = utils.exec_command(actual_command)
+                if not silent:
+                    log.emit('judge\'s output:\n%s', utils.snip_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
+                judge_result = (proc.returncode == 0)
+            finally:
+                user_output.close()
+                os.unlink(user_output.name)
+                return judge_result
     else:
 
         def match(a, b):
