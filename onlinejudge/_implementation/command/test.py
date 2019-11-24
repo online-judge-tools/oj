@@ -71,7 +71,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
 
                 actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)
                 if not silent:
-                    log.emit(actual_command)
+                    log.emit('judge command:\n%s\n', actual_command)
                 info, proc = utils.exec_command(actual_command)
                 if not silent:
                     log.emit('judge\'s output:\n%s', utils.snip_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
