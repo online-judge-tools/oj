@@ -20,8 +20,8 @@ online-judge-tools has features for testing libraries.
 By this feature, the test can be automated.
 
 For example, the following shell script should be written.
-First, create a file like ``test.cpp``.
-In ``test.cpp``, specify the problem in the form of ``#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&``.
+First, create a file whose name ends with ``.test.cpp``.
+In the file, specify the problem in the form of ``#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&``.
 ex. `union_find_tree.test.cpp <https://github.com/kmyk/competitive-programming-library/blob/d4e35b5afe641bffb18cc2d6404fa1a67765b5ba/data_structure/union_find_tree.test.cpp>`_.
 The script then looks for files with matched extensions, automatically compiles the code and obtains system test inputs and outputs, and tests them.
 Since it can be executed locally, the contest server workload is light.
