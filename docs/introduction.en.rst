@@ -299,41 +299,36 @@ Test for special forms of problem
 
 -   Problems with multiple solutions
 
-    It is not supported directly.
-    Please do `assert <https://cpprefjp.github.io/reference/cassert/assert.html>`_ in the implemented program.
+    You can validate simply by using `assert <https://cpprefjp.github.io/reference/cassert/assert.html>`_ in the implemented program.
+    If you want to use complex method (also, you need expected output of testcase) for validating, you can write a program on the judge side, and use it for test.
 
-    For example, if the problem is https://atcoder.jp/contests/agc022/tasks/agc022_b, you can test by implementing ``oj t``    in the following form.
+    For example, if the problem is https://atcoder.jp/contests/abc074/tasks/arc083_a, write the following program on the judge side and save it as ``judge.py`` and ``oj t --judge-command "python3 judge.py"`` will run the test.
 
-    .. code-block:: c++
+   .. code-block:: python
 
-      #include <bits/stdc++.h>
-      #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
-      #define ALL(x) begin(x), end(x)
-      using namespace std;
-      
-      vector<int> solve(int n) {
-          ...
-      }
-      
-      int main() {
-          int n; cin >> n;
-          vector<int> s = solve(n);
-          REP (i, s.size()) {
-              if (i) cout << ' ';
-              cout << s[i];
-          }
-          cout << endl;
-      
-          // check
-          int sum_s = accumulate(ALL(s), 0);
-          REP (i, n) {
-              assert (1 <= s[i] and s[i] <= 30000);
-              assert (gcd(s[i], sum_s - s[i]) != 1);
-          }
-          assert (set<int>(ALL(s)).size() == s.size());
-          assert (accumulate(ALL(s), 0, [&](int a, int b) { return gcd(a, b); }) == 1);
-          return 0;
-      }
+      import sys
+      # input
+      with open(sys.argv[1]) as testcase:
+          A, B, C, D, E, F = list(map(int, testcase.readline().split()))
+      with open(sys.argv[2]) as your_output:
+          y_all, y_sugar = list(map(int, your_output.readline().split()))
+      with open(sys.argv[3]) as expected_output:
+          e_all, e_sugar = list(map(int, expected_output.readline().split()))
+      # check
+      assert 100 * A <= y_all <= F
+      y_water = y_all - y_sugar
+      assert any(100 * A * i + 100 * B * j == y_water for i in range(3001) for j in range(3001))
+      assert any(C * i + D * j == y_sugar for i in range(3001) for j in range(3001))
+      assert y_sugar <= E * y_water / 100
+      assert y_sugar * e_all == e_sugar * y_all
+      assert (e_sugar > 0 and y_sugar == 0) is False
+
+    A program on the judge side can get the input of a testcase, the output of your program and the expected output through the file input.
+    The judge command is ran as ``<command> <input> <your_output> <expected_output>``. ``<command>`` is a runnable command specified by argument. 
+    ``<input>``, ``<your_output>`` and ``<expected_output>`` are file path of the input of a testcase, the output of your program and the expected output given by problem statement respectively.
+    Please get those using commandline arguments and validate a correctness of your answer as the above example.
+    If exit code of the judge command is 0, ``AC`` is shown, otherwise `WA`.
+
 
 -   Reactive problem
 
