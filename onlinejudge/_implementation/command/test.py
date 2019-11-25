@@ -56,7 +56,6 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
     elif judge is not None:  # special judge mode
 
         def match(a, b):
-            input = test_input_path.read_bytes()
             # On Windows, a temp file is not created if we use "with" statement,
             user_output = tempfile.NamedTemporaryFile(delete=False)
             judge_result = False
