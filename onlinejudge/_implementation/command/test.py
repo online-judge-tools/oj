@@ -64,8 +64,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
                     user_output.write(a.rstrip(rstrip_targets).encode())
                 else:
                     user_output.write(a.encode())
-                # if we don't reset seek, "user_output" is not enable to read from head.
-                user_output.seek(0)
+                user_output.close()
 
                 arg0 = judge
                 arg1 = str(test_input_path.resolve())
@@ -80,7 +79,6 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
                     log.emit('judge\'s output:\n%s', utils.snip_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
                 judge_result = (proc.returncode == 0)
             finally:
-                user_output.close()
                 os.unlink(user_output.name)
                 return judge_result
     else:
