@@ -80,7 +80,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
                 judge_result = (proc.returncode == 0)
             finally:
                 os.unlink(user_output.name)
-                return judge_result
+            return judge_result
     else:
 
         def match(a, b):
