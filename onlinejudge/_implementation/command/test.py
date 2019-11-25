@@ -116,9 +116,13 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
         print_input()
 
     # check WA or not
-    if test_output_path is not None:
-        with test_output_path.open('rb') as outf:
-            expected = outf.read().decode()
+    if (test_output_path is not None) or (judge is not None):
+        if test_output_path is not None:
+            with test_output_path.open('rb') as outf:
+                expected = outf.read().decode()
+        else:  # only if --judge-command option
+            expected = ''
+            log.warning('expected output is not found')
         # compare
         if mode == 'all':
             if not match(answer, expected):
