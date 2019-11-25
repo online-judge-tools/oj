@@ -47,12 +47,40 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
     return True
 
 
-def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool) -> str:
+def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
+    rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
+
     # prepare the comparing function
-    if error:  # float mode
+    if error is not None:  # float mode
         match = lambda a, b: compare_as_floats(a, b, error)
+    elif judge is not None:  # special judge mode
+
+        def match(a, b):
+            # On Windows, a temp file is not created if we use "with" statement,
+            user_output = tempfile.NamedTemporaryFile(delete=False)
+            judge_result = False
+            try:
+                if rstrip:
+                    user_output.write(a.rstrip(rstrip_targets).encode())
+                else:
+                    user_output.write(a.encode())
+                user_output.close()
+
+                arg0 = judge
+                arg1 = str(test_input_path.resolve())
+                arg2 = user_output.name
+                arg3 = str((str(test_output_path.resolve()) if test_output_path is not None else ''))
+
+                actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)  # TODO: quote arguments for paths including spaces; see https://github.com/kmyk/online-judge-tools/pull/584
+                log.status('$ %s', actual_command)
+                info, proc = utils.exec_command(actual_command)
+                if not silent:
+                    log.emit('judge\'s output:\n%s', utils.snip_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
+                judge_result = (proc.returncode == 0)
+            finally:
+                os.unlink(user_output.name)
+            return judge_result
     else:
-        rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
 
         def match(a, b):
             if a == b:
@@ -88,9 +116,13 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
         print_input()
 
     # check WA or not
-    if test_output_path is not None:
-        with test_output_path.open('rb') as outf:
-            expected = outf.read().decode()
+    if (test_output_path is not None) or (judge is not None):
+        if test_output_path is not None:
+            with test_output_path.open('rb') as outf:
+                expected = outf.read().decode()
+        else:  # only if --judge-command option
+            expected = ''
+            log.warning('expected output is not found')
         # compare
         if mode == 'all':
             if not match(answer, expected):
@@ -159,7 +191,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             else:
                 log.warning('memory: %f MB', memory)
 
-        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip)
+        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
 
     # return the result
     testcase = {

@@ -299,41 +299,36 @@ online-judge-tools には、これを助ける機能もあります。
 
 -   解が複数ある問題
 
-   直接は対応していません。
-   実装したプログラムの中で `assert <https://cpprefjp.github.io/reference/cassert/assert.html>`_ をしてください。
+   実装したプログラムの中で `assert <https://cpprefjp.github.io/reference/cassert/assert.html>`_ を用いることで、解答の正当性を簡易にチェックすることが可能です。
+   複雑なチェックが必要な場合や想定解答の内容をチェックに用いたい場合は、ジャッジ側のプログラムを自作して解答の正否の判定に用いることができます。
 
-   たとえば問題 https://atcoder.jp/contests/agc022/tasks/agc022_b であれば、以下のような形で実装をして ``oj t`` を実装することでテストが行なえます。
+   たとえば問題 https://atcoder.jp/contests/abc074/tasks/arc083_a であれば、次のようなジャッジ側プログラムを書いて ``judge.py`` という名前で保存し、 ``oj t --judge-command "python3 judge.py"`` とすればテストが実行されます。
 
-   .. code-block:: c++
+   .. code-block:: python
 
-      #include <bits/stdc++.h>
-      #define REP(i, n) for (int i = 0; (i) < (int)(n); ++ (i))
-      #define ALL(x) begin(x), end(x)
-      using namespace std;
-      
-      vector<int> solve(int n) {
-          ...
-      }
-      
-      int main() {
-          int n; cin >> n;
-          vector<int> s = solve(n);
-          REP (i, s.size()) {
-              if (i) cout << ' ';
-              cout << s[i];
-          }
-          cout << endl;
-      
-          // check
-          int sum_s = accumulate(ALL(s), 0);
-          REP (i, n) {
-              assert (1 <= s[i] and s[i] <= 30000);
-              assert (gcd(s[i], sum_s - s[i]) != 1);
-          }
-          assert (set<int>(ALL(s)).size() == s.size());
-          assert (accumulate(ALL(s), 0, [&](int a, int b) { return gcd(a, b); }) == 1);
-          return 0;
-      }
+      import sys
+      # input
+      with open(sys.argv[1]) as testcase:
+          A, B, C, D, E, F = list(map(int, testcase.readline().split()))
+      with open(sys.argv[2]) as your_output:
+          y_all, y_sugar = list(map(int, your_output.readline().split()))
+      with open(sys.argv[3]) as expected_output:
+          e_all, e_sugar = list(map(int, expected_output.readline().split()))
+      # check
+      assert 100 * A <= y_all <= F
+      y_water = y_all - y_sugar
+      assert any(100 * A * i + 100 * B * j == y_water for i in range(3001) for j in range(3001))
+      assert any(C * i + D * j == y_sugar for i in range(3001) for j in range(3001))
+      assert y_sugar <= E * y_water / 100
+      assert y_sugar * e_all == e_sugar * y_all
+      assert (e_sugar > 0 and y_sugar == 0) is False
+
+   ジャッジ側のプログラムは、テストケースの入力、解答（あなたのプログラムの出力）、想定解答をファイル入力を用いて取得することができます。
+   judgeのコマンドは ``<command> <input> <your_output> <expected_output>`` のように実行され、 ``<command>`` には引数で指定したジャッジの実行コマンドが入ります。
+   ``<input>`` , ``<your_output>`` , ``<expected_output>`` にはそれぞれ、テストケースの入力、解答、想定解答が格納されたファイルのパスが入ります。
+   サンプルに示すようにコマンドライン引数を用いて各ファイルを読み込み、解答の正否を判定してください。
+   ジャッジプログラムの終了コードが0になった場合に正答(AC)となり、それ以外は誤答(WA)となります。
+
 
 -   リアクティブ問題
 

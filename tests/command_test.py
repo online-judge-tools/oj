@@ -203,6 +203,74 @@ class TestTest(unittest.TestCase):
             }],
         )
 
+    def test_call_test_special_judge(self):
+        def assert_each_line_count(testcase_input: int, user_output: int, testcase_output: int) -> str:
+            def assert_line_count(file_path: str, expected: int):
+                return "with open({}, 'rb') as f:\n  assert len(f.readlines()) == {}\n".format(file_path, expected).replace('\n', os.linesep)
+
+            return tests.utils.python_c('import sys\n{}{}{}'.format(assert_line_count('sys.argv[1]', testcase_input), assert_line_count('sys.argv[2]', user_output), assert_line_count('sys.argv[3]', testcase_output)))
+
+        def echo(sentence: str) -> str:
+            return tests.utils.python_c("import os, sys; sys.stdout.buffer.write(('{}' + os.linesep).encode())".format(sentence))
+
+        self.snippet_call_test(
+            args=['-c', echo('foo'), '--judge-command', assert_each_line_count(2, 1, 3)],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\nfoo\nfoo\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-2.out',
+                    'data': 'foo\nfoo\nfoo\nbar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foofoobar\n'.replace('\n', os.linesep)
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foo\nfoo\nfoo\n'.replace('\n', os.linesep)
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                    'output': '%s/test/sample-2.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }],
+        )
+
     def test_call_test_multiline_all(self):
         self.snippet_call_test(
             args=['-c', cat(), '-m', 'all'],
