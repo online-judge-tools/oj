@@ -62,6 +62,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
             judge_result = False
             try:
                 user_output.write(a.rstrip(rstrip_targets).encode())
+                # if we don't reset seek, "user_output" is not enable to read from head.
                 user_output.seek(0)
 
                 arg0 = judge
