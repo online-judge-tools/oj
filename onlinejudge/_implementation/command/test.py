@@ -5,7 +5,6 @@ import json
 import math
 import os
 import pathlib
-import shlex
 import subprocess
 import sys
 import tempfile
@@ -68,11 +67,11 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
                 user_output.close()
 
                 arg0 = judge
-                arg1 = shlex.quote(str(test_input_path.resolve()))
-                arg2 = shlex.quote(user_output.name)
-                arg3 = shlex.quote(str((str(test_output_path.resolve()) if test_output_path is not None else '')))
+                arg1 = str(test_input_path.resolve())
+                arg2 = user_output.name
+                arg3 = str((str(test_output_path.resolve()) if test_output_path is not None else ''))
 
-                actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)
+                actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)  # TODO: quote arguments for paths including spaces; see https://github.com/kmyk/online-judge-tools/pull/584
                 log.status('$ %s', actual_command)
                 info, proc = utils.exec_command(actual_command)
                 if not silent:
