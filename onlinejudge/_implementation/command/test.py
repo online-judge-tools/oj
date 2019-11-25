@@ -73,10 +73,10 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
                 arg3 = shlex.quote(str((str(test_output_path.resolve()) if test_output_path is not None else '')))
 
                 actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)
-                if not silent:
-                    log.emit('judge command:\n%s\n', actual_command)
-                info, proc = utils.exec_command(actual_command)
                 log.status('$ %s', actual_command)
+                info, proc = utils.exec_command(actual_command)
+                if not silent:
+                    log.emit('judge\'s output:\n%s', utils.snip_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
                 judge_result = (proc.returncode == 0)
             finally:
                 os.unlink(user_output.name)
