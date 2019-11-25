@@ -70,7 +70,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
                 arg0 = judge
                 arg1 = str(test_input_path.resolve())
                 arg2 = user_output.name
-                arg3 = str(test_output_path.resolve() or '')
+                arg3 = str((str(test_output_path.resolve()) if test_output_path is not None else ''))
 
                 actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)
                 if not silent:
