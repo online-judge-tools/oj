@@ -1,8 +1,11 @@
 # Change Log
 
-## Unreleased
+## 7.4.0 / 2019-11-29
 
 -   [@kawacchu](https://github.com/kawacchu) (AtCoder: [kawacchu](https://atcoder.jp/users/kawacchu)) joined as a maintainer :tada:
+-   [#584](https://github.com/kmyk/online-judge-tools/pull/584) add `--judge-command` option to `test` with special judge ([@btk15049](https://github.com/btk15049))
+-   [#609](https://github.com/kmyk/online-judge-tools/issues/609) fix an issue about sizes of terminals on CI environments (reported by [@yosupo06](https://github.com/yosupo06))
+-   [#616](https://github.com/kmyk/online-judge-tools/pull/616) [#619](https://github.com/kmyk/online-judge-tools/pull/619) [#620](https://github.com/kmyk/online-judge-tools/pull/620) fix some bugs on AtCoder
 
 ## 7.3.0 / 2019-11-8
 
