@@ -4,6 +4,7 @@ the module for yosupo's Library Checker (https://judge.yosupo.jp)
 """
 
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -57,10 +58,10 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         files += [(file.name, file.read_bytes()) for file in path.glob('out/*.out')]
         return onlinejudge._implementation.testcase_zipper.extract_from_files(iter(files))
 
-    def _get_cloned_repository_path(self):
+    def _get_cloned_repository_path(self) -> pathlib.Path:
         return utils.cache_dir / 'library-checker-problems'
 
-    def _generate_test_cases_in_cloned_repository(self):
+    def _generate_test_cases_in_cloned_repository(self) -> None:
         path = self._get_cloned_repository_path()
 
         try:
@@ -93,7 +94,7 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
                 log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
                 raise
 
-    def _get_problem_directory_path(self):
+    def _get_problem_directory_path(self) -> pathlib.Path:
         path = self._get_cloned_repository_path()
         problems = toml.load(path / 'problems.toml')
         return path / problems['problems'][self.problem_id]['dir']
@@ -114,6 +115,12 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
             if m:
                 return cls(problem_id=m.group(1))
         return None
+
+    def download_checker_cpp(self) -> bytes:
+        self._generate_test_cases_in_cloned_repository()
+        path = self._get_problem_directory_path()
+        with open(str(path / "checker.cpp"), "rb") as fh:
+            return fh.read()
 
 
 onlinejudge.dispatch.services += [LibraryCheckerService]
