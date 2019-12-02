@@ -44,6 +44,9 @@ def download(args: 'argparse.Namespace') -> None:
         else:
             samples = problem.download_sample_cases(session=sess)
 
+    if not samples:
+        raise onlinejudge.type.SampleParseError("Sample not found")
+
     # append the history for submit command
     if not args.dry_run and is_default_format:
         history = onlinejudge._implementation.download_history.DownloadHistory()
