@@ -656,11 +656,12 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
                 yield (pre, h3)
                 continue
 
-            # a old format: #task-statement h3+section>pre.prettyprint
+            # a old format: #task-statement h3+section>pre:first-chid
             # partially supported by AtCoder's JavaScript
-            # NOTE: The relaxed format "#task-statement h3+section>pre" may cause false-positive.
+            # NOTE: The relaxed format "#task-statement h3+section>pre" may cause false-positive. e.g. https://atcoder.jp/contests/abc003/tasks/abc003_4
+            # NOTE: The format "h3+section>pre.prettyprint" sometimes cause false-negative. e.g. https://atcoder.jp/contests/tdpc/tasks/tdpc_fibonacci
             # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
-            if 'prettyprint' in pre.attrs.get('class', []) and pre.parent.name == 'section':
+            if pre.find_previous_sibling() is None and pre.parent.name == 'section':
                 h3 = get_header(pre, tag=pre.parent.find_previous_sibling(), expected_tag_name='h3')
                 if h3:
                     yield (pre, h3)
