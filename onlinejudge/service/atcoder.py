@@ -656,7 +656,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
                 yield (pre, h3)
                 continue
 
-            # a old format: #task-statement h3+section>pre:first-chid
+            # a old format: #task-statement h3+section>pre:first-child
             # partially supported by AtCoder's JavaScript
             # NOTE: The relaxed format "#task-statement h3+section>pre" may cause false-positive. e.g. https://atcoder.jp/contests/abc003/tasks/abc003_4
             # NOTE: The format "h3+section>pre.prettyprint" sometimes cause false-negative. e.g. https://atcoder.jp/contests/tdpc/tasks/tdpc_fibonacci
