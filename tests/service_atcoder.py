@@ -477,7 +477,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 5 * 1000)
 
-    def test_from_html_issue_625(self):
+    def test_download_sample_cases_pre_without_prettyprint_insection(self):
         # see: https://github.com/kmyk/online-judge-tools/issues/625
         self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/tdpc/tasks/tdpc_fibonacci').download_sample_cases(), [
             TestCase(name='sample-1', input_name='Sample Input 1', input_data=b'2 10\n', output_name='Sample Output 1', output_data=b'55\n'),
