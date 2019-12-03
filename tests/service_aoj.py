@@ -39,6 +39,15 @@ class AOJProblemTest(unittest.TestCase):
             TestCase(name='sample-1', input_name='1', input_data=b'4\n0 0\n10 0\n10 10\n0 10\n3\n0 0\n1 0\n0 1\n0\n', output_name='1', output_data=b'Case 1: 14.142135624\nCase 2: 1.41421356\n'),
         ])
 
+    def test_download_sample_cases_not_registered(self):
+        # see: https://github.com/kmyk/online-judge-tools/issues/207
+        self.assertEqual(AOJProblem.from_url('https://onlinejudge.u-aizu.ac.jp/challenges/sources/ICPC/Regional/1399').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='Sample Input 1', input_data=b'5\n1 2 3 4 5\n1 2 3 4 5\n', output_name=' Sample Output 1', output_data=b'2 3 4 5 1\n'),
+            TestCase(name='sample-2', input_name='Sample Input 2', input_data=b'5\n3 4 5 6 7\n1 3 5 7 9\n', output_name='Sample Output 2', output_data=b'9 5 7 3 1\n'),
+            TestCase(name='sample-3', input_name='Sample Input 3', input_data=b'5\n3 2 2 1 1\n1 1 2 2 3\n', output_name='Sample Output 3', output_data=b'1 3 1 2 2\n'),
+            TestCase(name='sample-4', input_name='Sample Input 4', input_data=b'5\n3 4 10 4 9\n2 7 3 6 9\n', output_name=' Sample Output 4', output_data=b'9 7 3 6 2\n'),
+        ])
+
 
 class AOJArenaProblemTest(unittest.TestCase):
     def test_from_url(self):
@@ -53,6 +62,11 @@ class AOJArenaProblemTest(unittest.TestCase):
             TestCase(name='sample-1', input_name='1', input_data=b'koukyoukoukokukikou\nabrakadabra\nacmicpc\njapaque\nhelloworld\n#\n', output_name='1', output_data=b'0\n2\n4\n5\n7\n'),
         ])
 
-    @unittest.expectedFailure
     def test_download_sample_cases_not_registered(self):
-        self.assertNotEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp18Day3/problems/B').download_sample_cases(), [])
+        # see: https://github.com/kmyk/online-judge-tools/issues/207
+        self.assertEqual(AOJArenaProblem.from_url('https://onlinejudge.u-aizu.ac.jp/services/room.html#RitsCamp18Day3/problems/B').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='入力例1', input_data=b'4\n2 0 -2 1\n', output_name='出力例1', output_data=b'1\n1\n'),
+            TestCase(name='sample-2', input_name='入力例2', input_data=b'3\n2 -2 -2\n', output_name='出力例2', output_data=b'3\n1\n2\n3\n'),
+            TestCase(name='sample-3', input_name='入力例3', input_data=b'2\n-1 0\n', output_name='出力例3', output_data=b'0\n'),
+            TestCase(name='sample-4', input_name='入力例4', input_data=b'5\n-1 2 1 -2 -1\n', output_name='出力例4', output_data=b'3\n1\n2\n4\n'),
+        ])
