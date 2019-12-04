@@ -12,9 +12,11 @@ import string
 import urllib.parse
 from typing import *
 
+import bs4
 import requests
 
 import onlinejudge._implementation.logging as log
+import onlinejudge._implementation.testcase_zipper
 import onlinejudge._implementation.utils as utils
 import onlinejudge.type
 from onlinejudge.type import TestCase
@@ -47,6 +49,7 @@ class AOJProblem(onlinejudge.type.Problem):
 
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
         session = session or utils.get_default_session()
+
         # get samples via the official API
         # reference: http://developers.u-aizu.ac.jp/api?key=judgedat%2Ftestcases%2Fsamples%2F%7BproblemId%7D_GET
         url = 'https://judgedat.u-aizu.ac.jp/testcases/samples/{}'.format(self.problem_id)
@@ -60,6 +63,29 @@ class AOJProblem(onlinejudge.type.Problem):
                 str(sample['serial']),
                 sample['out'].encode(),
             )]
+
+        # parse HTML if no samples are registered
+        # see: https://github.com/kmyk/online-judge-tools/issues/207
+        if not samples:
+            log.warning("sample cases are not registered in the official API")
+            log.status("fallback: parsing HTML")
+
+            # reference: http://developers.u-aizu.ac.jp/api?key=judgeapi%2Fresources%2Fdescriptions%2F%7Blang%7D%2F%7Bproblem_id%7D_GET
+            url = 'https://judgeapi.u-aizu.ac.jp/resources/descriptions/ja/{}'.format(self.problem_id)
+            resp = utils.request('GET', url, session=session)
+            html = json.loads(resp.content.decode(resp.encoding))['html']
+
+            # list h3+pre
+            zipper = onlinejudge._implementation.testcase_zipper.SampleZipper()
+            expected_strings = ('入力例', '出力例', 'Sample Input', 'Sample Output')
+            soup = bs4.BeautifulSoup(html, utils.html_parser)
+            for pre in soup.find_all('pre'):
+                tag = pre.find_previous_sibling()
+                if tag and tag.name == 'h3' and tag.string and any(s in tag.string for s in expected_strings):
+                    s = utils.textfile(utils.parse_content(pre).lstrip())
+                    zipper.add(s.encode(), tag.string)
+            samples = zipper.get()
+
         return samples
 
     def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
@@ -153,7 +179,6 @@ class AOJArenaProblem(onlinejudge.type.Problem):
         return self._problem_id
 
     def download_sample_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
-        log.warning("most of problems in arena have no registered sample cases.")
         return AOJProblem(problem_id=self.get_problem_id()).download_sample_cases(session=session)
 
     def download_system_cases(self, *, session: Optional[requests.Session] = None) -> List[TestCase]:
