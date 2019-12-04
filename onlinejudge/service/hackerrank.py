@@ -87,10 +87,10 @@ class HackerRankProblem(onlinejudge.type.Problem):
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('hackerrank.com', 'www.hackerrank.com'):
-            m = re.match(r'^/contests/([0-9A-Za-z-]+)/challenges/([0-9A-Za-z-]+)$', utils.normpath(result.path))
+            m = re.match(r'^/contests/([0-9A-Za-z-]+)/challenges/([0-9A-Za-z-]+)(/problem)?/?$', utils.normpath(result.path))
             if m:
                 return cls(contest_slug=m.group(1), challenge_slug=m.group(2))
-            m = re.match(r'^/challenges/([0-9A-Za-z-]+)$', utils.normpath(result.path))
+            m = re.match(r'^/challenges/([0-9A-Za-z-]+)(/problem)?/?$', utils.normpath(result.path))
             if m:
                 return cls(contest_slug='master', challenge_slug=m.group(1))
         return None
