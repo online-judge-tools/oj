@@ -64,7 +64,7 @@ class AOJProblem(onlinejudge.type.Problem):
                 sample['out'].encode(),
             )]
 
-        # parse HTML if no samples registerd
+        # parse HTML if no samples were registered
         # see: https://github.com/kmyk/online-judge-tools/issues/207
         if not samples:
             log.warning("sample cases are not registered in the official API")
