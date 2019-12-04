@@ -73,7 +73,8 @@ def parse_content(parent: Union[bs4.NavigableString, bs4.Tag, bs4.Comment]) -> b
 
 def new_session_with_our_user_agent() -> requests.Session:
     session = requests.Session()
-    session.headers['User-Agent'] += ' (+{})'.format(version.__url__)
+    session.headers['User-Agent'] = '{}/{} (+{})'.format(version.__package_name__, version.__version__, version.__url__)
+    log.debug('User-Agent: %s', session.headers['User-Agent'])
     return session
 
 
