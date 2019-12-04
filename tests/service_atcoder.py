@@ -477,6 +477,24 @@ class AtCoderProblemDataTest(unittest.TestCase):
         self.assertEqual(data.score, None)
         self.assertEqual(data.time_limit_msec, 5 * 1000)
 
+    def test_download_sample_cases_pre_without_prettyprint_insection(self):
+        # see: https://github.com/kmyk/online-judge-tools/issues/625
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/tdpc/tasks/tdpc_fibonacci').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='Sample Input 1', input_data=b'2 10\n', output_name='Sample Output 1', output_data=b'55\n'),
+            TestCase(name='sample-2', input_name='Sample Input 2', input_data=b'3 10\n', output_name='Sample Output 2', output_data=b'105\n'),
+        ])
+
+    def test_download_sample_cases_s8pc_broken_html(self):
+        # see: https://github.com/kmyk/online-judge-tools/issues/615
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/s8pc-4/tasks/s8pc_4_d').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='Sample Input 1', input_data=b'4\n1 2\n2 3\n2 4\n', output_name='Sample Output 1', output_data=b'2.0\n1.0\n2.0\n2.0\n'),
+            TestCase(name='sample-2', input_name='Sample Input 2', input_data=b'4\n1 2\n2 4\n4 3\n', output_name='Sample Output 2', output_data=b'3.0\n1.5\n3.0\n1.5\n'),
+            TestCase(name='sample-3', input_name='Sample Input 3', input_data=b'5\n1 2\n2 3\n3 4\n4 5\n', output_name='Sample Output 3', output_data=b'4.0\n2.0\n2.0\n2.0\n4.0\n'),
+            TestCase(name='sample-4', input_name='Sample Input 4', input_data=b'7\n1 2\n1 3\n2 4\n2 5\n3 6\n3 7\n', output_name='Sample Output 4', output_data=b'2.000000000000\n1.666666666667\n1.666666666667\n3.000000000000\n3.000000000000\n3.000000000000\n3.000000000000\n'),
+            TestCase(name='sample-5', input_name='Sample Input 5', input_data=b'12\n1 2\n2 3\n2 4\n4 5\n5 6\n5 7\n6 8\n8 9\n2 10\n10 11\n11 12\n', output_name='Sample Output 5', output_data=b'3.666666666667\n2.250000000000\n3.666666666667\n2.833333333333\n2.555555555556\n2.666666666667\n4.333333333333\n2.666666666667\n5.333333333333\n2.500000000000\n2.500000000000\n5.000000000000\n'),
+            TestCase(name='sample-6', input_name='Sample Input 6', input_data=b'2\n1 2\n', output_name='Sample Output 6', output_data=b'1.0\n1.0\n'),
+        ])
+
 
 class AtCoderProblemGetInputFormatTest(unittest.TestCase):
     def test_normal(self):
