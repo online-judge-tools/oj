@@ -18,6 +18,7 @@ class DownloadInvalid(unittest.TestCase):
 
     def test_call_download_no_sample_found(self):
         self.snippet_call_download_raises(SampleParseError, 'https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a')
+        self.snippet_call_download_raises(SampleParseError, 'https://open.kattis.com/problems/hello')
 
     def test_call_download_twice(self):
         self.snippet_call_download_twice('https://atcoder.jp/contests/abc114/tasks/abc114_c', 'https://atcoder.jp/contests/abc003/tasks/abc003_4', [
