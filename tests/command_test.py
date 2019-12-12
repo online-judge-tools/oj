@@ -903,3 +903,23 @@ class TestTest(unittest.TestCase):
                 'exitcode': 255,
             }],
         )
+
+    def test_call_non_unicode(self):
+        data = self.snippet_call_test(
+            args=['-c', tests.utils.python_c("import sys; sys.stdout.buffer.write(bytes(range(256)))")],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                },
+                'output': bytes(range(256)).decode(errors='replace'),
+                'exitcode': 0,
+            }],
+        )
