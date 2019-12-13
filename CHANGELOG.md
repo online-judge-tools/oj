@@ -1,5 +1,13 @@
 # Change Log
 
+## 7.5.0 / 2019-12-13
+
+-   [#630](https://github.com/kmyk/online-judge-tools/pull/630) update the User-Agent for HackerRank
+-   [#628](https://github.com/kmyk/online-judge-tools/pull/628) improve the samples parser for AtCoder
+-   [#627](https://github.com/kmyk/online-judge-tools/pull/627) parse HTML in AOJ when no samples are registered in the official API
+-   [#626](https://github.com/kmyk/online-judge-tools/pull/626) raise errors when no samples are found
+-   [#613](https://github.com/kmyk/online-judge-tools/pull/613) fix the issue of `test` subcommand with non-Unicode outputs
+
 ## 7.4.0 / 2019-11-29
 
 -   [@kawacchu](https://github.com/kawacchu) (AtCoder: [kawacchu](https://atcoder.jp/users/kawacchu)) joined as a maintainer :tada:
