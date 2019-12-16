@@ -15,6 +15,7 @@ Submodules
 
    onlinejudge.dispatch
    onlinejudge.type
+   onlinejudge.utils
 
 Module contents
 ---------------
