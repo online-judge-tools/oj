@@ -26,8 +26,8 @@ class SubmitArgumentsTest(unittest.TestCase):
             },
         ]
         with tests.utils.sandbox(files):
-            tests.utils.run(['dl', url], check=True)
-            tests.utils.run(['s', '-y', '--no-open', 'a.cpp'], check=True)
+            tests.utils.run(['dl', url], check=False)
+            tests.utils.run(['s', '-y', '--no-open', url, 'a.cpp'], check=True)
 
     @unittest.skipIf(os.name == 'nt', "shell script doesn't work on Windows")
     @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
