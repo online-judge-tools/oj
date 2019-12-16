@@ -353,6 +353,10 @@ class AtCoderContest(onlinejudge.type.Contest):
         return AtCoderService()
 
     def list_problem_data(self, *, session: Optional[requests.Session] = None) -> List['AtCoderProblemData']:
+        """
+        :raises Exception: if logging in is required to see the tasks page
+        """
+
         # get
         session = session or utils.get_default_session()
         url = 'https://atcoder.jp/contests/{}/tasks'.format(self.contest_id)
@@ -365,6 +369,7 @@ class AtCoderContest(onlinejudge.type.Contest):
         return [AtCoderProblemData._from_table_row(tr, session=session, response=resp, timestamp=timestamp) for tr in tbody.find_all('tr')]
 
     def list_problems(self, *, session: Optional[requests.Session] = None) -> Sequence['AtCoderProblem']:
+        # Even without logging in, we can list problems of some contests via standings pages, but some contests have no standings pages
         return tuple([data.problem for data in self.list_problem_data(session=session)])
 
     # yapf: disable

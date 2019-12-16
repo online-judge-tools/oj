@@ -13,7 +13,7 @@ import onlinejudge.type
 
 
 class DownloadHistory(object):
-    def __init__(self, path: pathlib.Path = utils.cache_dir / 'download-history.jsonl'):
+    def __init__(self, path: pathlib.Path = utils.user_cache_dir / 'download-history.jsonl'):
         self.path = path
 
     def add(self, problem: onlinejudge.type.Problem, directory: pathlib.Path = pathlib.Path.cwd()) -> None:
