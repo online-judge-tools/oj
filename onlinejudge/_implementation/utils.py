@@ -19,16 +19,15 @@ import urllib.parse
 from typing import *
 from typing.io import *
 
-import appdirs
 import bs4
 
 import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
+import onlinejudge.utils
 from onlinejudge.type import *
+from onlinejudge.utils import *  # re-export
 
-config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
-data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
-cache_dir = pathlib.Path(appdirs.user_cache_dir(version.__package_name__))
+new_session_with_our_user_agent = onlinejudge.utils._new_session_with_our_user_agent
 html_parser = 'lxml'
 
 
@@ -69,42 +68,6 @@ def parse_content(parent: Union[bs4.NavigableString, bs4.Tag, bs4.Comment]) -> b
             for child in children:
                 res += parse_content(child)
     return bs4.NavigableString(res)
-
-
-def new_session_with_our_user_agent() -> requests.Session:
-    session = requests.Session()
-    session.headers['User-Agent'] = '{}/{} (+{})'.format(version.__package_name__, version.__version__, version.__url__)
-    log.debug('User-Agent: %s', session.headers['User-Agent'])
-    return session
-
-
-_default_session = None  # Optional[requests.Session]
-
-
-def get_default_session() -> requests.Session:
-    """
-    :note: cookie is not saved to disk
-    """
-    global _default_session
-    if _default_session is None:
-        _default_session = new_session_with_our_user_agent()
-    return _default_session
-
-
-default_cookie_path = data_dir / 'cookie.jar'
-
-
-@contextlib.contextmanager
-def with_cookiejar(session: requests.Session, path: pathlib.Path = default_cookie_path) -> Generator[requests.Session, None, None]:
-    session.cookies = http.cookiejar.LWPCookieJar(str(path))  # type: ignore
-    if path.exists():
-        log.status('load cookie from: %s', path)
-        session.cookies.load()  # type: ignore
-    yield session
-    log.status('save cookie to: %s', path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    session.cookies.save()  # type: ignore
-    path.chmod(0o600)  # NOTE: to make secure a little bit
 
 
 class FormSender(object):
@@ -231,7 +194,7 @@ def request(method: str, url: str, session: requests.Session, raise_for_status: 
 
 def get_latest_version_from_pypi() -> str:
     pypi_url = 'https://pypi.org/pypi/{}/json'.format(version.__package_name__)
-    version_cache_path = cache_dir / "pypi.json"
+    version_cache_path = user_cache_dir / "pypi.json"
     update_interval = 60 * 60 * 8  # 8 hours
 
     # load cache

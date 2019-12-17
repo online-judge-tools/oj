@@ -59,7 +59,7 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         return onlinejudge._implementation.testcase_zipper.extract_from_files(iter(files))
 
     def _get_cloned_repository_path(self) -> pathlib.Path:
-        return utils.cache_dir / 'library-checker-problems'
+        return utils.user_cache_dir / 'library-checker-problems'
 
     def _generate_test_cases_in_cloned_repository(self) -> None:
         path = self._get_cloned_repository_path()
