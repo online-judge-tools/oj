@@ -18,8 +18,8 @@ Test Script
 online-judge-tools には、ライブラリのテストに利用できる機能があります。
 それらを組み合わせればテストの自動化が可能です。
 
-例えば以下のようなシェルスクリプトを書いておくとよいでしょう。
-まず ``.test.cpp`` という拡張子を持つファイルを作り、その中で ``#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=jp`` のような形で問題を指定しておきます (例: `union_find_tree.test.cpp <https://github.com/kmyk/competitive-programming-library/blob/d4e35b5afe641bffb18cc2d6404fa1a67765b5ba/data_structure/union_find_tree.test.cpp>`_)。
+例えば以下のようなシェルスクリプトを書くことができます。
+まず ``.test.cpp`` という拡張子を持つファイルを作り、その中で ``#define PROBLEM "http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=jp"`` のような形で問題を指定しておきます (例: `union_find_tree.test.cpp <https://github.com/kmyk/competitive-programming-library/blob/d4e35b5afe641bffb18cc2d6404fa1a67765b5ba/data_structure/union_find_tree.test.cpp>`_)。
 するとこのスクリプトは、そのような拡張子のファイルを探し、自動でコードをコンパイルし、システムテストの入出力を自動で取得し、テストをしてくれます。
 ローカルでの実行なのでサーバには比較的やさしいです。
 
@@ -31,39 +31,34 @@ online-judge-tools には、ライブラリのテストに利用できる機能�
 
    CXX=${CXX:-g++}
    CXXFLAGS="${CXXFLAGS:--std=c++14 -O2 -Wall -g}"
-   ulimit -s unlimited
+   ulimit -s unlimited  # make the stack size unlimited
 
-   run() {
-       file="$1"
-       url="$(grep -o '^# *define \+PROBLEM \+\(https\?://.*\)' < "$file" | sed 's/.* http/http/')"
-       dir=test/$(echo -n "$url" | md5sum | sed 's/ .*//')
-       mkdir -p ${dir}
-       $CXX $CXXFLAGS -I . -o ${dir}/a.out "$file"
-       if [[ -n ${url} ]] ; then
-           if [[ ! -e ${dir}/test ]] ; then
-               sleep 2
-               oj download --system "$url" -d ${dir}/test
-           fi
-           oj test --tle 10 --c ${dir}/a.out -d ${dir}/test
-       else
-           ${dir}/a.out
+   # list files to test
+   for file in $(find . -name \*.test.cpp) ; do
+
+       # get the URL for verification
+       url="$(sed -e 's/^# *define \+PROBLEM \+"\(https\?:\/\/.*\)"/\1/ ; t ; d' "$file")"
+       if [[ -z ${url} ]] ; then
+           continue
        fi
-   }
 
-   if [ $# -eq 0 ] ; then
-       for f in $(find . -name \*.test.cpp) ; do
-           run $f
-       done
-   else
-       for f in "$@" ; do
-           run "$f"
-       done
-   fi
+       dir=cache/$(echo -n "$url" | md5sum | sed 's/ .*//')
+       mkdir -p ${dir}
 
-ただし現在は実質的に `AOJ <https://onlinejudge.u-aizu.ac.jp/home>`_ と `Library Checker <https://judge.yosupo.jp>`_ にしか対応していないので注意してください。
-Codeforces はシステムテストのケースを配布してくれていませんし、 AtCoder は配布してくれてはいますが DropBox 経由なので自動化が困難なためです。
+       # download sample cases
+       if [[ ! -e ${dir}/test ]] ; then
+           sleep 2
+           oj download --system "$url" -d ${dir}/test
+       fi
 
-このスクリプトはあくまで一例であり、「Python にも対応させたい」「差分だけテストしたい」などの要求がある場合は各々で拡張してください (例: `test.sh <https://github.com/kmyk/competitive-programming-library/blob/master/test.sh>`_)。
+       # run test
+       $CXX $CXXFLAGS -I . -o ${dir}/a.out "$file"
+       oj test --tle 10 --c ${dir}/a.out -d ${dir}/test
+   done
+
+
+このスクリプトはあくまで一例であり、「Python にも対応させたい」「差分だけテストしたい」などの要求がある場合は各々で拡張してください。
+そのような拡張の一例として `online-judge-verify-helper <https://github.com/kmyk/online-judge-verify-helper>`_ があり、これを利用することもできます。
 
 
 Continuous Integration
@@ -108,11 +103,13 @@ Travis CI のページ https://travis-ci.org/ から登録してライブラリ�
 .. |badge| image:: https://img.shields.io/travis/kmyk/competitive-programming-library/master.svg
    :target: https://travis-ci.org/kmyk/competitive-programming-library
 
+(注意: この節は GitHub Actiosn が public release される前に書かれました。現在では Travis CI でなく GitHub Actions を使ってみてもよいかもしれません。)
+
 
 Examples
 --------
 
-上で説明したものが実際に利用されている例として次のふたつを挙げておきます。
+onlinejudge-tools がライブラリの verify に使われている例として次のふたつを挙げておきます。現在はどちらも `online-judge-verify-helper <https://github.com/kmyk/online-judge-verify-helper>`_ を利用しています。
 
 - https://github.com/kmyk/competitive-programming-library
 - https://github.com/beet-aizu/library

@@ -19,11 +19,10 @@ Test Script
 online-judge-tools has features for testing libraries.
 By this feature, the test can be automated.
 
-For example, the following shell script should be written.
-First, create a file whose name ends with ``.test.cpp``.
-In the file, specify the problem in the form of ``#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&``.
-ex. `union_find_tree.test.cpp <https://github.com/kmyk/competitive-programming-library/blob/d4e35b5afe641bffb18cc2d6404fa1a67765b5ba/data_structure/union_find_tree.test.cpp>`_.
-The script then looks for files with matched extensions, automatically compiles the code and obtains system test inputs and outputs, and tests them.
+For example, you can write a shell script like below.
+First, create a file which has a name ending with ``.test.cpp`` and contains a line in the form of ``#define PROBLEM "http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A"``,
+e.g. `union_find_tree.test.cpp <https://github.com/kmyk/competitive-programming-library/blob/d4e35b5afe641bffb18cc2d6404fa1a67765b5ba/data_structure/union_find_tree.test.cpp>`_.
+The script finds such files, automatically compiles codes and obtains system test inputs and outputs, and tests them.
 Since it can be executed locally, the contest server workload is light.
 
 .. code-block:: bash
@@ -34,40 +33,34 @@ Since it can be executed locally, the contest server workload is light.
 
    CXX=${CXX:-g++}
    CXXFLAGS="${CXXFLAGS:--std=c++14 -O2 -Wall -g}"
-   ulimit -s unlimited
+   ulimit -s unlimited  # make the stack size unlimited
 
-   run() {
-       file="$1"
-       url="$(grep -o '^# *define \+PROBLEM \+\(https\?://.*\)' < "$file" | sed 's/.* http/http/')"
-       dir=test/$(echo -n "$url" | md5sum | sed 's/ .*//')
-       mkdir -p ${dir}
-       $CXX $CXXFLAGS -I . -o ${dir}/a.out "$file"
-       if [[ -n ${url} ]] ; then
-           if [[ ! -e ${dir}/test ]] ; then
-               sleep 2
-               oj download --system "$url" -d ${dir}/test
-           fi
-           oj test --tle 10 --c ${dir}/a.out -d ${dir}/test
-       else
-           ${dir}/a.out
+   # list files to test
+   for file in $(find . -name \*.test.cpp) ; do
+
+       # get the URL for verification
+       url="$(sed -e 's/^# *define \+PROBLEM \+"\(https\?:\/\/.*\)"/\1/ ; t ; d' "$file")"
+       if [[ -z ${url} ]] ; then
+           continue
        fi
-   }
 
-   if [ $# -eq 0 ] ; then
-       for f in $(find . -name \*.test.cpp) ; do
-           run $f
-       done
-   else
-       for f in "$@" ; do
-           run "$f"
-       done
-   fi
+       dir=cache/$(echo -n "$url" | md5sum | sed 's/ .*//')
+       mkdir -p ${dir}
 
-However, please note that currently only `AOJ <https://onlinejudge.u-aizu.ac.jp/home>`_ and `Library Checker <https://judge.yosupo.jp>`_ are supported.
-Since Codeforces doesn't distribute system test cases, and AtCoder distributes it via DropBox, but automated download is difficult.
+       # download sample cases
+       if [[ ! -e ${dir}/test ]] ; then
+           sleep 2
+           oj download --system "$url" -d ${dir}/test
+       fi
 
-This script is only an example, and if you have requests such as "I want to support Python" or "I want to test only the differences",
-please extend this script by yourself.
+       # run test
+       $CXX $CXXFLAGS -I . -o ${dir}/a.out "$file"
+       oj test --tle 10 --c ${dir}/a.out -d ${dir}/test
+   done
+
+
+This script is just an example to show how we can use online-judge-tools for this purpose.
+You can extend this by yourself or use a tool `online-judge-verify-helper <https://github.com/kmyk/online-judge-verify-helper>`_ .
 
 
 Continuous Integration
@@ -118,11 +111,13 @@ The color of this badge changes depending on the success or failure of CI.
 .. |badge| image:: https://img.shields.io/travis/kmyk/competitive-programming-library/master.svg
    :target: https://travis-ci.org/kmyk/competitive-programming-library
 
+(Caution: This section have been written before GitHub Actions is released. Now, I also recommend GitHub Actions not only Travis CI.)
+
 
 Examples
 --------
 
-The following are two examples that run CI by online-judge-tools.
+The following are two examples that run CI by online-judge-tools via `online-judge-verify-helper <https://github.com/kmyk/online-judge-verify-helper>`_ .
 
 - https://github.com/kmyk/competitive-programming-library
 - https://github.com/beet-aizu/library
