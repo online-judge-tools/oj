@@ -65,14 +65,14 @@ class TophProblem(onlinejudge.type.Problem):
         for table in soup.find_all('table', class_="samples"):
             log.debug('table: %s', str(table))
             case = table.find('tbody').find('tr')
-            assert len(list(case.children))
+            assert len(list(case.children)) == 2
             input_pre, output_pre = list(map(lambda td: td.find('pre'), list(case.children)))
             assert input_pre.name == 'pre'
             assert output_pre.name == 'pre'
             assert re.search("^preSample.*Input$", input_pre.attrs['id'])
             assert re.search("^preSample.*Output$", output_pre.attrs['id'])
-            samples.add(input_pre.text.lstrip().encode(), "Input")
-            samples.add(output_pre.text.lstrip().encode(), "Output")
+            samples.add(utils.parse_content(input_pre).lstrip().encode(), "Input")
+            samples.add(utils.parse_content(output_pre).lstrip().encode(), "Output")
         return samples.get()
 
     def get_available_languages(self, *, session: Optional[requests.Session] = None) -> List[Language]:
