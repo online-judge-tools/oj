@@ -103,7 +103,7 @@ Travis CI のページ https://travis-ci.org/ から登録してライブラリ�
 .. |badge| image:: https://img.shields.io/travis/kmyk/competitive-programming-library/master.svg
    :target: https://travis-ci.org/kmyk/competitive-programming-library
 
-(注意: この節は GitHub Actiosn が public release される前に書かれました。現在では Travis CI でなく GitHub Actions を使ってみてもよいかもしれません。)
+(注意: この節は GitHub Actions が public release される前に書かれました。現在では Travis CI でなく GitHub Actions を使ってみてもよいかもしれません。)
 
 
 Examples
