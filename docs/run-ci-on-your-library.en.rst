@@ -111,7 +111,7 @@ The color of this badge changes depending on the success or failure of CI.
 .. |badge| image:: https://img.shields.io/travis/kmyk/competitive-programming-library/master.svg
    :target: https://travis-ci.org/kmyk/competitive-programming-library
 
-(Caution: This section have been written before GitHub Actions is released. Now, I also recommend GitHub Actions not only Travis CI.)
+(Caution: This section have been written before GitHub Actions was released. Now, I also recommend GitHub Actions not only Travis CI.)
 
 
 Examples
