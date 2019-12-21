@@ -1,5 +1,7 @@
 import json
 import os
+import pathlib
+import random
 import sys
 import unittest
 
@@ -923,3 +925,43 @@ class TestTest(unittest.TestCase):
                 'exitcode': 0,
             }],
         )
+
+    # TODO: fix
+    @unittest.expectedFailure
+    @unittest.skipIf(os.name == 'nt', "procfs is required")
+    def test_call_test_check_no_zombie(self):
+        marker = 'zombie-%08x' % random.randrange(2**32)
+        data = self.snippet_call_test(
+            args=['-c', tests.utils.python_c("import time; time.sleep(100)  # {}".format(marker)), '--tle', '1'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'foo\n'
+                },
+            ],
+            expected=[{
+                'status': 'TLE',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                },
+                'output': '',
+                'exitcode': None,
+            }, {
+                'status': 'TLE',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                },
+                'output': '',
+                'exitcode': None,
+            }],
+        )
+        # check there are no processes whose command-line arguments contains the marker word
+        for cmdline in pathlib.Path('/proc').glob('*/cmdline'):
+            with open(str(cmdline), 'rb') as fh:
+                self.assertNotIn(marker.encode(), fh.read())
