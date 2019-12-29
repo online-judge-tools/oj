@@ -7,7 +7,6 @@ import http.client
 import http.cookiejar
 import json
 import os
-import pathlib
 import posixpath
 import shlex
 import shutil
@@ -347,11 +346,3 @@ class DummySubmission(Submission):
     @classmethod
     def from_url(cls, s: str) -> Optional[Submission]:
         return None
-
-
-@contextlib.contextmanager
-def chdir(path: pathlib.Path):
-    cwd = pathlib.Path.cwd()
-    os.chdir(str(path))
-    yield
-    os.chdir(str(cwd))
