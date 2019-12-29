@@ -92,19 +92,18 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         LibraryCheckerService._update_cloned_repository()
         path = LibraryCheckerService._get_cloned_repository_path()
 
-        log.status('$ cd %s', path)
-        with utils.chdir(path):
-            # generate test cases
-            if sys.version_info < (3, 6):
-                log.warning("generate.py may not work on Python 3.5 or older")
-            if os.name == 'nt':
-                log.warning("generate.py may not work on Windows")
-            log.status('$ ./generate.py problems.toml -p %s', self.problem_id)
-            try:
-                subprocess.check_call([sys.executable, 'generate.py', 'problems.toml', '-p', self.problem_id], stdout=sys.stdout, stderr=sys.stderr)
-            except subprocess.CalledProcessError:
-                log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
-                raise
+        if sys.version_info < (3, 6):
+            log.warning("generate.py may not work on Python 3.5 or older")
+        if os.name == 'nt':
+            log.warning("generate.py may not work on Windows")
+
+        command = [sys.executable, str(path / 'generate.py'), str(path / 'problems.toml'), '-p', self.problem_id]
+        log.status('$ %s', ' '.join(command))
+        try:
+            subprocess.check_call(command, stdout=sys.stdout, stderr=sys.stderr)
+        except subprocess.CalledProcessError:
+            log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
+            raise
 
     def _get_problem_directory_path(self) -> pathlib.Path:
         path = LibraryCheckerService._get_cloned_repository_path()
