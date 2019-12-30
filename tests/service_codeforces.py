@@ -18,6 +18,12 @@ class CodeforcesContestTest(unittest.TestCase):
         self.assertEqual(CodeforcesContest.from_url('http://codeforces.com/gym/101025').contest_id, 101025)
         self.assertIsNone(CodeforcesContest.from_url('https://atcoder.jp/contests/abc120'))
 
+    def test_from_url_mx(self):
+        self.assertEqual(CodeforcesContest.from_url('http://m1.codeforces.com/contest/1333').get_url(), CodeforcesContest.from_url('https://codeforces.com/contest/1333').get_url())
+        self.assertEqual(CodeforcesContest.from_url('http://m2.codeforces.com/contest/1333').get_url(), CodeforcesContest.from_url('https://codeforces.com/contest/1333').get_url())
+        self.assertEqual(CodeforcesContest.from_url('http://m3.codeforces.com/contest/1333').get_url(), CodeforcesContest.from_url('https://codeforces.com/contest/1333').get_url())
+        self.assertIsNone(CodeforcesContest.from_url('http://m4.codeforces.com/contest/1333'))
+
     def test_list_problems_data(self):
         contest = CodeforcesContest.from_url('https://codeforces.com/contest/1157')
         problems = contest.list_problem_data()

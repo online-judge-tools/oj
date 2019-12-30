@@ -21,6 +21,8 @@ import onlinejudge.dispatch
 import onlinejudge.type
 from onlinejudge.type import *
 
+_CODEFORCES_DOMAINS = ('codeforces.com', 'm1.codeforces.com', 'm2.codeforces.com', 'm3.codeforces.com')
+
 
 class CodeforcesService(onlinejudge.type.Service):
     def login(self, *, get_credentials: onlinejudge.type.CredentialsProvider, session: Optional[requests.Session] = None) -> None:
@@ -73,7 +75,7 @@ class CodeforcesService(onlinejudge.type.Service):
         # example: http://codeforces.com/
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc == 'codeforces.com':
+                and result.netloc in _CODEFORCES_DOMAINS:
             return cls()
         return None
 
@@ -185,7 +187,7 @@ class CodeforcesContest(onlinejudge.type.Contest):
     def from_url(cls, url: str) -> Optional['CodeforcesContest']:
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc == 'codeforces.com':
+                and result.netloc in _CODEFORCES_DOMAINS:
             table = {}
             table['contest'] = r'/contest/([0-9]+).*'.format()  # example: https://codeforces.com/contest/538
             table['gym'] = r'/gym/([0-9]+).*'.format()  # example: https://codeforces.com/gym/101021
@@ -399,7 +401,7 @@ class CodeforcesProblem(onlinejudge.type.Problem):
     def from_url(cls, url: str) -> Optional['CodeforcesProblem']:
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
-                and result.netloc == 'codeforces.com':
+                and result.netloc in _CODEFORCES_DOMAINS:
             # "0" is needed. example: https://codeforces.com/contest/1000/problem/0
             # "[1-9]?" is sometime used. example: https://codeforces.com/contest/1133/problem/F2
             re_for_index = r'(0|[A-Za-z][1-9]?)'
