@@ -6,7 +6,7 @@ import tests.command_download
 from onlinejudge.type import SampleParseError
 
 
-class DownloadInvalid(unittest.TestCase):
+class DownloadInvalidTest(unittest.TestCase):
     def snippet_call_download_raises(self, *args, **kwargs):
         tests.command_download.snippet_call_download_raises(self, *args, **kwargs)
 
