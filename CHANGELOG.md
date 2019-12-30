@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.6.0 / 2019-12-30
+
+-   [#643](https://github.com/kmyk/online-judge-tools/pull/643) make efficient about Library Checker
+-   [#645](https://github.com/kmyk/online-judge-tools/pull/645) recognize URLs of spare servers of Codeforces like [m1.codeforces.com](http://m1.codeforces.com/)
+-   [#636](https://github.com/kmyk/online-judge-tools/pull/636) provide internal functions about sessions as a library
+
 ## 7.5.0 / 2019-12-13
 
 -   [#630](https://github.com/kmyk/online-judge-tools/pull/630) update the User-Agent for HackerRank
