@@ -14,7 +14,6 @@ import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
 from onlinejudge.type import *
 
-user_config_dir = pathlib.Path(appdirs.user_config_dir(version.__package_name__))
 user_data_dir = pathlib.Path(appdirs.user_data_dir(version.__package_name__))
 user_cache_dir = pathlib.Path(appdirs.user_cache_dir(version.__package_name__))
 
