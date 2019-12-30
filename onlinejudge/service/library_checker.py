@@ -37,6 +37,36 @@ class LibraryCheckerService(onlinejudge.type.Service):
             return cls()
         return None
 
+    @classmethod
+    def _get_cloned_repository_path(cls) -> pathlib.Path:
+        return utils.user_cache_dir / 'library-checker-problems'
+
+    is_repository_updated = False
+
+    @classmethod
+    def _update_cloned_repository(cls) -> None:
+        if cls.is_repository_updated:
+            return
+
+        try:
+            subprocess.check_call(['git', '--version'], stdout=sys.stdout, stderr=sys.stderr)
+        except FileNotFoundError:
+            log.error('git command not found')
+            raise
+
+        path = LibraryCheckerService._get_cloned_repository_path()
+        if not path.exists():
+            # init the problem repository
+            url = 'https://github.com/yosupo06/library-checker-problems'
+            log.status('$ git clone %s %s', url, path)
+            subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stdout, stderr=sys.stderr)
+        else:
+            # sync the problem repository
+            log.status('$ git --git-dir %s pull', str(path / '.git'))
+            subprocess.check_call(['git', '--git-dir', str(path / '.git'), 'pull'], stdout=sys.stdout, stderr=sys.stderr)
+
+        cls.is_repository_updated = True
+
 
 class LibraryCheckerProblem(onlinejudge.type.Problem):
     def __init__(self, *, problem_id: str):
@@ -58,44 +88,25 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         files += [(file.name, file.read_bytes()) for file in path.glob('out/*.out')]
         return onlinejudge._implementation.testcase_zipper.extract_from_files(iter(files))
 
-    def _get_cloned_repository_path(self) -> pathlib.Path:
-        return utils.user_cache_dir / 'library-checker-problems'
-
     def _generate_test_cases_in_cloned_repository(self) -> None:
-        path = self._get_cloned_repository_path()
+        LibraryCheckerService._update_cloned_repository()
+        path = LibraryCheckerService._get_cloned_repository_path()
 
+        if sys.version_info < (3, 6):
+            log.warning("generate.py may not work on Python 3.5 or older")
+        if os.name == 'nt':
+            log.warning("generate.py may not work on Windows")
+
+        command = [sys.executable, str(path / 'generate.py'), str(path / 'problems.toml'), '-p', self.problem_id]
+        log.status('$ %s', ' '.join(command))
         try:
-            subprocess.check_call(['git', '--version'], stdout=sys.stdout, stderr=sys.stderr)
-        except FileNotFoundError:
-            log.error('git command not found')
+            subprocess.check_call(command, stdout=sys.stdout, stderr=sys.stderr)
+        except subprocess.CalledProcessError:
+            log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
             raise
 
-        # init the problem repository
-        if not path.exists():
-            url = 'https://github.com/yosupo06/library-checker-problems'
-            log.status('$ git clone %s %s', url, path)
-            subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stdout, stderr=sys.stderr)
-
-        log.status('$ cd %s', path)
-        with utils.chdir(path):
-            # sync the problem repository
-            log.status('$ git pull')
-            subprocess.check_call(['git', 'pull'], stdout=sys.stdout, stderr=sys.stderr)
-
-            # generate test cases
-            if sys.version_info < (3, 6):
-                log.warning("generate.py may not work on Python 3.5 or older")
-            if os.name == 'nt':
-                log.warning("generate.py may not work on Windows")
-            log.status('$ ./generate.py problems.toml -p %s', self.problem_id)
-            try:
-                subprocess.check_call([sys.executable, 'generate.py', 'problems.toml', '-p', self.problem_id], stdout=sys.stdout, stderr=sys.stderr)
-            except subprocess.CalledProcessError:
-                log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
-                raise
-
     def _get_problem_directory_path(self) -> pathlib.Path:
-        path = self._get_cloned_repository_path()
+        path = LibraryCheckerService._get_cloned_repository_path()
         problems = toml.load(path / 'problems.toml')
         return path / problems['problems'][self.problem_id]['dir']
 
@@ -117,7 +128,7 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         return None
 
     def download_checker_cpp(self) -> bytes:
-        self._generate_test_cases_in_cloned_repository()
+        LibraryCheckerService._update_cloned_repository()
         path = self._get_problem_directory_path()
         with open(str(path / "checker.cpp"), "rb") as fh:
             return fh.read()
