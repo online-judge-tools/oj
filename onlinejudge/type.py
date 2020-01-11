@@ -16,7 +16,8 @@ CredentialsProvider = Callable[[], Tuple[str, str]]
 
 
 class LoginError(RuntimeError):
-    pass
+    def __init__(self, message: str = 'failed to login'):
+        super().__init__(message)
 
 
 class Service(ABC):
@@ -98,18 +99,21 @@ Language = NamedTuple('Language', [
 
 
 class NotLoggedInError(RuntimeError):
-    pass
+    def __init__(self, message: str = 'login required'):
+        super().__init__(message)
 
 
 class SampleParseError(RuntimeError):
     """
     .. versionadded:: 7.0.0
     """
-    pass
+    def __init__(self, message: str = 'failed to parse samples'):
+        super().__init__(message)
 
 
 class SubmissionError(RuntimeError):
-    pass
+    def __init__(self, message: str = 'failed to submit'):
+        super().__init__(message)
 
 
 class DownloadedData(ABC):
