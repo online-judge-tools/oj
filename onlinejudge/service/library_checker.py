@@ -62,8 +62,8 @@ class LibraryCheckerService(onlinejudge.type.Service):
             subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stdout, stderr=sys.stderr)
         else:
             # sync the problem repository
-            log.status('$ git --git-dir %s pull', str(path / '.git'))
-            subprocess.check_call(['git', '--git-dir', str(path / '.git'), 'pull'], stdout=sys.stdout, stderr=sys.stderr)
+            log.status('$ git -C %s pull', str(path))
+            subprocess.check_call(['git', '-C', str(path), 'pull'], stdout=sys.stdout, stderr=sys.stderr)
 
         cls.is_repository_updated = True
 
