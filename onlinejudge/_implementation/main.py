@@ -49,6 +49,7 @@ supported services:
   PKU JudgeOnline
   Kattis
   Toph (Problem Archive)
+  CodeChef
   Facebook Hacker Cup
   Library Checker (https://judge.yosupo.jp/)
 

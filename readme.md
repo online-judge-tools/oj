@@ -27,6 +27,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   PKU JudgeOnline
     -   Kattis
     -   Toph (Problem Archive)
+    -   CodeChef
     -   Facebook Hacker Cup
     -   Library Checker (<https://judge.yosupo.jp>)
 -   Download system test cases
