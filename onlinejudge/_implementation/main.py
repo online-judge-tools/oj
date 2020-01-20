@@ -6,8 +6,6 @@ import sys
 import traceback
 from typing import List, Optional
 
-import requests.exceptions
-
 import onlinejudge
 import onlinejudge.__about__ as version
 import onlinejudge._implementation.logging as log
