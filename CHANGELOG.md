@@ -4,7 +4,7 @@
 ## 7.7.0 / 2019-01-20
 -   [#654](https://github.com/kmyk/online-judge-tools/pull/654) fix a bug of git pull option about Library Checker
 -   [#653](https://github.com/kmyk/online-judge-tools/pull/653) add CodeChef support
--   [#649](https://github.com/kmyk/online-judge-tools/pull/649) add to guess Common Lisp and Clojure files by the extension [@fukamachi](https://github.com/fukamachi)
+-   [#649](https://github.com/kmyk/online-judge-tools/pull/649) allow `submit` to guess Common Lisp and Clojure files by the extension [@fukamachi](https://github.com/fukamachi)
 
 ## 7.6.0 / 2019-12-30
 
