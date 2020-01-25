@@ -268,7 +268,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         return lang_ids
 
     else:
-        log.debug('language guessing: othres')
+        log.debug('language guessing: others')
         table = [
              { 'names': [ 'awk'                   ], 'exts': [ 'awk'       ] },
              { 'names': [ 'bash'                  ], 'exts': [ 'sh'        ] },
