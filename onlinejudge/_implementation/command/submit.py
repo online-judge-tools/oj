@@ -275,7 +275,10 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
              { 'names': [ 'brainfuck'             ], 'exts': [ 'bf'        ] },
              { 'names': [ 'c#'                    ], 'exts': [ 'cs'        ] },
              { 'names': [ 'c'                     ], 'exts': [ 'c'         ], 'split': True },
+             { 'names': [ 'ceylon'                ], 'exts': [ 'ceylon'    ] },
              { 'names': [ 'clojure'               ], 'exts': [ 'clj'       ] },
+             { 'names': [ 'common lisp'           ], 'exts': [ 'lisp', 'lsp', 'cl' ] },
+             { 'names': [ 'crystal'               ], 'exts': [ 'cr'        ] },
              { 'names': [ 'd'                     ], 'exts': [ 'd'         ], 'split': True },
              { 'names': [ 'f#'                    ], 'exts': [ 'fs'        ] },
              { 'names': [ 'fortran'               ], 'exts': [ 'for', 'f', 'f90', 'f95', 'f03' ] },
@@ -283,8 +286,11 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
              { 'names': [ 'haskell'               ], 'exts': [ 'hs'        ] },
              { 'names': [ 'java'                  ], 'exts': [ 'java'      ] },
              { 'names': [ 'javascript'            ], 'exts': [ 'js'        ] },
-             { 'names': [ 'common lisp'           ], 'exts': [ 'lisp'      ] },
+             { 'names': [ 'julia'                 ], 'exts': [ 'jl'        ] },
+             { 'names': [ 'kotlin'                ], 'exts': [ 'kt', 'kts' ] },
              { 'names': [ 'lua'                   ], 'exts': [ 'lua'       ] },
+             { 'names': [ 'nim'                   ], 'exts': [ 'nim'       ] },
+             { 'names': [ 'moonscript'            ], 'exts': [ 'moon'      ] },
              { 'names': [ 'objective-c'           ], 'exts': [ 'm'         ] },
              { 'names': [ 'ocaml'                 ], 'exts': [ 'ml'        ] },
              { 'names': [ 'octave'                ], 'exts': [ 'm'         ] },
@@ -301,7 +307,9 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
              { 'names': [ 'swift'                 ], 'exts': [ 'swift'     ] },
              { 'names': [ 'text'                  ], 'exts': [ 'txt'       ] },
              { 'names': [ 'typescript'            ], 'exts': [ 'ts'        ] },
+             { 'names': [ 'unlambda'              ], 'exts': [ 'unl'       ] },
              { 'names': [ 'vim script'            ], 'exts': [ 'vim'       ] },
+             { 'names': [ 'visual basic'          ], 'exts': [ 'vb'        ] },
         ]  # type: List[Dict[str, Any]]  # yapf: disable
 
         lang_ids = []
