@@ -30,7 +30,6 @@ class SPOJService(onlinejudge.type.Service):
     def from_url(cls, url: str) -> Optional['SPOJService']:
         # example: https://www.spoj.com/
         result = urllib.parse.urlparse(url)
-        print(result.netloc)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc in ('www.spoj.com',):
             return cls()
@@ -62,6 +61,7 @@ class SPOJProblem(onlinejudge.type.Problem):
 
     def _find_sample_tags(cls, soup: bs4.BeautifulSoup) -> Iterator[Tuple[bs4.Tag, bs4.Tag]]:
         expected_strings = ('Sample Input:', 'Sample Output:')
+
         def get_header(pre, tag, expected_tag_name):
             if tag and tag.name == expected_tag_name and tag.string and any(s in tag.string for s in expected_strings):
                 return tag
@@ -88,9 +88,7 @@ class SPOJProblem(onlinejudge.type.Problem):
         result = urllib.parse.urlparse(url)
         if result.scheme in ('', 'http', 'https') \
                 and result.netloc == 'www.spoj.com':
-            m = re.match(
-                r'/(?:problems)/([0-9A-Z_a-z-]+)/?',
-                result.path)
+            m = re.match(r'/(?:problems)/([0-9A-Z_a-z-]+)/?', result.path)
             if m:
                 problem_id = m.group(1)
                 return cls(problem_id=problem_id)
