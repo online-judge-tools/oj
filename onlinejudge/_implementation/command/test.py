@@ -11,6 +11,10 @@ import tempfile
 import threading
 import traceback
 from typing import *
+import webbrowser
+
+from sxsdiff import DiffCalculator
+from sxsdiff.generators.github import GitHubStyledGenerator
 
 import onlinejudge._implementation.format_utils as fmtutils
 import onlinejudge._implementation.logging as log
@@ -124,34 +128,22 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
             expected = ''
             log.warning('expected output is not found')
         # compare
-        if mode == 'all':
-            if not match(answer, expected):
-                log.failure(log.red('WA'))
-                print_input()
-                if not silent:
+        if not match(answer, expected):
+            log.failure(log.red('WA'))
+            print_input()
+            if not silent:
+                if mode == "text":
                     log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
                     log.emit('expected:\n%s', utils.snip_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
-                status = 'WA'
-        elif mode == 'line':
-            answer_words = answer.splitlines()
-            correct_words = expected.splitlines()
-            for i, (x, y) in enumerate(zip(answer_words + [None] * len(correct_words), correct_words + [None] * len(answer_words))):  # type: ignore
-                if x is None and y is None:
-                    break
-                elif x is None:
-                    print_input()
-                    log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i + 1, log.bold(y))
-                    status = 'WA'
-                elif y is None:
-                    print_input()
-                    log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i + 1, log.bold(x))
-                    status = 'WA'
-                elif not match(x, y):
-                    print_input()
-                    log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i + 1, log.bold(x), log.bold(y))
-                    status = 'WA'
-        else:
-            assert False
+                elif mode == "browser":
+                    sxsdiff_result = DiffCalculator().run(answer, expected)
+                    with tempfile.TemporaryDirectory() as tempdir:
+                        with (pathlib.Path(tempdir) / "diff.html").open("w") as f:
+                            GitHubStyledGenerator(file=f).run(sxsdiff_result)
+                    webbrowser.open_new("diff.html")
+                else:
+                    assert False
+            status = 'WA'
     else:
         if not silent:
             log.emit(('output:\n%s' if is_input_printed else '%s'), utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
