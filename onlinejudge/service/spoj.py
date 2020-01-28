@@ -62,7 +62,7 @@ class SPOJProblem(onlinejudge.type.Problem):
     def _find_sample_tags(cls, soup: bs4.BeautifulSoup) -> Iterator[Tuple[bs4.Tag, bs4.Tag]]:
         expected_strings = ('Sample Input:', 'Sample Output:')
 
-        def get_header(pre, tag, expected_tag_name):
+        def get_header(tag, expected_tag_name):
             if tag and tag.name == expected_tag_name and tag.string and any(s in tag.string for s in expected_strings):
                 return tag
             return None
@@ -70,7 +70,7 @@ class SPOJProblem(onlinejudge.type.Problem):
         for pre in soup.find(id='problem-body').find_all('pre'):
             log.debug('pre tag: %s', str(pre))
             tag = pre.find_previous_sibling().find_previous_sibling()
-            h3 = get_header(pre, tag=tag, expected_tag_name='b')
+            h3 = get_header(tag=tag, expected_tag_name='b')
 
             if h3:
                 yield (pre, h3)
