@@ -131,8 +131,8 @@ tips:
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
     subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
-    subparser.add_argument('-m', '--mode', choices=['text', 'browser'], default='text', help='mode to dispaly an output with the correct answer. (default: text)')
-    subparser.add_argument('-1', '--line', dest='mode', action='store_const', const='line', help='equivalent to --mode line')
+    subparser.add_argument('-m', '--display-mode', choices=['plain-text', 'sxs'], default='plain-text', help='mode to display an output with the correct answer (default: plain-text)')
+    subparser.add_argument('--sxs', dest='display-mode', action='store_const', const='sxs', help='display an output and the correct answer with side by side mode (equivalent to --display-mode sxs)')
     subparser.add_argument('--no-rstrip', action='store_false', dest='rstrip')
     subparser.add_argument('--rstrip', action='store_true', help='rstrip output before compare (default)')
     subparser.add_argument('-s', '--silent', action='store_true', help='don\'t report output and correct answer even if not AC  (for --mode all)')
@@ -302,7 +302,7 @@ def main(args: Optional[List[str]] = None) -> None:
         log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md')
         sys.exit(1)
     except Exception as e:
-        log.error('\n' + traceback.format_exc())
+        log.debug('\n' + traceback.format_exc())
         log.error(str(e))
         sys.exit(1)
 
