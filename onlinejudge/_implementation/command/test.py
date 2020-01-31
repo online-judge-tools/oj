@@ -5,6 +5,7 @@ import json
 import math
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -13,8 +14,7 @@ import traceback
 from typing import *
 import webbrowser
 
-from sxsdiff import DiffCalculator
-from sxsdiff.generators.github import GitHubStyledGenerator
+import colorama
 
 import onlinejudge._implementation.format_utils as fmtutils
 import onlinejudge._implementation.logging as log
@@ -49,6 +49,21 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
             if x != y:
                 return False
     return True
+
+
+def display_side_by_side_color(answer: str, expected: str):
+    def space_padding(s: Optional[str], max_length: int) -> str:
+        if s is None:
+            return " " * max_length
+        return s + " " * (max_length - len(s))
+
+    max_chars = shutil.get_terminal_size()[0] // 2 - 2
+
+    for flag, ans_line, exp_line in utils.side_by_side_diff(answer, expected):
+        if not flag:
+            log.emit(space_padding(ans_line, max_chars) + "| " + space_padding(exp_line, max_chars))
+        else:
+            log.emit(colorama.Back.LIGHTRED_EX + space_padding(ans_line, max_chars) + colorama.Style.RESET_ALL + "| " + colorama.Back.GREEN + space_padding(exp_line, max_chars) + colorama.Style.RESET_ALL)
 
 
 def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
@@ -132,15 +147,11 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
             log.failure(log.red('WA'))
             print_input()
             if not silent:
-                if mode == "text":
+                if mode == "simple":
                     log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
                     log.emit('expected:\n%s', utils.snip_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
-                elif mode == "browser":
-                    sxsdiff_result = DiffCalculator().run(answer, expected)
-                    with tempfile.TemporaryDirectory() as tempdir:
-                        with (pathlib.Path(tempdir) / "diff.html").open("w") as f:
-                            GitHubStyledGenerator(file=f).run(sxsdiff_result)
-                    webbrowser.open_new("diff.html")
+                elif mode == "side-by-side":
+                    display_side_by_side_color(answer, expected)
                 else:
                     assert False
             status = 'WA'
@@ -183,7 +194,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             else:
                 log.warning('memory: %f MB', memory)
 
-        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
+        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.display_mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
 
     # return the result
     testcase = {
