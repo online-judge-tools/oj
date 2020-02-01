@@ -275,7 +275,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_multiline_all(self):
         self.snippet_call_test(
-            args=['-c', cat(), '-m', 'all'],
+            args=['-c', cat(), '-m', 'simple'],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -317,7 +317,7 @@ class TestTest(unittest.TestCase):
 
     def test_call_test_multiline_line(self):
         self.snippet_call_test(
-            args=['-c', cat(), '-m', 'line'],
+            args=['-c', cat(), '-m', 'side-by-side'],
             files=[
                 {
                     'path': 'test/sample-1.in',
