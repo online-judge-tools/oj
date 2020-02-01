@@ -49,27 +49,19 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
 
 
 def display_side_by_side_color(answer: str, expected: str):
-    def space_padding(s: Optional[str], max_length: int) -> str:
-        if s is None:
-            return " " * max_length
+    def space_padding(s: str, max_length: int) -> str:
         return s + " " * max_length
 
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
-    num_answer_lines = [len(line) for line in answer.split(os.linesep)]
-    num_expected_lines = [len(line) for line in expected.split(os.linesep)]
-
-    # Need to match num_lines not to cause IndexError
-    while len(num_expected_lines) > len(num_answer_lines):
-        num_answer_lines.append(0)
-    while len(num_expected_lines) < len(num_answer_lines):
-        num_expected_lines.append(0)
 
     log.emit("-" * max_chars + "|" + "-" * max_chars)
-    for i, (diff_found, ans_line, exp_line) in enumerate(utils.side_by_side_diff(answer, expected)):
+    log.emit("output" + " " * (max_chars - 6) + "|" + "expected" + " " * (max_chars - 8))
+    log.emit("-" * max_chars + "|" + "-" * max_chars)
+    for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(utils.side_by_side_diff(answer, expected)):
         if not diff_found:
-            log.emit(space_padding(ans_line, max_chars - num_answer_lines[i]) + "|" + space_padding(exp_line, max_chars - num_expected_lines[i]))
+            log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + space_padding(exp_line, max_chars - exp_chars))
         else:
-            log.emit(log.red(space_padding(ans_line, max_chars - num_answer_lines[i])) + "|" + log.green(space_padding(exp_line, max_chars - num_expected_lines[i])))
+            log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(space_padding(exp_line, max_chars - exp_chars)))
     log.emit("-" * max_chars + "|" + "-" * max_chars)
 
 
