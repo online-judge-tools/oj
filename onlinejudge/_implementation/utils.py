@@ -9,7 +9,6 @@ import itertools
 import json
 import os
 import posixpath
-import pyparsing
 import re
 import shlex
 import shutil
