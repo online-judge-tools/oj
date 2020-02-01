@@ -12,9 +12,6 @@ import tempfile
 import threading
 import traceback
 from typing import *
-import webbrowser
-
-import colorama
 
 import onlinejudge._implementation.format_utils as fmtutils
 import onlinejudge._implementation.logging as log
@@ -55,15 +52,19 @@ def display_side_by_side_color(answer: str, expected: str):
     def space_padding(s: Optional[str], max_length: int) -> str:
         if s is None:
             return " " * max_length
-        return s + " " * (max_length - len(s))
+        return s + " " * max_length
 
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
+    num_answer_lines = [len(line) for line in answer.split(os.linesep)]
+    num_expected_lines = [len(line) for line in expected.split(os.linesep)]
 
-    for flag, ans_line, exp_line in utils.side_by_side_diff(answer, expected):
+    log.emit("-" * max_chars + "|" + "-" * max_chars)
+    for i, (flag, ans_line, exp_line) in enumerate(utils.side_by_side_diff(answer, expected)):
         if not flag:
-            log.emit(space_padding(ans_line, max_chars) + "| " + space_padding(exp_line, max_chars))
+            log.emit(space_padding(ans_line, max_chars - num_answer_lines[i]) + "|" + space_padding(exp_line, max_chars - num_expected_lines[i]))
         else:
-            log.emit(colorama.Back.LIGHTRED_EX + space_padding(ans_line, max_chars) + colorama.Style.RESET_ALL + "| " + colorama.Back.GREEN + space_padding(exp_line, max_chars) + colorama.Style.RESET_ALL)
+            log.emit(log.red(space_padding(ans_line, max_chars - num_answer_lines[i])) + "|" + log.green(space_padding(exp_line, max_chars - num_expected_lines[i])))
+    log.emit("-" * max_chars + "|" + "-" * max_chars)
 
 
 def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:

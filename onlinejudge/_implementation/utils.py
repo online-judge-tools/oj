@@ -9,6 +9,7 @@ import itertools
 import json
 import os
 import posixpath
+import pyparsing
 import re
 import shlex
 import shutil
@@ -356,7 +357,6 @@ def side_by_side_diff(old_text, new_text):
     """ Calculates a side-by-side line-based difference view.
     ref http://code.activestate.com/recipes/577784-line-based-side-by-side-diff/
     """
-
     def yield_open_entry(open_entry):
         """ Yield all open changes. """
         ls, rs = open_entry
@@ -383,10 +383,7 @@ def side_by_side_diff(old_text, new_text):
     for change_type, entry in diff:
         assert change_type in [-1, 0, 1]
 
-        entry = (entry.replace('&', '&amp;')
-                 .replace('<', '&lt;')
-                 .replace('>', '&gt;'))
-
+        entry = (entry.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'))
         lines = line_split.split(entry)
 
         # Merge with previous entry if still open
@@ -401,10 +398,10 @@ def side_by_side_diff(old_text, new_text):
                 rs[-1] = rs[-1] + line
             elif change_type == 1:
                 rs[-1] = rs[-1] or ''
-                rs[-1] += colorama.Style.BRIGHT + '%s' % line if line else '' + colorama.Style.NORMAL
+                rs[-1] += log.green_diff('%s' % line if line else '')
             elif change_type == -1:
                 ls[-1] = ls[-1] or ''
-                ls[-1] += colorama.Style.BRIGHT + '%s' % line if line else '' + colorama.Style.NORMAL
+                ls[-1] += log.red_diff('%s' % line if line else '')
 
         lines = lines[1:]
 
@@ -424,14 +421,14 @@ def side_by_side_diff(old_text, new_text):
                 ls, rs = open_entry
 
                 for line in lines:
-                    rs.append(colorama.Style.BRIGHT + '%s' % line if line else '' + colorama.Style.NORMAL)
+                    rs.append(log.green_diff('%s' % line if line else ''))
 
                 open_entry = (ls, rs)
             elif change_type == -1:
                 ls, rs = open_entry
 
                 for line in lines:
-                    ls.append(colorama.Style.BRIGHT + '%s' % line if line else '' + colorama.Style.NORMAL)
+                    ls.append(log.red_diff('%s' % line if line else ''))
 
                 open_entry = (ls, rs)
 
