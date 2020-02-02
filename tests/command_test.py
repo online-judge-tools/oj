@@ -2,11 +2,16 @@ import json
 import os
 import pathlib
 import random
+import shutil
 import sys
 import unittest
 
 import tests.utils
+from testfixtures import LogCapture
 from tests.utils import cat, sleep_1sec
+
+from onlinejudge._implementation import logging
+from onlinejudge._implementation.command import test
 
 
 class TestTest(unittest.TestCase):
@@ -965,3 +970,85 @@ class TestTest(unittest.TestCase):
         for cmdline in pathlib.Path('/proc').glob('*/cmdline'):
             with open(str(cmdline), 'rb') as fh:
                 self.assertNotIn(marker.encode(), fh.read())
+
+
+class TestLogTest(unittest.TestCase):
+    max_chars = shutil.get_terminal_size()[0] // 2 - 2
+
+    def snippet_call_test(self, answer, expected, display_lines):
+        lines = [
+            ('onlinejudge._implementation.logging', 'INFO', '-' * self.max_chars + '|' + '-' * self.max_chars),
+            ('onlinejudge._implementation.logging', 'INFO', 'output' + ' ' * (self.max_chars - 6) + '|expected' + ' ' * (self.max_chars - 8)),
+            ('onlinejudge._implementation.logging', 'INFO', '-' * self.max_chars + '|' + '-' * self.max_chars),
+        ]
+        for line in display_lines:
+            lines.append(('onlinejudge._implementation.logging', 'INFO', line))
+        lines.append(('onlinejudge._implementation.logging', 'INFO', '-' * self.max_chars + '|' + '-' * self.max_chars))
+
+        with LogCapture() as capture:
+            test.display_side_by_side_color(answer, expected)
+            capture.check(*lines)
+
+    def test_side_by_side1(self):
+        self.snippet_call_test('kmyk', 'kmyk', ('kmyk' + ' ' * (self.max_chars - 4) + '|kmyk' + ' ' * (self.max_chars - 4), ))
+
+    def test_side_by_side2(self):
+        self.snippet_call_test('kmy', 'kmv', (logging.red('km' + logging.red_diff('y') + ' ' * (self.max_chars - 3)) + '|' + logging.green('km' + logging.green_diff('v') + ' ' * (self.max_chars - 3)), ))
+
+    def test_side_by_side3(self):
+        display_lines = [
+            'Alice' + ' ' * (self.max_chars - 5) + '|Alice' + ' ' * (self.max_chars - 5),
+            'Bob' + ' ' * (self.max_chars - 3) + '|Bob' + ' ' * (self.max_chars - 3),
+            'Alice' + ' ' * (self.max_chars - 5) + '|Alice' + ' ' * (self.max_chars - 5),
+        ]
+        self.snippet_call_test('Alice\nBob\nAlice', 'Alice\nBob\nAlice', display_lines)
+
+    def test_side_by_side4(self):
+        display_lines = [
+            'Alice' + ' ' * (self.max_chars - 5) + '|Alice' + ' ' * (self.max_chars - 5),
+            logging.red('B' + logging.red_diff('0') + 'b' + ' ' * (self.max_chars - 3)) + '|' + logging.green('B' + logging.green_diff('o') + 'b' + ' ' * (self.max_chars - 3)),
+            'Alice' + ' ' * (self.max_chars - 5) + '|Alice' + ' ' * (self.max_chars - 5),
+        ]
+        self.snippet_call_test('Alice\nB0b\nAlice', 'Alice\nBob\nAlice', display_lines)
+
+    def test_side_by_side5(self):
+        display_lines = [
+            logging.red(' ' * (self.max_chars)) + '|' + logging.green(logging.green_diff('0 2') + ' ' * (self.max_chars - 3)),
+            '1 2' + ' ' * (self.max_chars - 3) + '|1 2' + ' ' * (self.max_chars - 3),
+            '2 2' + ' ' * (self.max_chars - 3) + '|2 2' + ' ' * (self.max_chars - 3),
+            '3 2' + ' ' * (self.max_chars - 3) + '|3 2' + ' ' * (self.max_chars - 3),
+            logging.red(logging.red_diff('4 2') + ' ' * (self.max_chars - 3)) + '|' + logging.green(' ' * (self.max_chars)),
+        ]
+        self.snippet_call_test('1 2\n2 2\n3 2\n4 2', '0 2\n1 2\n2 2\n3 2', display_lines)
+
+    def test_side_by_side6(self):
+        display_lines = [
+            logging.red(' ' * (self.max_chars)) + '|' + logging.green(logging.green_diff('0 2') + ' ' * (self.max_chars - 3)),
+            logging.red(' ' * (self.max_chars)) + '|' + logging.green(logging.green_diff('1 2') + ' ' * (self.max_chars - 3)),
+            '2 2' + ' ' * (self.max_chars - 3) + '|2 2' + ' ' * (self.max_chars - 3),
+            '3 2' + ' ' * (self.max_chars - 3) + '|3 2' + ' ' * (self.max_chars - 3),
+            '4 2' + ' ' * (self.max_chars - 3) + '|4 2' + ' ' * (self.max_chars - 3),
+            logging.red(logging.red_diff('5 2') + ' ' * (self.max_chars - 3)) + '|' + logging.green(' ' * (self.max_chars)),
+            logging.red(logging.red_diff('6 2') + ' ' * (self.max_chars - 3)) + '|' + logging.green(' ' * (self.max_chars)),
+        ]
+        self.snippet_call_test('2 2\n3 2\n4 2\n5 2\n6 2', '0 2\n1 2\n2 2\n3 2\n4 2', display_lines)
+
+    def test_side_by_side7(self):
+        display_lines = [
+            logging.red(logging.red_diff('0 2') + ' ' * (self.max_chars - 3)) + '|' + logging.green(' ' * (self.max_chars)),
+            logging.red(logging.red_diff('1 2') + ' ' * (self.max_chars - 3)) + '|' + logging.green(' ' * (self.max_chars)),
+            '2 2' + ' ' * (self.max_chars - 3) + '|2 2' + ' ' * (self.max_chars - 3),
+            '3 2' + ' ' * (self.max_chars - 3) + '|3 2' + ' ' * (self.max_chars - 3),
+            '4 2' + ' ' * (self.max_chars - 3) + '|4 2' + ' ' * (self.max_chars - 3),
+            logging.red(' ' * (self.max_chars)) + '|' + logging.green(logging.green_diff('5 2') + ' ' * (self.max_chars - 3)),
+            logging.red(' ' * (self.max_chars)) + '|' + logging.green(logging.green_diff('6 2') + ' ' * (self.max_chars - 3)),
+        ]
+        self.snippet_call_test('0 2\n1 2\n2 2\n3 2\n4 2', '2 2\n3 2\n4 2\n5 2\n6 2', display_lines)
+
+    def test_side_by_side8(self):
+        display_lines = [
+            logging.red(logging.red_diff('1') + ' 0 2' + ' ' * (self.max_chars - 5)) + '|' + logging.green(logging.green_diff('2') + ' 0 2' + ' ' * (self.max_chars - 5)),
+            logging.red('1 ' + logging.red_diff('0') + ' 2' + ' ' * (self.max_chars - 5)) + '|' + logging.green('1 ' + logging.green_diff('1') + ' 2' + ' ' * (self.max_chars - 5)),
+            logging.red('1 0 ' + logging.red_diff('2') + ' ' * (self.max_chars - 5)) + '|' + logging.green('1 0 ' + logging.green_diff('3') + ' ' * (self.max_chars - 5)),
+        ]
+        self.snippet_call_test('1 0 2\n1 0 2\n1 0 2', '2 0 2\n1 1 2\n1 0 3', display_lines)
