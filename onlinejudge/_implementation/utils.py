@@ -351,7 +351,7 @@ class DummySubmission(Submission):
         return None
 
 
-def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[str, str, int, int], None, None]:
+def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, str, str, int, int], None, None]:
     """
     Calculates a side-by-side line-based difference view.
     """
