@@ -1,5 +1,10 @@
 # Change Log
 
+## 7.8.0 / 2019-02-03
+
+-   [#665](https://github.com/kmyk/online-judge-tools/pull/665) add Sphere Online Judge support
+-   [#661](https://github.com/kmyk/online-judge-tools/pull/661) allow `submit` to guess more languages ([@eggplants](https://github.com/eggplants))
+-   [#660](https://github.com/kmyk/online-judge-tools/pull/660) prevent installation using unsupported versions of Python
 
 ## 7.7.0 / 2019-01-20
 -   [#654](https://github.com/kmyk/online-judge-tools/pull/654) fix a bug of git pull option about Library Checker
