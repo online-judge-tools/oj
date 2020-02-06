@@ -133,11 +133,9 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
                 return cls(problem_id=m.group(1))
         return None
 
-    def download_checker_cpp(self) -> bytes:
-        LibraryCheckerService._update_cloned_repository()
-        path = self._get_problem_directory_path()
-        with open(str(path / "checker.cpp"), "rb") as fh:
-            return fh.read()
+    def download_checker_binary(self) -> pathlib.Path:
+        self._generate_test_cases_in_cloned_repository(compile_checker=True)
+        return self._get_problem_directory_path() / "checker"
 
 
 onlinejudge.dispatch.services += [LibraryCheckerService]
