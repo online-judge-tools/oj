@@ -49,7 +49,7 @@ class LibraryCheckerService(onlinejudge.type.Service):
             return
 
         try:
-            subprocess.check_call(['git', '--version'], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(['git', '--version'], stdout=sys.stderr, stderr=sys.stderr)
         except FileNotFoundError:
             log.error('git command not found')
             raise
@@ -59,11 +59,11 @@ class LibraryCheckerService(onlinejudge.type.Service):
             # init the problem repository
             url = 'https://github.com/yosupo06/library-checker-problems'
             log.status('$ git clone %s %s', url, path)
-            subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stderr, stderr=sys.stderr)
         else:
             # sync the problem repository
             log.status('$ git -C %s pull', str(path))
-            subprocess.check_call(['git', '-C', str(path), 'pull'], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(['git', '-C', str(path), 'pull'], stdout=sys.stderr, stderr=sys.stderr)
 
         cls.is_repository_updated = True
 
@@ -103,7 +103,7 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
             command.append('--compile-checker')
         log.status('$ %s', ' '.join(command))
         try:
-            subprocess.check_call(command, stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(command, stdout=sys.stderr, stderr=sys.stderr)
         except subprocess.CalledProcessError:
             log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
             raise
