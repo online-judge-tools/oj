@@ -30,7 +30,6 @@ setup(
         'diff-match-patch >= 20181111',
         'lxml >= 4',
         'requests >= 2',
-        'sxsdiff >= 0.3.0',
         'toml >= 0.10',
     ],
     packages=find_packages(exclude=('tests', 'docs')),
