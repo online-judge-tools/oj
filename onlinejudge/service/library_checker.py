@@ -3,6 +3,7 @@
 the module for yosupo's Library Checker (https://judge.yosupo.jp)
 """
 
+import glob
 import os
 import pathlib
 import re
@@ -12,7 +13,6 @@ import urllib.parse
 from typing import *
 
 import requests
-import toml
 
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.testcase_zipper
@@ -49,7 +49,7 @@ class LibraryCheckerService(onlinejudge.type.Service):
             return
 
         try:
-            subprocess.check_call(['git', '--version'], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(['git', '--version'], stdout=sys.stderr, stderr=sys.stderr)
         except FileNotFoundError:
             log.error('git command not found')
             raise
@@ -59,11 +59,11 @@ class LibraryCheckerService(onlinejudge.type.Service):
             # init the problem repository
             url = 'https://github.com/yosupo06/library-checker-problems'
             log.status('$ git clone %s %s', url, path)
-            subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(['git', 'clone', url, str(path)], stdout=sys.stderr, stderr=sys.stderr)
         else:
             # sync the problem repository
             log.status('$ git -C %s pull', str(path))
-            subprocess.check_call(['git', '-C', str(path), 'pull'], stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(['git', '-C', str(path), 'pull'], stdout=sys.stderr, stderr=sys.stderr)
 
         cls.is_repository_updated = True
 
@@ -88,7 +88,7 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         files += [(file.name, file.read_bytes()) for file in path.glob('out/*.out')]
         return onlinejudge._implementation.testcase_zipper.extract_from_files(iter(files))
 
-    def _generate_test_cases_in_cloned_repository(self) -> None:
+    def _generate_test_cases_in_cloned_repository(self, compile_checker: bool = False) -> None:
         LibraryCheckerService._update_cloned_repository()
         path = LibraryCheckerService._get_cloned_repository_path()
 
@@ -97,18 +97,24 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
         if os.name == 'nt':
             log.warning("generate.py may not work on Windows")
 
-        command = [sys.executable, str(path / 'generate.py'), str(path / 'problems.toml'), '-p', self.problem_id]
+        problem_spec = str(self._get_problem_directory_path() / 'info.toml')
+        command = [sys.executable, str(path / 'generate.py'), problem_spec]
+        if compile_checker:
+            command.append('--compile-checker')
         log.status('$ %s', ' '.join(command))
         try:
-            subprocess.check_call(command, stdout=sys.stdout, stderr=sys.stderr)
+            subprocess.check_call(command, stdout=sys.stderr, stderr=sys.stderr)
         except subprocess.CalledProcessError:
             log.error("the generate.py failed: check https://github.com/yosupo06/library-checker-problems/issues")
             raise
 
     def _get_problem_directory_path(self) -> pathlib.Path:
         path = LibraryCheckerService._get_cloned_repository_path()
-        problems = toml.load(path / 'problems.toml')
-        return path / problems['problems'][self.problem_id]['dir']
+        info_tomls = list(path.glob('**/{}/info.toml'.format(glob.escape(self.problem_id))))
+        if len(info_tomls) != 1:
+            log.error("the problem %s not found or broken", self.problem_id)
+            raise RuntimeError()
+        return info_tomls[0].parent
 
     def get_url(self) -> str:
         return 'https://judge.yosupo.jp/problem/{}'.format(self.problem_id)
@@ -127,11 +133,9 @@ class LibraryCheckerProblem(onlinejudge.type.Problem):
                 return cls(problem_id=m.group(1))
         return None
 
-    def download_checker_cpp(self) -> bytes:
-        LibraryCheckerService._update_cloned_repository()
-        path = self._get_problem_directory_path()
-        with open(str(path / "checker.cpp"), "rb") as fh:
-            return fh.read()
+    def download_checker_binary(self) -> pathlib.Path:
+        self._generate_test_cases_in_cloned_repository(compile_checker=True)
+        return self._get_problem_directory_path() / "checker"
 
 
 onlinejudge.dispatch.services += [LibraryCheckerService]
