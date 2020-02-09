@@ -54,15 +54,13 @@ def display_side_by_side_color(answer: str, expected: str):
 
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
-    log.emit("-" * max_chars + "|" + "-" * max_chars)
-    log.emit("output" + " " * (max_chars - 6) + "|" + "expected" + " " * (max_chars - 8))
+    log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:" + " " * (max_chars - 9))
     log.emit("-" * max_chars + "|" + "-" * max_chars)
     for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(utils.side_by_side_diff(answer, expected)):
         if not diff_found:
             log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + space_padding(exp_line, max_chars - exp_chars))
         else:
             log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(space_padding(exp_line, max_chars - exp_chars)))
-    log.emit("-" * max_chars + "|" + "-" * max_chars)
 
 
 def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:

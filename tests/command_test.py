@@ -977,13 +977,11 @@ class TestLogTest(unittest.TestCase):
 
     def snippet_call_test(self, answer, expected, display_lines):
         lines = [
-            ('onlinejudge._implementation.logging', 'INFO', '-' * self.max_chars + '|' + '-' * self.max_chars),
-            ('onlinejudge._implementation.logging', 'INFO', 'output' + ' ' * (self.max_chars - 6) + '|expected' + ' ' * (self.max_chars - 8)),
+            ('onlinejudge._implementation.logging', 'INFO', 'output:' + ' ' * (self.max_chars - 7) + '|expected:' + ' ' * (self.max_chars - 9)),
             ('onlinejudge._implementation.logging', 'INFO', '-' * self.max_chars + '|' + '-' * self.max_chars),
         ]
         for line in display_lines:
             lines.append(('onlinejudge._implementation.logging', 'INFO', line))
-        lines.append(('onlinejudge._implementation.logging', 'INFO', '-' * self.max_chars + '|' + '-' * self.max_chars))
 
         with LogCapture() as capture:
             test.display_side_by_side_color(answer, expected)

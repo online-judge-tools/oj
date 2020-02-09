@@ -351,26 +351,27 @@ class DummySubmission(Submission):
         return None
 
 
+def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:
+    """ Yield all open changes. """
+    ls, rs, lnums, rnums = open_entry
+    # Get unchanged parts onto the right line
+    if ls[0] == rs[0]:
+        yield (False, ls[0], rs[0], lnums[0], rnums[0])
+        for l, r, lnum, rnum in itertools.zip_longest(ls[1:], rs[1:], lnums[1:], rnums[1:]):
+            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+    elif ls[-1] == rs[-1]:
+        for l, r, lnum, rnum in itertools.zip_longest(ls[:-1], rs[:-1], lnums[:-1], rnums[:-1]):
+            yield (l != r, l or '', r or '', lnum or 0, rnum or 0)
+        yield (False, ls[-1], rs[-1], lnums[-1], rnums[-1])
+    else:
+        for l, r, lnum, rnum in itertools.zip_longest(ls, rs, lnums, rnums):
+            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+
+
 def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, str, str, int, int], None, None]:
     """
     Calculates a side-by-side line-based difference view.
     """
-    def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]):
-        """ Yield all open changes. """
-        ls, rs, lnums, rnums = open_entry
-        # Get unchanged parts onto the right line
-        if ls[0] == rs[0]:
-            yield (False, ls[0], rs[0], lnums[0], rnums[0])
-            for l, r, lnum, rnum in itertools.zip_longest(ls[1:], rs[1:], lnums[1:], rnums[1:]):
-                yield (True, l or '', r or '', lnum or 0, rnum or 0)
-        elif ls[-1] == rs[-1]:
-            for l, r, lnum, rnum in itertools.zip_longest(ls[:-1], rs[:-1], lnums[:-1], rnums[:-1]):
-                yield (l != r, l or '', r or '', lnum or 0, rnum or 0)
-            yield (False, ls[-1], rs[-1], lnums[-1], rnums[-1])
-        else:
-            for l, r, lnum, rnum in itertools.zip_longest(ls, rs, lnums, rnums):
-                yield (True, l or '', r or '', lnum or 0, rnum or 0)
-
     line_split = re.compile(r'(?:\r?\n)')
     dmp = diff_match_patch.diff_match_patch()
 
