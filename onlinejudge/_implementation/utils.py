@@ -21,7 +21,6 @@ from typing.io import *
 import bs4
 
 import onlinejudge.__about__ as version
-import onlinejudge._implementation.logging as log
 import onlinejudge.utils
 from onlinejudge.type import *
 from onlinejudge.utils import *  # re-export

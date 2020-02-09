@@ -1,16 +1,21 @@
 # Python Version: 3.x
 import concurrent.futures
 import contextlib
+import itertools
 import json
 import math
 import os
 import pathlib
+import re
+import shutil
 import subprocess
 import sys
 import tempfile
 import threading
 import traceback
 from typing import *
+
+import diff_match_patch
 
 import onlinejudge._implementation.format_utils as fmtutils
 import onlinejudge._implementation.logging as log
@@ -124,34 +129,18 @@ def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memo
             expected = ''
             log.warning('expected output is not found')
         # compare
-        if mode == 'all':
-            if not match(answer, expected):
-                log.failure(log.red('WA'))
-                print_input()
-                if not silent:
+        if not match(answer, expected):
+            log.failure(log.red('WA'))
+            print_input()
+            if not silent:
+                if mode == "simple":
                     log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
                     log.emit('expected:\n%s', utils.snip_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
-                status = 'WA'
-        elif mode == 'line':
-            answer_words = answer.splitlines()
-            correct_words = expected.splitlines()
-            for i, (x, y) in enumerate(zip(answer_words + [None] * len(correct_words), correct_words + [None] * len(answer_words))):  # type: ignore
-                if x is None and y is None:
-                    break
-                elif x is None:
-                    print_input()
-                    log.failure(log.red('WA') + ': line %d: line is nothing: expected "%s"', i + 1, log.bold(y))
-                    status = 'WA'
-                elif y is None:
-                    print_input()
-                    log.failure(log.red('WA') + ': line %d: unexpected line: output "%s"', i + 1, log.bold(x))
-                    status = 'WA'
-                elif not match(x, y):
-                    print_input()
-                    log.failure(log.red('WA') + ': line %d: output "%s": expected "%s"', i + 1, log.bold(x), log.bold(y))
-                    status = 'WA'
-        else:
-            assert False
+                elif mode == "side-by-side":
+                    display_side_by_side_color(answer, expected)
+                else:
+                    assert False
+            status = 'WA'
     else:
         if not silent:
             log.emit(('output:\n%s' if is_input_printed else '%s'), utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
@@ -191,7 +180,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             else:
                 log.warning('memory: %f MB', memory)
 
-        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
+        status = compare_and_report(proc, answer, elapsed, memory, test_input_path, test_output_path, mle=args.mle, mode=args.display_mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
 
     # return the result
     testcase = {
@@ -293,3 +282,101 @@ def test(args: 'argparse.Namespace') -> None:
 
     if ac_count != len(tests):
         sys.exit(1)
+
+
+def display_side_by_side_color(answer: str, expected: str):
+    def space_padding(s: str, max_length: int) -> str:
+        return s + " " * max_length
+
+    max_chars = shutil.get_terminal_size()[0] // 2 - 2
+
+    log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:" + " " * (max_chars - 9))
+    log.emit("-" * max_chars + "|" + "-" * max_chars)
+    for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
+        if not diff_found:
+            log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + space_padding(exp_line, max_chars - exp_chars))
+        else:
+            log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(space_padding(exp_line, max_chars - exp_chars)))
+
+
+def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:
+    """ Yield all open changes. """
+    ls, rs, lnums, rnums = open_entry
+    # Get unchanged parts onto the right line
+    if ls[0] == rs[0]:
+        yield (False, ls[0], rs[0], lnums[0], rnums[0])
+        for l, r, lnum, rnum in itertools.zip_longest(ls[1:], rs[1:], lnums[1:], rnums[1:]):
+            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+    elif ls[-1] == rs[-1]:
+        for l, r, lnum, rnum in itertools.zip_longest(ls[:-1], rs[:-1], lnums[:-1], rnums[:-1]):
+            yield (l != r, l or '', r or '', lnum or 0, rnum or 0)
+        yield (False, ls[-1], rs[-1], lnums[-1], rnums[-1])
+    else:
+        for l, r, lnum, rnum in itertools.zip_longest(ls, rs, lnums, rnums):
+            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+
+
+def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, str, str, int, int], None, None]:
+    """
+    Calculates a side-by-side line-based difference view.
+    """
+    line_split = re.compile(r'(?:\r?\n)')
+    dmp = diff_match_patch.diff_match_patch()
+
+    diff = dmp.diff_main(old_text, new_text)
+    dmp.diff_cleanupSemantic(diff)
+
+    open_entry = ([''], [''], [0], [0])
+    for change_type, entry in diff:
+        assert change_type in [-1, 0, 1]
+
+        entry = (entry.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'))
+        lines = line_split.split(entry)
+
+        # Merge with previous entry if still open
+        ls, rs, lnums, rnums = open_entry
+
+        line = lines[0]
+        if line:
+            if change_type == 0:
+                ls[-1] += line
+                rs[-1] += line
+                lnums[-1] += len(line)
+                rnums[-1] += len(line)
+            elif change_type == 1:
+                rs[-1] = rs[-1] or ''
+                rs[-1] += log.green_diff(line) if line else ''
+                rnums[-1] += len(line)
+            elif change_type == -1:
+                ls[-1] = ls[-1] or ''
+                ls[-1] += log.red_diff(line) if line else ''
+                lnums[-1] += len(line)
+
+        lines = lines[1:]
+
+        if lines:
+            if change_type == 0:
+                # Push out open entry
+                for entry in yield_open_entry(open_entry):
+                    yield entry
+
+                # Directly push out lines until last
+                for line in lines[:-1]:
+                    yield (False, line, line, len(line), len(line))
+
+                # Keep last line open
+                open_entry = ([lines[-1]], [lines[-1]], [len(lines[-1])], [len(lines[-1])])
+            elif change_type == 1:
+                ls, rs, lnums, rnums = open_entry
+                for line in lines:
+                    rs.append(log.green_diff(line) if line else '')
+                    rnums.append(len(line))
+            elif change_type == -1:
+                ls, rs, lnums, rnums = open_entry
+                for line in lines:
+                    ls.append(log.red_diff(line) if line else '')
+                    lnums.append(len(line))
+
+    # Push out open entry
+    for entry in yield_open_entry(open_entry):
+        yield entry

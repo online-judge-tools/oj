@@ -27,6 +27,7 @@ setup(
         'appdirs >= 1',
         'beautifulsoup4 >= 4',
         'colorama >= 0.3',
+        'diff-match-patch >= 20181111',
         'lxml >= 4',
         'requests >= 2',
         'toml >= 0.10',
