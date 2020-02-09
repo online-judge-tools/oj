@@ -1,10 +1,12 @@
 # Python Version: 3.x
 import concurrent.futures
 import contextlib
+import itertools
 import json
 import math
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -12,6 +14,8 @@ import tempfile
 import threading
 import traceback
 from typing import *
+
+import diff_match_patch
 
 import onlinejudge._implementation.format_utils as fmtutils
 import onlinejudge._implementation.logging as log
@@ -46,21 +50,6 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
             if x != y:
                 return False
     return True
-
-
-def display_side_by_side_color(answer: str, expected: str):
-    def space_padding(s: str, max_length: int) -> str:
-        return s + " " * max_length
-
-    max_chars = shutil.get_terminal_size()[0] // 2 - 2
-
-    log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:" + " " * (max_chars - 9))
-    log.emit("-" * max_chars + "|" + "-" * max_chars)
-    for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(utils.side_by_side_diff(answer, expected)):
-        if not diff_found:
-            log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + space_padding(exp_line, max_chars - exp_chars))
-        else:
-            log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(space_padding(exp_line, max_chars - exp_chars)))
 
 
 def compare_and_report(proc: subprocess.Popen, answer: str, elapsed: float, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
@@ -293,3 +282,101 @@ def test(args: 'argparse.Namespace') -> None:
 
     if ac_count != len(tests):
         sys.exit(1)
+
+
+def display_side_by_side_color(answer: str, expected: str):
+    def space_padding(s: str, max_length: int) -> str:
+        return s + " " * max_length
+
+    max_chars = shutil.get_terminal_size()[0] // 2 - 2
+
+    log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:" + " " * (max_chars - 9))
+    log.emit("-" * max_chars + "|" + "-" * max_chars)
+    for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
+        if not diff_found:
+            log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + space_padding(exp_line, max_chars - exp_chars))
+        else:
+            log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(space_padding(exp_line, max_chars - exp_chars)))
+
+
+def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:
+    """ Yield all open changes. """
+    ls, rs, lnums, rnums = open_entry
+    # Get unchanged parts onto the right line
+    if ls[0] == rs[0]:
+        yield (False, ls[0], rs[0], lnums[0], rnums[0])
+        for l, r, lnum, rnum in itertools.zip_longest(ls[1:], rs[1:], lnums[1:], rnums[1:]):
+            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+    elif ls[-1] == rs[-1]:
+        for l, r, lnum, rnum in itertools.zip_longest(ls[:-1], rs[:-1], lnums[:-1], rnums[:-1]):
+            yield (l != r, l or '', r or '', lnum or 0, rnum or 0)
+        yield (False, ls[-1], rs[-1], lnums[-1], rnums[-1])
+    else:
+        for l, r, lnum, rnum in itertools.zip_longest(ls, rs, lnums, rnums):
+            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+
+
+def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, str, str, int, int], None, None]:
+    """
+    Calculates a side-by-side line-based difference view.
+    """
+    line_split = re.compile(r'(?:\r?\n)')
+    dmp = diff_match_patch.diff_match_patch()
+
+    diff = dmp.diff_main(old_text, new_text)
+    dmp.diff_cleanupSemantic(diff)
+
+    open_entry = ([''], [''], [0], [0])
+    for change_type, entry in diff:
+        assert change_type in [-1, 0, 1]
+
+        entry = (entry.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'))
+        lines = line_split.split(entry)
+
+        # Merge with previous entry if still open
+        ls, rs, lnums, rnums = open_entry
+
+        line = lines[0]
+        if line:
+            if change_type == 0:
+                ls[-1] += line
+                rs[-1] += line
+                lnums[-1] += len(line)
+                rnums[-1] += len(line)
+            elif change_type == 1:
+                rs[-1] = rs[-1] or ''
+                rs[-1] += log.green_diff(line) if line else ''
+                rnums[-1] += len(line)
+            elif change_type == -1:
+                ls[-1] = ls[-1] or ''
+                ls[-1] += log.red_diff(line) if line else ''
+                lnums[-1] += len(line)
+
+        lines = lines[1:]
+
+        if lines:
+            if change_type == 0:
+                # Push out open entry
+                for entry in yield_open_entry(open_entry):
+                    yield entry
+
+                # Directly push out lines until last
+                for line in lines[:-1]:
+                    yield (False, line, line, len(line), len(line))
+
+                # Keep last line open
+                open_entry = ([lines[-1]], [lines[-1]], [len(lines[-1])], [len(lines[-1])])
+            elif change_type == 1:
+                ls, rs, lnums, rnums = open_entry
+                for line in lines:
+                    rs.append(log.green_diff(line) if line else '')
+                    rnums.append(len(line))
+            elif change_type == -1:
+                ls, rs, lnums, rnums = open_entry
+                for line in lines:
+                    ls.append(log.red_diff(line) if line else '')
+                    lnums.append(len(line))
+
+    # Push out open entry
+    for entry in yield_open_entry(open_entry):
+        yield entry
