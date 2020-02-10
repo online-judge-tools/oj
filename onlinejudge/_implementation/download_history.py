@@ -1,5 +1,4 @@
 # Python Version: 3.x
-import datetime
 import json
 import pathlib
 import time
@@ -17,7 +16,6 @@ class DownloadHistory(object):
         self.path = path
 
     def add(self, problem: onlinejudge.type.Problem, directory: pathlib.Path = pathlib.Path.cwd()) -> None:
-        now = datetime.datetime.now(datetime.timezone.utc).astimezone()
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with open(str(self.path), 'a') as fh:
             fh.write(json.dumps({
