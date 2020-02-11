@@ -305,34 +305,36 @@ def display_side_by_side_color(answer: str, expected: str):
 
 
 def display_snipped_side_by_side_color(answer: str, expected: str):
+    """
+    Display first differ line and its previous 3 lines and its next 3 lines.
+    """
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
-    deq = collections.deque(maxlen=5)
+    deq = collections.deque(maxlen=7)
 
     count_from_first_difference = 0
     for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
         if count_from_first_difference > 0:
             count_from_first_difference += 1
-        if not diff_found:
-            deq.append((str(i), diff_found, ans_line, exp_line, ans_chars, exp_chars))
-        else:
-            deq.append((str(i), diff_found, ans_line, exp_line, ans_chars, exp_chars))
+        deq.append((str(i), diff_found, ans_line, exp_line, ans_chars, exp_chars))
+        if diff_found:
             if count_from_first_difference == 0:
                 count_from_first_difference = 1
-        if count_from_first_difference == 3:
+        if count_from_first_difference == 4:
             break
 
     max_line_num_digits = len(str(max([entry[0] for entry in deq])))
-    max_digits_half = max_line_num_digits // 2
 
     log.emit(" " * max_line_num_digits + "|output:" + " " * (max_chars - 7 - max_line_num_digits - 1) + "|" + "expected:" + " " * (max_chars - 9))
     log.emit("-" * max_chars + "|" + "-" * max_chars)
 
     for (str_i, diff_found, ans_line, exp_line, ans_chars, exp_chars) in deq:
-        num_spaces_after_output = max_chars - ans_chars - max_digits_half - 2
+        num_spaces_after_output = max_chars - ans_chars - max_line_num_digits - 1
+        num_spaces_after_expect = max_chars - exp_chars - max_line_num_digits - 1
+        line_num_display = space_padding(str_i, max_line_num_digits - len(str_i)) + "|"
         if not diff_found:
-            log.emit(space_padding(str_i, max_line_num_digits - len(str_i)) + "|" + space_padding(ans_line, num_spaces_after_output) + "|" + space_padding(exp_line, num_spaces_after_output))
+            log.emit(line_num_display + space_padding(ans_line, num_spaces_after_output) + "|" + space_padding(exp_line, num_spaces_after_expect))
         else:
-            log.emit(space_padding(str_i, max_line_num_digits - len(str_i)) + "|" + log.red(space_padding(ans_line, num_spaces_after_output)) + "|" + log.green(space_padding(exp_line, num_spaces_after_output)))
+            log.emit(line_num_display + log.red(space_padding(ans_line, num_spaces_after_output)) + "|" + log.green(space_padding(exp_line, num_spaces_after_expect)))
 
 
 def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:
