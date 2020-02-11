@@ -315,7 +315,7 @@ def display_snipped_side_by_side_color(answer: str, expected: str):
     for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
         if count_from_first_difference > 0:
             count_from_first_difference += 1
-        deq.append((str(i), diff_found, ans_line, exp_line, ans_chars, exp_chars))
+        deq.append((str(i + 1), diff_found, ans_line, exp_line, ans_chars, exp_chars))
         if diff_found:
             if count_from_first_difference == 0:
                 count_from_first_difference = 1
