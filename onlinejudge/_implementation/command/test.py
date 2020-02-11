@@ -134,11 +134,11 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
             log.failure(log.red('WA'))
             print_input()
             if not silent:
-                if mode == "simple":
+                if mode == 'simple':
                     log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
                     log.emit('expected:\n%s', utils.snip_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
-                elif mode == "side-by-side":
-                    if max(answer.count("\n"), expected.count("\n")) <= 40:
+                elif mode == 'side-by-side':
+                    if max(answer.count('\n'), expected.count('\n')) <= 40:
                         display_side_by_side_color(answer, expected)
                     else:
                         display_snipped_side_by_side_color(answer, expected)
