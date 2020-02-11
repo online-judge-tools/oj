@@ -262,7 +262,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         """
 
         session = session or utils.get_default_session()
-        if 'Authorization' not in session.headers and not self.get_service().is_logged_in(session=session):
+        if not self.get_service().is_logged_in(session=session):
             raise NotLoggedInError
         url = '{}/testcase.zip'.format(self.get_url())
         resp = utils.request('GET', url, session=session)
