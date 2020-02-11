@@ -11,6 +11,7 @@ import onlinejudge._implementation.download_history
 import onlinejudge._implementation.format_utils as format_utils
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
+from onlinejudge.service.yukicoder import YukicoderProblem
 import onlinejudge.type
 
 if TYPE_CHECKING:
@@ -39,7 +40,7 @@ def download(args: 'argparse.Namespace') -> None:
 
     # get samples from the server
     with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
-        if args.yukicoder_token:
+        if args.yukicoder_token and isinstance(problem, YukicoderProblem):
             sess.headers['Authorization'] = 'Bearer {}'.format(args.yukicoder_token)
         if args.system:
             samples = problem.download_system_cases(session=sess)
