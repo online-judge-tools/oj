@@ -1050,3 +1050,48 @@ class TestLogTest(unittest.TestCase):
             logging.red('1 0 ' + logging.red_diff('2') + ' ' * (self.max_chars - 5)) + '|' + logging.green('1 0 ' + logging.green_diff('3')),
         ]
         self.snippet_call_test('1 0 2\n1 0 2\n1 0 2', '2 0 2\n1 1 2\n1 0 3', display_lines)
+
+
+class TestSnippedLogTest(unittest.TestCase):
+    max_chars = shutil.get_terminal_size()[0] // 2 - 2
+
+    def snippet_call_test(self, answer, expected, display_lines, max_line_num_digits):
+        lines = [
+            ('onlinejudge._implementation.logging', 'INFO', " " * max_line_num_digits + '|output:' + ' ' * (self.max_chars - 8 - max_line_num_digits) + '|expected:'),
+            ('onlinejudge._implementation.logging', 'INFO', '-' * self.max_chars + '|' + '-' * self.max_chars),
+        ]
+        for line in display_lines:
+            lines.append(('onlinejudge._implementation.logging', 'INFO', line))
+
+        with LogCapture() as capture:
+            test.display_snipped_side_by_side_color(answer, expected)
+            capture.check(*lines)
+
+    def test_side_by_side1(self):
+        display_lines = [
+            '41|Alice' + ' ' * (self.max_chars - 8) + '|Alice',
+            '42|Bob' + ' ' * (self.max_chars - 6) + '|Bob',
+            '43|Alice' + ' ' * (self.max_chars - 8) + '|Alice',
+            '44|' + logging.red(logging.red_diff('Bob') + ' ' * (self.max_chars - 6)) + '|' + logging.green(logging.green_diff('John')),
+            '45|' + logging.red(logging.red_diff('Alice') + ' ' * (self.max_chars - 8)) + '|' + logging.green(logging.green_diff('John')),
+            '46|Bob' + ' ' * (self.max_chars - 6) + '|Bob',
+            '47|Alice' + ' ' * (self.max_chars - 8) + '|Alice',
+        ]
+        output = '\n' * 40 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n'
+        expect = '\n' * 40 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n'
+        self.snippet_call_test(output, expect, display_lines, 2)
+
+
+    def test_side_by_side2(self):
+        display_lines = [
+            '98 |Alice' + ' ' * (self.max_chars - 9) + '|Alice',
+            '99 |Bob' + ' ' * (self.max_chars - 7) + '|Bob',
+            '100|Alice' + ' ' * (self.max_chars - 9) + '|Alice',
+            '101|' + logging.red(logging.red_diff('Bob') + ' ' * (self.max_chars - 7)) + '|' + logging.green(logging.green_diff('John')),
+            '102|' + logging.red(logging.red_diff('Alice') + ' ' * (self.max_chars - 9)) + '|' + logging.green(logging.green_diff('John')),
+            '103|Bob' + ' ' * (self.max_chars - 7) + '|Bob',
+            '104|Alice' + ' ' * (self.max_chars - 9) + '|Alice',
+        ]
+        output = '\n' * 97 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n'
+        expect = '\n' * 97 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n'
+        self.snippet_call_test(output, expect, display_lines, 3)
