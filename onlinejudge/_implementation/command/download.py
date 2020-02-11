@@ -39,6 +39,8 @@ def download(args: 'argparse.Namespace') -> None:
 
     # get samples from the server
     with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
+        if args.yukicoder_token:
+            sess.headers['Authorization'] = 'Bearer {}'.format(args.yukicoder_token)
         if args.system:
             samples = problem.download_system_cases(session=sess)
         else:
