@@ -264,7 +264,7 @@ class YukicoderProblem(onlinejudge.type.Problem):
         session = session or utils.get_default_session()
         if not self.get_service().is_logged_in(session=session):
             raise NotLoggedInError
-        url = 'https://yukicoder.me/problems/no/{}/testcase.zip'.format(self.problem_no)
+        url = '{}/testcase.zip'.format(self.get_url())
         resp = utils.request('GET', url, session=session)
         fmt = 'test_%e/%s'
         return onlinejudge._implementation.testcase_zipper.extract_from_zip(resp.content, fmt)
