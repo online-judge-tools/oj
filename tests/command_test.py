@@ -972,7 +972,7 @@ class TestTest(unittest.TestCase):
                 self.assertNotIn(marker.encode(), fh.read())
 
 
-class TestLogTest(unittest.TestCase):
+class TestTestSideBySideLog(unittest.TestCase):
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
     def snippet_call_test(self, answer, expected, display_lines):
@@ -1052,7 +1052,7 @@ class TestLogTest(unittest.TestCase):
         self.snippet_call_test('1 0 2\n1 0 2\n1 0 2', '2 0 2\n1 1 2\n1 0 3', display_lines)
 
 
-class TestSnippedLogTest(unittest.TestCase):
+class TestTestSnippedSideBySideLog(unittest.TestCase):
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
     def snippet_call_test(self, answer, expected, display_lines, max_line_num_digits):
