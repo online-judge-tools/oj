@@ -11,8 +11,8 @@ import onlinejudge._implementation.download_history
 import onlinejudge._implementation.format_utils as format_utils
 import onlinejudge._implementation.logging as log
 import onlinejudge._implementation.utils as utils
-from onlinejudge.service.yukicoder import YukicoderProblem
 import onlinejudge.type
+from onlinejudge.service.yukicoder import YukicoderProblem
 
 if TYPE_CHECKING:
     import argparse
