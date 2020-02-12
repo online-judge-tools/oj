@@ -189,7 +189,7 @@ class YukicoderOfficialAPITest(unittest.TestCase):
     def test_get_submissions(self):
         data = YukicoderService().get_submissions(page=3, status='TLE')
         self.assertEqual(len(data), 50)
-        self.assertEqual(data[4]['結果'], 'TLE')
+        self.assertTrue('TLE' == data[4]['結果'] or 'TLE\n(最新)' in data[4]['結果'])
 
     def test_get_problems(self):
         data = YukicoderService().get_problems(page=2, sort='no_asc')
