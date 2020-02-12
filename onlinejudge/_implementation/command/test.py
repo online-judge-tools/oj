@@ -290,13 +290,13 @@ def display_side_by_side_color(answer: str, expected: str):
 
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
-    log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:" + " " * (max_chars - 9))
+    log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:")
     log.emit("-" * max_chars + "|" + "-" * max_chars)
     for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
-        if not diff_found:
-            log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + space_padding(exp_line, max_chars - exp_chars))
+        if diff_found:
+            log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(exp_line))
         else:
-            log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(space_padding(exp_line, max_chars - exp_chars)))
+            log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + exp_line)
 
 
 def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:
