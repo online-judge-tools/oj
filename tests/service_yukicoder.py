@@ -189,6 +189,7 @@ class YukicoderOfficialAPITest(unittest.TestCase):
     def test_get_submissions(self):
         data = YukicoderService().get_submissions(page=3, status='TLE')
         self.assertEqual(len(data), 50)
+        # yukicoder returns sentence such as 'TLE\n(最新)--\nAC' when the submission was rejudged and judge status was changed.
         self.assertTrue('TLE' == data[4]['結果'] or 'TLE\n(最新)' in data[4]['結果'])
 
     def test_get_problems(self):
