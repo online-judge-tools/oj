@@ -6,7 +6,6 @@ import shutil
 import sys
 import unittest
 
-from test.support import captured_stdout
 import tests.utils
 from testfixtures import LogCapture
 from tests.utils import cat, sleep_1sec
@@ -978,18 +977,58 @@ class TestTestLog(unittest.TestCase):
 
     def check_log_lines(self, result, expect):
         self.assertEqual(len(result), len(expect))
-        for result_line, expect_line in zip(result.split('\n'), expect.split('\n')):
+        for result_line, expect_line in zip(result, expect):
             if expect_line.startswith('[x]'):
-                self.assertTrue(result_line.startswith('[x]'))
+                # Time and max memory can not be reproduced
+                self.assertTrue(result_line.startswith(expect_line))
             else:
                 self.assertEqual(result_line, expect_line)
 
     def snippet_call_test(self, args, files, expected_log_lines):
         self.maxDiff = None
         result = tests.utils.run_in_sandbox(args=['test'] + args, files=files, pipe_stderr=True)
-        self.assertEqual(result['proc'].stderr.decode(), '\n'.join(expected_log_lines))
+        print(result['proc'].stderr.decode(), file=sys.stderr)
+        self.check_log_lines(result['proc'].stderr.decode().split('\n'), expected_log_lines)
 
-    def test_side_by_side(self):
+    def test_side_by_short(self):
+        self.snippet_call_test(
+            args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '\n' * 4 + '1' + '\n' * 4
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': '\n' * 4 + '2' + '\n' * 4
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] time:',
+                '[-] WA',
+                'output:' + ' ' * (self.max_chars - 7) + '|expected:',
+                '-' * self.max_chars + '|' + '-' * self.max_chars,
+                ' ' * self.max_chars + '|',
+                ' ' * self.max_chars + '|',
+                ' ' * self.max_chars + '|',
+                ' ' * self.max_chars + '|',
+                '1' + ' ' * (self.max_chars - 1) + '|2',
+                ' ' * self.max_chars + '|',
+                ' ' * self.max_chars + '|',
+                ' ' * self.max_chars + '|',
+                ' ' * self.max_chars + '|',
+                '',
+                '[x] slowest:',
+                '[x] max memory:',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
+
+    def test_side_by_side_long(self):
         self.snippet_call_test(
             args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
             files=[
@@ -1006,20 +1045,20 @@ class TestTestLog(unittest.TestCase):
                 '[*] 1 cases found',
                 '',
                 '[*] sample-1',
-                '[x] time: 0.004370 sec',
+                '[x] ',
                 '[-] WA',
-                '  |output:                            |expected:',
-                '--------------------------------------|--------------------------------------',
-                '38|                                   |',
-                '39|                                   |',
-                '40|                                   |',
+                '  |output:' + ' ' * (self.max_chars - 10) + '|expected:',
+                '-' * self.max_chars + '|' + '-' * self.max_chars,
+                '38|' + ' ' * (self.max_chars - 3) + '|',
+                '39|' + ' ' * (self.max_chars - 3) + '|',
+                '40|' + ' ' * (self.max_chars - 3) + '|',
                 '41|1                                  |2',
-                '42|                                   |',
-                '43|                                   |',
-                '44|                                   |',
+                '42|' + ' ' * (self.max_chars - 3) + '|',
+                '43|' + ' ' * (self.max_chars - 3) + '|',
+                '44|' + ' ' * (self.max_chars - 3) + '|',
                 '',
-                '[x] slowest: 0.004370 sec  (for sample-1)',
-                '[x] max memory: 1.804000 MB  (for sample-1)',
+                '[x] slowest:',
+                '[x] max memory:',
                 '[-] test failed: 0 AC / 1 cases',
                 '',
             ],
@@ -1134,7 +1173,6 @@ class TestTestSnippedSideBySideLog(unittest.TestCase):
         output = '\n' * 40 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n'
         expect = '\n' * 40 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n'
         self.snippet_call_test(output, expect, display_lines, 2)
-
 
     def test_side_by_side2(self):
         display_lines = [
