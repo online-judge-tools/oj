@@ -972,6 +972,7 @@ class TestTest(unittest.TestCase):
                 self.assertNotIn(marker.encode(), fh.read())
 
 
+@unittest.skipIf(os.name == 'nt', "memory checking is disabled and output is different with Linux")
 class TestTestLog(unittest.TestCase):
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
@@ -988,7 +989,7 @@ class TestTestLog(unittest.TestCase):
         self.maxDiff = None
         result = tests.utils.run_in_sandbox(args=['test'] + args, files=files, pipe_stderr=True)
         print(result['proc'].stderr.decode(), file=sys.stderr)
-        self.check_log_lines(result['proc'].stderr.decode().split('\n'), expected_log_lines)
+        self.check_log_lines(result['proc'].stderr.decode().split(os.linesep), expected_log_lines)
 
     def test_side_by_short(self):
         self.snippet_call_test(
@@ -996,11 +997,11 @@ class TestTestLog(unittest.TestCase):
             files=[
                 {
                     'path': 'test/sample-1.in',
-                    'data': '\n' * 4 + '1' + '\n' * 4
+                    'data': os.linesep * 4 + '1' + os.linesep * 4
                 },
                 {
                     'path': 'test/sample-1.out',
-                    'data': '\n' * 4 + '2' + '\n' * 4
+                    'data': os.linesep * 4 + '2' + os.linesep * 4
                 },
             ],
             expected_log_lines=[
@@ -1034,11 +1035,11 @@ class TestTestLog(unittest.TestCase):
             files=[
                 {
                     'path': 'test/sample-1.in',
-                    'data': '\n' * 40 + '1' + '\n' * 10
+                    'data': os.linesep * 40 + '1' + os.linesep * 10
                 },
                 {
                     'path': 'test/sample-1.out',
-                    'data': '\n' * 40 + '2' + '\n' * 10
+                    'data': os.linesep * 40 + '2' + os.linesep * 10
                 },
             ],
             expected_log_lines=[
@@ -1170,8 +1171,8 @@ class TestTestSnippedSideBySideLog(unittest.TestCase):
             '46|Bob' + ' ' * (self.max_chars - 6) + '|Bob',
             '47|Alice' + ' ' * (self.max_chars - 8) + '|Alice',
         ]
-        output = '\n' * 40 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n'
-        expect = '\n' * 40 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n'
+        output = ('\n' * 40 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n').replace('\n', os.linesep)
+        expect = ('\n' * 40 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n').replace('\n', os.linesep)
         self.snippet_call_test(output, expect, display_lines, 2)
 
     def test_side_by_side2(self):
@@ -1184,6 +1185,6 @@ class TestTestSnippedSideBySideLog(unittest.TestCase):
             '103|Bob' + ' ' * (self.max_chars - 7) + '|Bob',
             '104|Alice' + ' ' * (self.max_chars - 9) + '|Alice',
         ]
-        output = '\n' * 97 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n'
-        expect = '\n' * 97 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n'
+        output = ('\n' * 97 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n').replace('\n', os.linesep)
+        expect = ('\n' * 97 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n').replace('\n', os.linesep)
         self.snippet_call_test(output, expect, display_lines, 3)
