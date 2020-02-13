@@ -6,6 +6,7 @@ import shutil
 import sys
 import unittest
 
+from test.support import captured_stdout
 import tests.utils
 from testfixtures import LogCapture
 from tests.utils import cat, sleep_1sec
@@ -970,6 +971,59 @@ class TestTest(unittest.TestCase):
         for cmdline in pathlib.Path('/proc').glob('*/cmdline'):
             with open(str(cmdline), 'rb') as fh:
                 self.assertNotIn(marker.encode(), fh.read())
+
+
+class TestTestLog(unittest.TestCase):
+    max_chars = shutil.get_terminal_size()[0] // 2 - 2
+
+    def check_log_lines(self, result, expect):
+        self.assertEqual(len(result), len(expect))
+        for result_line, expect_line in zip(result.split('\n'), expect.split('\n')):
+            if expect_line.startswith('[x]'):
+                self.assertTrue(result_line.startswith('[x]'))
+            else:
+                self.assertEqual(result_line, expect_line)
+
+    def snippet_call_test(self, args, files, expected_log_lines):
+        self.maxDiff = None
+        result = tests.utils.run_in_sandbox(args=['test'] + args, files=files, pipe_stderr=True)
+        self.assertEqual(result['proc'].stderr.decode(), '\n'.join(expected_log_lines))
+
+    def test_side_by_side(self):
+        self.snippet_call_test(
+            args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '\n' * 40 + '1' + '\n' * 10
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': '\n' * 40 + '2' + '\n' * 10
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] time: 0.004370 sec',
+                '[-] WA',
+                '  |output:                            |expected:',
+                '--------------------------------------|--------------------------------------',
+                '38|                                   |',
+                '39|                                   |',
+                '40|                                   |',
+                '41|1                                  |2',
+                '42|                                   |',
+                '43|                                   |',
+                '44|                                   |',
+                '',
+                '[x] slowest: 0.004370 sec  (for sample-1)',
+                '[x] max memory: 1.804000 MB  (for sample-1)',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
 
 
 class TestTestSideBySideLog(unittest.TestCase):

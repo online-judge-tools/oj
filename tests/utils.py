@@ -42,16 +42,17 @@ def get_oj_exe():
         return [sys.executable, '-m', 'onlinejudge._implementation.main']
 
 
-def run(args, *, env=None, check=False, oj_exe=get_oj_exe()):
+def run(args, *, env=None, check=False, pipe_stderr=False, oj_exe=get_oj_exe()):
     # oj_exe should be evaluated out of sandboxes
     env = env or dict(os.environ)
     env['PYTHONPATH'] = str(pathlib.Path(__file__).parent.parent)  # this is required to run in sandboxes
-    return subprocess.run(oj_exe + args, stdout=subprocess.PIPE, stderr=sys.stderr, env=env, check=check)
+    err = subprocess.PIPE if pipe_stderr else sys.stderr
+    return subprocess.run(oj_exe + args, stdout=subprocess.PIPE, stderr=err, env=env, check=check)
 
 
-def run_in_sandbox(args, files):
+def run_in_sandbox(args, files, pipe_stderr=False):
     with sandbox(files) as tempdir:
-        proc = run(args)
+        proc = run(args, pipe_stderr=pipe_stderr)
         return {
             'proc': proc,
             'tempdir': tempdir,
