@@ -161,8 +161,7 @@ Travis CI から PyPI 上へ upload を仕掛けるように設定されてい�
 
 1.  `onlinejudge/__about__.py` 中の `__version_info__` の値を bump して commit する
     -   このとき同時に `CHANGELOG.md` も修正する
-    -   pull requests をもらっていた場合は、その作成者の名前を `readme.md` にある一覧へ追加する
-    -   例: [3a24dc](https://github.com/kmyk/online-judge-tools/commit/3a24dc64b56d898e387dee56cf9915be3ab0f7e2)
+    -   メンテナ以外のコントリビュータからpull requests をもらっていた場合は、その作成者の名前を `CHANGELOG.md` に併記する
 2.  `v0.1.23` の形で Git tag を打って GitHub 上へ push する
     -   これにより Travis CI の機能が呼び出され PyPI への upload がなされる
     -   これにより AppVeyor の機能が呼び出され GitHub release の生成とその assets への実行ファイル `oj.exe` の追加がなされる
