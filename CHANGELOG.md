@@ -1,5 +1,12 @@
 # Change Log
 
+## 8.0.0 / 2019-02-14
+
+-   [#675](https://github.com/kmyk/online-judge-tools/pull/675) snip side-by-side diff display if result is long
+-   [#676](https://github.com/kmyk/online-judge-tools/pull/676) `download` command support yukicoder token ([@beet-aizu](https://github.com/beet-aizu))
+-   [#671](https://github.com/kmyk/online-judge-tools/pull/671) support latest library checker
+-   [#665](https://github.com/kmyk/online-judge-tools/pull/665) `test` support side-by-side diff display
+
 ## 7.8.0 / 2019-02-03
 
 -   [#665](https://github.com/kmyk/online-judge-tools/pull/665) add Sphere Online Judge support
