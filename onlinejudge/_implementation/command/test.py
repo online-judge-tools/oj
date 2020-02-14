@@ -1,4 +1,5 @@
 # Python Version: 3.x
+import collections
 import concurrent.futures
 import contextlib
 import itertools
@@ -133,11 +134,14 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
             log.failure(log.red('WA'))
             print_input()
             if not silent:
-                if mode == "simple":
+                if mode == 'simple':
                     log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
                     log.emit('expected:\n%s', utils.snip_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
-                elif mode == "side-by-side":
-                    display_side_by_side_color(answer, expected)
+                elif mode == 'side-by-side':
+                    if max(answer.count('\n'), expected.count('\n')) <= 40:
+                        display_side_by_side_color(answer, expected)
+                    else:
+                        display_snipped_side_by_side_color(answer, expected)
                 else:
                     assert False
             status = 'WA'
@@ -284,10 +288,11 @@ def test(args: 'argparse.Namespace') -> None:
         sys.exit(1)
 
 
-def display_side_by_side_color(answer: str, expected: str):
-    def space_padding(s: str, max_length: int) -> str:
-        return s + " " * max_length
+def space_padding(s: str, max_length: int) -> str:
+    return s + " " * max_length
 
+
+def display_side_by_side_color(answer: str, expected: str):
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
     log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:")
@@ -297,6 +302,38 @@ def display_side_by_side_color(answer: str, expected: str):
             log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(exp_line))
         else:
             log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + exp_line)
+
+
+def display_snipped_side_by_side_color(answer: str, expected: str):
+    """
+    Display first differ line and its previous 3 lines and its next 3 lines.
+    """
+    max_chars = shutil.get_terminal_size()[0] // 2 - 2
+    deq = collections.deque(maxlen=7)  # type: Deque[Tuple[str, bool, str, str, int, int]]
+
+    count_from_first_difference = 0
+    for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
+        if count_from_first_difference > 0:
+            count_from_first_difference += 1
+        deq.append((str(i + 1), diff_found, ans_line, exp_line, ans_chars, exp_chars))
+        if diff_found:
+            if count_from_first_difference == 0:
+                count_from_first_difference = 1
+        if count_from_first_difference == 4:
+            break
+
+    max_line_num_digits = max([len(entry[0]) for entry in deq])
+
+    log.emit(" " * max_line_num_digits + "|output:" + " " * (max_chars - 7 - max_line_num_digits - 1) + "|" + "expected:")
+    log.emit("-" * max_chars + "|" + "-" * max_chars)
+
+    for (str_i, diff_found, ans_line, exp_line, ans_chars, exp_chars) in deq:
+        num_spaces_after_output = max_chars - ans_chars - max_line_num_digits - 1
+        line_num_display = space_padding(str_i, max_line_num_digits - len(str_i)) + "|"
+        if not diff_found:
+            log.emit(line_num_display + space_padding(ans_line, num_spaces_after_output) + "|" + exp_line)
+        else:
+            log.emit(line_num_display + log.red(space_padding(ans_line, num_spaces_after_output)) + "|" + log.green(exp_line))
 
 
 def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:
