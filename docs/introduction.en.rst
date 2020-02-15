@@ -360,7 +360,7 @@ List of supported services
 --------------------------
 
 For services that communicate with online judge servers, the services available may be limited.
-Supported service as of ``v7.2.0`` (2019-09-27) is as follows.
+Supported service as of ``v8.0.0`` (2020-02-14) is as follows.
 
 Download sample (``oj d``):
 
@@ -375,6 +375,8 @@ Download sample (``oj d``):
 -  `Kattis <https://open.kattis.com/>`_
 -  `PKU JudgeOnline <http://poj.org/>`_
 -  `Toph (Problem Archive) <https://toph.co/>`_
+-  `CodeChef <https://www.codechef.com/>`_
+-  `Sphere online judge <https://www.spoj.com/>`_
 -  `yukicoder <https://yukicoder.me/>`_
 -  `Library Checker <https://judge.yosupo.jp>`_
 
