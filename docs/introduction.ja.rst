@@ -360,7 +360,7 @@ online-judge-tools には、これを助ける機能もあります。
 --------------------------
 
 オンラインジャッジのサーバーと通信を行なうような機能については利用できるサービスが制限されることがあります。
-``v7.2.0`` (2019-09-27) 時点での対応サービスは以下のようになります。
+``v8.0.0`` (2020-02-15) 時点での対応サービスは以下のようになります。
 
 サンプルのダウンロード (``oj d``):
 
@@ -375,6 +375,8 @@ online-judge-tools には、これを助ける機能もあります。
 -  `Kattis <https://open.kattis.com/>`_
 -  `PKU JudgeOnline <http://poj.org/>`_
 -  `Toph (Problem Archive) <https://toph.co/>`_
+-  `CodeChef <https://www.codechef.com/>`_
+-  `Sphere online judge <https://www.spoj.com/>`_
 -  `yukicoder <https://yukicoder.me/>`_
 -  `Library Checker <https://judge.yosupo.jp>`_
 
