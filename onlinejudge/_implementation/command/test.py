@@ -309,31 +309,34 @@ def display_snipped_side_by_side_color(answer: str, expected: str):
     Display first differ line and its previous 3 lines and its next 3 lines.
     """
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
-    deq = collections.deque(maxlen=7)  # type: Deque[Tuple[str, bool, str, str, int, int]]
+    deq = collections.deque(maxlen=7)  # type: Deque[Tuple[int, bool, str, str, int, int]]
 
     count_from_first_difference = 0
     for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
         if count_from_first_difference > 0:
             count_from_first_difference += 1
-        deq.append((str(i + 1), diff_found, ans_line, exp_line, ans_chars, exp_chars))
+        deq.append((i + 1, diff_found, ans_line, exp_line, ans_chars, exp_chars))
         if diff_found:
             if count_from_first_difference == 0:
                 count_from_first_difference = 1
         if count_from_first_difference == 4:
             break
 
-    max_line_num_digits = max([len(entry[0]) for entry in deq])
+    max_line_num_digits = max([len(str(entry[0])) for entry in deq])
 
     log.emit(" " * max_line_num_digits + "|output:" + " " * (max_chars - 7 - max_line_num_digits - 1) + "|" + "expected:")
     log.emit("-" * max_chars + "|" + "-" * max_chars)
 
-    for (str_i, diff_found, ans_line, exp_line, ans_chars, exp_chars) in deq:
+    for (line_number, diff_found, ans_line, exp_line, ans_chars, exp_chars) in deq:
         num_spaces_after_output = max_chars - ans_chars - max_line_num_digits - 1
-        line_num_display = space_padding(str_i, max_line_num_digits - len(str_i)) + "|"
+        line_num_display = space_padding(str(line_number), max_line_num_digits - len(str(line_number))) + "|"
         if not diff_found:
             log.emit(line_num_display + space_padding(ans_line, num_spaces_after_output) + "|" + exp_line)
         else:
             log.emit(line_num_display + log.red(space_padding(ans_line, num_spaces_after_output)) + "|" + log.green(exp_line))
+    num_snipped_lines = answer.count('\n') + 1 - line_number
+    if num_snipped_lines > 0:
+        log.emit('... ({} lines) ...'.format(num_snipped_lines))
 
 
 def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:

@@ -1057,6 +1057,43 @@ class TestTestLog(unittest.TestCase):
                 '42|' + ' ' * (self.max_chars - 3) + '|',
                 '43|' + ' ' * (self.max_chars - 3) + '|',
                 '44|' + ' ' * (self.max_chars - 3) + '|',
+                '... (7 lines) ...',
+                '',
+                '[x] slowest:',
+                '[x] max memory:',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
+
+    def test_side_by_side_long2(self):
+        self.snippet_call_test(
+            args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': os.linesep * 50 + '1'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': os.linesep * 50 + '2'
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] ',
+                '[-] WA',
+                '  |output:' + ' ' * (self.max_chars - 10) + '|expected:',
+                '-' * self.max_chars + '|' + '-' * self.max_chars,
+                '45|' + ' ' * (self.max_chars - 3) + '|',
+                '46|' + ' ' * (self.max_chars - 3) + '|',
+                '47|' + ' ' * (self.max_chars - 3) + '|',
+                '48|' + ' ' * (self.max_chars - 3) + '|',
+                '49|' + ' ' * (self.max_chars - 3) + '|',
+                '50|' + ' ' * (self.max_chars - 3) + '|',
+                '51|1                                  |2',
                 '',
                 '[x] slowest:',
                 '[x] max memory:',
@@ -1170,9 +1207,10 @@ class TestTestSnippedSideBySideLog(unittest.TestCase):
             '45|' + logging.red(logging.red_diff('Alice') + ' ' * (self.max_chars - 8)) + '|' + logging.green(logging.green_diff('John')),
             '46|Bob' + ' ' * (self.max_chars - 6) + '|Bob',
             '47|Alice' + ' ' * (self.max_chars - 8) + '|Alice',
+            '... (1 lines) ...',
         ]
-        output = ('\n' * 40 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n').replace('\n', os.linesep)
-        expect = ('\n' * 40 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n').replace('\n', os.linesep)
+        output = ('\n' * 40 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob').replace('\n', os.linesep)
+        expect = ('\n' * 40 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob').replace('\n', os.linesep)
         self.snippet_call_test(output, expect, display_lines, 2)
 
     def test_side_by_side2(self):
@@ -1184,7 +1222,8 @@ class TestTestSnippedSideBySideLog(unittest.TestCase):
             '102|' + logging.red(logging.red_diff('Alice') + ' ' * (self.max_chars - 9)) + '|' + logging.green(logging.green_diff('John')),
             '103|Bob' + ' ' * (self.max_chars - 7) + '|Bob',
             '104|Alice' + ' ' * (self.max_chars - 9) + '|Alice',
+            '... (1 lines) ...',
         ]
-        output = ('\n' * 97 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob\n').replace('\n', os.linesep)
-        expect = ('\n' * 97 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob\n').replace('\n', os.linesep)
+        output = ('\n' * 97 + 'Alice\nBob\nAlice\nBob\nAlice\nBob\nAlice\nBob').replace('\n', os.linesep)
+        expect = ('\n' * 97 + 'Alice\nBob\nAlice\nJohn\nJohn\nBob\nAlice\nBob').replace('\n', os.linesep)
         self.snippet_call_test(output, expect, display_lines, 3)
