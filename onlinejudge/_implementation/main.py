@@ -14,7 +14,6 @@ from onlinejudge._implementation.command.download import download
 from onlinejudge._implementation.command.generate_input import generate_input
 from onlinejudge._implementation.command.generate_output import generate_output
 from onlinejudge._implementation.command.login import login
-from onlinejudge._implementation.command.split_input import split_input, split_input_auto_footer
 from onlinejudge._implementation.command.submit import submit
 from onlinejudge._implementation.command.test import test
 from onlinejudge._implementation.command.test_reactive import test_reactive
@@ -187,66 +186,6 @@ tips:
     subparser.add_argument('generator', type=str, help='your program to generate test cases')
     subparser.add_argument('count', nargs='?', type=int, help='the number of cases to generate (default: 100)')
 
-    # split input
-    subparser = subparsers.add_parser('split-input', help='split a input file which contains many cases, using your implementation  (experimental)', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
-format string for --output:
-  %i                    index
-
-command for --command:
-  Specify a command which outputs something after reading each case.
-  It can be easily made from your solution for the problem.
-  example:
-    #include <iostream>
-    using namespace std;
-    int main() {
-        while (true) {
-            int v, e; cin >> v >> e;
-            if (v == 0 and e == 0) break;
-            for (int i = 0; i < e; ++ i) {
-                int v, w; char c; cin >> v >> w >> c;
-            }
-            cout << "foo" << endl;
-        }
-        return 0;
-    }
-
-example:
-  if original input is below, it consists of two cases:
-    4 2
-    0 1 A
-    1 2 B
-    6 6
-    0 1 A
-    0 2 A
-    0 3 B
-    0 4 A
-    1 2 B
-    4 5 C
-    0 0
-  then the result with appropriate options:
-    4 2
-    0 1 A
-    1 2 B
-    0 0
-  ans
-    6 6
-    0 1 A
-    0 2 A
-    0 3 B
-    0 4 A
-    1 2 B
-    4 5 C
-    0 0
-''')
-    subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
-    subparser.add_argument('-i', '--input', metavar='PATH', required=True, help='input file  (required)')
-    subparser.add_argument('-o', '--output', metavar='FORMAT', required=True, help='output path  (required)')
-    subparser.add_argument('-t', '--time', metavar='SECOND', default=0.1, type=float, help='the interval between two cases')
-    subparser.add_argument('--ignore', metavar='N', default=0, type=int, help='ignore initial N lines of input')
-    subparser.add_argument('--header', help='put a header string to the output')
-    subparser.add_argument('--footer', help='put a footer string to the output')
-    subparser.add_argument('--auto-footer', action='store_const', const=split_input_auto_footer, dest='footer', help='use the original last line as a footer')
-
     # test reactive
     subparser = subparsers.add_parser('test-reactive', aliases=['t/r'], help='test for reactive problem', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 ''')
@@ -278,8 +217,6 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         generate_output(args)
     elif args.subcommand in ['generate-input', 'g/i']:
         generate_input(args)
-    elif args.subcommand == 'split-input':
-        split_input(args)
     else:
         parser.print_help(file=sys.stderr)
         sys.exit(1)

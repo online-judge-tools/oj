@@ -55,7 +55,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
 -   Test your solution for reactive problem
 -   Generate input files from generators
 -   Generate output files from input and reference implementation
--   Split an input file with many cases to files
+-   ~~Split an input file with many cases to files~~ (removed)
 
 ## How to install
 
