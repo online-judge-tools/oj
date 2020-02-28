@@ -39,14 +39,14 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   yukicoder
     -   Codeforces
     -   HackerRank
-    -   Topcoder
+    -   ~~Topcoder~~
     -   Toph
 -   Submit your solution
     -   AtCoder
     -   yukicoder
     -   Codeforces
     -   HackerRank
-    -   Topcoder (Marathon Match)
+    -   ~~Topcoder (Marathon Match)~~
     -   Toph (Problem Archive)
 -   ~~Generate scanner for input~~  (removed, use [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools))
     -   AtCoder

@@ -124,14 +124,8 @@ def submit(args: 'argparse.Namespace') -> None:
                     return
 
         # submit
-        kwargs = {}
-        if isinstance(problem, onlinejudge.service.topcoder.TopcoderLongContestProblem):
-            if args.full_submission:
-                kwargs['kind'] = 'full'
-            else:
-                kwargs['kind'] = 'example'
         try:
-            submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess, **kwargs)
+            submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess)
         except NotLoggedInError:
             log.failure('login required')
             sys.exit(1)

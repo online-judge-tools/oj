@@ -79,7 +79,6 @@ supported services:
   AtCoder
   Codeforces
   yukicoder
-  Topcoder
   HackerRank
   Toph
 ''')
@@ -94,7 +93,6 @@ supported services:
 supported services:
   AtCoder
   Codeforces
-  Topcoder (Marathon Match)
   yukicoder
   HackerRank
   Toph (Problem Archive)
@@ -117,7 +115,6 @@ supported services:
     subparser.add_argument('--open', action='store_true', default=True, help='open the result page after submission (default)')
     subparser.add_argument('-w', '--wait', metavar='SECOND', type=float, default=3, help='sleep before submitting')
     subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
-    subparser.add_argument('--full-submission', action='store_true', help='for Topcoder Marathon Match. use this to do "Submit", the default behavier is "Test Examples".')
 
     # test
     subparser = subparsers.add_parser('test', aliases=['t'], help='test your code', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
