@@ -1,5 +1,11 @@
 # Change Log
 
+## 9.0.0 / 2019-02-29
+
+-   [#692](https://github.com/kmyk/online-judge-tools/pull/692) (breaking changes) remove `split-input` subcommand
+-   [#691](https://github.com/kmyk/online-judge-tools/pull/691) (breaking changes) remove support for Topcoder Marathon Match
+-   [#686](https://github.com/kmyk/online-judge-tools/pull/686) fix a bug of `--side-by-side` option
+
 ## 8.0.0 / 2019-02-14
 
 -   [#675](https://github.com/kmyk/online-judge-tools/pull/675) snip side-by-side diff display if result is long
