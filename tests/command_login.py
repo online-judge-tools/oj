@@ -5,7 +5,6 @@ import tests.utils
 from onlinejudge.service.atcoder import AtCoderService
 from onlinejudge.service.codeforces import CodeforcesService
 from onlinejudge.service.hackerrank import HackerRankService
-from onlinejudge.service.topcoder import TopcoderService
 from onlinejudge.service.toph import TophService
 from onlinejudge.service.yukicoder import YukicoderService
 
@@ -29,9 +28,6 @@ class LoginTest(unittest.TestCase):
     def test_call_login_check_hackerrank_failure(self):
         self.snippet_call_login_check_failure('https://www.hackerrank.com/')
 
-    def test_call_login_check_topcoder_failure(self):
-        self.snippet_call_login_check_failure('https://community.topcoder.com/')
-
     def test_call_login_check_toph_failure(self):
         self.snippet_call_login_check_failure('https://toph.co/')
 
@@ -49,10 +45,6 @@ class LoginTest(unittest.TestCase):
     @unittest.skipIf(not tests.utils.is_logged_in(HackerRankService()), 'login is required')
     def test_call_login_check_hackerrank_success(self):
         self.snippet_call_login_check_success('https://www.hackerrank.com/')
-
-    @unittest.skipIf(not tests.utils.is_logged_in(TopcoderService()), 'login is required')
-    def test_call_login_check_topcoder_success(self):
-        self.snippet_call_login_check_success('https://community.topcoder.com/')
 
     @unittest.skipIf(not tests.utils.is_logged_in(TophService()), 'login is required')
     def test_call_login_check_toph_success(self):

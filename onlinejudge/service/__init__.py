@@ -11,6 +11,5 @@ import onlinejudge.service.kattis
 import onlinejudge.service.library_checker
 import onlinejudge.service.poj
 import onlinejudge.service.spoj
-import onlinejudge.service.topcoder
 import onlinejudge.service.toph
 import onlinejudge.service.yukicoder
