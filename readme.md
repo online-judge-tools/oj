@@ -195,8 +195,9 @@ For other questions, use [Gitter](https://gitter.im/online-judge-tools/community
 
 conflicted:
 
--   [nodchip/OnlineJudgeHelper](https://github.com/nodchip/OnlineJudgeHelper)
+-   [jmerle/competitive-companion](https://github.com/jmerle/competitive-companion)
 -   [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools)
+-   [nodchip/OnlineJudgeHelper](https://github.com/nodchip/OnlineJudgeHelper)
 
 not conflicted:
 
@@ -207,16 +208,17 @@ not conflicted:
 projects depending on kmyk/online-judge-tools:
 
 1.  wrappers:
-    -   [kjnh10/pcm](https://github.com/kjnh10/pcm)
-    -   [Tatamo/atcoder-cli](https://github.com/Tatamo/atcoder-cli)
-    -   one of my friends uses `oj` via shortcut keys of VSCode
+    -   [Tatamo/atcoder-cli](https://github.com/Tatamo/atcoder-cli) is a thin wrapper optimized for AtCoder
+    -   [kjnh10/pcm](https://github.com/kjnh10/pcm) is a tool which internally uses online-judge-tools
+    -   some people use `oj` via Visual Studio Code
 1.  libraries using this for CI:
-    -   [blue-jam/ProconLibrary](https://github.com/blue-jam/ProconLibrary) uses `oj` for CI
-    -   [kmyk/competitive-programming-library](https://github.com/kmyk/competitive-programming-library) uses `oj` for CI
+    -   [kmyk/competitive-programming-library](https://kmyk.github.io/competitive-programming-library/) is my library for competitive programming, which uses `oj` via [kmyk/online-judge-verify-helper](https://github.com/kmyk/online-judge-verify-helper)
+    -   [beet-aizu/library](https://beet-aizu.github.io/library/) also uses [kmyk/online-judge-verify-helper](https://github.com/kmyk/online-judge-verify-helper)
+    -   [blue-jam/ProconLibrary](https://github.com/blue-jam/ProconLibrary) uses `oj` for CI from their own scripts
 1.  others:
+    -   [kmyk/online-judge-verify-helper](https://github.com/kmyk/online-judge-verify-helper) automates testing your library for competitive programming and generate documents
     -   [fukatani/rujaion](https://github.com/fukatani/rujaion) is an IDE for competitive-programming with Rust
-    -   [kmyk/AtCoderProblemsStatic](https://github.com/kmyk/AtCoderProblemsStatic) is a clone of [kenkoooo/AtCoderProblems](https://github.com/kenkoooo/AtCoderProblems)
-    -   [kmyk/atcoder-auto-debugger](https://github.com/kmyk/atcoder-auto-debugger) is a program to analyze submissions for AtCoder and find bugs
+
 
 ## Contributing
 
