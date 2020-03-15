@@ -1029,7 +1029,7 @@ class TestTestLog(unittest.TestCase):
             ],
         )
 
-    def test_side_by_side_long(self):
+    def test_side_by_side_long1(self):
         self.snippet_call_test(
             args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
             files=[
@@ -1053,7 +1053,7 @@ class TestTestLog(unittest.TestCase):
                 '38|' + ' ' * (self.max_chars - 3) + '|',
                 '39|' + ' ' * (self.max_chars - 3) + '|',
                 '40|' + ' ' * (self.max_chars - 3) + '|',
-                '41|1                                  |2',
+                '41|1' + ' ' * (self.max_chars - 4) + '|2',
                 '42|' + ' ' * (self.max_chars - 3) + '|',
                 '43|' + ' ' * (self.max_chars - 3) + '|',
                 '44|' + ' ' * (self.max_chars - 3) + '|',
@@ -1094,6 +1094,154 @@ class TestTestLog(unittest.TestCase):
                 '49|' + ' ' * (self.max_chars - 3) + '|',
                 '50|' + ' ' * (self.max_chars - 3) + '|',
                 '51|1                                  |2',
+                '',
+                '[x] slowest:',
+                '[x] max memory:',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
+
+    def test_side_by_side_long3(self):
+        self.snippet_call_test(
+            args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 10
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 5 + '2' + os.linesep + ('1' + os.linesep) * 5
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] ',
+                '[-] WA',
+                '  |output:' + ' ' * (self.max_chars - 10) + '|expected:',
+                '-' * self.max_chars + '|' + '-' * self.max_chars,
+                '43|1' + ' ' * (self.max_chars - 4) + '|1',
+                '44|1' + ' ' * (self.max_chars - 4) + '|1',
+                '45|1' + ' ' * (self.max_chars - 4) + '|1',
+                '  |' + ' ' * (self.max_chars - 3) + '|2',
+                '46|1' + ' ' * (self.max_chars - 4) + '|1',
+                '47|1' + ' ' * (self.max_chars - 4) + '|1',
+                '48|1' + ' ' * (self.max_chars - 4) + '|1',
+                '... (3 lines) ...',
+                '',
+                '[x] slowest:',
+                '[x] max memory:',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
+
+    def test_side_by_side_long4(self):
+        self.snippet_call_test(
+            args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 5 + '2' + os.linesep + ('1' + os.linesep) * 5
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 10
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] ',
+                '[-] WA',
+                '  |output:' + ' ' * (self.max_chars - 10) + '|expected:',
+                '-' * self.max_chars + '|' + '-' * self.max_chars,
+                '43|1' + ' ' * (self.max_chars - 4) + '|1',
+                '44|1' + ' ' * (self.max_chars - 4) + '|1',
+                '45|1' + ' ' * (self.max_chars - 4) + '|1',
+                '46|2' + ' ' * (self.max_chars - 4) + '|',
+                '47|1' + ' ' * (self.max_chars - 4) + '|1',
+                '48|1' + ' ' * (self.max_chars - 4) + '|1',
+                '49|1' + ' ' * (self.max_chars - 4) + '|1',
+                '... (3 lines) ...',
+                '',
+                '[x] slowest:',
+                '[x] max memory:',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
+
+    def test_side_by_side_long5(self):
+        self.snippet_call_test(
+            args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 11
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 5 + '1 2' + os.linesep + ('1' + os.linesep) * 5
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] ',
+                '[-] WA',
+                '  |output:' + ' ' * (self.max_chars - 10) + '|expected:',
+                '-' * self.max_chars + '|' + '-' * self.max_chars,
+                '43|1' + ' ' * (self.max_chars - 4) + '|1',
+                '44|1' + ' ' * (self.max_chars - 4) + '|1',
+                '45|1' + ' ' * (self.max_chars - 4) + '|1',
+                '46|1' + ' ' * (self.max_chars - 4) + '|1 2',
+                '47|1' + ' ' * (self.max_chars - 4) + '|1',
+                '48|1' + ' ' * (self.max_chars - 4) + '|1',
+                '49|1' + ' ' * (self.max_chars - 4) + '|1',
+                '... (3 lines) ...',
+                '',
+                '[x] slowest:',
+                '[x] max memory:',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
+
+    def test_side_by_side_long6(self):
+        self.snippet_call_test(
+            args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 5 + '1 2' + os.linesep + ('1' + os.linesep) * 5
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': os.linesep * 40 + ('1' + os.linesep) * 11
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] ',
+                '[-] WA',
+                '  |output:' + ' ' * (self.max_chars - 10) + '|expected:',
+                '-' * self.max_chars + '|' + '-' * self.max_chars,
+                '43|1' + ' ' * (self.max_chars - 4) + '|1',
+                '44|1' + ' ' * (self.max_chars - 4) + '|1',
+                '45|1' + ' ' * (self.max_chars - 4) + '|1',
+                '46|1 2' + ' ' * (self.max_chars - 6) + '|1',
+                '47|1' + ' ' * (self.max_chars - 4) + '|1',
+                '48|1' + ' ' * (self.max_chars - 4) + '|1',
+                '49|1' + ' ' * (self.max_chars - 4) + '|1',
+                '... (3 lines) ...',
                 '',
                 '[x] slowest:',
                 '[x] max memory:',
