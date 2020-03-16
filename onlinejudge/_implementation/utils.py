@@ -297,8 +297,17 @@ def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: 
         return str(e)
 
     def font(line: str) -> str:
-        repl = lambda m: log.dim(m.group(1).replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r') + '(trailing spaces)' + m.group(2))
-        line, _ = re.subn(r'(\s+)(\n)', repl, line)
+        if not line.endswith('\n'):
+            line += log.dim('(no trailing spaces)')
+        else:
+
+            def repl(m):
+                if m.group(1) == '\r':
+                    return log.dim('\\r' + m.group(2))
+                else:
+                    return log.dim(m.group(1).replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r') + '(trailing spaces)' + m.group(2))
+
+            line = re.sub(r'(\s+)(\n)$', repl, line)
         if bold:
             line = log.bold(line)
         return line
