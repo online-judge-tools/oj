@@ -97,15 +97,14 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
             if a == b.replace('\n', '\r\n'):
                 log.warning(r'WA if not replaceing "\r\n" with "\n"')
                 return True
-            if a.rstrip(rstrip_targets) == b.replace('\n', '\r\n').rstrip(rstrip_targets):
-                # TODO: use a smart way if you need more equality patterns
+            if rstrip and a.rstrip(rstrip_targets) == b.replace('\n', '\r\n').rstrip(rstrip_targets):
                 log.warning('WA if no rstrip')
                 log.warning(r'WA if not replaceing "\r\n" with "\n"')
                 return True
             if a.replace('\n', '\r\n') == b:
                 log.warning(r'WA if not replaceing "\n" with "\r\n"')
                 return True
-            if a.replace('\n', '\r\n').rstrip(rstrip_targets) == a.rstrip(rstrip_targets):
+            if rstrip and a.replace('\n', '\r\n').rstrip(rstrip_targets) == b.rstrip(rstrip_targets):
                 # TODO: use a smart way if you need more equality patterns
                 log.warning('WA if no rstrip')
                 log.warning(r'WA if not replaceing "\n" with "\r\n"')
