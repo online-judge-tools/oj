@@ -81,7 +81,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
                 log.status('$ %s', actual_command)
                 info, proc = utils.exec_command(actual_command)
                 if not silent:
-                    log.emit('judge\'s output:\n%s', utils.snip_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
+                    log.emit('judge\'s output:\n%s', utils.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
                 judge_result = (proc.returncode == 0)
             finally:
                 os.unlink(user_output.name)
@@ -104,7 +104,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
         if does_print_input and not is_input_printed:
             is_input_printed = True
             with test_input_path.open('rb') as inf:
-                log.emit('input:\n%s', utils.snip_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
+                log.emit('input:\n%s', utils.make_pretty_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
 
     # check TLE, RE or not
     status = 'AC'
@@ -135,8 +135,8 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
             print_input()
             if not silent:
                 if mode == 'simple':
-                    log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
-                    log.emit('expected:\n%s', utils.snip_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
+                    log.emit('output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+                    log.emit('expected:\n%s', utils.make_pretty_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
                 elif mode == 'side-by-side':
                     if max(answer.count('\n'), expected.count('\n')) <= 40:
                         display_side_by_side_color(answer, expected)
@@ -147,7 +147,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
             status = 'WA'
     else:
         if not silent:
-            log.emit(('output:\n%s' if is_input_printed else '%s'), utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            log.emit(('output:\n%s' if is_input_printed else '%s'), utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
     if status == 'AC':
         log.success(log.green('AC'))
 
