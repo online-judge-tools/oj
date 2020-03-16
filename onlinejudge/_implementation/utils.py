@@ -338,7 +338,7 @@ def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: 
             *map(font, text[-char_in_line * tail:].splitlines(keepends=True)),
         ])]
 
-    candidates: List[str] = []
+    candidates = []  # type: List[str]
     candidates += no_snip_text()
     candidates += snip_line_based()
     candidates += snip_char_based()
