@@ -55,10 +55,8 @@ def download(args: 'argparse.Namespace') -> None:
         history = onlinejudge._implementation.download_history.DownloadHistory()
         history.add(problem)
 
-    # write samples to files
-    for i, sample in enumerate(samples):
-        log.emit('')
-        log.info('sample %d', i)
+    # prepare files to write
+    def iterate_files_to_write(sample: onlinejudge.type.TestCase, *, i: int) -> Iterator[Tuple[str, pathlib.Path, bytes]]:
         for ext in ['in', 'out']:
             data = getattr(sample, ext + 'put_data')
             if data is None:
@@ -71,17 +69,26 @@ def download(args: 'argparse.Namespace') -> None:
             table['b'] = os.path.basename(name)
             table['d'] = os.path.dirname(name)
             path = args.directory / format_utils.percentformat(args.format, table)  # type: pathlib.Path
-            log.status('%sput: %s', ext, name)
-            if not args.silent:
-                log.emit(utils.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True))
-            if args.dry_run:
-                continue
+            yield ext, path, data
+
+    for i, sample in enumerate(samples):
+        for _, path, _ in iterate_files_to_write(sample, i=i):
             if path.exists():
                 raise FileExistsError('Failed to download since file already exists: ' + str(path))
-            path.parent.mkdir(parents=True, exist_ok=True)
-            with path.open('wb') as fh:
-                fh.write(data)
-            log.success('saved to: %s', path)
+
+    # write samples to files
+    for i, sample in enumerate(samples):
+        log.emit('')
+        log.info('sample %d', i)
+        for ext, path, data in iterate_files_to_write(sample, i=i):
+            log.status('%sput: %s', ext, sample.name)
+            if not args.silent:
+                log.emit(utils.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True))
+            if not args.dry_run:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                with path.open('wb') as fh:
+                    fh.write(data)
+                log.success('saved to: %s', path)
 
     # print json
     if args.json:
