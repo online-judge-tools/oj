@@ -298,7 +298,7 @@ def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: 
 
     def font(line: str) -> str:
         if not line.endswith('\n'):
-            line += log.dim('(no trailing spaces)')
+            line += log.dim('(no trailing newline)')
         else:
 
             def repl(m):
