@@ -249,7 +249,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                         versions += [version]
                 if not versions:
                     log.status('no version info in code')
-                    versions = [2, 3]
+                    versions = [3]
             log.status('use: %s', ', '.join(map(str, versions)))
 
             saved_ids = lang_ids
