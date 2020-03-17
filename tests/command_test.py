@@ -991,6 +991,45 @@ class TestTestLog(unittest.TestCase):
         print(result['proc'].stderr.decode(), file=sys.stderr)
         self.check_log_lines(result['proc'].stderr.decode().split(os.linesep), expected_log_lines)
 
+    def test_trailing_spaces(self):
+        self.snippet_call_test(
+            args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'1\r\n2 \r\n3\n4  \t  \n5  \n6')")],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '',
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': '1\n2\n3\n',
+                },
+            ],
+            expected_log_lines=[
+                '[*] 1 cases found',
+                '',
+                '[*] sample-1',
+                '[x] time:',
+                '[-] WA',
+                'output:',
+                r'1\r',
+                r'2_\r(trailing spaces)',
+                r'3',
+                r'4__\t__(trailing spaces)',
+                r'5__(trailing spaces)',
+                r'6(no trailing newline)',
+                'expected:',
+                '1',
+                '2',
+                '3',
+                '',
+                '',
+                '[x] slowest:',
+                '[x] max memory:',
+                '[-] test failed: 0 AC / 1 cases',
+                '',
+            ],
+        )
+
     def test_side_by_short(self):
         self.snippet_call_test(
             args=['-m', 'side-by-side', '-c', cat(), '--no-rstrip'],
