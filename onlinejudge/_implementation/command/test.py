@@ -297,7 +297,7 @@ def display_side_by_side_color(answer: str, expected: str):
 
     log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:")
     log.emit("-" * max_chars + "|" + "-" * max_chars)
-    for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
+    for _, diff_found, ans_line, exp_line, ans_chars, exp_chars in side_by_side_diff(answer, expected):
         if diff_found:
             log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(exp_line))
         else:
@@ -309,54 +309,61 @@ def display_snipped_side_by_side_color(answer: str, expected: str):
     Display first differ line and its previous 3 lines and its next 3 lines.
     """
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
-    deq = collections.deque(maxlen=7)  # type: Deque[Tuple[int, bool, str, str, int, int]]
+    deq = collections.deque(maxlen=7)  # type: Deque[Tuple[Optional[int], bool, str, str, int, int]]
 
     count_from_first_difference = 0
-    for i, (diff_found, ans_line, exp_line, ans_chars, exp_chars) in enumerate(side_by_side_diff(answer, expected)):
+    i = 0
+    for flag, diff_found, ans_line, exp_line, ans_chars, exp_chars in side_by_side_diff(answer, expected):
+        if flag: i += 1
         if count_from_first_difference > 0:
             count_from_first_difference += 1
-        deq.append((i + 1, diff_found, ans_line, exp_line, ans_chars, exp_chars))
+        line_num = i if flag else None
+        deq.append((line_num, diff_found, ans_line, exp_line, ans_chars, exp_chars))
         if diff_found:
             if count_from_first_difference == 0:
                 count_from_first_difference = 1
         if count_from_first_difference == 4:
             break
 
-    max_line_num_digits = max([len(str(entry[0])) for entry in deq])
+    max_line_num_digits = max([len(str(entry[0])) for entry in deq if entry[0] is not None])
 
     log.emit(" " * max_line_num_digits + "|output:" + " " * (max_chars - 7 - max_line_num_digits - 1) + "|" + "expected:")
     log.emit("-" * max_chars + "|" + "-" * max_chars)
 
+    last_line_number = 0
     for (line_number, diff_found, ans_line, exp_line, ans_chars, exp_chars) in deq:
         num_spaces_after_output = max_chars - ans_chars - max_line_num_digits - 1
-        line_num_display = space_padding(str(line_number), max_line_num_digits - len(str(line_number))) + "|"
+        line_number_str = str(line_number) if line_number is not None else ""
+        line_num_display = space_padding(line_number_str, max_line_num_digits - len(line_number_str)) + "|"
         if not diff_found:
             log.emit(line_num_display + space_padding(ans_line, num_spaces_after_output) + "|" + exp_line)
         else:
             log.emit(line_num_display + log.red(space_padding(ans_line, num_spaces_after_output)) + "|" + log.green(exp_line))
-    num_snipped_lines = answer.count('\n') + 1 - line_number
+        if line_number is not None:
+            last_line_number = line_number
+    num_snipped_lines = answer.count('\n') + 1 - last_line_number
     if num_snipped_lines > 0:
         log.emit('... ({} lines) ...'.format(num_snipped_lines))
 
 
-def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, str, str, int, int], None, None]:
+def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, bool, str, str, int, int], None, None]:
     """ Yield all open changes. """
     ls, rs, lnums, rnums = open_entry
     # Get unchanged parts onto the right line
     if ls[0] == rs[0]:
-        yield (False, ls[0], rs[0], lnums[0], rnums[0])
+        yield (True, False, ls[0], rs[0], lnums[0], rnums[0])
         for l, r, lnum, rnum in itertools.zip_longest(ls[1:], rs[1:], lnums[1:], rnums[1:]):
-            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+            yield (l is not None, True, l or '', r or '', lnum or 0, rnum or 0)
     elif ls[-1] == rs[-1]:
         for l, r, lnum, rnum in itertools.zip_longest(ls[:-1], rs[:-1], lnums[:-1], rnums[:-1]):
-            yield (l != r, l or '', r or '', lnum or 0, rnum or 0)
-        yield (False, ls[-1], rs[-1], lnums[-1], rnums[-1])
+            yield (l is not None, l != r, l or '', r or '', lnum or 0, rnum or 0)
+        yield (True, False, ls[-1], rs[-1], lnums[-1], rnums[-1])
     else:
         for l, r, lnum, rnum in itertools.zip_longest(ls, rs, lnums, rnums):
-            yield (True, l or '', r or '', lnum or 0, rnum or 0)
+            yield (l is not None, True, l or '', r or '', lnum or 0, rnum or 0)
 
 
-def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, str, str, int, int], None, None]:
+def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, bool, str, str, int, int], None, None]:
     """
     Calculates a side-by-side line-based difference view.
     """
@@ -402,7 +409,7 @@ def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, str
 
                 # Directly push out lines until last
                 for line in lines[:-1]:
-                    yield (False, line, line, len(line), len(line))
+                    yield (True, False, line, line, len(line), len(line))
 
                 # Keep last line open
                 open_entry = ([lines[-1]], [lines[-1]], [len(lines[-1])], [len(lines[-1])])
