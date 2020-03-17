@@ -19,6 +19,7 @@ class TestTest(unittest.TestCase):
         result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--json'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(result['proc'].stdout.decode())
+        print(data)
         if expected is None:
             return data
         else:
