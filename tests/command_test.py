@@ -160,11 +160,11 @@ class TestTest(unittest.TestCase):
                 },
                 {
                     'path': 'test/sample-5.in',
-                    'data': '1.0\n2.0\n'.replace('\n', os.linesep)
+                    'data': '1.0\n2.0\n'
                 },
                 {
                     'path': 'test/sample-5.out',
-                    'data': '1.0\n'.replace('\n', os.linesep)
+                    'data': '1.0\n'
                 },
             ],
             expected=[{
@@ -210,7 +210,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-5.in',
                     'output': '%s/test/sample-5.out',
                 },
-                'output': '1.0\n2.0\n'.replace('\n', os.linesep),
+                'output': '1.0\n2.0\n',
                 'exitcode': 0,
             }],
         )
@@ -289,19 +289,19 @@ class TestTest(unittest.TestCase):
             files=[
                 {
                     'path': 'test/sample-1.in',
-                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                    'data': 'foo\nfoobar\n'
                 },
                 {
                     'path': 'test/sample-1.out',
-                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                    'data': 'foo\nfoobar\n'
                 },
                 {
                     'path': 'test/sample-2.in',
-                    'data': 'bar\nfoobar\n'.replace('\n', os.linesep)
+                    'data': 'bar\nfoobar\n'
                 },
                 {
                     'path': 'test/sample-2.out',
-                    'data': 'bar\nbarbar\n'.replace('\n', os.linesep)
+                    'data': 'bar\nbarbar\n'
                 },
             ],
             expected=[{
@@ -311,7 +311,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-1.in',
                     'output': '%s/test/sample-1.out',
                 },
-                'output': 'foo\nfoobar\n'.replace('\n', os.linesep),
+                'output': 'foo\nfoobar\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -320,7 +320,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-2.in',
                     'output': '%s/test/sample-2.out',
                 },
-                'output': 'bar\nfoobar\n'.replace('\n', os.linesep),
+                'output': 'bar\nfoobar\n',
                 'exitcode': 0,
             }],
         )
