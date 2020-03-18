@@ -105,7 +105,7 @@ supported services:
     subparser.add_argument('--no-guess-latest', action='store_false', dest='guess_cxx_latest')
     subparser.add_argument('--guess-cxx-latest', action='store_true', help='use the lasest version for C++ (default)')
     subparser.add_argument('--guess-cxx-compiler', choices=('gcc', 'clang', 'all'), default='gcc', help='use the specified C++ compiler if both of GCC and Clang are available (default: gcc)')
-    subparser.add_argument('--guess-python-version', choices=('2', '3', 'auto', 'all'), default='auto', help='shebang or modelines are used by default. write something like "#!/usr/bin/env python3". (default: auto)')
+    subparser.add_argument('--guess-python-version', choices=('2', '3', 'auto', 'all'), default='auto', help='default: auto')
     subparser.add_argument('--guess-python-interpreter', choices=('cpython', 'pypy', 'all'), default='cpython', help='use the specified Python interpreter if both of CPython and PyPy are available (default: cpython)')
     subparser.add_argument('--format-dos2unix', action='store_true', help='replace CRLF with LF for given file')
     subparser.add_argument('--format-rstrip', action='store_true', help='remove trailing newlines from given file')

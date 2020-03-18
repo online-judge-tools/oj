@@ -45,7 +45,7 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
             log.info('skipped.')
             return
         assert answer is not None
-        log.emit(utils.snip_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
+        log.emit(utils.make_pretty_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
 
         # find the destination path
         match_result = fmtutils.match_with_format(args.directory, args.format, test_input_path)  # type: Optional[Match[Any]]

@@ -8,6 +8,7 @@ import http.cookiejar
 import json
 import os
 import posixpath
+import re
 import shlex
 import shutil
 import signal
@@ -297,38 +298,60 @@ def getter_with_load_details(name: str, type: Union[str, type]) -> Callable:
     return wrapper
 
 
-def snip_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
+def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
     assert head + tail < limit
     try:
         text = content.decode()
     except UnicodeDecodeError as e:
         return str(e)
-    font = log.bold if bold else (lambda s: s)
+
+    def font(line: str) -> str:
+        if not line.endswith('\n'):
+            line += log.dim('(no trailing newline)')
+        else:
+
+            def repl(m):
+                if m.group(1) == '\r':
+                    return log.dim('\\r' + m.group(2))
+                else:
+                    return log.dim(m.group(1).replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r') + '(trailing spaces)' + m.group(2))
+
+            line = re.sub(r'(\s+)(\n)$', repl, line)
+        if bold:
+            line = log.bold(line)
+        return line
+
     char_in_line, _ = shutil.get_terminal_size()
     char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
 
-    def snip_line_based():
+    def no_snip_text() -> List[str]:
+        lines = text.splitlines(keepends=True)
+        return [''.join(map(font, lines))]
+
+    def snip_line_based() -> List[str]:
         lines = text.splitlines(keepends=True)
         if len(lines) < limit:
-            return font(text)
-        else:
-            return ''.join([
-                font(''.join(lines[:head])),
-                '... ({} lines) ...\n'.format(len(lines[head:-tail])),
-                font(''.join(lines[-tail:])),
-            ])
+            return []
+        return [''.join([
+            *map(font, lines[:head]),
+            '... ({} lines) ...\n'.format(len(lines[head:-tail])),
+            *map(font, lines[-tail:]),
+        ])]
 
-    def snip_char_based():
+    def snip_char_based() -> List[str]:
         if len(text) < char_in_line * limit:
-            return font(text)
-        else:
-            return ''.join([
-                font(text[:char_in_line * head]),
-                '... ({} chars) ...'.format(len(text[char_in_line * head:-char_in_line * tail])),
-                font(text[-char_in_line * tail:]),
-            ])
+            return []
+        return [''.join([
+            *map(font, text[:char_in_line * head].splitlines(keepends=True)),
+            '... ({} chars) ...'.format(len(text[char_in_line * head:-char_in_line * tail])),
+            *map(font, text[-char_in_line * tail:].splitlines(keepends=True)),
+        ])]
 
-    return min([font(text), snip_line_based(), snip_char_based()], key=len)
+    candidates = []  # type: List[str]
+    candidates += no_snip_text()
+    candidates += snip_line_based()
+    candidates += snip_char_based()
+    return min(candidates, key=len)
 
 
 class DummySubmission(Submission):

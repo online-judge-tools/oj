@@ -73,7 +73,7 @@ def download(args: 'argparse.Namespace') -> None:
             path = args.directory / format_utils.percentformat(args.format, table)  # type: pathlib.Path
             log.status('%sput: %s', ext, name)
             if not args.silent:
-                log.emit(utils.snip_large_file_content(data, limit=40, head=20, tail=10, bold=True))
+                log.emit(utils.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True))
             if args.dry_run:
                 continue
             if path.exists():

@@ -49,7 +49,7 @@ def submit(args: 'argparse.Namespace') -> None:
 
     # report code
     log.info('code (%d byte):', len(code))
-    log.emit(utils.snip_large_file_content(code, limit=30, head=10, tail=10, bold=True))
+    log.emit(utils.make_pretty_large_file_content(code, limit=30, head=10, tail=10, bold=True))
 
     with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
         # guess or select language ids
@@ -230,7 +230,9 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             lang_ids += select('pypy', language_dict.keys())
 
         # version
-        if select_words(['python', '2'], lang_ids) and select_words(['python', '3'], lang_ids):
+        two_found = select_words(['python', '2'], lang_ids) or select_words(['pypy', '2'], lang_ids)
+        three_found = select_words(['python', '3'], lang_ids) or select_words(['pypy', '3'], lang_ids)
+        if two_found and three_found:
             log.status('both Python2 and Python3 are available for version of Python')
             if python_version in ('2', '3'):
                 versions = [int(python_version)]
@@ -249,7 +251,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                         versions += [version]
                 if not versions:
                     log.status('no version info in code')
-                    versions = [2, 3]
+                    versions = [3]
             log.status('use: %s', ', '.join(map(str, versions)))
 
             saved_ids = lang_ids
@@ -257,6 +259,8 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             for version in versions:
                 lang_ids += select('python%d' % version, saved_ids)
                 lang_ids += select('python %d' % version, saved_ids)
+                lang_ids += select('pypy%d' % version, saved_ids)
+                lang_ids += select('pypy %d' % version, saved_ids)
 
         lang_ids = list(set(lang_ids))
         return lang_ids
