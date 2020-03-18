@@ -20,8 +20,8 @@ def prepare_files(files):
     for f in files:
         path = pathlib.Path(f['path'])
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(str(path), 'w') as fh:
-            fh.write(f['data'])
+        with open(str(path), 'wb') as fh:
+            fh.write(f['data'].encode())
         if f.get('executable', False):
             path.chmod(0o755)
 
