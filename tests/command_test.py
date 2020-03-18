@@ -936,7 +936,6 @@ class TestTest(unittest.TestCase):
             }],
         )
 
-
     def test_call_output_uses_crlf(self):
         data = self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\r\nbaz\r\n')")],
