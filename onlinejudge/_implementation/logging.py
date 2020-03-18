@@ -79,3 +79,4 @@ green = lambda s: colorama.Fore.GREEN + s + colorama.Fore.RESET
 red = lambda s: colorama.Fore.RED + s + colorama.Fore.RESET
 green_diff = lambda s: colorama.Fore.RESET + colorama.Back.GREEN + colorama.Style.BRIGHT + s + colorama.Style.NORMAL + colorama.Back.RESET + colorama.Fore.GREEN
 red_diff = lambda s: colorama.Fore.RESET + colorama.Back.RED + colorama.Style.BRIGHT + s + colorama.Style.NORMAL + colorama.Back.RESET + colorama.Fore.RED
+dim = lambda s: colorama.Style.RESET_ALL + colorama.Style.DIM + s + colorama.Style.RESET_ALL

@@ -43,7 +43,7 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
 
         if print_data:
             log.emit('input:')
-            log.emit(utils.snip_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+            log.emit(utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
         with input_path.open('wb') as fh:
             fh.write(input_data)
         log.success('saved to: %s', input_path)
@@ -51,7 +51,7 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
         if output_data is not None:
             if print_data:
                 log.emit('output:')
-                log.emit(utils.snip_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
+                log.emit(utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
             with output_path.open('wb') as fh:
                 fh.write(output_data)
             log.success('saved to: %s', output_path)
@@ -149,9 +149,9 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         expected = output_data.decode()
         if not simple_match(answer, expected):
             log.failure(log.red('WA'))
-            log.emit('input:\n%s', utils.snip_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
-            log.emit('output:\n%s', utils.snip_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
-            log.emit('expected:\n%s', utils.snip_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
+            log.emit('input:\n%s', utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+            log.emit('output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            log.emit('expected:\n%s', utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
             status = 'WA'
 
         if status == 'AC':
