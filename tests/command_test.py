@@ -15,10 +15,11 @@ from onlinejudge._implementation.command import test
 
 
 class TestTest(unittest.TestCase):
-    def snippet_call_test(self, args, files, expected, verbose=True):
+    def snippet_call_test(self, args, files, expected, verbose=True, replace_output_newline=True):
         result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--json'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(result['proc'].stdout.decode())
+        print(data)
         if expected is None:
             return data
         else:
@@ -31,7 +32,11 @@ class TestTest(unittest.TestCase):
                     self.assertEqual(a['testcase']['output'], b['testcase']['output'].replace('/', os.path.sep) % result['tempdir'])
                 self.assertEqual(a['exitcode'], b['exitcode'])
                 self.assertEqual(a['status'], b['status'])
-                self.assertEqual(a['output'].replace(os.linesep, '\n'), b['output'])
+                if replace_output_newline:
+                    a_output = a['output'].replace(os.linesep, '\n')
+                else:
+                    a_output = a['output']
+                self.assertEqual(a_output, b['output'])
 
     def test_call_test_simple(self):
         self.snippet_call_test(
@@ -155,11 +160,11 @@ class TestTest(unittest.TestCase):
                 },
                 {
                     'path': 'test/sample-5.in',
-                    'data': '1.0\n2.0\n'.replace('\n', os.linesep)
+                    'data': '1.0\n2.0\n'
                 },
                 {
                     'path': 'test/sample-5.out',
-                    'data': '1.0\n'.replace('\n', os.linesep)
+                    'data': '1.0\n'
                 },
             ],
             expected=[{
@@ -205,7 +210,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-5.in',
                     'output': '%s/test/sample-5.out',
                 },
-                'output': '1.0\n2.0\n'.replace('\n', os.linesep),
+                'output': '1.0\n2.0\n',
                 'exitcode': 0,
             }],
         )
@@ -284,19 +289,19 @@ class TestTest(unittest.TestCase):
             files=[
                 {
                     'path': 'test/sample-1.in',
-                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                    'data': 'foo\nfoobar\n'
                 },
                 {
                     'path': 'test/sample-1.out',
-                    'data': 'foo\nfoobar\n'.replace('\n', os.linesep)
+                    'data': 'foo\nfoobar\n'
                 },
                 {
                     'path': 'test/sample-2.in',
-                    'data': 'bar\nfoobar\n'.replace('\n', os.linesep)
+                    'data': 'bar\nfoobar\n'
                 },
                 {
                     'path': 'test/sample-2.out',
-                    'data': 'bar\nbarbar\n'.replace('\n', os.linesep)
+                    'data': 'bar\nbarbar\n'
                 },
             ],
             expected=[{
@@ -306,7 +311,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-1.in',
                     'output': '%s/test/sample-1.out',
                 },
-                'output': 'foo\nfoobar\n'.replace('\n', os.linesep),
+                'output': 'foo\nfoobar\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -315,7 +320,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-2.in',
                     'output': '%s/test/sample-2.out',
                 },
-                'output': 'bar\nfoobar\n'.replace('\n', os.linesep),
+                'output': 'bar\nfoobar\n',
                 'exitcode': 0,
             }],
         )
@@ -929,6 +934,84 @@ class TestTest(unittest.TestCase):
                 'output': bytes(range(256)).decode(errors='replace'),
                 'exitcode': 0,
             }],
+        )
+
+    def test_call_output_uses_crlf(self):
+        data = self.snippet_call_test(
+            args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\r\nbaz\r\n')")],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '',
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\nbar\nbaz\n'
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\r\nbar\r\nbaz\r\n',
+                'exitcode': 0,
+            }],
+            replace_output_newline=False,
+        )
+
+    def test_call_expected_uses_crlf(self):
+        data = self.snippet_call_test(
+            args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\nbar\nbaz\n')")],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '',
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\r\nbar\r\nbaz\r\n',
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\nbar\nbaz\n',
+                'exitcode': 0,
+            }],
+            replace_output_newline=False,
+        )
+
+    def test_call_output_uses_both_lf_and_crlf(self):
+        data = self.snippet_call_test(
+            args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\nbaz\r\n')")],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '',
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\nbar\nbaz\n'
+                },
+            ],
+            expected=[{
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\r\nbar\nbaz\r\n',
+                'exitcode': 0,
+            }],
+            replace_output_newline=False,
         )
 
     # TODO: fix
