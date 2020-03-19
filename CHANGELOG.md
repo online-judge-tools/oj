@@ -1,5 +1,14 @@
 # Change Log
 
+## 9.1.0 / 2020-03-20
+
+-   [#704](https://github.com/kmyk/online-judge-tools/pull/704) `oj download` become atomic
+-   [#706](https://github.com/kmyk/online-judge-tools/pull/706) kill zombies caused by time command in `oj test` 
+-   [#705](https://github.com/kmyk/online-judge-tools/pull/705) default Python version of `oj submit` become Python 3 and fix a bug of '--guess-python-interpreter' option
+-   [#703](https://github.com/kmyk/online-judge-tools/pull/703) `oj test` allow CRLF newline character
+-   [#702](https://github.com/kmyk/online-judge-tools/pull/702) display trailing spaces explicitly
+-   [#700](https://github.com/kmyk/online-judge-tools/pull/700) fix a bug of side-by-side-display line number 
+
 ## 9.0.0 / 2020-02-29
 
 -   [#692](https://github.com/kmyk/online-judge-tools/pull/692) (breaking changes) remove `split-input` subcommand
