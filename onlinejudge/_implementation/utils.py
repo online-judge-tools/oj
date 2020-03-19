@@ -11,6 +11,7 @@ import posixpath
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -135,8 +136,13 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
             command = command_str.encode().decode()  # type: ignore
         begin = time.perf_counter()
 
+        # We need kill processes called from the "time" command using process groups. Without this, zombies spawn. see https://github.com/kmyk/online-judge-tools/issues/640
+        preexec_fn = None
+        if gnu_time is not None and os.name == 'posix':
+            preexec_fn = os.setsid
+
         try:
-            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr)
+            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr, preexec_fn=preexec_fn)
         except FileNotFoundError:
             log.error('No such file or directory: %s', command)
             sys.exit(1)
@@ -147,7 +153,10 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         try:
             answer, _ = proc.communicate(input=input, timeout=timeout)
         except subprocess.TimeoutExpired:
-            proc.terminate()
+            if preexec_fn is not None:
+                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+            else:
+                proc.terminate()
 
         end = time.perf_counter()
         memory = None  # type: Optional[float]
