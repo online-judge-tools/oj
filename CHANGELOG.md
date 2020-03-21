@@ -2,12 +2,13 @@
 
 ## 9.1.0 / 2020-03-20
 
--   [#704](https://github.com/kmyk/online-judge-tools/pull/704) `oj download` become atomic
--   [#706](https://github.com/kmyk/online-judge-tools/pull/706) kill zombies caused by time command in `oj test` 
--   [#705](https://github.com/kmyk/online-judge-tools/pull/705) default Python version of `oj submit` become Python 3 and fix a bug of '--guess-python-interpreter' option
--   [#703](https://github.com/kmyk/online-judge-tools/pull/703) `oj test` allow CRLF newline character
--   [#702](https://github.com/kmyk/online-judge-tools/pull/702) display trailing spaces explicitly
--   [#700](https://github.com/kmyk/online-judge-tools/pull/700) fix a bug of side-by-side-display line number 
+-   [#704](https://github.com/kmyk/online-judge-tools/pull/704) improve error logs of `oj download` when files already exist
+-   [#706](https://github.com/kmyk/online-judge-tools/pull/706) kill zombie processes caused by `--tle` option in `oj test` 
+-   [#705](https://github.com/kmyk/online-judge-tools/pull/705) make `oj submit` use Python 3 by default
+-   [#705](https://github.com/kmyk/online-judge-tools/pull/705) fix a bug of `--guess-python-interpreter` option
+-   [#703](https://github.com/kmyk/online-judge-tools/pull/703) allow CRLF as line separators in `oj test`
+-   [#702](https://github.com/kmyk/online-judge-tools/pull/702) display trailing spaces explicitly in `oj test`
+-   [#700](https://github.com/kmyk/online-judge-tools/pull/700) fix a bug of `--side-by-side` option about line numbers
 
 ## 9.0.0 / 2020-02-29
 
