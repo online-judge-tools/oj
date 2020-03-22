@@ -1,25 +1,35 @@
 # Change Log
 
-## 9.0.0 / 2019-02-29
+## 9.1.0 / 2020-03-20
+
+-   [#704](https://github.com/kmyk/online-judge-tools/pull/704) improve error logs of `oj download` when files already exist
+-   [#706](https://github.com/kmyk/online-judge-tools/pull/706) kill zombie processes caused by `--tle` option in `oj test` 
+-   [#705](https://github.com/kmyk/online-judge-tools/pull/705) make `oj submit` use Python 3 by default
+-   [#705](https://github.com/kmyk/online-judge-tools/pull/705) fix a bug of `--guess-python-interpreter` option
+-   [#703](https://github.com/kmyk/online-judge-tools/pull/703) allow CRLF as line separators in `oj test`
+-   [#702](https://github.com/kmyk/online-judge-tools/pull/702) display trailing spaces explicitly in `oj test`
+-   [#700](https://github.com/kmyk/online-judge-tools/pull/700) fix a bug of `--side-by-side` option about line numbers
+
+## 9.0.0 / 2020-02-29
 
 -   [#692](https://github.com/kmyk/online-judge-tools/pull/692) (breaking changes) remove `split-input` subcommand
 -   [#691](https://github.com/kmyk/online-judge-tools/pull/691) (breaking changes) remove support for Topcoder Marathon Match
 -   [#686](https://github.com/kmyk/online-judge-tools/pull/686) fix a bug of `--side-by-side` option
 
-## 8.0.0 / 2019-02-14
+## 8.0.0 / 2020-02-14
 
 -   [#675](https://github.com/kmyk/online-judge-tools/pull/675) snip side-by-side diff display if result is long
 -   [#676](https://github.com/kmyk/online-judge-tools/pull/676) `download` command support yukicoder token ([@beet-aizu](https://github.com/beet-aizu))
 -   [#671](https://github.com/kmyk/online-judge-tools/pull/671) support latest library checker
 -   [#665](https://github.com/kmyk/online-judge-tools/pull/665) `test` support side-by-side diff display
 
-## 7.8.0 / 2019-02-03
+## 7.8.0 / 2020-02-03
 
 -   [#665](https://github.com/kmyk/online-judge-tools/pull/665) add Sphere Online Judge support
 -   [#661](https://github.com/kmyk/online-judge-tools/pull/661) allow `submit` to guess more languages ([@eggplants](https://github.com/eggplants))
 -   [#660](https://github.com/kmyk/online-judge-tools/pull/660) prevent installation using unsupported versions of Python
 
-## 7.7.0 / 2019-01-20
+## 7.7.0 / 2020-01-20
 -   [#654](https://github.com/kmyk/online-judge-tools/pull/654) fix a bug of git pull option about Library Checker
 -   [#653](https://github.com/kmyk/online-judge-tools/pull/653) add CodeChef support
 -   [#649](https://github.com/kmyk/online-judge-tools/pull/649) allow `submit` to guess Common Lisp and Clojure files by the extension [@fukamachi](https://github.com/fukamachi)
