@@ -75,7 +75,7 @@ class GoogleCodeJamProblem(onlinejudge.type.Problem):
         elif self.domain == 'code.google.com':
             url = 'https://{}/{}/contest/{}/dashboard/ContestInfo'.format(self.domain, self.kind, self.contest_id)
             resp = utils.request('GET', url, session=session)
-            data = json.loads(resp.content)
+            data = json.loads(resp.content.decode())
 
             # parse JSON
             assert self.problem_id.startswith('p')
