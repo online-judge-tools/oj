@@ -48,6 +48,7 @@ supported services:
   Toph (Problem Archive)
   CodeChef
   Facebook Hacker Cup
+  Google Code Jam
   Library Checker (https://judge.yosupo.jp/)
 
 supported services with --system:

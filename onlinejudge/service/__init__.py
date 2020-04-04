@@ -6,6 +6,7 @@ import onlinejudge.service.codechef
 import onlinejudge.service.codeforces
 import onlinejudge.service.csacademy
 import onlinejudge.service.facebook
+import onlinejudge.service.google
 import onlinejudge.service.hackerrank
 import onlinejudge.service.kattis
 import onlinejudge.service.library_checker
