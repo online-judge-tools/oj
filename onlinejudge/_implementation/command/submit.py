@@ -156,6 +156,21 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
     return result
 
 
+def parse_python_version(description: str) -> Optional[int]:
+    """
+    :param description: must contain ``python`` or ``pypy`` as a substring
+    """
+
+    assert 'python' in description.lower() or 'pypy' in description.lower()
+    match = re.match(r'([23])\.(?:\d+(?:\.\d+)?|x)', description)
+    if match:
+        return int(match.group(1))
+    match = re.match(r'(?:Python|PyPy) *\(?([23])', description, re.IGNORECASE)
+    if match:
+        return int(match.group(1))
+    return None
+
+
 def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
     assert cxx_compiler.lower() in ('gcc', 'clang', 'all')
     assert python_version.lower() in ('2', '3', 'auto', 'all')
@@ -230,12 +245,19 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             lang_ids += select('pypy', language_dict.keys())
 
         # version
-        two_found = select_words(['python', '2'], lang_ids) or select_words(['pypy', '2'], lang_ids)
-        three_found = select_words(['python', '3'], lang_ids) or select_words(['pypy', '3'], lang_ids)
+        three_found = False
+        two_found = False
+        for lang_id in lang_ids:
+            version = parse_python_version(language_dict[lang_id]['description'])
+            log.debug('%s (%s) is recognized as Python %s', lang_id, language_dict[lang_id]['description'], str(version or 'unknown'))
+            if version == 3:
+                three_found = True
+            if version == 2:
+                two_found = True
         if two_found and three_found:
             log.status('both Python2 and Python3 are available for version of Python')
             if python_version in ('2', '3'):
-                versions = [int(python_version)]
+                versions = [int(python_version)]  # type: List[Optional[int]]
             elif python_version == 'all':
                 versions = [2, 3]
             else:
@@ -253,14 +275,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                     log.status('no version info in code')
                     versions = [3]
             log.status('use: %s', ', '.join(map(str, versions)))
-
-            saved_ids = lang_ids
-            lang_ids = []
-            for version in versions:
-                lang_ids += select('python%d' % version, saved_ids)
-                lang_ids += select('python %d' % version, saved_ids)
-                lang_ids += select('pypy%d' % version, saved_ids)
-                lang_ids += select('pypy %d' % version, saved_ids)
+            lang_ids = list(filter(lambda lang_id: parse_python_version(language_dict[lang_id]['description']) in versions + [None], lang_ids))
 
         lang_ids = list(set(lang_ids))
         return lang_ids
