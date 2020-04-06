@@ -217,9 +217,9 @@ def parse_python_interpreter(description: str) -> str:
 
 
 def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
-    assert cxx_compiler.lower() in ('gcc', 'clang', 'all')
-    assert python_version.lower() in ('2', '3', 'auto', 'all')
-    assert python_interpreter.lower() in ('cpython', 'pypy', 'all')
+    assert cxx_compiler in ('gcc', 'clang', 'all')
+    assert python_version in ('2', '3', 'auto', 'all')
+    assert python_interpreter in ('cpython', 'pypy', 'all')
 
     ext = filename.suffix
     lang_ids = language_dict.keys()
@@ -246,14 +246,14 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                 found_clang = True
         if found_gcc and found_clang:
             log.status('both GCC and Clang are available for C++ compiler')
-            if cxx_compiler.lower() == 'gcc':
+            if cxx_compiler == 'gcc':
                 log.status('use: GCC')
                 lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in ('gcc', None), lang_ids))
-            elif cxx_compiler.lower() == 'clang':
+            elif cxx_compiler == 'clang':
                 log.status('use: Clang')
                 lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in ('clang', None), lang_ids))
             else:
-                assert cxx_compiler.lower() == 'all'
+                assert cxx_compiler == 'all'
         log.debug('lang ids after compiler filter: %s', lang_ids)
 
         # version
@@ -279,8 +279,8 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         lang_ids = list(filter(lambda lang_id: is_python_description(language_dict[lang_id]), lang_ids))
         if any([parse_python_interpreter(language_dict[lang_id]) == 'pypy' for lang_id in lang_ids]):
             log.status('PyPy is available for Python interpreter')
-        if python_interpreter.lower() != 'all':
-            lang_ids = list(filter(lambda lang_id: parse_python_interpreter(language_dict[lang_id]) == python_interpreter.lower(), lang_ids))
+        if python_interpreter != 'all':
+            lang_ids = list(filter(lambda lang_id: parse_python_interpreter(language_dict[lang_id]) == python_interpreter, lang_ids))
 
         # version
         three_found = False
