@@ -53,14 +53,14 @@ def submit(args: 'argparse.Namespace') -> None:
 
     with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
         # guess or select language ids
-        langs = {language.id: {'description': language.name} for language in problem.get_available_languages(session=sess)}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in problem.get_available_languages(session=sess)}  # type: Dict[LanguageId, str]
         matched_lang_ids = None  # type: Optional[List[str]]
-        if args.language in langs:
+        if args.language in language_dict:
             matched_lang_ids = [args.language]
         else:
             if args.guess:
                 kwargs = {
-                    'language_dict': langs,
+                    'language_dict': language_dict,
                     'cxx_latest': args.guess_cxx_latest,
                     'cxx_compiler': args.guess_cxx_compiler,
                     'python_version': args.guess_python_version,
@@ -69,20 +69,20 @@ def submit(args: 'argparse.Namespace') -> None:
                 matched_lang_ids = guess_lang_ids_of_file(args.file, code, **kwargs)
                 if not matched_lang_ids:
                     log.info('failed to guess languages from the file name')
-                    matched_lang_ids = list(langs.keys())
+                    matched_lang_ids = list(language_dict.keys())
                 if args.language is not None:
                     log.info('you can use `--no-guess` option if you want to do an unusual submission')
-                    matched_lang_ids = select_ids_of_matched_languages(args.language.split(), matched_lang_ids, language_dict=langs)
+                    matched_lang_ids = select_ids_of_matched_languages(args.language.split(), matched_lang_ids, language_dict=language_dict)
             else:
                 if args.language is None:
                     matched_lang_ids = None
                 else:
-                    matched_lang_ids = select_ids_of_matched_languages(args.language.split(), list(langs.keys()), language_dict=langs)
+                    matched_lang_ids = select_ids_of_matched_languages(args.language.split(), list(language_dict.keys()), language_dict=language_dict)
 
         # report selected language ids
         if matched_lang_ids is not None and len(matched_lang_ids) == 1:
             args.language = matched_lang_ids[0]
-            log.info('chosen language: %s (%s)', args.language, langs[LanguageId(args.language)]['description'])
+            log.info('chosen language: %s (%s)', args.language, language_dict[LanguageId(args.language)])
         else:
             if matched_lang_ids is None:
                 log.error('language is unknown')
@@ -93,8 +93,8 @@ def submit(args: 'argparse.Namespace') -> None:
             else:
                 log.error('Matched languages were not narrowed down to one.')
                 log.info('You have to choose:')
-            for lang_id in sorted(matched_lang_ids or langs.keys()):
-                log.emit('%s (%s)', lang_id, langs[LanguageId(lang_id)]['description'])
+            for lang_id in sorted(matched_lang_ids or language_dict.keys()):
+                log.emit('%s (%s)', lang_id, language_dict[LanguageId(lang_id)])
             sys.exit(1)
 
         # confirm
@@ -145,7 +145,7 @@ def submit(args: 'argparse.Namespace') -> None:
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
     result = []
     for lang_id in lang_ids:
-        desc = language_dict[lang_id]['description'].lower()
+        desc = language_dict[lang_id].lower()
         if split:
             desc = desc.split()
         pred = all([word.lower() in desc for word in words])
@@ -230,7 +230,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
     if ext in ('cpp', 'cxx', 'cc', 'C'):
         log.debug('language guessing: C++')
         # memo: https://stackoverflow.com/questions/1545080/c-code-file-extension-cc-vs-cpp
-        lang_ids = list(filter(lambda lang_id: is_cplusplus_description(language_dict[lang_id]['description']), lang_ids))
+        lang_ids = list(filter(lambda lang_id: is_cplusplus_description(language_dict[lang_id]), lang_ids))
         if not lang_ids:
             return []
         log.debug('all lang ids for C++: %s', lang_ids)
@@ -239,7 +239,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         found_gcc = False
         found_clang = False
         for lang_id in lang_ids:
-            compiler = parse_cplusplus_compiler(language_dict[lang_id]['description'])
+            compiler = parse_cplusplus_compiler(language_dict[lang_id])
             if compiler == 'gcc':
                 found_gcc = True
             elif compiler == 'clang':
@@ -248,10 +248,10 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             log.status('both GCC and Clang are available for C++ compiler')
             if cxx_compiler.lower() == 'gcc':
                 log.status('use: GCC')
-                lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]['description']) in ('gcc', None), lang_ids))
+                lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in ('gcc', None), lang_ids))
             elif cxx_compiler.lower() == 'clang':
                 log.status('use: Clang')
-                lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]['description']) in ('clang', None), lang_ids))
+                lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in ('clang', None), lang_ids))
             else:
                 assert cxx_compiler.lower() == 'all'
         log.debug('lang ids after compiler filter: %s', lang_ids)
@@ -261,10 +261,10 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             saved_lang_ids = lang_ids
             lang_ids = []
             for compiler in ('gcc', 'clang'):  # use the latest for each compiler
-                ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]['description']) in (compiler, None), saved_lang_ids))
+                ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in (compiler, None), saved_lang_ids))
                 if not ids:
                     continue
-                ids.sort(key=lambda lang_id: parse_cplusplus_version(language_dict[lang_id]['description']) or '')
+                ids.sort(key=lambda lang_id: parse_cplusplus_version(language_dict[lang_id]) or '')
                 lang_ids += [ids[-1]]  # since C++11 < C++1y < ... as strings
         log.debug('lang ids after version filter: %s', lang_ids)
 
@@ -276,18 +276,18 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         log.debug('language guessing: Python')
 
         # interpreter
-        lang_ids = list(filter(lambda lang_id: is_python_description(language_dict[lang_id]['description']), lang_ids))
-        if any([parse_python_interpreter(language_dict[lang_id]['description']) == 'pypy' for lang_id in lang_ids]):
+        lang_ids = list(filter(lambda lang_id: is_python_description(language_dict[lang_id]), lang_ids))
+        if any([parse_python_interpreter(language_dict[lang_id]) == 'pypy' for lang_id in lang_ids]):
             log.status('PyPy is available for Python interpreter')
         if python_interpreter.lower() != 'all':
-            lang_ids = list(filter(lambda lang_id: parse_python_interpreter(language_dict[lang_id]['description']) == python_interpreter.lower(), lang_ids))
+            lang_ids = list(filter(lambda lang_id: parse_python_interpreter(language_dict[lang_id]) == python_interpreter.lower(), lang_ids))
 
         # version
         three_found = False
         two_found = False
         for lang_id in lang_ids:
-            version = parse_python_version(language_dict[lang_id]['description'])
-            log.debug('%s (%s) is recognized as Python %s', lang_id, language_dict[lang_id]['description'], str(version or 'unknown'))
+            version = parse_python_version(language_dict[lang_id])
+            log.debug('%s (%s) is recognized as Python %s', lang_id, language_dict[lang_id], str(version or 'unknown'))
             if version == 3:
                 three_found = True
             if version == 2:
@@ -313,7 +313,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                     log.status('no version info in code')
                     versions = [3]
             log.status('use: %s', ', '.join(map(str, versions)))
-            lang_ids = list(filter(lambda lang_id: parse_python_version(language_dict[lang_id]['description']) in versions + [None], lang_ids))
+            lang_ids = list(filter(lambda lang_id: parse_python_version(language_dict[lang_id]) in versions + [None], lang_ids))
 
         lang_ids = sorted(set(lang_ids))
         return lang_ids

@@ -178,7 +178,7 @@ class LanguageGuessingCPlusPlusTest(unittest.TestCase):
         cxx_compiler = 'gcc'
         expected = ['3003']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, cxx_latest=cxx_latest, cxx_compiler=cxx_compiler), expected)
 
     def test_atcoder_3_clang(self):
@@ -189,7 +189,7 @@ class LanguageGuessingCPlusPlusTest(unittest.TestCase):
         cxx_compiler = 'clang'
         expected = ['3005']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, cxx_latest=cxx_latest, cxx_compiler=cxx_compiler), expected)
 
     def test_atcoder_4_gcc(self):
@@ -200,7 +200,7 @@ class LanguageGuessingCPlusPlusTest(unittest.TestCase):
         cxx_compiler = 'gcc'
         expected = ['4003']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, cxx_latest=cxx_latest, cxx_compiler=cxx_compiler), expected)
 
     def test_atcoder_4_clang(self):
@@ -211,7 +211,7 @@ class LanguageGuessingCPlusPlusTest(unittest.TestCase):
         cxx_compiler = 'clang'
         expected = ['4004']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, cxx_latest=cxx_latest, cxx_compiler=cxx_compiler), expected)
 
     def test_codeforces_gcc(self):
@@ -222,7 +222,7 @@ class LanguageGuessingCPlusPlusTest(unittest.TestCase):
         cxx_compiler = 'gcc'
         expected = ['61']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, cxx_latest=cxx_latest, cxx_compiler=cxx_compiler), expected)
 
     def test_codeforces_clang(self):
@@ -233,7 +233,7 @@ class LanguageGuessingCPlusPlusTest(unittest.TestCase):
         cxx_compiler = 'clang'
         expected = ['52']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, cxx_latest=cxx_latest, cxx_compiler=cxx_compiler), expected)
 
 
@@ -249,7 +249,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'cpython'
         expected = ['3022']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_atcoder_3_python_3(self):
@@ -260,7 +260,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'cpython'
         expected = ['3023']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_atcoder_3_pypy_2(self):
@@ -274,7 +274,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'pypy'
         expected = ['3509']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_atcoder_3_pypy_3(self):
@@ -285,7 +285,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'pypy'
         expected = ['3510']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_atcoder_4_python_3(self):
@@ -296,7 +296,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'cpython'
         expected = ['4006']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_atcoder_4_pypy_2(self):
@@ -310,7 +310,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'pypy'
         expected = ['4046']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_atcoder_4_pypy_3(self):
@@ -321,7 +321,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'pypy'
         expected = ['4047']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_codeforces_python_2(self):
@@ -335,7 +335,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'cpython'
         expected = ['7']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_codeforces_python_3(self):
@@ -346,7 +346,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'cpython'
         expected = ['31']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_codeforces_pypy_2(self):
@@ -360,7 +360,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'pypy'
         expected = ['40']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
     def test_codeforces_pypy_3(self):
@@ -371,7 +371,7 @@ class LanguageGuessingPythonTest(unittest.TestCase):
         python_interpreter = 'pypy'
         expected = ['41']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict, python_version=python_version, python_interpreter=python_interpreter), expected)
 
 
@@ -382,7 +382,7 @@ class LanguageGuessingOthersTest(unittest.TestCase):
         code = 'fn main() { println!("Hello, world!"); }\n'
         expected = ['3504']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict), expected)
 
     def test_atcoder_4_fsharp(self):
@@ -391,7 +391,7 @@ class LanguageGuessingOthersTest(unittest.TestCase):
         code = 'open System\nprintfn "Hello, world!"\n'
         expected = ['4022', '4023']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict), expected)
 
     def test_codeforces_haskell(self):
@@ -400,5 +400,5 @@ class LanguageGuessingOthersTest(unittest.TestCase):
         code = 'main = return ()\n'
         expected = ['12']
 
-        language_dict = {language.id: {'description': language.name} for language in languages}  # type: Dict[LanguageId, Dict[str, str]]
+        language_dict = {language.id: language.name for language in languages}  # type: Dict[LanguageId, str]
         self.assertEqual(submit.guess_lang_ids_of_file(filename=pathlib.Path(filename), code=code.encode(), language_dict=language_dict), expected)
