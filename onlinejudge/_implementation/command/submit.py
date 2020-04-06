@@ -156,12 +156,45 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
     return result
 
 
-def parse_python_version(description: str) -> Optional[int]:
+def is_cplusplus_description(description: str) -> bool:
+    return 'c++' in description.lower() or 'g++' in description.lower()
+
+
+def parse_cplusplus_compiler(description: str) -> str:
     """
-    :param description: must contain ``python`` or ``pypy`` as a substring
+    :param description: must be for C++
     """
 
-    assert 'python' in description.lower() or 'pypy' in description.lower()
+    assert is_cplusplus_description(description)
+    if 'clang' in description.lower():
+        return 'clang'
+    if 'gcc' in description.lower() or 'g++' in description.lower():
+        return 'gcc'
+    return 'gcc'  # by default
+
+
+def parse_cplusplus_version(description: str) -> Optional[str]:
+    """
+    :param description: must be for C++
+    """
+
+    assert is_cplusplus_description(description)
+    match = re.search(r'[CG]\+\+\s?(\d\w)\b', description)
+    if match:
+        return match.group(1)
+    return None
+
+
+def is_python_description(description: str) -> bool:
+    return 'python' in description.lower() or 'pypy' in description.lower()
+
+
+def parse_python_version(description: str) -> Optional[int]:
+    """
+    :param description: must be for Python
+    """
+
+    assert is_python_description(description)
     match = re.match(r'([23])\.(?:\d+(?:\.\d+)?|x)', description)
     if match:
         return int(match.group(1))
@@ -171,13 +204,23 @@ def parse_python_version(description: str) -> Optional[int]:
     return None
 
 
+def parse_python_interpreter(description: str) -> str:
+    """
+    :param description: must be for Python
+    """
+
+    assert is_python_description(description)
+    if 'pypy' in description.lower():
+        return 'pypy'
+    else:
+        return 'cpython'
+
+
 def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
     assert cxx_compiler.lower() in ('gcc', 'clang', 'all')
     assert python_version.lower() in ('2', '3', 'auto', 'all')
     assert python_interpreter.lower() in ('cpython', 'pypy', 'all')
 
-    select_words = (lambda words, lang_ids, **kwargs: select_ids_of_matched_languages(words, lang_ids, language_dict=language_dict, **kwargs))
-    select = (lambda word, lang_ids, **kwargs: select_words([word], lang_ids, **kwargs))
     ext = filename.suffix
     lang_ids = language_dict.keys()
 
@@ -187,62 +230,57 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
     if ext in ('cpp', 'cxx', 'cc', 'C'):
         log.debug('language guessing: C++')
         # memo: https://stackoverflow.com/questions/1545080/c-code-file-extension-cc-vs-cpp
-        lang_ids = list(set(select('c++', lang_ids) + select('g++', lang_ids)))
+        lang_ids = list(filter(lambda lang_id: is_cplusplus_description(language_dict[lang_id]['description']), lang_ids))
         if not lang_ids:
             return []
         log.debug('all lang ids for C++: %s', lang_ids)
 
         # compiler
-        select_gcc = lambda ids: list(set(select('gcc', ids) + select('clang', select('g++', ids), remove=True)))
-        if select_gcc(lang_ids) and select('clang', lang_ids):
+        found_gcc = False
+        found_clang = False
+        for lang_id in lang_ids:
+            compiler = parse_cplusplus_compiler(language_dict[lang_id]['description'])
+            if compiler == 'gcc':
+                found_gcc = True
+            elif compiler == 'clang':
+                found_clang = True
+        if found_gcc and found_clang:
             log.status('both GCC and Clang are available for C++ compiler')
             if cxx_compiler.lower() == 'gcc':
                 log.status('use: GCC')
-                lang_ids = select_gcc(lang_ids)
+                lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]['description']) in ('gcc', None), lang_ids))
             elif cxx_compiler.lower() == 'clang':
                 log.status('use: Clang')
-                lang_ids = select('clang', lang_ids)
+                lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]['description']) in ('clang', None), lang_ids))
             else:
                 assert cxx_compiler.lower() == 'all'
         log.debug('lang ids after compiler filter: %s', lang_ids)
 
         # version
         if cxx_latest:
-            saved_ids = lang_ids
+            saved_lang_ids = lang_ids
             lang_ids = []
-            for compiler in (None, 'gcc', 'clang'):  # use the latest for each compiler
-                version_of = {}
-                if compiler == 'gcc':
-                    ids = select_gcc(saved_ids)
-                elif compiler == 'clang':
-                    ids = select('clang', saved_ids)
-                else:
-                    ids = saved_ids
+            for compiler in ('gcc', 'clang'):  # use the latest for each compiler
+                ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]['description']) in (compiler, None), saved_lang_ids))
                 if not ids:
                     continue
-                for lang_id in ids:
-                    m = re.search(r'[cg]\+\+\w\w', language_dict[lang_id]['description'].lower())
-                    if m:
-                        version_of[lang_id] = m.group(0)
-                ids.sort(key=lambda lang_id: version_of.get(lang_id, ''))
+                ids.sort(key=lambda lang_id: parse_cplusplus_version(language_dict[lang_id]['description']) or '')
                 lang_ids += [ids[-1]]  # since C++11 < C++1y < ... as strings
-            lang_ids = list(set(lang_ids))
         log.debug('lang ids after version filter: %s', lang_ids)
 
         assert lang_ids
+        lang_ids = sorted(set(lang_ids))
         return lang_ids
 
     elif ext == 'py':
         log.debug('language guessing: Python')
-        if select('pypy', language_dict.keys()):
-            log.status('PyPy is available for Python interpreter')
 
         # interpreter
-        lang_ids = []
-        if python_interpreter.lower() in ('cpython', 'all'):
-            lang_ids += select('python', language_dict.keys())
-        elif python_interpreter.lower() in ('pypy', 'all') or not lang_ids:
-            lang_ids += select('pypy', language_dict.keys())
+        lang_ids = list(filter(lambda lang_id: is_python_description(language_dict[lang_id]['description']), lang_ids))
+        if any([parse_python_interpreter(language_dict[lang_id]['description']) == 'pypy' for lang_id in lang_ids]):
+            log.status('PyPy is available for Python interpreter')
+        if python_interpreter.lower() != 'all':
+            lang_ids = list(filter(lambda lang_id: parse_python_interpreter(language_dict[lang_id]['description']) == python_interpreter.lower(), lang_ids))
 
         # version
         three_found = False
@@ -277,7 +315,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             log.status('use: %s', ', '.join(map(str, versions)))
             lang_ids = list(filter(lambda lang_id: parse_python_version(language_dict[lang_id]['description']) in versions + [None], lang_ids))
 
-        lang_ids = list(set(lang_ids))
+        lang_ids = sorted(set(lang_ids))
         return lang_ids
 
     else:
@@ -329,8 +367,8 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         for data in table:
             if ext in data['exts']:
                 for name in data['names']:
-                    lang_ids += select(name, language_dict.keys(), split=data.get('split', False))
-        return list(set(lang_ids))
+                    lang_ids += select_ids_of_matched_languages([name], language_dict.keys(), language_dict=language_dict, split=data.get('split', False))
+        return sorted(set(lang_ids))
 
 
 def format_code(code: bytes, dos2unix: bool = False, rstrip: bool = False) -> bytes:
