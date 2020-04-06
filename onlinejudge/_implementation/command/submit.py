@@ -264,7 +264,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                 ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in (compiler, None), saved_lang_ids))
                 if not ids:
                     continue
-                ids.sort(key=lambda lang_id: parse_cplusplus_version(language_dict[lang_id]) or '')
+                ids.sort(key=lambda lang_id: (parse_cplusplus_version(language_dict[lang_id]) or '', language_dict[lang_id]))
                 lang_ids += [ids[-1]]  # since C++11 < C++1y < ... as strings
         log.debug('lang ids after version filter: %s', lang_ids)
 
