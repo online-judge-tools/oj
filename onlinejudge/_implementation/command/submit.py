@@ -157,6 +157,7 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
 
 
 def is_cplusplus_description(description: str) -> bool:
+    # Here, 'clang' is not used as intended. Think about strings like "C++ (Clang)", "Clang++" (this includes "g++" as a substring), or "C (Clang)".
     return 'c++' in description.lower() or 'g++' in description.lower()
 
 
