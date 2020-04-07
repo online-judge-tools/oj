@@ -1,5 +1,9 @@
 # Change Log
 
+## 9.1.1 / 2020-04-08
+
+-   [#718](https://github.com/kmyk/online-judge-tools/pull/718) fix a bug of `oj submit` about Python and the language update of AtCoder
+
 ## 9.1.0 / 2020-03-20
 
 -   [#704](https://github.com/kmyk/online-judge-tools/pull/704) improve error logs of `oj download` when files already exist
