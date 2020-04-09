@@ -1,7 +1,7 @@
 """
 the module for Google Code Jam and Google Kick Start (https://codingcompetitions.withgoogle.com/)
 
-.. versionadded:: 9.3.0
+.. versionadded:: 9.2.0
 """
 
 import base64
