@@ -1,5 +1,9 @@
 # Change Log
 
+## 9.2.0 / 2020-04-09
+
+-   [#715](https://github.com/kmyk/online-judge-tools/pull/715) add Google Code Jam support
+
 ## 9.1.1 / 2020-04-08
 
 -   [#718](https://github.com/kmyk/online-judge-tools/pull/718) fix a bug of `oj submit` about Python and the language update of AtCoder
