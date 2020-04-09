@@ -30,6 +30,7 @@ Tools for online judge services. Downloading sample cases, Testing/Submitting yo
     -   CodeChef
     -   Sphere online judge
     -   Facebook Hacker Cup
+    -   Google Code Jam
     -   Library Checker (<https://judge.yosupo.jp>)
 -   Download system test cases
     -   yukicoder
