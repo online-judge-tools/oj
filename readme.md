@@ -188,6 +188,8 @@ AtCoder Beginner Contest 118: B - Foods Loved by Everyone    kotatsugame  (37 by
     -   No. I have tried it once, but it is actually not so convenient and only increases the maintenance cost.
 -   I don't want to give my password to this program.
     -   This program stores only your session tokens. Use `oj login --use-brower=always ...` and read [onlinejudge/_implementation/command/login.py](https://github.com/kmyk/online-judge-tools/blob/master/onlinejudge/_implementation/command/login.py).
+-   Can I remove the delays and the `[y/N]` confirmation before submitting?
+    -   Yes, you can remove with options (see [#711](https://github.com/kmyk/online-judge-tools/issues/711)). However, please be careful not to make mistakes and get penalties.
 
 For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) [![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community) or other SNSs.
 
