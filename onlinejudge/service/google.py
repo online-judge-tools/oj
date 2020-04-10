@@ -61,7 +61,7 @@ class GoogleCodeJamProblem(onlinejudge.type.Problem):
         if self.domain == 'codingcompetitions.withgoogle.com':
             url = 'https://codejam.googleapis.com/dashboard/{}/poll?p=e30'.format(self.contest_id)
             resp = utils.request('GET', url, session=session)
-            data = json.loads(base64.urlsafe_b64decode(resp.content + b'=' * ((-len(resp.content)) % 3)).decode())
+            data = json.loads(base64.urlsafe_b64decode(resp.content + b'=' * ((-len(resp.content)) % 4)).decode())
             log.debug('%s', data)
 
             # parse JSON
