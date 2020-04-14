@@ -34,7 +34,7 @@ class SampleZipper(object):
 
     def get(self) -> List[TestCase]:
         if self._dangling is not None:
-            log.error('dangling sample string: %s', self._dangling[1])
+            log.error('cannot find sample output: %s', self._dangling[1])
             raise SampleParseError
         return self._testcases
 
