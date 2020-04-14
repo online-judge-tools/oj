@@ -650,16 +650,14 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
         for pre in soup.find(id='task-statement').find_all('pre'):
             log.debug('pre tag: %s', str(pre))
 
-            # the standard format: #task-statement h3+pre
-            # used by AtCoder's JavaScript, sometimes used with .prettyprint
-            # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
-            # NOTE: The AtCoder's JavaScript (at https://atcoder.jp/public/js/contest.js?v=201911110917 version) supports:
-            #     -   "#task-statement h3+pre" format for Copy buttons of <h3> and <pre> tags
-            #     -   "pre.prettyprint" format for Copy buttons of <pre> tags
-            h3 = get_header(tag=pre.find_previous_sibling('h3'))
-            if h3:
-                yield (pre, h3)
-                continue
+            # a very old format: #task-statement p+pre.literal-block
+            # entirely unsupported by AtCoder's JavaScript
+            # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
+            if 'literal-block' in pre.attrs.get('class', []):
+                p = get_header(tag=pre.find_previous_sibling('p'))
+                if p:
+                    yield (pre, p)
+                    continue
 
             # a old format: #task-statement h3+section>pre:first-child
             # partially supported by AtCoder's JavaScript
@@ -672,14 +670,16 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
                     yield (pre, h3)
                     continue
 
-            # a very old format: #task-statement p+pre.literal-block
-            # entirely unsupported by AtCoder's JavaScript
-            # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
-            if 'literal-block' in pre.attrs.get('class', []):
-                p = get_header(tag=pre.find_previous_sibling('p'))
-                if p:
-                    yield (pre, p)
-                    continue
+            # the standard format: #task-statement h3+pre
+            # used by AtCoder's JavaScript, sometimes used with .prettyprint
+            # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
+            # NOTE: The AtCoder's JavaScript (at https://atcoder.jp/public/js/contest.js?v=201911110917 version) supports:
+            #     -   "#task-statement h3+pre" format for Copy buttons of <h3> and <pre> tags
+            #     -   "pre.prettyprint" format for Copy buttons of <pre> tags
+            h3 = get_header(tag=pre.find_previous_sibling('h3'))
+            if h3:
+                yield (pre, h3)
+                continue
 
     @classmethod
     def _parse_sample_cases(cls, soup: bs4.BeautifulSoup) -> List[onlinejudge.type.TestCase]:
