@@ -642,8 +642,11 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
     def _find_sample_tags(cls, soup: bs4.BeautifulSoup) -> Iterator[Tuple[bs4.Tag, bs4.Tag]]:
         expected_strings = ('入力例', '出力例', 'Sample Input', 'Sample Output')
 
-        def get_header(tag):
-            if tag and tag.string and any(s in tag.string for s in expected_strings):
+        def get_header(tag, expected_tag_name, ignore_tag_names):
+            assert not (expected_tag_name in ignore_tag_names)
+            while tag and tag.name in ignore_tag_names:
+                tag = tag.previous_sibling
+            if tag and tag.name == expected_tag_name and tag.string and any(s in tag.string for s in expected_strings):
                 return tag
             return None
 
@@ -652,9 +655,10 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
 
             # a very old format: #task-statement p+pre.literal-block
             # entirely unsupported by AtCoder's JavaScript
+            # NOTE: h3+p+pre.literal-block can be regarded as the standard format, so firstly check a very old format.
             # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
             if 'literal-block' in pre.attrs.get('class', []):
-                p = get_header(tag=pre.find_previous_sibling('p'))
+                p = get_header(tag=pre.previous_sibling, expected_tag_name='p', ignore_tag_names=('br'))
                 if p:
                     yield (pre, p)
                     continue
@@ -665,7 +669,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             # NOTE: The format "h3+section>pre.prettyprint" sometimes cause false-negative. e.g. https://atcoder.jp/contests/tdpc/tasks/tdpc_fibonacci
             # example: https://atcoder.jp/contests/abc003/tasks/abc003_4
             if pre.find_previous_sibling() is None and pre.parent.name == 'section':
-                h3 = get_header(tag=pre.parent.find_previous_sibling('h3'))
+                h3 = get_header(tag=pre.parent.previous_sibling, expected_tag_name='h3', ignore_tag_names=('br', 'p'))
                 if h3:
                     yield (pre, h3)
                     continue
@@ -676,7 +680,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             # NOTE: The AtCoder's JavaScript (at https://atcoder.jp/public/js/contest.js?v=201911110917 version) supports:
             #     -   "#task-statement h3+pre" format for Copy buttons of <h3> and <pre> tags
             #     -   "pre.prettyprint" format for Copy buttons of <pre> tags
-            h3 = get_header(tag=pre.find_previous_sibling('h3'))
+            h3 = get_header(tag=pre.previous_sibling, expected_tag_name='h3', ignore_tag_names=('br', 'p'))
             if h3:
                 yield (pre, h3)
                 continue
