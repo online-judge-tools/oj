@@ -654,18 +654,18 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
             log.debug('pre tag: %s', str(pre))
 
             # a very old format: #task-statement p+pre.literal-block
-            # between <p> and <pre class="literal-block">, text and <br> are ignored
+            # between <p> and <pre class="literal-block">, ignore text and <br>
             # entirely unsupported by AtCoder's JavaScript
             # NOTE: h3+p+pre.literal-block can be regarded as the standard format, so FIRSTLY check a very old format.
             # example: https://atcoder.jp/contests/utpc2011/tasks/utpc2011_1
             if 'literal-block' in pre.attrs.get('class', []):
-                p = get_header(tag=pre.find_previous_sibling(), expected_tag_name='p', ignore_tag_names=('br', ))
+                p = get_header(tag=pre.find_previous_sibling(), expected_tag_name='p', ignore_tag_names=('br',))
                 if p:
                     yield (pre, p)
                     continue
 
             # a old format: #task-statement h3+section>pre:first-child
-            # between <h3> and <section>, text, <br> and <p> are ignored
+            # between <h3> and <section>, ignore text, <br> and <p>
             # partially supported by AtCoder's JavaScript
             # NOTE: The relaxed format "#task-statement h3+section>pre" may cause false-positive. e.g. https://atcoder.jp/contests/abc003/tasks/abc003_4
             # NOTE: The format "h3+section>pre.prettyprint" sometimes cause false-negative. e.g. https://atcoder.jp/contests/tdpc/tasks/tdpc_fibonacci
@@ -677,7 +677,7 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
                     continue
 
             # the standard format: #task-statement h3+pre
-            # between <h3> and <pre>, text, <p> and <br> are ignored
+            # between <h3> and <pre>, ignore text, <br> and <p>
             # used by AtCoder's JavaScript, sometimes used with .prettyprint
             # example: https://atcoder.jp/contests/abc114/tasks/abc114_d
             # NOTE: The AtCoder's JavaScript (at https://atcoder.jp/public/js/contest.js?v=201911110917 version) supports:
