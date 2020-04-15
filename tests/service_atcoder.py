@@ -495,6 +495,11 @@ class AtCoderProblemDataTest(unittest.TestCase):
             TestCase(name='sample-6', input_name='Sample Input 6', input_data=b'2\n1 2\n', output_name='Sample Output 6', output_data=b'1.0\n1.0\n'),
         ])
 
+    def test_download_sample_cases_ttpc2015_inserted_p_tag(self):
+        self.assertEqual(AtCoderProblem.from_url('https://atcoder.jp/contests/ttpc2015/tasks/ttpc2015_i').download_sample_cases(), [
+            TestCase(name='sample-1', input_name='入力例1', input_data=b'5\n4 2 3 1 5\n', output_name='出力例1', output_data=b'3\n2 4\n1 2\n2 4\n'),
+        ])
+
 
 class AtCoderProblemGetInputFormatTest(unittest.TestCase):
     def test_normal(self):
