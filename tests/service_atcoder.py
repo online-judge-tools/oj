@@ -495,7 +495,7 @@ class AtCoderProblemDataTest(unittest.TestCase):
             TestCase(name='sample-6', input_name='Sample Input 6', input_data=b'2\n1 2\n', output_name='Sample Output 6', output_data=b'1.0\n1.0\n'),
         ])
 
-    @unittext.expectedFailure
+    @unittest.expectedFailure
     def test_download_sample_cases_ttpc2015_inserted_p_tag(self):
         # see: https://github.com/kmyk/online-judge-tools/pull/724
         # see: https://github.com/kmyk/online-judge-tools/issues/726
