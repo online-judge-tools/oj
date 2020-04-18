@@ -319,8 +319,10 @@ class CodeforcesProblem(onlinejudge.type.Problem):
         samples = onlinejudge._implementation.testcase_zipper.SampleZipper()
         for tag in soup.find_all('div', class_=re.compile('^(in|out)put$')):  # Codeforces writes very nice HTML :)
             log.debug('tag: %s', str(tag))
-            assert len(list(tag.children)) == 2  # if not 2, next line throws ValueError.
-            title, pre = list(tag.children)
+            non_empty_children = [child for child in tag.children if type(child) is not bs4.element.NavigableString]
+            log.debug("tags after removing bs4.element.NavigableString: %s", non_empty_children)
+            assert len(non_empty_children) == 2  # if not 2, next line throws ValueError.
+            title, pre = list(non_empty_children)
             assert 'title' in title.attrs['class']
             assert pre.name == 'pre'
             s = utils.parse_content(pre)
