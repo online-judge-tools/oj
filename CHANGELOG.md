@@ -3,6 +3,7 @@
 ## 9.2.1 / 2020-04-19
 
 -   [#728](https://github.com/kmyk/online-judge-tools/pull/728) fix new errors of `oj download` on Codeforces ([@njkevlani](https://github.com/njkevlani))
+-   [#725](https://github.com/kmyk/online-judge-tools/pull/725) improve an error message for failure of downloading sample cases ([@kotatsugame](https://github.com/kotatsugame))
 
 ## 9.2.0 / 2020-04-09
 
