@@ -1,5 +1,9 @@
 # Change Log
 
+## 9.2.1 / 2020-04-19
+
+-   [#728](https://github.com/kmyk/online-judge-tools/pull/728) fix new errors of `oj download` on Codeforces ([@njkevlani](https://github.com/njkevlani))
+
 ## 9.2.0 / 2020-04-09
 
 -   [#715](https://github.com/kmyk/online-judge-tools/pull/715) add Google Code Jam support
