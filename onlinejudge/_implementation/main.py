@@ -148,7 +148,7 @@ tips:
     subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
 
     # generate output
-    subparser = subparsers.add_parser('generate-output', aliases=['g/o'], help='generate output files form input and reference implementation', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+    subparser = subparsers.add_parser('generate-output', aliases=['g/o'], help='generate output files from input and reference implementation', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 format string for --format:
   %s                    name
   %e                    extension: "in" or "out"
@@ -167,7 +167,7 @@ tips:
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
 
     # generate input
-    subparser = subparsers.add_parser('generate-input', aliases=['g/i'], help='generate input files form given generator', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+    subparser = subparsers.add_parser('generate-input', aliases=['g/i'], help='generate input files from given generator', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
 format string for --format:
   %s                    name
   %e                    extension: "in" or "out"
