@@ -155,18 +155,16 @@ However, there are some areas that are not covered due to the difficulty of test
 
 ## deployment
 
-Travis CI から PyPI 上へ upload を仕掛けるように設定されています。
+GitHub Actions から PyPI 上へ upload を仕掛けるように設定されています。
 
 手順:
 
 1.  `onlinejudge/__about__.py` 中の `__version_info__` の値を bump して commit する
     -   このとき同時に `CHANGELOG.md` も修正する
     -   メンテナ以外のコントリビュータからpull requests をもらっていた場合は、その作成者の名前を `CHANGELOG.md` に併記する
-2.  `v0.1.23` の形で Git tag を打って GitHub 上へ push する
+2.  GitHub release のページから release を生成する
     -   これにより Travis CI の機能が呼び出され PyPI への upload がなされる
-    -   これにより AppVeyor の機能が呼び出され GitHub release の生成とその assets への実行ファイル `oj.exe` の追加がなされる
-3.  GitHub release のページから、生成された release を編集して説明文を加える
-    -   `CHANGELOG.md` に書いたものをコピペするとよい
+    -   説明文には `CHANGELOG.md` に書いたものをコピペする
 
 ## how to add a new contest platform / 対応サービスの追加の手順
 

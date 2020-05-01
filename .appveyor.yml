@@ -4,8 +4,6 @@ environment:
   matrix:
     - PYTHON: C:\Python35
     - PYTHON: C:\Python36-x64
-    - PYTHON: C:\Python36-x64
-      TEST_OJ_EXE: dist\oj.exe  # for unit tests
 
 install:
   # Prepend newly installed Python to the PATH of this build (this cannot be
@@ -18,27 +16,7 @@ install:
   # about it being out of date.
   - python -m pip install --upgrade pip
   - pip install --upgrade setuptools
-  - pip install pyinstaller
   - pip install -e .[dev,docs]
-  - pyinstaller --name oj --onefile onlinejudge\_implementation\main.py
 
 test_script:
   - ps: pytest -v $(dir tests/*.py | % {$_.FullName})
-  - dist\oj.exe --version
-
-artifacts:
-  - path: dist\oj.exe
-    name: oj_exe
-
-deploy:
-  release: $(APPVEYOR_REPO_TAG_NAME)
-  provider: GitHub
-  auth_token:
-    secure: z5/wB9Or6BhMxAJ2vh31xOtI2REiETaYMykjvsp1D9mqruhzCtlyeiGHPUxAEI0T
-  artifact: oj_exe
-  force_update: true
-  draft: false
-  on:
-    appveyor_repo_tag: true
-    branch: master
-    TEST_OJ_EXE: dist\oj.exe
