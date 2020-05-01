@@ -87,6 +87,6 @@ class CodeforcesProblemTest(unittest.TestCase):
         data = problem.download_data()
         self.assertEqual(data.name, 'Almost All')
         self.assertEqual(data.points, 2000)
-        self.assertEqual(data.rating, 2800)
+        self.assertEqual(data.rating, 2700)
         self.assertEqual(data.tags, ['constructive algorithms', 'trees'])
         self.assertEqual(data.type, 'PROGRAMMING')

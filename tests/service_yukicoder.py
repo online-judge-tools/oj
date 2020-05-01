@@ -140,10 +140,6 @@ class YukicoderOfficialAPITest(unittest.TestCase):
         self.assertEqual(data['Id'], 10)
         self.assertEqual(data['Name'], 'yuki2006')
 
-    def test_get_user_0(self):
-        data = YukicoderService().get_user(id=0)
-        self.assertIsNone(data)
-
     def test_get_solved_10(self):
         data = YukicoderService().get_solved(id=10)
         self.assertGreater(len(data), 200)
