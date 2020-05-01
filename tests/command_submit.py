@@ -4,9 +4,9 @@ import unittest
 
 import requests.exceptions
 import tests.utils
+from onlinejudge_command.main import get_parser
+from onlinejudge_command.subcommand.submit import submit
 
-from onlinejudge._implementation.command.submit import submit
-from onlinejudge._implementation.main import get_parser
 from onlinejudge.service.atcoder import AtCoderService
 from onlinejudge.service.codeforces import CodeforcesService
 from onlinejudge.service.hackerrank import HackerRankService

@@ -6,17 +6,18 @@ import sys
 import traceback
 from typing import List, Optional
 
+import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
+from onlinejudge_command.subcommand.download import download
+from onlinejudge_command.subcommand.generate_input import generate_input
+from onlinejudge_command.subcommand.generate_output import generate_output
+from onlinejudge_command.subcommand.login import login
+from onlinejudge_command.subcommand.submit import submit
+from onlinejudge_command.subcommand.test import test
+from onlinejudge_command.subcommand.test_reactive import test_reactive
+
 import onlinejudge
 import onlinejudge.__about__ as version
-import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
-from onlinejudge._implementation.command.download import download
-from onlinejudge._implementation.command.generate_input import generate_input
-from onlinejudge._implementation.command.generate_output import generate_output
-from onlinejudge._implementation.command.login import login
-from onlinejudge._implementation.command.submit import submit
-from onlinejudge._implementation.command.test import test
-from onlinejudge._implementation.command.test_reactive import test_reactive
 
 
 def version_check() -> None:

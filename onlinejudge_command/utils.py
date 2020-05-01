@@ -2,12 +2,10 @@
 import contextlib
 import datetime
 import distutils.version
-import functools
 import http.client
-import http.cookiejar
 import json
 import os
-import posixpath
+import pathlib
 import re
 import shlex
 import shutil
@@ -16,98 +14,28 @@ import subprocess
 import sys
 import tempfile
 import time
-import urllib.parse
 from typing import *
 from typing.io import *
 
-import bs4
+import onlinejudge_command.logging as log
+import requests
 
 import onlinejudge.__about__ as version
 import onlinejudge.utils
 from onlinejudge.type import *
-from onlinejudge.utils import *  # re-export
 
-new_session_with_our_user_agent = onlinejudge.utils._new_session_with_our_user_agent
-html_parser = 'lxml'
-
-
-def describe_status_code(status_code: int) -> str:
-    return '{} {}'.format(status_code, http.client.responses[status_code])
+user_data_dir = onlinejudge.utils.user_data_dir
+user_cache_dir = onlinejudge.utils.user_cache_dir
+default_cookie_path = onlinejudge.utils.default_cookie_path
 
 
-def previous_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
-    tag = tag.previous_sibling
-    while tag and not isinstance(tag, bs4.Tag):
-        tag = tag.previous_sibling
-    return tag
-
-
-def next_sibling_tag(tag: bs4.Tag) -> bs4.Tag:
-    tag = tag.next_sibling
-    while tag and not isinstance(tag, bs4.Tag):
-        tag = tag.next_sibling
-    return tag
-
-
-# remove all HTML tag without interpretation (except <br>)
-# remove all comment
-# using DFS(Depth First Search)
-# discussed in https://github.com/kmyk/online-judge-tools/issues/553
-def parse_content(parent: Union[bs4.NavigableString, bs4.Tag, bs4.Comment]) -> bs4.NavigableString:
-    res = ''
-    if isinstance(parent, bs4.Comment):
-        pass
-    elif isinstance(parent, bs4.NavigableString):
-        return parent
-    else:
-        children = parent.contents
-        if len(children) == 0:
-            html_tag = str(parent)
-            return bs4.NavigableString('\n') if 'br' in html_tag else bs4.NavigableString('')
-        else:
-            for child in children:
-                res += parse_content(child)
-    return bs4.NavigableString(res)
-
-
-class FormSender(object):
-    def __init__(self, form: bs4.Tag, url: str):
-        assert isinstance(form, bs4.Tag)
-        assert form.name == 'form'
-        self.form = form
-        self.url = url
-        self.payload = {}  # type: Dict[str, str]
-        self.files = {}  # type: Dict[str, IO[Any]]
-        for input in self.form.find_all('input'):
-            log.debug('input: %s', str(input))
-            if input.attrs.get('type') in ['checkbox', 'radio']:
-                continue
-            if 'name' in input.attrs and 'value' in input.attrs:
-                self.payload[input['name']] = input['value']
-
-    def set(self, key: str, value: str) -> None:
-        self.payload[key] = value
-
-    def get(self) -> Dict[str, str]:
-        return self.payload
-
-    def set_file(self, key: str, filename: str, content: bytes) -> None:
-        self.files[key] = (filename, content)  # type: ignore
-
-    def unset(self, key: str) -> None:
-        del self.payload[key]
-
-    def request(self, session: requests.Session, method: str = None, action: Optional[str] = None, raise_for_status: bool = True, **kwargs) -> requests.Response:
-        if method is None:
-            method = self.form['method'].upper()
-        url = urllib.parse.urljoin(self.url, action)
-        action = action or self.form['action']
-        log.debug('payload: %s', str(self.payload))
-        return request(method, url, session=session, raise_for_status=raise_for_status, data=self.payload, files=self.files, **kwargs)
-
-
-def dos2unix(s: str) -> str:
-    return s.replace('\r\n', '\n')
+@contextlib.contextmanager
+def new_session_with_our_user_agent(*, path: pathlib.Path) -> Iterator[requests.Session]:
+    session = requests.Session()
+    session.headers['User-Agent'] = '{}/{} (+{})'.format(version.__package_name__, version.__version__, version.__url__)
+    log.debug('User-Agent: %s', session.headers['User-Agent'])
+    with onlinejudge.utils.with_cookiejar(session, path=path) as session:
+        yield session
 
 
 def textfile(s: str) -> str:  # should have trailing newline
@@ -174,15 +102,8 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
     return info, proc
 
 
-# We should use this instead of posixpath.normpath
-# posixpath.normpath doesn't collapse a leading duplicated slashes. see: https://stackoverflow.com/questions/7816818/why-doesnt-os-normpath-collapse-a-leading-double-slash
-
-
-def normpath(path: str) -> str:
-    path = posixpath.normpath(path)
-    if path.startswith('//'):
-        path = '/' + path.lstrip('/')
-    return path
+def describe_status_code(status_code: int) -> str:
+    return '{} {}'.format(status_code, http.client.responses[status_code])
 
 
 def request(method: str, url: str, session: requests.Session, raise_for_status: bool = True, **kwargs) -> requests.Response:
@@ -239,63 +160,12 @@ def is_update_available_on_pypi() -> bool:
     return a < b
 
 
-def remove_prefix(s: str, prefix: str) -> str:
-    assert s.startswith(prefix)
-    return s[len(prefix):]
-
-
 def remove_suffix(s: str, suffix: str) -> str:
     assert s.endswith(suffix)
     return s[:-len(suffix)]
 
 
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
-
-
-def getter_with_load_details(name: str, type: Union[str, type]) -> Callable:
-    """
-    :note: confirm that the type annotation `get_foo = getter_with_load_details("_foo", type=int)  # type: Callable[..., int]` is correct one
-    :note: this cannot be a decorator, since mypy fails to recognize the types
-
-    This functions is bad one, but I think
-
-        get_foo = getter_with_load_details("_foo", type=int)  # type: Callable[..., int]
-
-    is better than
-
-        def get_foo(self, session: Optional[requests.Session] = None) -> int:
-            if self._foo is None:
-                self._load_details(session=session)
-                assert self._foo is not None
-            return self._foo
-
-    Of course the latter is better when it is used only once, but the former is better when the pattern is repeated.
-    """
-    @functools.wraps(lambda self: getattr(self, name))
-    def wrapper(self, session: Optional[requests.Session] = None):
-        if getattr(self, name) is None:
-            assert session is None or isinstance(session, requests.Session)
-            self._load_details(session=session)
-        return getattr(self, name)
-
-    # add documents
-    assert type is not None
-    py_class = lambda s: ':py:class:`{}`'.format(s)
-    if isinstance(type, str):
-        if type.count('[') == 0:
-            rst = py_class(type)
-        elif type.count('[') == 1:
-            a, b = remove_suffix(type, ']').split('[')
-            rst = '{} [ {} ]'.format(py_class(a), py_class(b))
-        else:
-            assert False
-    elif type in (int, float, str, bytes, datetime.datetime, datetime.timedelta):
-        rst = py_class(type.__name__)
-    else:
-        assert False
-    wrapper.__doc__ = ':return: {}'.format(rst)
-
-    return wrapper
 
 
 def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
@@ -352,28 +222,3 @@ def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: 
     candidates += snip_line_based()
     candidates += snip_char_based()
     return min(candidates, key=len)
-
-
-class DummySubmission(Submission):
-    def __init__(self, url: str, problem: Problem):
-        self.url = url
-        self.problem = problem
-
-    def download_code(self, session: Optional[requests.Session] = None) -> bytes:
-        raise NotImplementedError
-
-    def get_url(self) -> str:
-        return self.url
-
-    def download_problem(self, *, session: Optional[requests.Session] = None) -> Problem:
-        raise NotImplementedError
-
-    def get_service(self) -> Service:
-        raise NotImplementedError
-
-    def __repr__(self) -> str:
-        return '{}({}, problem={})'.format(self.__class__, self.url, self.problem)
-
-    @classmethod
-    def from_url(cls, s: str) -> Optional[Submission]:
-        return None

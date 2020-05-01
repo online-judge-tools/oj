@@ -6,10 +6,11 @@ import time
 import webbrowser
 from typing import *
 
+import onlinejudge_command.download_history
+import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
+
 import onlinejudge
-import onlinejudge._implementation.download_history
-import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
 from onlinejudge.type import *
 
 if TYPE_CHECKING:
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 
 def submit(args: 'argparse.Namespace') -> None:
     # guess url
-    history = onlinejudge._implementation.download_history.DownloadHistory()
+    history = onlinejudge_command.download_history.DownloadHistory()
     if args.file.parent.resolve() == pathlib.Path.cwd():
         guessed_urls = history.get()
     else:
@@ -51,7 +52,7 @@ def submit(args: 'argparse.Namespace') -> None:
     log.info('code (%d byte):', len(code))
     log.emit(utils.make_pretty_large_file_content(code, limit=30, head=10, tail=10, bold=True))
 
-    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
+    with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
         # guess or select language ids
         language_dict = {language.id: language.name for language in problem.get_available_languages(session=sess)}  # type: Dict[LanguageId, str]
         matched_lang_ids = None  # type: Optional[List[str]]
