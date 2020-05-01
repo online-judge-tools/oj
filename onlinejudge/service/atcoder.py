@@ -725,7 +725,9 @@ class AtCoderProblemDetailedData(AtCoderProblemData):
         select = form.find('div', id='select-lang').find('select', attrs={'name': 'data.LanguageId'})  # NOTE: AtCoder can vary languages depending on tasks, even in one contest. here, ignores this fact.
         languages = []  # type: List[Language]
         for option in select.find_all('option'):
-            languages += [Language(option.attrs['value'], option.string)]
+            # As of May 1st 2020, the first option does not have a value element.
+            if 'value' in option.attrs:
+                languages += [Language(option.attrs['value'], option.string)]
         return languages
 
     @classmethod
