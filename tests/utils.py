@@ -29,6 +29,7 @@ def prepare_files(files):
 @contextlib.contextmanager
 def sandbox(files):
     with tempfile.TemporaryDirectory() as tempdir:
+        tempdir = str(pathlib.Path(tempdir).resolve())  # to expand paths like "C:\PROGRA~1" on Windows
         with chdir(tempdir):
             prepare_files(files)
             yield tempdir
