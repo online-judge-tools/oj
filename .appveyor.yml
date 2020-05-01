@@ -20,4 +20,3 @@ install:
 
 test_script:
   - ps: pytest -v $(dir tests/*.py | % {$_.FullName})
-  - dist\oj.exe --version
