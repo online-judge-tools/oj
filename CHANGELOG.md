@@ -1,5 +1,10 @@
 # Change Log
 
+## 9.2.2 / 2020-05-01
+
+-   [#739](https://github.com/kmyk/online-judge-tools/pull/739) follow the update of the submission form of AtCoder ([@serihiro](https://github.com/serihiro))
+-   [#731](https://github.com/kmyk/online-judge-tools/pull/731) fix typos in messages in `--help` ([@cgschu1tz](https://github.com/cgschu1tz))
+
 ## 9.2.1 / 2020-04-19
 
 -   [#728](https://github.com/kmyk/online-judge-tools/pull/728) fix new errors of `oj download` on Codeforces ([@njkevlani](https://github.com/njkevlani))
