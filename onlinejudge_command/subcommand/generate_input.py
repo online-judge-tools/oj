@@ -8,9 +8,9 @@ import pathlib
 import threading
 from typing import *
 
-import onlinejudge._implementation.format_utils as fmtutils
-import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
+import onlinejudge_command.format_utils as fmtutils
+import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
 
 
 @contextlib.contextmanager

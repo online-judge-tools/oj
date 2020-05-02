@@ -7,7 +7,7 @@ import re
 import sys
 from typing import Dict, Generator, List, Match, Optional, Set
 
-import onlinejudge._implementation.logging as log
+import onlinejudge_command.logging as log
 
 
 def percentsplit(s: str) -> Generator[str, None, None]:

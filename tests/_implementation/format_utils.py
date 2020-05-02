@@ -1,6 +1,6 @@
 import unittest
 
-from onlinejudge._implementation.format_utils import *
+from onlinejudge_command.format_utils import *
 
 
 class PercentFormatTest(unittest.TestCase):

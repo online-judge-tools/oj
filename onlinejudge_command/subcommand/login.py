@@ -6,11 +6,11 @@ import sys
 import time
 from typing import *
 
+import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
 import requests
 
 import onlinejudge
-import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
 
 if TYPE_CHECKING:
     import argparse
@@ -86,7 +86,7 @@ def login(args: 'argparse.Namespace') -> None:
     if service is None:
         sys.exit(1)
 
-    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as session:
+    with utils.new_session_with_our_user_agent(path=args.cookie) as session:
 
         if is_logged_in_with_message(service, session=session):
             return

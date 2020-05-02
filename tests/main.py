@@ -1,6 +1,6 @@
 import unittest
 
-from onlinejudge._implementation import main
+from onlinejudge_command import main
 
 
 class RequestExceptionTest(unittest.TestCase):

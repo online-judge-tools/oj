@@ -5,9 +5,10 @@ import time
 import traceback
 from typing import *
 
+import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
+
 import onlinejudge
-import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
 import onlinejudge.type
 
 

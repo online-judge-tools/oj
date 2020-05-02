@@ -17,10 +17,9 @@ import traceback
 from typing import *
 
 import diff_match_patch
-
-import onlinejudge._implementation.format_utils as fmtutils
-import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
+import onlinejudge_command.format_utils as fmtutils
+import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
 
 if TYPE_CHECKING:
     import argparse

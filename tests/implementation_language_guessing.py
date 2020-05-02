@@ -2,7 +2,8 @@ import pathlib
 import textwrap
 import unittest
 
-import onlinejudge._implementation.command.submit as submit
+import onlinejudge_command.subcommand.submit as submit
+
 from onlinejudge.type import Language, LanguageId
 
 # https://atcoder.jp/contests/language-test-ver1

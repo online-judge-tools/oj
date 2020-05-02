@@ -4,13 +4,13 @@ import os
 import pathlib
 from typing import *
 
+import onlinejudge_command.download_history
+import onlinejudge_command.format_utils as format_utils
+import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
 import requests.exceptions
 
 import onlinejudge
-import onlinejudge._implementation.download_history
-import onlinejudge._implementation.format_utils as format_utils
-import onlinejudge._implementation.logging as log
-import onlinejudge._implementation.utils as utils
 import onlinejudge.type
 from onlinejudge.service.yukicoder import YukicoderProblem
 
@@ -39,7 +39,7 @@ def download(args: 'argparse.Namespace') -> None:
         args.format = '%b.%e'
 
     # get samples from the server
-    with utils.with_cookiejar(utils.new_session_with_our_user_agent(), path=args.cookie) as sess:
+    with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
         if args.yukicoder_token and isinstance(problem, YukicoderProblem):
             sess.headers['Authorization'] = 'Bearer {}'.format(args.yukicoder_token)
         if args.system:
@@ -52,7 +52,7 @@ def download(args: 'argparse.Namespace') -> None:
 
     # append the history for submit command
     if not args.dry_run and is_default_format:
-        history = onlinejudge._implementation.download_history.DownloadHistory()
+        history = onlinejudge_command.download_history.DownloadHistory()
         history.add(problem)
 
     # prepare files to write

@@ -2,9 +2,8 @@ import hashlib
 import os
 
 import tests.utils
-
-from onlinejudge._implementation.command.download import download
-from onlinejudge._implementation.main import get_parser
+from onlinejudge_command.main import get_parser
+from onlinejudge_command.subcommand.download import download
 
 
 def get_files_from_json(samples):
