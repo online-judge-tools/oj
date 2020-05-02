@@ -181,7 +181,7 @@ Long version:
 1.  register the module to the `onlinejudge/service/__init__.py`
 1.  write tests for your platform
     -   You should make `tests/command_download_${NAME}.py` and/or append to `tests/command_submit.py`. Please see other existing tests.
-1.  update `readme.md` (Add Features description)
+1.  update `README.md` (Add Features description)
 
 ## detailed description of philosophy of design / 設計の方針の詳しい説明
 
