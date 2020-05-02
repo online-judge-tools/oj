@@ -145,6 +145,7 @@ class AOJProblem(onlinejudge.type.Problem):
         # example: https://onlinejudge.u-aizu.ac.jp/problems/CGL_3_B
         m = re.match(r'^/problems/(\w+)$', utils.normpath(result.path))
         if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'onlinejudge.u-aizu.ac.jp' \
                 and m:
             n = m.group(1)
             return cls(problem_id=n)
