@@ -16,43 +16,17 @@ Tools to help solving problems on various online judges. This automates download
 
 ## Features
 
--   Download sample cases (`oj download URL`)
-    -   AtCoder
-    -   yukicoder
-    -   Anarchy Golf
-    -   Codeforces
-    -   HackerRank
-    -   Aizu Online Judge
-    -   Aizu Online Judge (Arena)
-    -   CS Academy
-    -   PKU JudgeOnline
-    -   Kattis
-    -   Toph (Problem Archive)
-    -   CodeChef
-    -   Sphere online judge
-    -   Facebook Hacker Cup
-    -   Google Code Jam
-    -   Google Kick Start
-    -   Library Checker
--   Download system test cases (`oj download --system URL`)
-    -   yukicoder
-    -   Aizu Online Judge
-    -   HackerRank
-    -   Library Checker
--   Login (`oj login URL`)
-    -   AtCoder (with username and password)
-    -   Codeforces (with username and password)
-    -   all other services (via web browsers)
--   Submit your solution (`oj submit [URL] FILE`)
-    -   AtCoder
-    -   yukicoder
-    -   Codeforces
-    -   HackerRank
-    -   Toph (Problem Archive)
--   Test your solution (`oj test -c COMMAND`)
--   Test your solution for reactive problem (`oj test-reactive -c COMMAND JUDGE_COMMAND`)
--   Generate input files from generators (`oj generate-input GENERATOR_COMMAND`)
--   Generate output files from input and reference implementation (`oj generate-output -c COMMAND`)
+-   Download sample cases
+-   Download system test cases
+-   Login
+-   Submit your code
+-   Test your code
+-   Test your code for reactive problems
+-   Generate input files from generators
+-   Generate output files from input and reference implementation
+
+Many online judges (Codeforces, AtCoder, HackerRank, etc.) are supported.
+For details, see [the table of online-judge-tools/api-client](https://github.com/online-judge-tools/api-client#supported-websites).
 
 ## How to install
 
@@ -62,7 +36,7 @@ The package is <https://pypi.python.org/pypi/online-judge-tools> [![PyPI](https:
 $ pip3 install online-judge-tools
 ```
 
-For details, read [the FAQ](#faq).
+For detailed instructions, read [the FAQ](#faq).
 
 
 ## How to use
