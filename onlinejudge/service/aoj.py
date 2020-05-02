@@ -141,6 +141,15 @@ class AOJProblem(onlinejudge.type.Problem):
             n = m.group(5)
             return cls(problem_id=n)
 
+        # example: https://onlinejudge.u-aizu.ac.jp/problems/0423
+        # example: https://onlinejudge.u-aizu.ac.jp/problems/CGL_3_B
+        m = re.match(r'^/problems/(\w+)$', utils.normpath(result.path))
+        if result.scheme in ('', 'http', 'https') \
+                and result.netloc == 'onlinejudge.u-aizu.ac.jp' \
+                and m:
+            n = m.group(1)
+            return cls(problem_id=n)
+
         return None
 
     def get_service(self) -> AOJService:
