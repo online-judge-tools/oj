@@ -8,6 +8,7 @@ from typing import List, Optional
 
 import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
+import onlinejudge_command.update_checking as update_checking
 import onlinejudge_command.utils as utils
 from onlinejudge_command.subcommand.download import download
 from onlinejudge_command.subcommand.generate_input import generate_input
@@ -18,13 +19,6 @@ from onlinejudge_command.subcommand.test import test
 from onlinejudge_command.subcommand.test_reactive import test_reactive
 
 import onlinejudge.__about__ as api_version
-
-
-def version_check() -> None:
-    if utils.is_update_available_on_pypi():
-        log.warning('update available: %s -> %s', version.__version__, utils.get_latest_version_from_pypi())
-        log.info('run: $ pip3 install -U %s', version.__package_name__)
-        log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CHANGELOG.md')
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -227,7 +221,7 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
 def main(args: Optional[List[str]] = None) -> None:
     log.addHandler(log.logging.StreamHandler(sys.stderr))
     log.setLevel(log.logging.INFO)
-    version_check()
+    is_updated = update_checking.run()
     parser = get_parser()
     namespace = parser.parse_args(args=args)
     try:
@@ -237,10 +231,14 @@ def main(args: Optional[List[str]] = None) -> None:
         log.error('NotImplementedError')
         log.info('The operation you specified is not supported yet. Pull requests are welcome.')
         log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md')
+        if not is_updated:
+            log.info('hint: try updating the version of online-judge-tools')
         sys.exit(1)
     except Exception as e:
         log.debug('\n' + traceback.format_exc())
         log.error(str(e))
+        if not is_updated:
+            log.info('hint: try updating the version of online-judge-tools')
         sys.exit(1)
 
 
