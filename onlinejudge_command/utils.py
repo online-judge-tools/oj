@@ -1,9 +1,6 @@
 # Python Version: 3.x
 import contextlib
 import datetime
-import distutils.version
-import http.client
-import json
 import os
 import pathlib
 import re
@@ -17,10 +14,10 @@ import time
 from typing import *
 from typing.io import *
 
+import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
 import requests
 
-import onlinejudge.__about__ as version
 import onlinejudge.utils
 from onlinejudge.type import *
 
@@ -100,64 +97,6 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         'memory': memory,  # Optional[float], in megabyte
     }
     return info, proc
-
-
-def describe_status_code(status_code: int) -> str:
-    return '{} {}'.format(status_code, http.client.responses[status_code])
-
-
-def request(method: str, url: str, session: requests.Session, raise_for_status: bool = True, **kwargs) -> requests.Response:
-    assert method in ['GET', 'POST']
-    kwargs.setdefault('allow_redirects', True)
-    log.status('%s: %s', method, url)
-    if 'data' in kwargs:
-        log.debug('data: %s', repr(kwargs['data']))
-    resp = session.request(method, url, **kwargs)
-    if resp.url != url:
-        log.status('redirected: %s', resp.url)
-    log.status(describe_status_code(resp.status_code))
-    if raise_for_status:
-        resp.raise_for_status()
-    return resp
-
-
-def get_latest_version_from_pypi() -> str:
-    pypi_url = 'https://pypi.org/pypi/{}/json'.format(version.__package_name__)
-    version_cache_path = user_cache_dir / "pypi.json"
-    update_interval = 60 * 60 * 8  # 8 hours
-
-    # load cache
-    if version_cache_path.exists():
-        with version_cache_path.open() as fh:
-            cache = json.load(fh)
-        if time.time() < cache['time'] + update_interval:
-            return cache['version']
-
-    # get
-    try:
-        resp = request('GET', pypi_url, session=requests.Session())
-        data = json.loads(resp.content.decode())
-        value = data['info']['version']
-    except requests.RequestException as e:
-        log.error(str(e))
-        value = '0.0.0'  # ignore since this failure is not important
-    cache = {
-        'time': int(time.time()),  # use timestamp because Python's standard datetime library is too weak to parse strings
-        'version': value,
-    }
-
-    # store cache
-    version_cache_path.parent.mkdir(parents=True, exist_ok=True)
-    with version_cache_path.open('w') as fh:
-        json.dump(cache, fh)
-
-    return value
-
-
-def is_update_available_on_pypi() -> bool:
-    a = distutils.version.StrictVersion(version.__version__)
-    b = distutils.version.StrictVersion(get_latest_version_from_pypi())
-    return a < b
 
 
 def remove_suffix(s: str, suffix: str) -> str:
