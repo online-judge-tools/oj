@@ -1,5 +1,12 @@
 # Change Log
 
+## 10.0.0 / 2020-05-03
+
+-   create the GitHub organization [online-judge-tools](https://github.com/online-judge-tools) so that projects will work even when [@kmyk](https://github.com/kmyk) is missing
+    -   Now [@yosupo06](https://github.com/yosupo06) is an owner of the organization to keep  :dart:
+-   move the repository to [online-judge-tools/oj](https://github.com/online-judge-tools/oj)
+-   purge the library part as [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client)
+
 ## 9.2.2 / 2020-05-01
 
 -   [#739](https://github.com/kmyk/online-judge-tools/pull/739) follow the update of the submission form of AtCoder ([@serihiro](https://github.com/serihiro))
