@@ -6,6 +6,7 @@ import sys
 import traceback
 from typing import List, Optional
 
+import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
 from onlinejudge_command.subcommand.download import download
@@ -16,8 +17,7 @@ from onlinejudge_command.subcommand.submit import submit
 from onlinejudge_command.subcommand.test import test
 from onlinejudge_command.subcommand.test_reactive import test_reactive
 
-import onlinejudge
-import onlinejudge.__about__ as version
+import onlinejudge.__about__ as api_version
 
 
 def version_check() -> None:
@@ -199,7 +199,7 @@ tips:
 
 def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
     if args.version:
-        print('online-judge-tools {}'.format(onlinejudge.__version__))
+        print('online-judge-tools {} (+ online-judge-api-client {})'.format(version.__version__, api_version.__version__))
         sys.exit(0)
     if args.verbose:
         log.setLevel(log.logging.DEBUG)
