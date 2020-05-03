@@ -1,5 +1,9 @@
 # Change Log
 
+## 10.0.1 / 2020-05-04
+
+-   [online-judge-tools/api-client#26](https://github.com/online-judge-tools/api-client/pull/26) [#757](https://github.com/online-judge-tools/oj/pull/757) fix the bug of the installation
+
 ## 10.0.0 / 2020-05-03
 
 -   create the GitHub organization [online-judge-tools](https://github.com/online-judge-tools) so that projects will work even when [@kmyk](https://github.com/kmyk) is missing
