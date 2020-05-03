@@ -10,7 +10,7 @@ import onlinejudge_command.download_history
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
 
-import onlinejudge
+import onlinejudge.dispatch as dispatch
 from onlinejudge.type import *
 
 if TYPE_CHECKING:
@@ -35,7 +35,7 @@ def submit(args: 'argparse.Namespace') -> None:
             sys.exit(1)
 
     # parse url
-    problem = onlinejudge.dispatch.problem_from_url(args.url)
+    problem = dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
 

@@ -18,12 +18,12 @@ import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
 import requests
 
-import onlinejudge.utils
+import onlinejudge.utils as utils
 from onlinejudge.type import *
 
-user_data_dir = onlinejudge.utils.user_data_dir
-user_cache_dir = onlinejudge.utils.user_cache_dir
-default_cookie_path = onlinejudge.utils.default_cookie_path
+user_data_dir = utils.user_data_dir
+user_cache_dir = utils.user_cache_dir
+default_cookie_path = utils.default_cookie_path
 
 
 @contextlib.contextmanager
@@ -31,7 +31,7 @@ def new_session_with_our_user_agent(*, path: pathlib.Path) -> Iterator[requests.
     session = requests.Session()
     session.headers['User-Agent'] = '{}/{} (+{})'.format(version.__package_name__, version.__version__, version.__url__)
     log.debug('User-Agent: %s', session.headers['User-Agent'])
-    with onlinejudge.utils.with_cookiejar(session, path=path) as session:
+    with utils.with_cookiejar(session, path=path) as session:
         yield session
 
 
