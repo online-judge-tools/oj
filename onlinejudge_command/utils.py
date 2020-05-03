@@ -16,10 +16,9 @@ from typing.io import *
 
 import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
+import onlinejudge_workaround_for_conflict.utils as utils
 import requests
-
-import onlinejudge.utils as utils
-from onlinejudge.type import *
+from onlinejudge_workaround_for_conflict.type import *
 
 user_data_dir = utils.user_data_dir
 user_cache_dir = utils.user_cache_dir

@@ -7,8 +7,7 @@ from typing import *
 
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
-
-from onlinejudge.type import Problem
+from onlinejudge_workaround_for_conflict.type import Problem
 
 
 class DownloadHistory(object):
