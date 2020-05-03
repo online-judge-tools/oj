@@ -6,12 +6,11 @@ import requests.exceptions
 import tests.utils
 from onlinejudge_command.main import get_parser
 from onlinejudge_command.subcommand.submit import submit
-
-from onlinejudge.service.atcoder import AtCoderService
-from onlinejudge.service.codeforces import CodeforcesService
-from onlinejudge.service.hackerrank import HackerRankService
-from onlinejudge.service.toph import TophService
-from onlinejudge.service.yukicoder import YukicoderService
+from onlinejudge_workaround_for_conflict.service.atcoder import AtCoderService
+from onlinejudge_workaround_for_conflict.service.codeforces import CodeforcesService
+from onlinejudge_workaround_for_conflict.service.hackerrank import HackerRankService
+from onlinejudge_workaround_for_conflict.service.toph import TophService
+from onlinejudge_workaround_for_conflict.service.yukicoder import YukicoderService
 
 
 class SubmitArgumentsTest(unittest.TestCase):

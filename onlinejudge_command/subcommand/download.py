@@ -8,17 +8,16 @@ import onlinejudge_command.download_history
 import onlinejudge_command.format_utils as format_utils
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
+import onlinejudge_workaround_for_conflict.dispatch as dispatch  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
 import requests.exceptions
-
-import onlinejudge
-import onlinejudge.type
-from onlinejudge.service.yukicoder import YukicoderProblem
+from onlinejudge_workaround_for_conflict.service.yukicoder import YukicoderProblem  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
+from onlinejudge_workaround_for_conflict.type import SampleParseError, TestCase  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
 
 if TYPE_CHECKING:
     import argparse
 
 
-def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> Dict[str, str]:
+def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
     data = {}  # type: Dict[str, str]
     data["name"] = sample.name
     data["input"] = sample.input_data.decode()
@@ -29,7 +28,7 @@ def convert_sample_to_dict(sample: onlinejudge.type.TestCase) -> Dict[str, str]:
 
 def download(args: 'argparse.Namespace') -> None:
     # prepare values
-    problem = onlinejudge.dispatch.problem_from_url(args.url)
+    problem = dispatch.problem_from_url(args.url)
     if problem is None:
         raise requests.exceptions.InvalidURL('The contest "%s" is not supported' % args.url)
     is_default_format = args.format is None and args.directory is None  # must be here since args.directory and args.format are overwritten
@@ -48,7 +47,7 @@ def download(args: 'argparse.Namespace') -> None:
             samples = problem.download_sample_cases(session=sess)
 
     if not samples:
-        raise onlinejudge.type.SampleParseError("Sample not found")
+        raise SampleParseError("Sample not found")
 
     # append the history for submit command
     if not args.dry_run and is_default_format:
@@ -56,7 +55,7 @@ def download(args: 'argparse.Namespace') -> None:
         history.add(problem)
 
     # prepare files to write
-    def iterate_files_to_write(sample: onlinejudge.type.TestCase, *, i: int) -> Iterator[Tuple[str, pathlib.Path, bytes]]:
+    def iterate_files_to_write(sample: TestCase, *, i: int) -> Iterator[Tuple[str, pathlib.Path, bytes]]:
         for ext in ['in', 'out']:
             data = getattr(sample, ext + 'put_data')
             if data is None:

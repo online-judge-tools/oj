@@ -7,16 +7,14 @@ from typing import *
 
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
-
-import onlinejudge
-import onlinejudge.type
+from onlinejudge_workaround_for_conflict.type import Problem
 
 
 class DownloadHistory(object):
     def __init__(self, path: pathlib.Path = utils.user_cache_dir / 'download-history.jsonl'):
         self.path = path
 
-    def add(self, problem: onlinejudge.type.Problem, directory: pathlib.Path = pathlib.Path.cwd()) -> None:
+    def add(self, problem: Problem, directory: pathlib.Path = pathlib.Path.cwd()) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with open(str(self.path), 'a') as fh:
             fh.write(json.dumps({

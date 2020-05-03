@@ -1,8 +1,7 @@
 import unittest
 
 import tests.command_download
-
-from onlinejudge.service.yukicoder import YukicoderService
+from onlinejudge_workaround_for_conflict.service.yukicoder import YukicoderService
 
 
 class DownloadYukicoderTest(unittest.TestCase):

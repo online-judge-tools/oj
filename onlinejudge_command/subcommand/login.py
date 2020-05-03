@@ -8,15 +8,15 @@ from typing import *
 
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
+import onlinejudge_workaround_for_conflict.dispatch as dispatch  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
 import requests
-
-import onlinejudge
+from onlinejudge_workaround_for_conflict.type import LoginError, Service  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
 
 if TYPE_CHECKING:
     import argparse
 
 
-def login_with_password(service: onlinejudge.type.Service, *, username: Optional[str], password: Optional[str], session: requests.Session) -> None:
+def login_with_password(service: Service, *, username: Optional[str], password: Optional[str], session: requests.Session) -> None:
     def get_credentials() -> Tuple[str, str]:
         nonlocal username, password
         if username is None:
@@ -33,7 +33,7 @@ class WebDriverException(Exception):
     pass
 
 
-def login_with_browser(service: onlinejudge.type.Service, *, session: requests.Session) -> None:
+def login_with_browser(service: Service, *, session: requests.Session) -> None:
     try:
         import selenium.webdriver
     except ImportError:
@@ -72,7 +72,7 @@ def login_with_browser(service: onlinejudge.type.Service, *, session: requests.S
         session.cookies.set_cookie(cookie)  # type: ignore
 
 
-def is_logged_in_with_message(service: onlinejudge.type.Service, *, session: requests.Session) -> bool:
+def is_logged_in_with_message(service: Service, *, session: requests.Session) -> bool:
     if service.is_logged_in(session=session):
         log.info('You have already signed in.')
         return True
@@ -82,7 +82,7 @@ def is_logged_in_with_message(service: onlinejudge.type.Service, *, session: req
 
 
 def login(args: 'argparse.Namespace') -> None:
-    service = onlinejudge.dispatch.service_from_url(args.url)
+    service = dispatch.service_from_url(args.url)
     if service is None:
         sys.exit(1)
 
@@ -117,7 +117,7 @@ def login(args: 'argparse.Namespace') -> None:
             except NotImplementedError as e:
                 log.error('%s', e)
                 pass
-            except onlinejudge.type.LoginError:
+            except LoginError:
                 sys.exit(1)
             else:
                 if is_logged_in_with_message(service, session=session):

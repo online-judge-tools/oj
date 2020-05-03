@@ -9,9 +9,8 @@ from typing import *
 import onlinejudge_command.download_history
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
-
-import onlinejudge
-from onlinejudge.type import *
+import onlinejudge_workaround_for_conflict.dispatch as dispatch  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
+from onlinejudge_workaround_for_conflict.type import *  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
 
 if TYPE_CHECKING:
     import argparse
@@ -35,7 +34,7 @@ def submit(args: 'argparse.Namespace') -> None:
             sys.exit(1)
 
     # parse url
-    problem = onlinejudge.dispatch.problem_from_url(args.url)
+    problem = dispatch.problem_from_url(args.url)
     if problem is None:
         sys.exit(1)
 
