@@ -1,5 +1,9 @@
 # Change Log
 
+## 10.0.2 / 2020-05-04
+
+-   [#759](https://github.com/online-judge-tools/oj/pull/759) fix the bug that processes remain running when Ctrl-C is pressed while `oj test` runs
+
 ## 10.0.1 / 2020-05-04
 
 -   [online-judge-tools/api-client#26](https://github.com/online-judge-tools/api-client/pull/26) [#757](https://github.com/online-judge-tools/oj/pull/757) fix the bug of the installation
