@@ -1,5 +1,10 @@
 # Change Log
 
+## 10.0.3 / 2020-05-04
+
+-   [#767](https://github.com/online-judge-tools/oj/pull/767) correct a message to recommend updating packages
+-   [#766](https://github.com/online-judge-tools/oj/pull/766) clear the history of `oj download` when the `test/` directory is empty
+
 ## 10.0.2 / 2020-05-04
 
 -   [#759](https://github.com/online-judge-tools/oj/pull/759) fix the bug that processes remain running when Ctrl-C is pressed while `oj test` runs
