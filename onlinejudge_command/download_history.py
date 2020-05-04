@@ -25,6 +25,15 @@ class DownloadHistory(object):
         log.status('append history to: %s', self.path)
         self._flush()
 
+    def remove(self, *, directory: pathlib.Path = pathlib.Path.cwd()) -> None:
+        if not self.path.exists():
+            return
+        with open(str(self.path)) as fh:
+            history_lines = fh.readlines()
+        with open(str(self.path), 'w') as fh:
+            pred = lambda line: pathlib.Path(json.loads(line)['directory']) != directory
+            fh.write(''.join(filter(pred, history_lines)))
+
     def _flush(self) -> None:
         # halve the size if it is more than 1MiB
         if self.path.stat().st_size >= 1024 * 1024:

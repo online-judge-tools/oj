@@ -52,6 +52,8 @@ def download(args: 'argparse.Namespace') -> None:
     # append the history for submit command
     if not args.dry_run and is_default_format:
         history = onlinejudge_command.download_history.DownloadHistory()
+        if not list(args.directory.glob('*')):
+            history.remove()  # for users who use only one directory for problems
         history.add(problem)
 
     # prepare files to write
