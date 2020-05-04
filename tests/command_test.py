@@ -3,7 +3,9 @@ import os
 import pathlib
 import random
 import shutil
+import signal
 import sys
+import threading
 import unittest
 
 import tests.utils
@@ -1011,7 +1013,7 @@ class TestTest(unittest.TestCase):
         )
 
     @unittest.skipIf(os.name == 'nt', "procfs is required")
-    def test_call_test_check_no_zombie(self):
+    def test_call_test_check_no_zombie_with_tle(self):
         marker = 'zombie-%08x' % random.randrange(2**32)
         data = self.snippet_call_test(
             args=['-c', tests.utils.python_c("import time; time.sleep(100)  # {}".format(marker)), '--tle', '1'],
@@ -1047,6 +1049,35 @@ class TestTest(unittest.TestCase):
         for cmdline in pathlib.Path('/proc').glob('*/cmdline'):
             with open(str(cmdline), 'rb') as fh:
                 self.assertNotIn(marker.encode(), fh.read())
+
+    @unittest.skipIf(os.name == 'nt', "procfs is required")
+    def test_call_test_check_no_zombie_with_keyboard_interrupt(self):
+        marker_for_callee = 'zombie-%08x' % random.randrange(2**32)
+        marker_for_caller = 'zombie-%08x' % random.randrange(2**32)
+        files = [
+            {
+                'path': 'test/{}-1.in'.format(marker_for_caller),
+                'data': 'foo\n'
+            },
+        ]
+
+        def send_keyboard_interrupt():
+            for cmdline in pathlib.Path('/proc').glob('*/cmdline'):
+                with open(str(cmdline), 'rb') as fh:
+                    if marker_for_caller.encode() in fh.read():
+                        pid = int(cmdline.parts[2])
+                        print('sending Ctrl-C to', pid)
+                        os.kill(pid, signal.SIGINT)
+
+        timer = threading.Timer(1.0, send_keyboard_interrupt)
+        timer.start()
+        result = tests.utils.run_in_sandbox(args=['-v', 'test', '-c', tests.utils.python_c("import time; time.sleep(10)  # {}".format(marker_for_callee)), 'test/{}-1.in'.format(marker_for_caller)], files=files)
+        self.assertNotEqual(result['proc'].returncode, 0)
+
+        # check there are no processes whose command-line arguments contains the marker word
+        for cmdline in pathlib.Path('/proc').glob('*/cmdline'):
+            with open(str(cmdline), 'rb') as fh:
+                self.assertNotIn(marker_for_callee.encode(), fh.read())
 
 
 @unittest.skipIf(os.name == 'nt', "memory checking is disabled and output is different with Linux")

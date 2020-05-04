@@ -77,8 +77,13 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         try:
             answer, _ = proc.communicate(input=input, timeout=timeout)
         except subprocess.TimeoutExpired:
+            pass
+        finally:
             if preexec_fn is not None:
-                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
             else:
                 proc.terminate()
 
