@@ -20,7 +20,7 @@ def submit(args: 'argparse.Namespace') -> None:
     # guess url
     history = onlinejudge_command.download_history.DownloadHistory()
     if args.file.parent.resolve() == pathlib.Path.cwd():
-        guessed_urls = history.get()
+        guessed_urls = history.get(directory=pathlib.Path.cwd())
     else:
         log.warning('cannot guess URL since the given file is not in the current directory')
         guessed_urls = []

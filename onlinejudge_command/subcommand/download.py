@@ -49,10 +49,13 @@ def download(args: 'argparse.Namespace') -> None:
     if not samples:
         raise SampleParseError("Sample not found")
 
-    # append the history for submit command
+    # append the history for submit subcommand
     if not args.dry_run and is_default_format:
         history = onlinejudge_command.download_history.DownloadHistory()
-        history.add(problem)
+        if not list(args.directory.glob('*')):
+            # reset the history to help users who use only one directory for many problems
+            history.remove(directory=pathlib.Path.cwd())
+        history.add(problem, directory=pathlib.Path.cwd())
 
     # prepare files to write
     def iterate_files_to_write(sample: TestCase, *, i: int) -> Iterator[Tuple[str, pathlib.Path, bytes]]:
