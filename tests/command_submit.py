@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 import unittest
 
@@ -15,7 +16,7 @@ from onlinejudge_workaround_for_conflict.service.yukicoder import YukicoderServi
 
 class SubmitArgumentsTest(unittest.TestCase):
     @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
-    def test_call_submit_atcoder_practice_2_with_history(self):
+    def test_call_submit_atcoder_practice_2_with_history_simple(self):
 
         url = 'https://atcoder.jp/contests/practice/tasks/practice_2'
         files = [
@@ -25,6 +26,22 @@ class SubmitArgumentsTest(unittest.TestCase):
             },
         ]
         with tests.utils.sandbox(files):
+            tests.utils.run(['dl', url], check=False)
+            tests.utils.run(['s', '-y', '--no-open', url, 'a.cpp'], check=True)
+
+    @unittest.skipIf(not tests.utils.is_logged_in(AtCoderService()), 'login is required')
+    def test_call_submit_atcoder_practice_2_with_history_remove(self):
+
+        url = 'https://atcoder.jp/contests/practice/tasks/practice_2'
+        files = [
+            {
+                'path': 'a.cpp',
+                'data': 'compile error'
+            },
+        ]
+        with tests.utils.sandbox(files):
+            tests.utils.run(['dl', 'https://atcoder.jp/contests/abc099/tasks/abc099_a'], check=True)
+            shutil.rmtree('test/')
             tests.utils.run(['dl', url], check=False)
             tests.utils.run(['s', '-y', '--no-open', url, 'a.cpp'], check=True)
 

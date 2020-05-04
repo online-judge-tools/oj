@@ -14,7 +14,8 @@ class DownloadHistory(object):
     def __init__(self, path: pathlib.Path = utils.user_cache_dir / 'download-history.jsonl'):
         self.path = path
 
-    def add(self, problem: Problem, directory: pathlib.Path = pathlib.Path.cwd()) -> None:
+    def add(self, problem: Problem, *, directory: pathlib.Path) -> None:
+        log.status('append the downloading history: %s', self.path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with open(str(self.path), 'a') as fh:
             fh.write(json.dumps({
@@ -22,12 +23,12 @@ class DownloadHistory(object):
                 'directory': str(directory),
                 'url': problem.get_url(),
             }) + '\n')
-        log.status('append history to: %s', self.path)
         self._flush()
 
-    def remove(self, *, directory: pathlib.Path = pathlib.Path.cwd()) -> None:
+    def remove(self, *, directory: pathlib.Path) -> None:
         if not self.path.exists():
             return
+        log.status('clear the downloading history for this directory: %s', self.path)
         with open(str(self.path)) as fh:
             history_lines = fh.readlines()
         with open(str(self.path), 'w') as fh:
@@ -43,7 +44,7 @@ class DownloadHistory(object):
                 fh.write(''.join(history_lines[:-len(history_lines) // 2]))
             log.status('halve history at: %s', self.path)
 
-    def get(self, directory: pathlib.Path = pathlib.Path.cwd()) -> List[str]:
+    def get(self, *, directory: pathlib.Path) -> List[str]:
         if not self.path.exists():
             return []
 

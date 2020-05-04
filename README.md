@@ -136,7 +136,7 @@ If you cannot install online-judge-tools even following the instructions, please
 ### Other questions
 
 -   I usually make one directory per one contest (or, site). Can I keep using this style?
-    -   Yes, you can use the `--directory` (`-d`) option. However, we don't recommend this style, because you should make additional test cases by yourself and run stress tests to maximize your rating.
+    -   Yes, you can use the `--directory` (`-d`) option or `$ rm -rf test/`. However, we don't recommend this style, because you should make additional test cases by yourself and run stress tests to maximize your rating.
 -   Can I download all sample cases of all problems at once?
     -   No, but you can use `oj-prepare` command in [kmyk/online-judge-template-generator](https://github.com/kmyk/online-judge-template-generator).
 -   Can I automatically compile my source code before testing?
