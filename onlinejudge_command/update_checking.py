@@ -79,6 +79,7 @@ def run_for_package(*, package_name: str, current_version: str) -> bool:
     is_updated = not is_update_available_on_pypi(package_name, current_version)
     if not is_updated:
         log.warning('update available for %s: %s -> %s', package_name, current_version, get_latest_version_from_pypi(package_name))
+        log.info('run: $ pip3 install -U %s', package_name)
     return is_updated
 
 
@@ -90,8 +91,6 @@ def run() -> bool:
     try:
         is_updated = run_for_package(package_name=version.__package_name__, current_version=version.__version__)
         is_api_updated = run_for_package(package_name=api_version.__package_name__, current_version=api_version.__version__)
-        if not is_updated or not is_api_updated:
-            log.info('run: $ pip3 install -U %s', version.__package_name__)
         return is_updated and is_api_updated
 
     except Exception as e:
