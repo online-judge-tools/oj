@@ -187,10 +187,6 @@ projects depending on kmyk/online-judge-tools:
     -   [fukatani/rujaion](https://github.com/fukatani/rujaion) is an IDE for competitive-programming with Rust
 
 
-## Contributing
-
-See [CONTRIBUTING.md](https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md)
-
 ### Hall-Of-Fame
 
 [![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/0)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/0)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/1)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/1)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/2)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/2)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/3)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/3)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/4)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/4)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/5)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/5)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/6)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/6)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/7)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/7)
