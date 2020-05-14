@@ -229,7 +229,7 @@ def main(args: Optional[List[str]] = None) -> None:
         log.debug('\n' + traceback.format_exc())
         log.error('NotImplementedError')
         log.info('The operation you specified is not supported yet. Pull requests are welcome.')
-        log.info('see: https://github.com/kmyk/online-judge-tools/blob/master/CONTRIBUTING.md')
+        log.info('see: https://github.com/online-judge-tools/oj')
         if not is_updated:
             log.info('hint: try updating the version of online-judge-tools')
         sys.exit(1)
