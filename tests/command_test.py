@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import platform
 import random
 import shutil
 import signal
@@ -698,7 +699,8 @@ class TestTest(unittest.TestCase):
             }],
         )
 
-    @unittest.skipIf(os.name == 'nt', "character '*' is not usable for paths in Windows")
+    @unittest.skipIf(platform.system() == 'Darwin', 'GNU time is not installed on macOS')
+    @unittest.skipIf(platform.system() == 'Windows', "character '*' is not usable for paths in Windows")
     def test_call_test_re_glob_injection(self):
         self.snippet_call_test(
             args=['-c', cat(), '-d', 'a.*/[abc]/**', '-f', '***/**/def/test_%e/%s.txt'],
@@ -792,7 +794,8 @@ class TestTest(unittest.TestCase):
         for case in data:
             self.assertEqual(case['status'], 'AC')
 
-    @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
+    @unittest.skipIf(platform.system() == 'Darwin', 'GNU time is not installed on macOS')
+    @unittest.skipIf(platform.system() == 'Windows', "memory checking is disabled on Windows environment")
     def test_call_test_large_memory(self):
         # make a bytes of 100 MB
         data = self.snippet_call_test(
@@ -810,7 +813,8 @@ class TestTest(unittest.TestCase):
             self.assertGreater(case['memory'], 100)
             self.assertLess(case['memory'], 1000)
 
-    @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
+    @unittest.skipIf(platform.system() == 'Darwin', 'GNU time is not installed on macOS')
+    @unittest.skipIf(platform.system() == 'Windows', "memory checking is disabled on Windows environment")
     def test_call_test_small_memory(self):
         # just print "foo"
         data = self.snippet_call_test(
@@ -827,7 +831,8 @@ class TestTest(unittest.TestCase):
             self.assertEqual(case['status'], 'AC')
             self.assertLess(case['memory'], 100)
 
-    @unittest.skipIf(os.name == 'nt', "memory checking is disabled on Windows environment")
+    @unittest.skipIf(platform.system() == 'Darwin', 'GNU time is not installed on macOS')
+    @unittest.skipIf(platform.system() == 'Windows', "memory checking is disabled on Windows environment")
     def test_call_test_memory_limit_error(self):
         # make a bytes of 100 MB
         self.snippet_call_test(
@@ -1012,7 +1017,7 @@ class TestTest(unittest.TestCase):
             replace_output_newline=False,
         )
 
-    @unittest.skipIf(os.name == 'nt', "procfs is required")
+    @unittest.skipIf(platform.system() == 'Windows', "procfs is required")
     def test_call_test_check_no_zombie_with_tle(self):
         marker = 'zombie-%08x' % random.randrange(2**32)
         data = self.snippet_call_test(
@@ -1050,7 +1055,7 @@ class TestTest(unittest.TestCase):
             with open(str(cmdline), 'rb') as fh:
                 self.assertNotIn(marker.encode(), fh.read())
 
-    @unittest.skipIf(os.name == 'nt', "procfs is required")
+    @unittest.skipIf(platform.system() == 'Windows', "procfs is required")
     def test_call_test_check_no_zombie_with_keyboard_interrupt(self):
         marker_for_callee = 'zombie-%08x' % random.randrange(2**32)
         marker_for_caller = 'zombie-%08x' % random.randrange(2**32)
