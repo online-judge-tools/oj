@@ -1,16 +1,15 @@
 name: test
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]  # workaround
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [3.5]  # workaround
 
         # The current version of GitHub Actions can only re-run all jobs; it cannot re-run a specific job. Many unstable tests make CI impossible to pass.
-        # os: [ubuntu-latest, windows-latest, macos-latest]
         # python-version: [3.5, 3.6]
         # exclude:
         # - os: windows-latest
