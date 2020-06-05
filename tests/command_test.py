@@ -1018,8 +1018,8 @@ class TestTest(unittest.TestCase):
         )
 
     @unittest.skipIf(platform.system() == 'Windows', "procfs is required")
-    def test_call_test_check_no_zombie_with_tle(self):
-        marker = 'zombie-%08x' % random.randrange(2**32)
+    def test_call_test_check_no_orphan_with_tle(self):
+        marker = 'orphan-%08x' % random.randrange(2**32)
         data = self.snippet_call_test(
             args=['-c', tests.utils.python_c("import time; time.sleep(100)  # {}".format(marker)), '--tle', '1'],
             files=[
@@ -1056,9 +1056,9 @@ class TestTest(unittest.TestCase):
                 self.assertNotIn(marker.encode(), fh.read())
 
     @unittest.skipIf(platform.system() == 'Windows', "procfs is required")
-    def test_call_test_check_no_zombie_with_keyboard_interrupt(self):
-        marker_for_callee = 'zombie-%08x' % random.randrange(2**32)
-        marker_for_caller = 'zombie-%08x' % random.randrange(2**32)
+    def test_call_test_check_no_orphan_with_keyboard_interrupt(self):
+        marker_for_callee = 'orphan-%08x' % random.randrange(2**32)
+        marker_for_caller = 'orphan-%08x' % random.randrange(2**32)
         files = [
             {
                 'path': 'test/{}-1.in'.format(marker_for_caller),

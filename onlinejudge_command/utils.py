@@ -60,7 +60,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
             command = command_str.encode().decode()  # type: ignore
         begin = time.perf_counter()
 
-        # We need kill processes called from the "time" command using process groups. Without this, zombies spawn. see https://github.com/kmyk/online-judge-tools/issues/640
+        # We need kill processes called from the "time" command using process groups. Without this, orphans spawn. see https://github.com/kmyk/online-judge-tools/issues/640
         preexec_fn = None
         if gnu_time is not None and os.name == 'posix':
             preexec_fn = os.setsid
