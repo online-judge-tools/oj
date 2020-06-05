@@ -1080,7 +1080,7 @@ class TestTest(unittest.TestCase):
                 self.assertNotIn(marker_for_callee.encode(), fh.read())
 
 
-@unittest.skipIf(os.name == 'nt', "memory checking is disabled and output is different with Linux")
+@unittest.skip("This end-to-end test is too fragile. We should refactor the implementation and write unit tests.")
 class TestTestLog(unittest.TestCase):
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
