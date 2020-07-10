@@ -104,7 +104,7 @@ online-judge-tools を使えばサンプルケースのテストの自動化が�
 もしそのような経験が一度でもあるのなら、提出を自動化することをおすすめします。
 
 online-judge-tools を使えば提出の自動化が可能です。
-問題 https://codeforces.com/contest/1200/problem/F にファイル ``main.cpp`` を提出したいときは ``oj s https://codeforces.com/contest/1200/problem/F`` を実行すればよいです。実際に実行したときの出力は次のようになります:
+たとえば、問題 https://codeforces.com/contest/1200/problem/F にファイル ``main.cpp`` を提出したいときは ``oj s https://codeforces.com/contest/1200/problem/F`` を実行すればよいです。実際に実行したときの出力は次のようになります:
 
 .. code-block:: console
 
@@ -172,13 +172,16 @@ URL の指定ミスを防ぐために、こちらの省力形の利用を推奨�
 これにはランダム生成したケースを使ってのデバッグが有効です。
 具体的には次のようにします。
 
-#. 制約を満たす入力をランダムに生成するようなプログラムを実装し、テストケースの入力をたくさん用意する
+#. 制約を満たす入力をランダムに生成するようなプログラムを実装する
+#. (1.) のプログラムを使ってテストケースの入力をたくさん用意する
 #. (もし可能なら、遅くても確実に正しい答えを出力するような愚直解を実装し、対応する出力をたくさん用意する)
-#. (1.), (2.) で作ったテストケースを使って、問題のプログラムをテストする
-#. (3.) で見つかった撃墜ケースを分析してバグを見つける
+#. (2.), (3.) で作ったテストケースを使って、問題のプログラムをテストする
+#. (4.) で見つかった撃墜ケースを分析してバグを見つける
 
 online-judge-tools には、これを助ける機能もあります。
-(1.) には ``oj g/i`` というコマンド、 (2.) には ``oj g/o`` というコマンドが使えます。
+(2.) には ``oj g/i`` というコマンド、 (3.) には ``oj g/o`` というコマンドが使えます。
+また (1.) のプログラムを半自動生成するためのツール `online-judge-tools/template-generator <https://github.com/online-judge-tools/template-generator>`_ も用意されています。
+
 たとえば https://onlinejudge.u-aizu.ac.jp/courses/library/7/DPL/1/DPL_1_B に対して以下のように利用します。
 
 .. code-block:: console
@@ -300,8 +303,8 @@ online-judge-tools には、これを助ける機能もあります。
 -   解が複数ある問題
 
    実装したプログラムの中で `assert <https://cpprefjp.github.io/reference/cassert/assert.html>`_ を用いることで、解答の正当性を簡易にチェックすることが可能です。
-   複雑なチェックが必要な場合や想定解答の内容をチェックに用いたい場合は、ジャッジ側のプログラムを自作して解答の正否の判定に用いることができます。
 
+   あるいは、複雑なチェックが必要な場合や想定解答の内容をチェックに用いたい場合は、ジャッジ側のプログラムを自作して解答の正否の判定に用いることができます。
    たとえば問題 https://atcoder.jp/contests/abc074/tasks/arc083_a であれば、次のようなジャッジ側プログラムを書いて ``judge.py`` という名前で保存し、 ``oj t --judge-command "python3 judge.py"`` とすればテストが実行されます。
 
    .. code-block:: python
