@@ -183,5 +183,5 @@ def webbrowser_register_explorer_exe() -> None:
 
     if not is_windows_subsystem_for_linux():
         return
-    instance = webbrowser.BackgroundBrowser('explorer.exe')
+    instance = webbrowser.GenericBrowser('explorer.exe')
     webbrowser.register('explorer', None, instance)
