@@ -8,9 +8,10 @@ from typing import *
 
 import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
-import onlinejudge_workaround_for_conflict.dispatch as dispatch  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
 import requests
-from onlinejudge_workaround_for_conflict.type import LoginError, Service  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
+
+import onlinejudge.dispatch as dispatch
+from onlinejudge.type import LoginError, Service
 
 if TYPE_CHECKING:
     import argparse

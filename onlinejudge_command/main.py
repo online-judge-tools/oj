@@ -10,7 +10,6 @@ import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
 import onlinejudge_command.update_checking as update_checking
 import onlinejudge_command.utils as utils
-import onlinejudge_workaround_for_conflict.__about__ as api_version  # see https://github.com/online-judge-tools/oj/issues/755#issuecomment-623118672
 from onlinejudge_command.subcommand.download import download
 from onlinejudge_command.subcommand.generate_input import generate_input
 from onlinejudge_command.subcommand.generate_output import generate_output
@@ -18,6 +17,8 @@ from onlinejudge_command.subcommand.login import login
 from onlinejudge_command.subcommand.submit import submit
 from onlinejudge_command.subcommand.test import test
 from onlinejudge_command.subcommand.test_reactive import test_reactive
+
+import onlinejudge.__about__ as api_version
 
 
 def get_parser() -> argparse.ArgumentParser:
