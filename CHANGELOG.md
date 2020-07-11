@@ -1,5 +1,11 @@
 # Change Log
 
+## 10.0.4 / 2020-07-12
+
+-   [#783](https://github.com/online-judge-tools/oj/pull/783) remove a workaround for the conflict of a module name
+-   [#784](https://github.com/online-judge-tools/oj/pull/784) fix an issue about opening webbrowsers under Windows Subsystem for Linux (helped by [@orisano](https://github.com/orisano) and [@southball](https://github.com/southball))
+-   [#785](https://github.com/online-judge-tools/oj/pull/785) print the versions for user support
+
 ## 10.0.3 / 2020-05-04
 
 -   [#767](https://github.com/online-judge-tools/oj/pull/767) correct a message to recommend updating packages
