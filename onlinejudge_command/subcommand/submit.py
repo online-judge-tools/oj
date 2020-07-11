@@ -135,11 +135,17 @@ def submit(args: 'argparse.Namespace') -> None:
 
         # show result
         if args.open:
-            browser = webbrowser.get()
-            log.status('open the submission page with browser')
-            opened = browser.open_new_tab(submission.get_url())
-            if not opened:
-                log.failure('failed to open the url. please set the $BROWSER envvar')
+            utils.webbrowser_register_explorer_exe()
+            try:
+                browser = webbrowser.get(using='nomomo')
+            except webbrowser.Error as e:
+                log.error('%s', e)
+                log.info('please set the $BROWSER envvar')
+            else:
+                log.status('open the submission page with browser: %s', browser)
+                opened = browser.open_new_tab(submission.get_url())
+                if not opened:
+                    log.failure('failed to open the url. please set the $BROWSER envvar')
 
 
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:

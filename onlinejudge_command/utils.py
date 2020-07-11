@@ -1,8 +1,10 @@
 # Python Version: 3.x
 import contextlib
 import datetime
+import functools
 import os
 import pathlib
+import platform
 import re
 import shlex
 import shutil
@@ -11,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import webbrowser
 from typing import *
 from typing.io import *
 
@@ -165,3 +168,20 @@ def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: 
     candidates += snip_line_based()
     candidates += snip_char_based()
     return min(candidates, key=len)
+
+
+def is_windows_subsystem_for_linux() -> bool:
+    return platform.uname().system == 'Linux' and 'Microsoft' in platform.uname().release
+
+
+@functools.lru_cache(maxsize=None)
+def webbrowser_register_explorer_exe() -> None:
+    """webbrowser_register_explorer registers `explorer.exe` in the list of browsers under Windows Subsystem for Linux.
+
+    See https://github.com/online-judge-tools/oj/issues/773
+    """
+
+    if not is_windows_subsystem_for_linux():
+        return
+    instance = webbrowser.BackgroundBrowser('explorer.exe')
+    webbrowser.register('explorer', None, instance)
