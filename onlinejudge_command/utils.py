@@ -181,7 +181,11 @@ def webbrowser_register_explorer_exe() -> None:
     See https://github.com/online-judge-tools/oj/issues/773
     """
 
+    # There is an issue that the terminal is cleared after `.open_new_tab()`. The reason is unknown, but adding an argurment `preferred=True` to `webbrowser.register` resolves this issues.
+
+    # See https://github.com/online-judge-tools/oj/pull/784
+
     if not is_windows_subsystem_for_linux():
         return
     instance = webbrowser.GenericBrowser('explorer.exe')
-    webbrowser.register('explorer', None, instance)
+    webbrowser.register('explorer', None, instance)  # TODO: use `preferred=True` to solve the issue that terminal is cleared, when the version of Python becomes 3.7 or higher
