@@ -199,6 +199,9 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
         log.setLevel(log.logging.DEBUG)
     log.debug('args: %s', str(args))
 
+    # print the version to use for user-supporting
+    log.info('online-judge-tools %s (+ online-judge-api-client %s)', version.__version__, api_version.__version__)
+
     if args.subcommand in ['download', 'd', 'dl']:
         download(args)
     elif args.subcommand in ['login', 'l']:
