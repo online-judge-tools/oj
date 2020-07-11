@@ -137,7 +137,7 @@ def submit(args: 'argparse.Namespace') -> None:
         if args.open:
             utils.webbrowser_register_explorer_exe()
             try:
-                browser = webbrowser.get(using='nomomo')
+                browser = webbrowser.get()
             except webbrowser.Error as e:
                 log.error('%s', e)
                 log.info('please set the $BROWSER envvar')
