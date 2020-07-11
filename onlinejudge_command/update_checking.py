@@ -6,9 +6,10 @@ from typing import *
 
 import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
-import onlinejudge_workaround_for_conflict.__about__ as api_version
 import requests
-from onlinejudge_workaround_for_conflict.utils import user_cache_dir
+
+import onlinejudge.__about__ as api_version
+from onlinejudge.utils import user_cache_dir
 
 
 def describe_status_code(status_code: int) -> str:

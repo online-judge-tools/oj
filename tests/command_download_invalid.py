@@ -2,7 +2,8 @@ import unittest
 
 import requests.exceptions
 import tests.command_download
-from onlinejudge_workaround_for_conflict.type import SampleParseError
+
+from onlinejudge.type import SampleParseError
 
 
 class DownloadInvalidTest(unittest.TestCase):
