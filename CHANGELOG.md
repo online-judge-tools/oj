@@ -1,5 +1,9 @@
 # Change Log
 
+## 10.0.5 / 2020-07-12
+
+-   [#787](https://github.com/online-judge-tools/oj/pull/787) add a workaround for the conflict of a module name
+
 ## 10.0.4 / 2020-07-12
 
 -   [#783](https://github.com/online-judge-tools/oj/pull/783) remove a workaround for the conflict of a module name
