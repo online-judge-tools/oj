@@ -6,6 +6,7 @@ import sys
 import traceback
 from typing import List, Optional
 
+import onlinejudge_command.__0_workaround_for_conflict  # pylint: disable=unused-import
 import onlinejudge_command.__about__ as version
 import onlinejudge_command.logging as log
 import onlinejudge_command.update_checking as update_checking
