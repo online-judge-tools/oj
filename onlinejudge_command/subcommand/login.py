@@ -4,9 +4,9 @@ import getpass
 import http.cookies
 import sys
 import time
+from logging import getLogger
 from typing import *
 
-import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
 import requests
 
@@ -15,6 +15,8 @@ from onlinejudge.type import LoginError, Service
 
 if TYPE_CHECKING:
     import argparse
+
+logger = getLogger(__name__)
 
 
 def login_with_password(service: Service, *, username: Optional[str], password: Optional[str], session: requests.Session) -> None:
@@ -49,7 +51,7 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
 
     # get cookies via Selenium
     url = service.get_url_of_login_page()
-    log.info('open with WebDriver: %s', url)
+    logger.info('open with WebDriver: %s', url)
     driver.get(url)
     cookies = []  # type: List[Dict[str, str]]
     try:
@@ -60,9 +62,9 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
         pass  # the window is closed
 
     # set cookies to the requests.Session
-    log.info('copy cookies from WebDriver')
+    logger.info('copy cookies from WebDriver')
     for c in cookies:
-        log.status('set cookie: %s', c['name'])
+        logger.debug('set cookie: %s', c['name'])
         morsel = http.cookies.Morsel()  # type: http.cookies.Morsel
         morsel.set(c['name'], c['value'], c['value'])
         morsel.update({key: value for key, value in c.items() if morsel.isReservedKey(key)})
@@ -75,10 +77,10 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
 
 def is_logged_in_with_message(service: Service, *, session: requests.Session) -> bool:
     if service.is_logged_in(session=session):
-        log.info('You have already signed in.')
+        logger.info('You have already signed in.')
         return True
     else:
-        log.warning('You are not signed in.')
+        logger.warning('You are not signed in.')
         return False
 
 
@@ -99,10 +101,10 @@ def login(args: 'argparse.Namespace') -> None:
             try:
                 login_with_browser(service, session=session)
             except ImportError:
-                log.error('Selenium is not installed: try $ pip3 install selenium')
+                logger.error('Selenium is not installed: try $ pip3 install selenium')
                 pass
             except WebDriverException as e:
-                log.error('%s', e)
+                logger.error('%s', e)
                 pass
             else:
                 if is_logged_in_with_message(service, session=session):
@@ -112,11 +114,11 @@ def login(args: 'argparse.Namespace') -> None:
 
         if args.use_browser in ('never', 'auto'):
             if args.use_browser == 'auto':
-                log.warning('use CUI login since Selenium fails')
+                logger.warning('use CUI login since Selenium fails')
             try:
                 login_with_password(service, username=args.username, password=args.password, session=session)
             except NotImplementedError as e:
-                log.error('%s', e)
+                logger.error('%s', e)
                 pass
             except LoginError:
                 sys.exit(1)

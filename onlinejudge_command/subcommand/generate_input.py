@@ -6,11 +6,13 @@ import itertools
 import os
 import pathlib
 import threading
+from logging import getLogger
 from typing import *
 
 import onlinejudge_command.format_utils as fmtutils
-import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
+
+logger = getLogger(__name__)
 
 
 @contextlib.contextmanager
@@ -42,30 +44,30 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
             os.makedirs(str(input_path.parent), exist_ok=True)
 
         if print_data:
-            log.emit('input:')
-            log.emit(utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + 'input:')
+            logger.info(utils.NO_HEADER + '%s', utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
         with input_path.open('wb') as fh:
             fh.write(input_data)
-        log.success('saved to: %s', input_path)
+        logger.info(utils.SUCCESS + 'saved to: %s', input_path)
 
         if output_data is not None:
             if print_data:
-                log.emit('output:')
-                log.emit(utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
+                logger.info(utils.NO_HEADER + 'output:')
+                logger.info(utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
             with output_path.open('wb') as fh:
                 fh.write(output_data)
-            log.success('saved to: %s', output_path)
+            logger.info(utils.SUCCESS + 'saved to: %s', output_path)
 
 
 def check_status(info, proc, *, submit):
-    submit(log.status, 'time: %f sec', info['elapsed'])
+    submit(logger.info, 'time: %f sec', info['elapsed'])
     if proc.returncode is None:
-        submit(log.failure, log.red('TLE'))
-        submit(log.info, 'skipped.')
+        submit(logger.failure, logger.red('TLE'))
+        submit(logger.info, 'skipped.')
         return False
     elif proc.returncode != 0:
-        submit(log.failure, log.red('RE') + ': return code %d', proc.returncode)
-        submit(log.info, 'skipped.')
+        submit(logger.failure, logger.red('RE') + ': return code %d', proc.returncode)
+        submit(logger.info, 'skipped.')
         return False
     assert info['answer'] is not None
     return True
@@ -75,11 +77,11 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
     with BufferedExecutor(lock) as submit:
 
         # print the header
-        submit(log.emit, '')
-        submit(log.info, '%s', name)
+        submit(logger.info, '')
+        submit(logger.info, '%s', name)
 
         # generate input
-        submit(log.status, 'generate input...')
+        submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, timeout=tle)
         input_data = info['answer']  # type: bytes
         if not check_status(info, proc, submit=submit):
@@ -89,7 +91,7 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
         if command is None:
             output_data = None  # type: Optional[bytes]
         else:
-            submit(log.status, 'generate output...')
+            submit(logger.info, 'generate output...')
             info, proc = utils.exec_command(command, input=input_data, timeout=tle)
             output_data = info['answer']
             if not check_status(info, proc, submit=submit):
@@ -103,7 +105,7 @@ def simple_match(a: str, b: str) -> bool:
     if a == b:
         return True
     if a.rstrip() == b.rstrip():
-        log.warning('WA if no rstrip')
+        logger.warning('WA if no rstrip')
         return True
     return False
 
@@ -112,11 +114,11 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
     with BufferedExecutor(lock) as submit:
 
         # print the header
-        submit(log.emit, '')
-        submit(log.info, '%d-th attempt', attempt)
+        submit(logger.info, '')
+        submit(logger.info, '%d-th attempt', attempt)
 
         # generate input
-        submit(log.status, 'generate input...')
+        submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, stdin=None, timeout=tle)
         input_data = info['answer']  # type: Optional[bytes]
         if not check_status(info, proc, submit=submit):
@@ -124,7 +126,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         assert input_data is not None
 
         # generate output
-        submit(log.status, 'generate output...')
+        submit(logger.info, 'generate output...')
         info, proc = utils.exec_command(command, input=input_data, timeout=tle)
         output_data = info['answer']  # type: Optional[bytes]
         if not check_status(info, proc, submit=submit):
@@ -132,7 +134,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         assert output_data is not None
 
         # hack
-        submit(log.status, 'hack...')
+        submit(logger.info, 'hack...')
         info, proc = utils.exec_command(hack, input=input_data, timeout=tle)
         answer = (info['answer'] or b'').decode()  # type: str
         elapsed = info['elapsed']  # type: float
@@ -141,17 +143,17 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         # compare
         status = 'AC'
         if proc.returncode is None:
-            submit(log.failure, log.red('TLE'))
+            submit(logger.info, 'FAILURE: ' + utils.red('TLE'))
             status = 'TLE'
         elif proc.returncode != 0:
-            log.failure(log.red('RE') + ': return code %d', proc.returncode)
+            logger.info(utils.FAILURE + '' + utils.red('RE') + ': return code %d', proc.returncode)
             status = 'RE'
         expected = output_data.decode()
         if not simple_match(answer, expected):
-            log.failure(log.red('WA'))
-            log.emit('input:\n%s', utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
-            log.emit('output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
-            log.emit('expected:\n%s', utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.FAILURE + '' + utils.red('WA'))
+            logger.info('NO_HDEADER: input:\n%s', utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+            logger.info('NO_HDEADER: output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            logger.info('NO_HDEADER: expected:\n%s', utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
             status = 'WA'
 
         if status == 'AC':

@@ -4,10 +4,10 @@ import re
 import sys
 import time
 import webbrowser
+from logging import getLogger
 from typing import *
 
 import onlinejudge_command.download_history
-import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
 
 import onlinejudge.dispatch as dispatch
@@ -16,6 +16,8 @@ from onlinejudge.type import *
 if TYPE_CHECKING:
     import argparse
 
+logger = getLogger(__name__)
+
 
 def submit(args: 'argparse.Namespace') -> None:
     # guess url
@@ -23,15 +25,15 @@ def submit(args: 'argparse.Namespace') -> None:
     if args.file.parent.resolve() == pathlib.Path.cwd():
         guessed_urls = history.get(directory=pathlib.Path.cwd())
     else:
-        log.warning('cannot guess URL since the given file is not in the current directory')
+        logger.warning('cannot guess URL since the given file is not in the current directory')
         guessed_urls = []
     if args.url is None:
         if len(guessed_urls) == 1:
             args.url = guessed_urls[0]
-            log.info('guessed problem: %s', args.url)
+            logger.info('guessed problem: %s', args.url)
         else:
-            log.error('failed to guess the URL to submit')
-            log.info('please manually specify URL as: $ oj submit URL FILE')
+            logger.error('failed to guess the URL to submit')
+            logger.info('please manually specify URL as: $ oj submit URL FILE')
             sys.exit(1)
 
     # parse url
@@ -49,8 +51,8 @@ def submit(args: 'argparse.Namespace') -> None:
     code = format_code(code, **format_config)
 
     # report code
-    log.info('code (%d byte):', len(code))
-    log.emit(utils.make_pretty_large_file_content(code, limit=30, head=10, tail=10, bold=True))
+    logger.info('code (%d byte):', len(code))
+    logger.info(utils.NO_HEADER + '%s', utils.make_pretty_large_file_content(code, limit=30, head=10, tail=10, bold=True))
 
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
         # guess or select language ids
@@ -69,10 +71,10 @@ def submit(args: 'argparse.Namespace') -> None:
                 }
                 matched_lang_ids = guess_lang_ids_of_file(args.file, code, **kwargs)
                 if not matched_lang_ids:
-                    log.info('failed to guess languages from the file name')
+                    logger.info('failed to guess languages from the file name')
                     matched_lang_ids = list(language_dict.keys())
                 if args.language is not None:
-                    log.info('you can use `--no-guess` option if you want to do an unusual submission')
+                    logger.info('you can use `--no-guess` option if you want to do an unusual submission')
                     matched_lang_ids = select_ids_of_matched_languages(args.language.split(), matched_lang_ids, language_dict=language_dict)
             else:
                 if args.language is None:
@@ -83,28 +85,28 @@ def submit(args: 'argparse.Namespace') -> None:
         # report selected language ids
         if matched_lang_ids is not None and len(matched_lang_ids) == 1:
             args.language = matched_lang_ids[0]
-            log.info('chosen language: %s (%s)', args.language, language_dict[LanguageId(args.language)])
+            logger.info('chosen language: %s (%s)', args.language, language_dict[LanguageId(args.language)])
         else:
             if matched_lang_ids is None:
-                log.error('language is unknown')
-                log.info('supported languages are:')
+                logger.error('language is unknown')
+                logger.info('supported languages are:')
             elif len(matched_lang_ids) == 0:
-                log.error('no languages are matched')
-                log.info('supported languages are:')
+                logger.error('no languages are matched')
+                logger.info('supported languages are:')
             else:
-                log.error('Matched languages were not narrowed down to one.')
-                log.info('You have to choose:')
+                logger.error('Matched languages were not narrowed down to one.')
+                logger.info('You have to choose:')
             for lang_id in sorted(matched_lang_ids or language_dict.keys()):
-                log.emit('%s (%s)', lang_id, language_dict[LanguageId(lang_id)])
+                logger.info(utils.NO_HEADER + '%s (%s)', lang_id, language_dict[LanguageId(lang_id)])
             sys.exit(1)
 
         # confirm
         guessed_unmatch = ([problem.get_url()] != guessed_urls)
         if guessed_unmatch:
             samples_text = ('samples of "{}'.format('", "'.join(guessed_urls)) if guessed_urls else 'no samples')
-            log.warning('the problem "%s" is specified to submit, but %s were downloaded in this directory. this may be mis-operation', problem.get_url(), samples_text)
+            logger.warning('the problem "%s" is specified to submit, but %s were downloaded in this directory. this may be mis-operation', problem.get_url(), samples_text)
         if args.wait:
-            log.status('sleep(%.2f)', args.wait)
+            logger.info('sleep(%.2f)', args.wait)
             time.sleep(args.wait)
         if not args.yes:
             if guessed_unmatch:
@@ -114,24 +116,24 @@ def submit(args: 'argparse.Namespace') -> None:
                 sys.stdout.flush()
                 c = sys.stdin.readline().rstrip()
                 if c != key:
-                    log.info('terminated.')
+                    logger.info('terminated.')
                     return
             else:
                 sys.stdout.write('Are you sure? [y/N] ')
                 sys.stdout.flush()
                 c = sys.stdin.read(1)
                 if c.lower() != 'y':
-                    log.info('terminated.')
+                    logger.info('terminated.')
                     return
 
         # submit
         try:
             submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess)
         except NotLoggedInError:
-            log.failure('login required')
+            logger.info(utils.FAILURE + 'login required')
             sys.exit(1)
         except SubmissionError:
-            log.failure('submission failed')
+            logger.info(utils.FAILURE + 'submission failed')
             sys.exit(1)
 
         # show result
@@ -140,10 +142,10 @@ def submit(args: 'argparse.Namespace') -> None:
             try:
                 browser = webbrowser.get()
             except webbrowser.Error as e:
-                log.error('%s', e)
-                log.info('please set the $BROWSER envvar')
+                logger.error('%s', e)
+                logger.info('please set the $BROWSER envvar')
             else:
-                log.status('open the submission page with browser: %s', browser)
+                logger.info('open the submission page with browser: %s', browser)
                 browser.open_new_tab(submission.get_url())
 
 
@@ -230,16 +232,16 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
     ext = filename.suffix
     lang_ids = language_dict.keys()
 
-    log.debug('file extension: %s', ext)
+    logger.debug('file extension: %s', ext)
     ext = ext.lstrip('.')
 
     if ext in ('cpp', 'cxx', 'cc', 'C'):
-        log.debug('language guessing: C++')
+        logger.debug('language guessing: C++')
         # memo: https://stackoverflow.com/questions/1545080/c-code-file-extension-cc-vs-cpp
         lang_ids = list(filter(lambda lang_id: is_cplusplus_description(language_dict[lang_id]), lang_ids))
         if not lang_ids:
             return []
-        log.debug('all lang ids for C++: %s', lang_ids)
+        logger.debug('all lang ids for C++: %s', lang_ids)
 
         # compiler
         found_gcc = False
@@ -251,16 +253,16 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             elif compiler == 'clang':
                 found_clang = True
         if found_gcc and found_clang:
-            log.status('both GCC and Clang are available for C++ compiler')
+            logger.info('both GCC and Clang are available for C++ compiler')
             if cxx_compiler == 'gcc':
-                log.status('use: GCC')
+                logger.info('use: GCC')
                 lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in ('gcc', None), lang_ids))
             elif cxx_compiler == 'clang':
-                log.status('use: Clang')
+                logger.info('use: Clang')
                 lang_ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in ('clang', None), lang_ids))
             else:
                 assert cxx_compiler == 'all'
-        log.debug('lang ids after compiler filter: %s', lang_ids)
+        logger.debug('lang ids after compiler filter: %s', lang_ids)
 
         # version
         if cxx_latest:
@@ -272,19 +274,19 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                     continue
                 ids.sort(key=lambda lang_id: (parse_cplusplus_version(language_dict[lang_id]) or '', language_dict[lang_id]))
                 lang_ids += [ids[-1]]  # since C++11 < C++1y < ... as strings
-        log.debug('lang ids after version filter: %s', lang_ids)
+        logger.debug('lang ids after version filter: %s', lang_ids)
 
         assert lang_ids
         lang_ids = sorted(set(lang_ids))
         return lang_ids
 
     elif ext == 'py':
-        log.debug('language guessing: Python')
+        logger.debug('language guessing: Python')
 
         # interpreter
         lang_ids = list(filter(lambda lang_id: is_python_description(language_dict[lang_id]), lang_ids))
         if any([parse_python_interpreter(language_dict[lang_id]) == 'pypy' for lang_id in lang_ids]):
-            log.status('PyPy is available for Python interpreter')
+            logger.info('PyPy is available for Python interpreter')
         if python_interpreter != 'all':
             lang_ids = list(filter(lambda lang_id: parse_python_interpreter(language_dict[lang_id]) == python_interpreter, lang_ids))
 
@@ -293,13 +295,13 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         two_found = False
         for lang_id in lang_ids:
             version = parse_python_version(language_dict[lang_id])
-            log.debug('%s (%s) is recognized as Python %s', lang_id, language_dict[lang_id], str(version or 'unknown'))
+            logger.debug('%s (%s) is recognized as Python %s', lang_id, language_dict[lang_id], str(version or 'unknown'))
             if version == 3:
                 three_found = True
             if version == 2:
                 two_found = True
         if two_found and three_found:
-            log.status('both Python2 and Python3 are available for version of Python')
+            logger.info('both Python2 and Python3 are available for version of Python')
             if python_version in ('2', '3'):
                 versions = [int(python_version)]  # type: List[Optional[int]]
             elif python_version == 'all':
@@ -316,16 +318,16 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                     if re.search(r'python *(version:? *)?%d'.encode() % version, s.lower()):
                         versions += [version]
                 if not versions:
-                    log.status('no version info in code')
+                    logger.info('no version info in code')
                     versions = [3]
-            log.status('use: %s', ', '.join(map(str, versions)))
+            logger.info('use: %s', ', '.join(map(str, versions)))
             lang_ids = list(filter(lambda lang_id: parse_python_version(language_dict[lang_id]) in versions + [None], lang_ids))
 
         lang_ids = sorted(set(lang_ids))
         return lang_ids
 
     else:
-        log.debug('language guessing: others')
+        logger.debug('language guessing: others')
         table = [
              { 'names': [ 'awk'                   ], 'exts': [ 'awk'       ] },
              { 'names': [ 'bash'                  ], 'exts': [ 'sh'        ] },
@@ -379,9 +381,9 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
 
 def format_code(code: bytes, dos2unix: bool = False, rstrip: bool = False) -> bytes:
     if dos2unix:
-        log.status('dos2unix...')
+        logger.info('dos2unix...')
         code = code.replace(b'\r\n', b'\n')
     if rstrip:
-        log.status('rstrip...')
+        logger.info('rstrip...')
         code = code.rstrip()
     return code

@@ -3,12 +3,15 @@ import contextlib
 import os
 import subprocess
 import sys
+from logging import getLogger
 from typing import *
 
-import onlinejudge_command.logging as log
+import onlinejudge_command.utils as utils
 
 if TYPE_CHECKING:
     import argparse
+
+logger = getLogger(__name__)
 
 
 @contextlib.contextmanager
@@ -30,8 +33,8 @@ def test_reactive(args: 'argparse.Namespace') -> None:
                     proc1.communicate()
                     proc2.communicate()
                     if proc1.returncode != 0:
-                        log.failure('RE: solution returns %d', proc1.returncode)
+                        logger.info(utils.FAILURE + 'RE: solution returns %d', proc1.returncode)
                     if proc2.returncode == 0:
-                        log.success('AC')
+                        logger.info(utils.SUCCESS + 'AC')
                     else:
-                        log.failure('WA: judge returns %d', proc2.returncode)
+                        logger.info(utils.FAILURE + 'WA: judge returns %d', proc2.returncode)

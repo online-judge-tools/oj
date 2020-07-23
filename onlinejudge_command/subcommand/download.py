@@ -2,11 +2,11 @@
 import json
 import os
 import pathlib
+from logging import getLogger
 from typing import *
 
 import onlinejudge_command.download_history
 import onlinejudge_command.format_utils as format_utils
-import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
 import requests.exceptions
 
@@ -16,6 +16,8 @@ from onlinejudge.type import SampleParseError, TestCase
 
 if TYPE_CHECKING:
     import argparse
+
+logger = getLogger(__name__)
 
 
 def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
@@ -81,17 +83,18 @@ def download(args: 'argparse.Namespace') -> None:
 
     # write samples to files
     for i, sample in enumerate(samples):
-        log.emit('')
-        log.info('sample %d', i)
+        logger.info('')
+        logger.info('sample %d', i)
         for ext, path, data in iterate_files_to_write(sample, i=i):
-            log.status('%sput: %s', ext, sample.name)
+            content = ''
             if not args.silent:
-                log.emit(utils.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True))
+                content = '\n' + utils.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True)
+            logger.info('%sput: %s%s', ext, sample.name, content)
             if not args.dry_run:
                 path.parent.mkdir(parents=True, exist_ok=True)
                 with path.open('wb') as fh:
                     fh.write(data)
-                log.success('saved to: %s', path)
+                logger.info(utils.SUCCESS + 'saved to: %s', path)
 
     # print json
     if args.json:
