@@ -13,6 +13,7 @@ log_colors_level = {
 
 log_colors_semantics = {
     'NO_HEADER': '',
+    'HINT': '[' + colorama.Fore.YELLOW + 'HINT' + colorama.Style.RESET_ALL + '] ',
     'NETWORK': '[' + colorama.Fore.MAGENTA + 'NETWORK' + colorama.Style.RESET_ALL + '] ',
     'SUCCESS': '[' + colorama.Fore.GREEN + 'SUCCESS' + colorama.Style.RESET_ALL + '] ',
     'FAILURE': '[' + colorama.Fore.RED + 'FAILURE' + colorama.Style.RESET_ALL + '] ',

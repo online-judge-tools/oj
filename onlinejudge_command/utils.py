@@ -112,6 +112,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
 
 # These strings can control logging output.
 NO_HEADER = 'NO_HEADER: '
+HINT = 'HINT: '
 SUCCESS = 'SUCCESS: '
 FAILURE = 'FAILURE: '
 
