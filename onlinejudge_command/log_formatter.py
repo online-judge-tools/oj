@@ -34,7 +34,7 @@ class LogFormatter(logging.Formatter):
         # detect the heading from the record
         heading = None
         message = record.getMessage()
-        if not message:
+        if not message and record.exc_info is None:
             heading = ''
         if heading is None:
             for key in ('GET', 'POST', 'redirected'):
@@ -50,6 +50,10 @@ class LogFormatter(logging.Formatter):
                     break
         if heading is None:
             heading = log_colors_level[record.levelno]
+
+        # exception
+        if record.exc_info is not None:
+            message += '\n' + self.formatException(record.exc_info)
 
         # make a string
         if not heading:
