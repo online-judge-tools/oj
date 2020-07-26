@@ -108,7 +108,7 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
             logger.debug(e)  # the window is closed
 
     # set cookies to the requests.Session
-    logger.info('copy cookies from WebDriver')
+    logger.info('Copying cookies via WebDriver...')
     for c in cookies:
         logger.debug('set cookie: %s', c['name'])
         morsel = http.cookies.Morsel()  # type: http.cookies.Morsel
@@ -123,10 +123,10 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
 
 def is_logged_in_with_message(service: Service, *, session: requests.Session) -> bool:
     if service.is_logged_in(session=session):
-        logger.info('You have already signed in.')
+        logger.info(utils.SUCCESS + 'You have already signed in.')
         return True
     else:
-        logger.warning('You are not signed in.')
+        logger.info(utils.FAILURE + 'You are not signed in.')
         return False
 
 
@@ -147,11 +147,9 @@ def login(args: 'argparse.Namespace') -> None:
             try:
                 login_with_browser(service, session=session)
             except ImportError:
-                logger.error('Selenium is not installed: try $ pip3 install selenium')
-                pass
+                logger.error('Selenium is not installed. Please run $ pip3 install selenium')
             except WebDriverException as e:
-                logger.error('%s', e)
-                pass
+                logger.debug(e)
             else:
                 if is_logged_in_with_message(service, session=session):
                     return
@@ -160,14 +158,15 @@ def login(args: 'argparse.Namespace') -> None:
 
         if args.use_browser in ('never', 'auto'):
             if args.use_browser == 'auto':
-                logger.warning('use CUI login since Selenium fails')
+                logger.warning('Switch to use CUI-based login instead of Selenium')
             try:
                 login_with_password(service, username=args.username, password=args.password, session=session)
             except NotImplementedError as e:
-                logger.error('%s', e)
-                pass
-            except LoginError:
-                sys.exit(1)
+                logger.exception(e)
+            except LoginError as e:
+                logger.debug(e)
+            except Exception as e:
+                logger.exception(e)
             else:
                 if is_logged_in_with_message(service, session=session):
                     return
