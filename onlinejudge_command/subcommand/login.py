@@ -36,30 +36,76 @@ class WebDriverException(Exception):
     pass
 
 
-def login_with_browser(service: Service, *, session: requests.Session) -> None:
-    try:
-        import selenium.webdriver
-    except ImportError:
-        raise
+def get_webdriver() -> Any:
+    """get_webdriver() detects an available webdriver and returns it.
 
+    :raises ImportError: of Selenium
+    """
+
+    import selenium.webdriver
+
+    logger.info('Trying to open Chrome via WebDriver...')
     try:
-        profile = selenium.webdriver.FirefoxProfile()
-        profile.set_preference("general.useragent.override", session.headers['User-Agent'])
-        driver = selenium.webdriver.Firefox(firefox_profile=profile)
+        return selenium.webdriver.Chrome()
     except selenium.common.exceptions.WebDriverException as e:
-        raise WebDriverException(e)
+        logger.error(e)
 
-    # get cookies via Selenium
-    url = service.get_url_of_login_page()
-    logger.info('open with WebDriver: %s', url)
-    driver.get(url)
-    cookies = []  # type: List[Dict[str, str]]
+    logger.info('Trying to open Firefox via WebDriver...')
     try:
-        while driver.current_url:
-            cookies = driver.get_cookies()
-            time.sleep(0.1)
-    except selenium.common.exceptions.WebDriverException:
-        pass  # the window is closed
+        return selenium.webdriver.Firefox()
+    except Exception as e:
+        logger.error(e)
+
+    logger.info('Trying to open Edge via WebDriver...')
+    try:
+        return selenium.webdriver.Edge()
+    except Exception as e:
+        logger.error(e)
+
+    logger.info('Trying to open Internet Explorer via WebDriver...')
+    try:
+        return selenium.webdriver.Ie()
+    except Exception as e:
+        logger.error(e)
+
+    logger.info('Trying to open Safari via WebDriver...')
+    try:
+        return selenium.webdriver.Safari()
+    except Exception as e:
+        logger.error(e)
+
+    logger.info('Trying to open Opera via WebDriver...')
+    try:
+        return selenium.webdriver.Opera()
+    except Exception as e:
+        logger.error(e)
+
+    logger.error('No WebDriver is available.')
+    logger.info(utils.HINT + 'Please install a WebDriver. See https://www.selenium.dev/documentation/en/webdriver/driver_requirements/')
+    raise WebDriverException('No WebDriver is installed.')
+
+
+def login_with_browser(service: Service, *, session: requests.Session) -> None:
+    """
+    :raises ImportError: of Selenium
+    :raises WebDriverException:
+    """
+
+    import selenium.webdriver
+
+    with get_webdriver() as driver:
+        # get cookies via Selenium
+        url = service.get_url_of_login_page()
+        logger.info('Opening the URL via WebDriver: %s', url)
+        logger.info('Please do the followings:\n    1. login in the GUI browser\n    2. close the GUI browser')
+        driver.get(url)
+        cookies = []  # type: List[Dict[str, str]]
+        try:
+            while driver.current_url:
+                cookies = driver.get_cookies()
+                time.sleep(0.1)
+        except selenium.common.exceptions.WebDriverException as e:
+            logger.debug(e)  # the window is closed
 
     # set cookies to the requests.Session
     logger.info('copy cookies from WebDriver')
