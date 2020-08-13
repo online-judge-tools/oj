@@ -2,14 +2,16 @@ import distutils.version
 import http.client
 import json
 import time
+from logging import getLogger
 from typing import *
 
 import onlinejudge_command.__about__ as version
-import onlinejudge_command.logging as log
 import requests
 
 import onlinejudge.__about__ as api_version
 from onlinejudge.utils import user_cache_dir
+
+logger = getLogger(__name__)
 
 
 def describe_status_code(status_code: int) -> str:
@@ -19,13 +21,13 @@ def describe_status_code(status_code: int) -> str:
 def request(method: str, url: str, session: requests.Session, raise_for_status: bool = True, **kwargs) -> requests.Response:
     assert method in ['GET', 'POST']
     kwargs.setdefault('allow_redirects', True)
-    log.status('%s: %s', method, url)
+    logger.info('%s: %s', method, url)
     if 'data' in kwargs:
-        log.debug('data: %s', repr(kwargs['data']))
+        logger.debug('data: %s', repr(kwargs['data']))
     resp = session.request(method, url, **kwargs)
     if resp.url != url:
-        log.status('redirected: %s', resp.url)
-    log.status(describe_status_code(resp.status_code))
+        logger.info('redirected: %s', resp.url)
+    logger.info(describe_status_code(resp.status_code))
     if raise_for_status:
         resp.raise_for_status()
     return resp
@@ -40,13 +42,13 @@ def get_latest_version_from_pypi(package_name: str) -> str:
     cache = {}  # type: Dict[str, Any]
     if version_cache_path.exists():
         try:
-            log.debug('load the cache for update checking: %s', str(version_cache_path))
+            logger.debug('load the cache for update checking: %s', str(version_cache_path))
             with version_cache_path.open() as fh:
                 cache = json.load(fh)
             if time.time() < cache[package_name]['time'] + update_interval:
                 return cache[package_name]['version']
         except Exception as e:
-            log.warning('failed to load the cache in update checking: %s', e)
+            logger.warning('failed to load the cache in update checking: %s', e)
 
     # get
     try:
@@ -54,7 +56,7 @@ def get_latest_version_from_pypi(package_name: str) -> str:
         data = json.loads(resp.content.decode())
         value = data['info']['version']
     except requests.RequestException as e:
-        log.error(str(e))
+        logger.error(str(e))
         value = '0.0.0'  # ignore since this failure is not important
     cache[package_name] = {
         'time': int(time.time()),  # use timestamp because Python's standard datetime library is too weak to parse strings
@@ -62,7 +64,7 @@ def get_latest_version_from_pypi(package_name: str) -> str:
     }
 
     # store cache
-    log.debug('store the cache for update checking: %s', str(version_cache_path))
+    logger.debug('store the cache for update checking: %s', str(version_cache_path))
     version_cache_path.parent.mkdir(parents=True, exist_ok=True)
     with version_cache_path.open('w') as fh:
         json.dump(cache, fh)
@@ -79,8 +81,8 @@ def is_update_available_on_pypi(package_name: str, current_version: str) -> bool
 def run_for_package(*, package_name: str, current_version: str) -> bool:
     is_updated = not is_update_available_on_pypi(package_name, current_version)
     if not is_updated:
-        log.warning('update available for %s: %s -> %s', package_name, current_version, get_latest_version_from_pypi(package_name))
-        log.info('run: $ pip3 install -U %s', package_name)
+        logger.warning('update available for %s: %s -> %s', package_name, current_version, get_latest_version_from_pypi(package_name))
+        logger.info('run: $ pip3 install -U %s', package_name)
     return is_updated
 
 
@@ -95,5 +97,5 @@ def run() -> bool:
         return is_updated and is_api_updated
 
     except Exception as e:
-        log.error('failed to check update: %s', e)
+        logger.error('failed to check update: %s', e)
         return True

@@ -4,11 +4,12 @@ import argparse
 import pathlib
 import sys
 import traceback
+from logging import DEBUG, INFO, StreamHandler, basicConfig, getLogger
 from typing import List, Optional
 
 import onlinejudge_command.__0_workaround_for_conflict  # pylint: disable=unused-import
 import onlinejudge_command.__about__ as version
-import onlinejudge_command.logging as log
+import onlinejudge_command.log_formatter as log_formatter
 import onlinejudge_command.update_checking as update_checking
 import onlinejudge_command.utils as utils
 from onlinejudge_command.subcommand.download import download
@@ -20,6 +21,8 @@ from onlinejudge_command.subcommand.test import test
 from onlinejudge_command.subcommand.test_reactive import test_reactive
 
 import onlinejudge.__about__ as api_version
+
+logger = getLogger(__name__)
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -196,12 +199,10 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
     if args.version:
         print('online-judge-tools {} (+ online-judge-api-client {})'.format(version.__version__, api_version.__version__))
         sys.exit(0)
-    if args.verbose:
-        log.setLevel(log.logging.DEBUG)
-    log.debug('args: %s', str(args))
+    logger.debug('args: %s', str(args))
 
     # print the version to use for user-supporting
-    log.info('online-judge-tools %s (+ online-judge-api-client %s)', version.__version__, api_version.__version__)
+    logger.info('online-judge-tools %s (+ online-judge-api-client %s)', version.__version__, api_version.__version__)
 
     if args.subcommand in ['download', 'd', 'dl']:
         download(args)
@@ -223,26 +224,35 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    log.addHandler(log.logging.StreamHandler(sys.stderr))
-    log.setLevel(log.logging.INFO)
-    is_updated = update_checking.run()
     parser = get_parser()
-    namespace = parser.parse_args(args=args)
+    parsed = parser.parse_args(args=args)
+
+    # configure the logger
+    level = INFO
+    if parsed.verbose:
+        level = DEBUG
+    handler = StreamHandler()
+    handler.setFormatter(log_formatter.LogFormatter())
+    basicConfig(level=level, handlers=[handler])
+
+    # check update
+    is_updated = update_checking.run()
+
     try:
-        run_program(namespace, parser=parser)
+        run_program(parsed, parser=parser)
     except NotImplementedError as e:
-        log.debug('\n' + traceback.format_exc())
-        log.error('NotImplementedError')
-        log.info('The operation you specified is not supported yet. Pull requests are welcome.')
-        log.info('see: https://github.com/online-judge-tools/oj')
+        logger.debug('\n' + traceback.format_exc())
+        logger.error('NotImplementedError')
+        logger.info('The operation you specified is not supported yet. Pull requests are welcome.')
+        logger.info('see: https://github.com/online-judge-tools/oj')
         if not is_updated:
-            log.info('hint: try updating the version of online-judge-tools')
+            logger.info('hint: try updating the version of online-judge-tools')
         sys.exit(1)
     except Exception as e:
-        log.debug('\n' + traceback.format_exc())
-        log.error(str(e))
+        logger.debug('\n' + traceback.format_exc())
+        logger.exception(str(e))
         if not is_updated:
-            log.info('hint: try updating the version of online-judge-tools')
+            logger.info('hint: try updating the version of online-judge-tools')
         sys.exit(1)
 
 

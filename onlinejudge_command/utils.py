@@ -14,15 +14,18 @@ import sys
 import tempfile
 import time
 import webbrowser
+from logging import getLogger
 from typing import *
 from typing.io import *
 
+import colorama
 import onlinejudge_command.__about__ as version
-import onlinejudge_command.logging as log
 import requests
 
 import onlinejudge.utils as utils
 from onlinejudge.type import *
+
+logger = getLogger(__name__)
 
 user_data_dir = utils.user_data_dir
 user_cache_dir = utils.user_cache_dir
@@ -33,7 +36,7 @@ default_cookie_path = utils.default_cookie_path
 def new_session_with_our_user_agent(*, path: pathlib.Path) -> Iterator[requests.Session]:
     session = requests.Session()
     session.headers['User-Agent'] = '{}/{} (+{})'.format(version.__package_name__, version.__version__, version.__url__)
-    log.debug('User-Agent: %s', session.headers['User-Agent'])
+    logger.debug('User-Agent: %s', session.headers['User-Agent'])
     with utils.with_cookiejar(session, path=path) as session:
         yield session
 
@@ -72,10 +75,10 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         try:
             proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr, preexec_fn=preexec_fn)
         except FileNotFoundError:
-            log.error('No such file or directory: %s', command)
+            logger.error('No such file or directory: %s', command)
             sys.exit(1)
         except PermissionError:
-            log.error('Permission denied: %s', command)
+            logger.error('Permission denied: %s', command)
             sys.exit(1)
         answer = None  # type: Optional[bytes]
         try:
@@ -96,7 +99,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         if gnu_time is not None:
             with open(fh.name) as fh1:
                 reported = fh1.read()
-            log.debug('GNU time says:\n%s', reported)
+            logger.debug('GNU time says:\n%s', reported)
             if reported.strip() and reported.splitlines()[-1].isdigit():
                 memory = int(reported.splitlines()[-1]) / 1000
     info = {
@@ -105,6 +108,59 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         'memory': memory,  # Optional[float], in megabyte
     }
     return info, proc
+
+
+# These strings can control logging output.
+NO_HEADER = 'NO_HEADER: '
+HINT = 'HINT: '
+SUCCESS = 'SUCCESS: '
+FAILURE = 'FAILURE: '
+
+
+def green(s: str) -> str:
+    """green(s) color s with green.
+
+    This function exists to encapsulate the coloring methods only in utils.py.
+    """
+
+    return colorama.Fore.GREEN + s + colorama.Fore.RESET
+
+
+def red(s: str) -> str:
+    """red(s) color s with red.
+
+    This function exists to encapsulate the coloring methods only in utils.py.
+    """
+
+    return colorama.Fore.RED + s + colorama.Fore.RESET
+
+
+def green_diff(s: str) -> str:
+    """green_diff(s) is deprecated.
+    """
+
+    return colorama.Fore.RESET + colorama.Back.GREEN + colorama.Style.BRIGHT + s + colorama.Style.NORMAL + colorama.Back.RESET + colorama.Fore.GREEN
+
+
+def red_diff(s: str) -> str:
+    """red_diff(s) is deprecated.
+    """
+
+    return colorama.Fore.RESET + colorama.Back.RED + colorama.Style.BRIGHT + s + colorama.Style.NORMAL + colorama.Back.RESET + colorama.Fore.RED
+
+
+def success(msg: str) -> str:
+    """success(msg) adds a header to msg for logging.
+    """
+
+    return colorama.Fore.GREEN + 'SUCCESS' + colorama.Style.RESET + ': ' + msg
+
+
+def failure(msg: str) -> str:
+    """success(msg) adds a header to msg for logging.
+    """
+
+    return colorama.Fore.RED + 'FAILURE' + colorama.Style.RESET + ': ' + msg
 
 
 def remove_suffix(s: str, suffix: str) -> str:
@@ -123,19 +179,22 @@ def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: 
         return str(e)
 
     def font(line: str) -> str:
+        dim = lambda s: colorama.Style.RESET_ALL + colorama.Style.DIM + s + colorama.Style.RESET_ALL
+        bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
+
         if not line.endswith('\n'):
-            line += log.dim('(no trailing newline)')
+            line += dim('(no trailing newline)')
         else:
 
             def repl(m):
                 if m.group(1) == '\r':
-                    return log.dim('\\r' + m.group(2))
+                    return dim('\\r' + m.group(2))
                 else:
-                    return log.dim(m.group(1).replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r') + '(trailing spaces)' + m.group(2))
+                    return dim(m.group(1).replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r') + '(trailing spaces)' + m.group(2))
 
             line = re.sub(r'(\s+)(\n)$', repl, line)
         if bold:
-            line = log.bold(line)
+            line = bold(line)
         return line
 
     char_in_line, _ = shutil.get_terminal_size()

@@ -5,9 +5,10 @@ import os
 import pathlib
 import re
 import sys
+from logging import getLogger
 from typing import Dict, Generator, List, Match, Optional, Set
 
-import onlinejudge_command.logging as log
+logger = getLogger(__name__)
 
 
 def percentsplit(s: str) -> Generator[str, None, None]:
@@ -56,7 +57,7 @@ def glob_with_format(directory: pathlib.Path, format: str) -> List[pathlib.Path]
     pattern = (glob.escape(str(directory) + os.path.sep) + percentformat(glob.escape(format).replace(glob.escape('%'), '%'), table))
     paths = list(map(pathlib.Path, glob.glob(pattern)))
     for path in paths:
-        log.debug('testcase globbed: %s', path)
+        logger.debug('testcase globbed: %s', path)
     return paths
 
 
@@ -86,7 +87,7 @@ def drop_backup_or_hidden_files(paths: List[pathlib.Path]) -> List[pathlib.Path]
     result = []  # type: List[pathlib.Path]
     for path in paths:
         if is_backup_or_hidden_file(path):
-            log.warning('ignore a backup file: %s', path)
+            logger.warning('ignore a backup file: %s', path)
         else:
             result += [path]
     return result
@@ -97,7 +98,7 @@ def construct_relationship_of_files(paths: List[pathlib.Path], directory: pathli
     for path in paths:
         m = match_with_format(directory, format, path.resolve())
         if not m:
-            log.error('unrecognizable file found: %s', path)
+            logger.error('unrecognizable file found: %s', path)
             sys.exit(1)
         name = m.groupdict()['name']
         ext = m.groupdict()['ext']
@@ -106,10 +107,10 @@ def construct_relationship_of_files(paths: List[pathlib.Path], directory: pathli
     for name in tests:
         if 'in' not in tests[name]:
             assert 'out' in tests[name]
-            log.error('dangling output case: %s', tests[name]['out'])
+            logger.error('dangling output case: %s', tests[name]['out'])
             sys.exit(1)
     if not tests:
-        log.error('no cases found')
+        logger.error('no cases found')
         sys.exit(1)
-    log.info('%d cases found', len(tests))
+    logger.info('%d cases found', len(tests))
     return tests

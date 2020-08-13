@@ -14,15 +14,17 @@ import sys
 import tempfile
 import threading
 import traceback
+from logging import getLogger
 from typing import *
 
 import diff_match_patch
 import onlinejudge_command.format_utils as fmtutils
-import onlinejudge_command.logging as log
 import onlinejudge_command.utils as utils
 
 if TYPE_CHECKING:
     import argparse
+
+logger = getLogger(__name__)
 
 MEMORY_WARNING = 500  # megabyte
 MEMORY_PRINT = 100  # megabyte
@@ -33,7 +35,7 @@ def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
         try:
             y = float(x)
             if not math.isfinite(y):
-                log.warning('not an real number found: %f', y)
+                logger.warning('not an real number found: %f', y)
             return y
         except ValueError:
             return x
@@ -60,7 +62,7 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
         match = lambda a, b: compare_as_floats(a, b, error)
     elif judge is not None:  # special judge mode
 
-        def match(a, b):
+        def match(a: str, b: str) -> bool:
             # On Windows, a temp file is not created if we use "with" statement,
             user_output = tempfile.NamedTemporaryFile(delete=False)
             judge_result = False
@@ -77,61 +79,61 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
                 arg3 = str((str(test_output_path.resolve()) if test_output_path is not None else ''))
 
                 actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)  # TODO: quote arguments for paths including spaces; see https://github.com/kmyk/online-judge-tools/pull/584
-                log.status('$ %s', actual_command)
+                logger.info('$ %s', actual_command)
                 info, proc = utils.exec_command(actual_command)
                 if not silent:
-                    log.emit('judge\'s output:\n%s', utils.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
+                    logger.info(utils.NO_HEADER + 'judge\'s output:\n%s', utils.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
                 judge_result = (proc.returncode == 0)
             finally:
                 os.unlink(user_output.name)
             return judge_result
     else:
 
-        def match(a, b):
+        def match(a: str, b: str) -> bool:
             if a == b:
                 return True
             if rstrip and a.rstrip(rstrip_targets) == b.rstrip(rstrip_targets):
-                log.warning('WA if no rstrip')
+                logger.warning('WA if no rstrip')
                 return True
             if a == b.replace('\n', '\r\n'):
-                log.warning(r'WA if not replacing "\r\n" with "\n"')
+                logger.warning(r'WA if not replacing "\r\n" with "\n"')
                 return True
             if rstrip and a.rstrip(rstrip_targets) == b.replace('\n', '\r\n').rstrip(rstrip_targets):
-                log.warning('WA if no rstrip')
-                log.warning(r'WA if not replacing "\r\n" with "\n"')
+                logger.warning('WA if no rstrip')
+                logger.warning(r'WA if not replacing "\r\n" with "\n"')
                 return True
             if a.replace('\n', '\r\n') == b:
-                log.warning(r'WA if not replacing "\n" with "\r\n"')
+                logger.warning(r'WA if not replacing "\n" with "\r\n"')
                 return True
             if rstrip and a.replace('\n', '\r\n').rstrip(rstrip_targets) == b.rstrip(rstrip_targets):
                 # TODO: use a smart way if you need more equality patterns
-                log.warning('WA if no rstrip')
-                log.warning(r'WA if not replacing "\n" with "\r\n"')
+                logger.warning('WA if no rstrip')
+                logger.warning(r'WA if not replacing "\n" with "\r\n"')
                 return True
             return False
 
     # prepare the function to print the input
     is_input_printed = False
 
-    def print_input():
+    def print_input() -> None:
         nonlocal is_input_printed
         if does_print_input and not is_input_printed:
             is_input_printed = True
             with test_input_path.open('rb') as inf:
-                log.emit('input:\n%s', utils.make_pretty_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
+                logger.info(utils.NO_HEADER + 'input:\n%s', utils.make_pretty_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
 
     # check TLE, RE or not
     status = 'AC'
     if proc.returncode is None:
-        log.failure(log.red('TLE'))
+        logger.info(utils.FAILURE + '' + utils.red('TLE'))
         status = 'TLE'
         print_input()
     elif memory is not None and mle is not None and memory > mle:
-        log.failure(log.red('MLE'))
+        logger.info(utils.FAILURE + '' + utils.red('MLE'))
         status = 'MLE'
         print_input()
     elif proc.returncode != 0:
-        log.failure(log.red('RE') + ': return code %d', proc.returncode)
+        logger.info(utils.FAILURE + '' + utils.red('RE') + ': return code %d', proc.returncode)
         status = 'RE'
         print_input()
 
@@ -142,15 +144,15 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
                 expected = outf.read().decode()
         else:  # only if --judge-command option
             expected = ''
-            log.warning('expected output is not found')
+            logger.warning('expected output is not found')
         # compare
         if not match(answer, expected):
-            log.failure(log.red('WA'))
+            logger.info(utils.FAILURE + '' + utils.red('WA'))
             print_input()
             if not silent:
                 if mode == 'simple':
-                    log.emit('output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
-                    log.emit('expected:\n%s', utils.make_pretty_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
+                    logger.info(utils.NO_HEADER + 'output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+                    logger.info(utils.NO_HEADER + 'expected:\n%s', utils.make_pretty_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
                 elif mode == 'side-by-side':
                     if max(answer.count('\n'), expected.count('\n')) <= 40:
                         display_side_by_side_color(answer, expected)
@@ -161,9 +163,10 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
             status = 'WA'
     else:
         if not silent:
-            log.emit(('output:\n%s' if is_input_printed else '%s'), utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            header = ('output:\n' if is_input_printed else '')
+            logger.info(utils.NO_HEADER + '%s%s', header, utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
     if status == 'AC':
-        log.success(log.green('AC'))
+        logger.info(utils.SUCCESS + '' + utils.green('AC'))
 
     return status
 
@@ -171,8 +174,8 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
 def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, lock: Optional[threading.Lock] = None, args: 'argparse.Namespace') -> Dict[str, Any]:
     # print the header earlier if not in parallel
     if lock is None:
-        log.emit('')
-        log.info('%s', test_name)
+        logger.info('')
+        logger.info('%s', test_name)
 
     # run the binary
     with test_input_path.open() as inf:
@@ -186,17 +189,17 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
     nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext() after updating Python to 3.7
     with lock or nullcontext:
         if lock is not None:
-            log.emit('')
-            log.info('%s', test_name)
-        log.status('time: %f sec', elapsed)
+            logger.info('')
+            logger.info('%s', test_name)
+        logger.info('time: %f sec', elapsed)
         if memory:
             if memory < MEMORY_PRINT:
                 if args.print_memory:
-                    log.status('memory: %f MB', memory)
+                    logger.info('memory: %f MB', memory)
             elif memory < MEMORY_WARNING:
-                log.status('memory: %f MB', memory)
+                logger.info('memory: %f MB', memory)
             else:
-                log.warning('memory: %f MB', memory)
+                logger.warning('memory: %f MB', memory)
 
         status = compare_and_report(proc, answer, memory, test_input_path, test_output_path, mle=args.mle, mode=args.display_mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
 
@@ -231,7 +234,7 @@ def check_gnu_time(gnu_time: str) -> bool:
     except AttributeError:
         raise  # AttributeError is also a mistake
     except Exception as e:
-        log.debug(traceback.format_exc())
+        logger.debug(traceback.format_exc())
     return False
 
 
@@ -245,7 +248,7 @@ def test(args: 'argparse.Namespace') -> None:
 
     # check wheather GNU time is available
     if not check_gnu_time(args.gnu_time):
-        log.warning('GNU time is not available: %s', args.gnu_time)
+        logger.warning('GNU time is not available: %s', args.gnu_time)
         args.gnu_time = None
     if args.mle is not None and args.gnu_time is None:
         raise RuntimeError('--mle is used but GNU time does not exist')
@@ -257,7 +260,7 @@ def test(args: 'argparse.Namespace') -> None:
             history += [test_single_case(name, paths['in'], paths.get('out'), args=args)]
     else:
         if os.name == 'nt':
-            log.warning("-j/--jobs opiton is unstable on Windows environmet")
+            logger.warning("-j/--jobs opiton is unstable on Windows environmet")
         with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
             lock = threading.Lock()
             futures = []  # type: List[concurrent.futures.Future]
@@ -283,17 +286,17 @@ def test(args: 'argparse.Namespace') -> None:
             heaviest_name = result['testcase']['name']
 
     # print the summary
-    log.emit('')
-    log.status('slowest: %f sec  (for %s)', slowest, slowest_name)
+    logger.info('')
+    logger.info('slowest: %f sec  (for %s)', slowest, slowest_name)
     if heaviest >= 0:
         if heaviest < MEMORY_WARNING:
-            log.status('max memory: %f MB  (for %s)', heaviest, heaviest_name)
+            logger.info('max memory: %f MB  (for %s)', heaviest, heaviest_name)
         else:
-            log.warning('max memory: %f MB  (for %s)', heaviest, heaviest_name)
+            logger.warning('max memory: %f MB  (for %s)', heaviest, heaviest_name)
     if ac_count == len(tests):
-        log.success('test ' + log.green('success') + ': %d cases', len(tests))
+        logger.info(utils.SUCCESS + 'test ' + utils.green('success') + ': %d cases', len(tests))
     else:
-        log.failure('test ' + log.red('failed') + ': %d AC / %d cases', ac_count, len(tests))
+        logger.info(utils.FAILURE + 'test ' + utils.red('failed') + ': %d AC / %d cases', ac_count, len(tests))
 
     if args.json:
         print(json.dumps(history))
@@ -309,13 +312,13 @@ def space_padding(s: str, max_length: int) -> str:
 def display_side_by_side_color(answer: str, expected: str):
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
-    log.emit("output:" + " " * (max_chars - 7) + "|" + "expected:")
-    log.emit("-" * max_chars + "|" + "-" * max_chars)
+    logger.info(utils.NO_HEADER + 'output:' + " " * (max_chars - 7) + "|" + "expected:")
+    logger.info(utils.NO_HEADER + '%s', "-" * max_chars + "|" + "-" * max_chars)
     for _, diff_found, ans_line, exp_line, ans_chars, exp_chars in side_by_side_diff(answer, expected):
         if diff_found:
-            log.emit(log.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + log.green(exp_line))
+            logger.info(utils.NO_HEADER + '%s', utils.red(space_padding(ans_line, max_chars - ans_chars)) + "|" + utils.green(exp_line))
         else:
-            log.emit(space_padding(ans_line, max_chars - ans_chars) + "|" + exp_line)
+            logger.info(utils.NO_HEADER + '%s', space_padding(ans_line, max_chars - ans_chars) + "|" + exp_line)
 
 
 def display_snipped_side_by_side_color(answer: str, expected: str):
@@ -341,8 +344,8 @@ def display_snipped_side_by_side_color(answer: str, expected: str):
 
     max_line_num_digits = max([len(str(entry[0])) for entry in deq if entry[0] is not None])
 
-    log.emit(" " * max_line_num_digits + "|output:" + " " * (max_chars - 7 - max_line_num_digits - 1) + "|" + "expected:")
-    log.emit("-" * max_chars + "|" + "-" * max_chars)
+    logger.info(utils.NO_HEADER + '%s', " " * max_line_num_digits + "|output:" + " " * (max_chars - 7 - max_line_num_digits - 1) + "|" + "expected:")
+    logger.info(utils.NO_HEADER + '%s', "-" * max_chars + "|" + "-" * max_chars)
 
     last_line_number = 0
     for (line_number, diff_found, ans_line, exp_line, ans_chars, exp_chars) in deq:
@@ -350,14 +353,14 @@ def display_snipped_side_by_side_color(answer: str, expected: str):
         line_number_str = str(line_number) if line_number is not None else ""
         line_num_display = space_padding(line_number_str, max_line_num_digits - len(line_number_str)) + "|"
         if not diff_found:
-            log.emit(line_num_display + space_padding(ans_line, num_spaces_after_output) + "|" + exp_line)
+            logger.info(utils.NO_HEADER + '%s', line_num_display + space_padding(ans_line, num_spaces_after_output) + "|" + exp_line)
         else:
-            log.emit(line_num_display + log.red(space_padding(ans_line, num_spaces_after_output)) + "|" + log.green(exp_line))
+            logger.info(utils.NO_HEADER + '%s', line_num_display + utils.red(space_padding(ans_line, num_spaces_after_output)) + "|" + utils.green(exp_line))
         if line_number is not None:
             last_line_number = line_number
     num_snipped_lines = answer.count('\n') + 1 - last_line_number
     if num_snipped_lines > 0:
-        log.emit('... ({} lines) ...'.format(num_snipped_lines))
+        logger.info(utils.NO_HEADER + '... (%s lines) ...', num_snipped_lines)
 
 
 def yield_open_entry(open_entry: Tuple[List[str], List[str], List[int], List[int]]) -> Generator[Tuple[bool, bool, str, str, int, int], None, None]:
@@ -406,11 +409,11 @@ def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, boo
                 rnums[-1] += len(line)
             elif change_type == 1:
                 rs[-1] = rs[-1] or ''
-                rs[-1] += log.green_diff(line) if line else ''
+                rs[-1] += utils.green_diff(line) if line else ''
                 rnums[-1] += len(line)
             elif change_type == -1:
                 ls[-1] = ls[-1] or ''
-                ls[-1] += log.red_diff(line) if line else ''
+                ls[-1] += utils.red_diff(line) if line else ''
                 lnums[-1] += len(line)
 
         lines = lines[1:]
@@ -430,12 +433,12 @@ def side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, boo
             elif change_type == 1:
                 ls, rs, lnums, rnums = open_entry
                 for line in lines:
-                    rs.append(log.green_diff(line) if line else '')
+                    rs.append(utils.green_diff(line) if line else '')
                     rnums.append(len(line))
             elif change_type == -1:
                 ls, rs, lnums, rnums = open_entry
                 for line in lines:
-                    ls.append(log.red_diff(line) if line else '')
+                    ls.append(utils.red_diff(line) if line else '')
                     lnums.append(len(line))
 
     # Push out open entry
