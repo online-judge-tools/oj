@@ -1,5 +1,11 @@
 # Change Log
 
+## 10.1.0 / 2020-07-11
+
+-   [#791](https://github.com/online-judge-tools/oj/pull/791) add WebDriver supports of more browsers
+-   [#789](https://github.com/online-judge-tools/oj/pull/789) change the style of logging from [pwntools](https://github.com/Gallopsled/pwntools)'s one to Python's standard one
+-   [#793](https://github.com/online-judge-tools/oj/pull/793) fix a minor bug of logging
+
 ## 10.0.5 / 2020-07-12
 
 -   [#787](https://github.com/online-judge-tools/oj/pull/787) add a workaround for the conflict of a module name
