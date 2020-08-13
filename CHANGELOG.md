@@ -1,6 +1,6 @@
 # Change Log
 
-## 10.1.0 / 2020-07-11
+## 10.1.0 / 2020-08-13
 
 -   [#791](https://github.com/online-judge-tools/oj/pull/791) add WebDriver supports of more browsers
 -   [#789](https://github.com/online-judge-tools/oj/pull/789) change the style of logging from [pwntools](https://github.com/Gallopsled/pwntools)'s one to Python's standard one
