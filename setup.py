@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-from setuptools import find_packages, setup
-
 import onlinejudge_command.__about__ as version
+from setuptools import find_packages, setup
 
 setup(
     name=version.__package_name__,

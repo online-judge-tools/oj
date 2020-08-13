@@ -3,6 +3,7 @@ import textwrap
 import unittest
 
 import onlinejudge_command.subcommand.submit as submit
+
 from onlinejudge.type import Language, LanguageId
 
 # https://atcoder.jp/contests/language-test-ver1

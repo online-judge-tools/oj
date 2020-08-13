@@ -1,6 +1,7 @@
 import unittest
 
 import tests.utils
+
 from onlinejudge.service.atcoder import AtCoderService
 from onlinejudge.service.codeforces import CodeforcesService
 from onlinejudge.service.hackerrank import HackerRankService

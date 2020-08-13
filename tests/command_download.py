@@ -3,11 +3,11 @@ import os
 import unittest
 
 import requests.exceptions
-
 import tests.utils
-from onlinejudge.type import SampleParseError
 from onlinejudge_command.main import get_parser
 from onlinejudge_command.subcommand.download import download
+
+from onlinejudge.type import SampleParseError
 
 
 def get_files_from_json(samples):
