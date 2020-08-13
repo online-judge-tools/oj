@@ -37,16 +37,10 @@ class LogFormatter(logging.Formatter):
         if not message and record.exc_info is None:
             heading = ''
         if heading is None:
-            for key in ('GET', 'POST', 'redirected'):
-                if message.startswith(key + ': '):
-                    heading = log_colors_semantics['NETWORK']
-            if message in status_code_messages:
-                heading = log_colors_semantics['NETWORK']
-        if heading is None:
             for key, value in log_colors_semantics.items():
-                if message.startswith(key + ': '):
+                if message.upper().startswith(key + ':'):
                     heading = value
-                    message = message[len(key + ': '):]
+                    message = message[len(key + ':'):].lstrip()
                     break
         if heading is None:
             heading = log_colors_level[record.levelno]
