@@ -1,8 +1,8 @@
 import unittest
 
 import requests.exceptions
-import tests.command_download
 
+import tests.command_download
 from onlinejudge.type import SampleParseError
 
 

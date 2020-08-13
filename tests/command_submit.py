@@ -4,15 +4,15 @@ import time
 import unittest
 
 import requests.exceptions
-import tests.utils
-from onlinejudge_command.main import get_parser
-from onlinejudge_command.subcommand.submit import submit
 
+import tests.utils
 from onlinejudge.service.atcoder import AtCoderService
 from onlinejudge.service.codeforces import CodeforcesService
 from onlinejudge.service.hackerrank import HackerRankService
 from onlinejudge.service.toph import TophService
 from onlinejudge.service.yukicoder import YukicoderService
+from onlinejudge_command.main import get_parser
+from onlinejudge_command.subcommand.submit import submit
 
 
 class SubmitArgumentsTest(unittest.TestCase):

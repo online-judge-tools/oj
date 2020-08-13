@@ -18,6 +18,7 @@ from logging import getLogger
 from typing import *
 
 import diff_match_patch
+
 import onlinejudge_command.format_utils as fmtutils
 import onlinejudge_command.utils as utils
 

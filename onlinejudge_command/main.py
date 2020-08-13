@@ -7,6 +7,7 @@ import traceback
 from logging import DEBUG, INFO, StreamHandler, basicConfig, getLogger
 from typing import List, Optional
 
+import onlinejudge.__about__ as api_version
 import onlinejudge_command.__0_workaround_for_conflict  # pylint: disable=unused-import
 import onlinejudge_command.__about__ as version
 import onlinejudge_command.log_formatter as log_formatter
@@ -19,8 +20,6 @@ from onlinejudge_command.subcommand.login import login
 from onlinejudge_command.subcommand.submit import submit
 from onlinejudge_command.subcommand.test import test
 from onlinejudge_command.subcommand.test_reactive import test_reactive
-
-import onlinejudge.__about__ as api_version
 
 logger = getLogger(__name__)
 

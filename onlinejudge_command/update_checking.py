@@ -5,10 +5,10 @@ import time
 from logging import getLogger
 from typing import *
 
-import onlinejudge_command.__about__ as version
 import requests
 
 import onlinejudge.__about__ as api_version
+import onlinejudge_command.__about__ as version
 from onlinejudge.utils import user_cache_dir
 
 logger = getLogger(__name__)
