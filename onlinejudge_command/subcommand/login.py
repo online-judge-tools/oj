@@ -3,6 +3,7 @@ import datetime
 import getpass
 import http.cookies
 import sys
+import textwrap
 import time
 from logging import getLogger
 from typing import *
@@ -81,7 +82,20 @@ def get_webdriver() -> Any:
         logger.error(e)
 
     logger.error('No WebDriver is available.')
-    logger.info(utils.HINT + 'Please install a WebDriver. See https://www.selenium.dev/documentation/en/webdriver/driver_requirements/')
+    logger.info(utils.HINT + textwrap.dedent("""
+        Please install a WebDriver.
+        See https://www.selenium.dev/documentation/en/webdriver/driver_requirements/
+
+        Detailed instructions:
+            If you use Ubuntu:
+                1. Run $ sudo apt install chromium-chromedriver firefox-geckodriver
+            If you use Ubuntu under Windows Subsystem for Linux:
+                1. Make a symbolic link from cookie.jar in WSL to cookie.jar out of WSL. For example, run $ ln -s /mnt/c/Users/%USERNAME%/AppData/Local/online-judge-tools/online-judge-tools/cookie.jar /home/ubuntu/.local/share/online-judge-tools/cookie.jar
+                2. Use `oj login` outside of WSL
+            If you use Windows:
+                1. Install Chocolatey. See https://chocolatey.org/
+                2. Run > choco install selenium-all-drivers
+    """))
     raise WebDriverException('No WebDriver is installed.')
 
 
