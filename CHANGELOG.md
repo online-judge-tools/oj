@@ -1,5 +1,9 @@
 # Change Log
 
+## 10.1.1 / 2020-08-14
+
+-   [#797](https://github.com/online-judge-tools/oj/pull/797) add a hint message to install WebDriver
+
 ## 10.1.0 / 2020-08-13
 
 -   [#791](https://github.com/online-judge-tools/oj/pull/791) add WebDriver supports of more browsers
