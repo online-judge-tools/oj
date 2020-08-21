@@ -3,6 +3,8 @@ import logging
 
 import colorama
 
+colorama.init()
+
 log_colors_level = {
     logging.DEBUG: '[' + colorama.Fore.RED + 'DEBUG' + colorama.Style.RESET_ALL + '] ',
     logging.INFO: '[' + colorama.Fore.BLUE + 'INFO' + colorama.Style.RESET_ALL + '] ',
