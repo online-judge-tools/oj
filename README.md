@@ -160,8 +160,13 @@ For other questions, use [Gitter](https://gitter.im/online-judge-tools/community
 
 ### Articles
 
+in English:
+
+-   [Introduction to online-judge-tools (English)](https://online-judge-tools.readthedocs.io/en/master/introduction.en.html) (the official documentation, translated)
+
 in Japanese:
 
+-   [Introduction to online-judge-tools (Japanese)](https://online-judge-tools.readthedocs.io/en/master/introduction.ja.html) (the official documentation)
 -   [online-judge-toolsを導入しよう！ &#183; ますぐれメモ](https://blog.masutech.work/posts/compro/oj-introduction/)
 -   [online-judge-toolsをVimから呼んで楽をする - Leverage Copy](https://maguroguma.hatenablog.com/entry/2020/08/19/090000)
 
