@@ -186,14 +186,7 @@ projects depending on kmyk/online-judge-tools:
     -   [kmyk/online-judge-template-generator](https://github.com/kmyk/online-judge-template-generator) analyzes problems and generates templates including auto-generated input/output parts
     -   [fukatani/rujaion](https://github.com/fukatani/rujaion) is an IDE for competitive-programming with Rust
 
-
-### Hall-Of-Fame
-
-[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/0)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/0)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/1)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/1)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/2)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/2)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/3)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/3)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/4)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/4)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/5)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/5)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/6)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/6)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/7)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/7)
-
-For the full list of contributors, see [CHANGELOG.md](https://github.com/kmyk/online-judge-tools/blob/master/CHANGELOG.md) or [the contributors page](https://github.com/kmyk/online-judge-tools/graphs/contributors) of GitHub.
-
-### maintainers
+## Maintainers
 
 -   current maintainers
     -   [@kmyk](https://github.com/kmyk) (AtCoder: [kimiyuki](https://atcoder.jp/users/kimiyuki), Codeforces: [kimiyuki](https://codeforces.com/profile/kimiyuki)) (original author)
