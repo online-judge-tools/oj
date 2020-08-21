@@ -1,5 +1,9 @@
 # Change Log
 
+## 10.1.2 / 2020-08-22
+
+-   [#801](https://github.com/online-judge-tools/oj/pull/801) fix a bug of logging on Windows `cmd.exe`
+
 ## 10.1.1 / 2020-08-14
 
 -   [#797](https://github.com/online-judge-tools/oj/pull/797) add a hint message to install WebDriver
