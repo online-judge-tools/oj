@@ -156,7 +156,16 @@ If you cannot install online-judge-tools even following the instructions, please
 
 For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) [![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community) or other SNSs.
 
-## Related Tools
+## Resources
+
+### Articles
+
+in Japanese:
+
+-   [online-judge-toolsを導入しよう！ &#183; ますぐれメモ](https://blog.masutech.work/posts/compro/oj-introduction/)
+-   [online-judge-toolsをVimから呼んで楽をする - Leverage Copy](https://maguroguma.hatenablog.com/entry/2020/08/19/090000)
+
+### Related Tools
 
 conflicted:
 
