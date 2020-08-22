@@ -156,7 +156,21 @@ If you cannot install online-judge-tools even following the instructions, please
 
 For other questions, use [Gitter](https://gitter.im/online-judge-tools/community) [![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community) or other SNSs.
 
-## Related Tools
+## Resources
+
+### Articles
+
+in English:
+
+-   [Introduction to online-judge-tools (English)](https://online-judge-tools.readthedocs.io/en/master/introduction.en.html) (the official documentation, translated)
+
+in Japanese:
+
+-   [Introduction to online-judge-tools (Japanese)](https://online-judge-tools.readthedocs.io/en/master/introduction.ja.html) (the official documentation)
+-   [online-judge-toolsを導入しよう！ &#183; ますぐれメモ](https://blog.masutech.work/posts/compro/oj-introduction/)
+-   [online-judge-toolsをVimから呼んで楽をする - Leverage Copy](https://maguroguma.hatenablog.com/entry/2020/08/19/090000)
+
+### Related Tools
 
 conflicted:
 
@@ -186,14 +200,7 @@ projects depending on kmyk/online-judge-tools:
     -   [kmyk/online-judge-template-generator](https://github.com/kmyk/online-judge-template-generator) analyzes problems and generates templates including auto-generated input/output parts
     -   [fukatani/rujaion](https://github.com/fukatani/rujaion) is an IDE for competitive-programming with Rust
 
-
-### Hall-Of-Fame
-
-[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/0)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/0)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/1)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/1)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/2)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/2)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/3)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/3)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/4)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/4)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/5)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/5)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/6)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/6)[![](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/images/7)](https://sourcerer.io/fame/kmyk/kmyk/online-judge-tools/links/7)
-
-For the full list of contributors, see [CHANGELOG.md](https://github.com/kmyk/online-judge-tools/blob/master/CHANGELOG.md) or [the contributors page](https://github.com/kmyk/online-judge-tools/graphs/contributors) of GitHub.
-
-### maintainers
+## Maintainers
 
 -   current maintainers
     -   [@kmyk](https://github.com/kmyk) (AtCoder: [kimiyuki](https://atcoder.jp/users/kimiyuki), Codeforces: [kimiyuki](https://codeforces.com/profile/kimiyuki)) (original author)
