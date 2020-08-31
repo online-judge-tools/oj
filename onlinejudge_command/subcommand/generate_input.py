@@ -151,9 +151,9 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         expected = output_data.decode()
         if not simple_match(answer, expected):
             logger.info(utils.FAILURE + '' + utils.red('WA'))
-            logger.info('NO_HDEADER: input:\n%s', utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
-            logger.info('NO_HDEADER: output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
-            logger.info('NO_HDEADER: expected:\n%s', utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + 'input:\n%s', utils.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + 'output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + 'expected:\n%s', utils.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
             status = 'WA'
 
         if status == 'AC':
