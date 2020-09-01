@@ -113,3 +113,16 @@ class GenerateInputTest(unittest.TestCase):
                 'data': '1\n'
             },
         ])
+
+    def test_call_generate_input_failure(self):
+        self.snippet_call_generate_input(
+            args=[tests.utils.python_script('generate.py'), '3'],
+            input_files=[
+                {
+                    'path': 'generate.py',
+                    'data': 'raise RuntimeError()\n'
+                },
+            ],
+            expected_values=[],
+            disallowed_files=['test/random-{}.in'.format(str(i).zfill(3)) for i in range(3)],
+        )
