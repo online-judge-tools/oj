@@ -5,6 +5,7 @@ import contextlib
 import itertools
 import os
 import pathlib
+import subprocess
 import threading
 from logging import getLogger
 from typing import *
@@ -59,14 +60,14 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
             logger.info(utils.SUCCESS + 'saved to: %s', output_path)
 
 
-def check_status(info, proc, *, submit):
+def check_status(info: Dict[str, Any], proc: subprocess.Popen, *, submit: Callable[..., None]) -> bool:
     submit(logger.info, 'time: %f sec', info['elapsed'])
     if proc.returncode is None:
-        submit(logger.failure, logger.red('TLE'))
+        submit(logger.info, utils.FAILURE + utils.red('TLE'))
         submit(logger.info, 'skipped.')
         return False
     elif proc.returncode != 0:
-        submit(logger.failure, logger.red('RE') + ': return code %d', proc.returncode)
+        submit(logger.info, utils.FAILURE + utils.red('RE') + ': return code %d', proc.returncode)
         submit(logger.info, 'skipped.')
         return False
     assert info['answer'] is not None
