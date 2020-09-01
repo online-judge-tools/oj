@@ -1,5 +1,10 @@
 # Change Log
 
+## 10.1.3 / 2020-09-01
+
+-   [#806](https://github.com/online-judge-tools/oj/pull/806) fix a bug of `generate-input` subcommand about logging  ([@rsk0315](https://github.com/rsk0315))
+-   [#807](https://github.com/online-judge-tools/oj/pull/807) fix a bug of `generate-input` subcommand which happens when generators failed
+
 ## 10.1.2 / 2020-08-22
 
 -   [#801](https://github.com/online-judge-tools/oj/pull/801) fix a bug of logging on Windows `cmd.exe`
