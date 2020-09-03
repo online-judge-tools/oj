@@ -59,11 +59,95 @@ class TestTest(unittest.TestCase):
                 },
                 {
                     'path': 'test/sample-3.in',
-                    'data': 'foobar \n'
+                    'data': 'foo  bar \n'
                 },
                 {
                     'path': 'test/sample-3.out',
-                    'data': 'foobar\n'
+                    'data': 'foo bar\n'
+                },
+                {
+                    'path': 'test/sample-4.in',
+                    'data': 'foo \n bar \n'
+                },
+                {
+                    'path': 'test/sample-4.out',
+                    'data': 'foo bar\n'
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                    'output': '%s/test/sample-2.out',
+                },
+                'output': 'bar\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foo  bar \n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-4',
+                    'input': '%s/test/sample-4.in',
+                    'output': '%s/test/sample-4.out',
+                },
+                'output': 'foo \n bar \n',
+                'exitcode': 0,
+            }],
+        )
+
+    def test_call_test_simple_with_ignore_spaces(self):
+        self.snippet_call_test(
+            args=['-c', cat(), '--compare-mode', 'ignore-spaces'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'bar\n'
+                },
+                {
+                    'path': 'test/sample-2.out',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foo  bar \n'
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foo bar\n'
+                },
+                {
+                    'path': 'test/sample-4.in',
+                    'data': 'foo \n bar \n'
+                },
+                {
+                    'path': 'test/sample-4.out',
+                    'data': 'foo bar\n'
                 },
             ],
             expected=[{
@@ -91,32 +175,92 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-3.in',
                     'output': '%s/test/sample-3.out',
                 },
-                'output': 'foobar \n',
+                'output': 'foo  bar \n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-4',
+                    'input': '%s/test/sample-4.in',
+                    'output': '%s/test/sample-4.out',
+                },
+                'output': 'foo \n bar \n',
                 'exitcode': 0,
             }],
         )
 
-    def test_call_test_norstrip(self):
+    def test_call_test_simple_with_ignore_spaces_and_newlines(self):
         self.snippet_call_test(
-            args=['-c', cat(), '--no-rstrip'],
+            args=['-c', cat(), '--compare-mode', 'ignore-spaces-and-newlines'],
             files=[
                 {
                     'path': 'test/sample-1.in',
-                    'data': 'foo \n'
+                    'data': 'foo\n'
                 },
                 {
                     'path': 'test/sample-1.out',
                     'data': 'foo\n'
                 },
+                {
+                    'path': 'test/sample-2.in',
+                    'data': 'bar\n'
+                },
+                {
+                    'path': 'test/sample-2.out',
+                    'data': 'foo\n'
+                },
+                {
+                    'path': 'test/sample-3.in',
+                    'data': 'foo  bar \n'
+                },
+                {
+                    'path': 'test/sample-3.out',
+                    'data': 'foo bar\n'
+                },
+                {
+                    'path': 'test/sample-4.in',
+                    'data': 'foo \n bar \n'
+                },
+                {
+                    'path': 'test/sample-4.out',
+                    'data': 'foo bar\n'
+                },
             ],
             expected=[{
-                'status': 'WA',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-1',
                     'input': '%s/test/sample-1.in',
                     'output': '%s/test/sample-1.out',
                 },
-                'output': 'foo \n',
+                'output': 'foo\n',
+                'exitcode': 0,
+            }, {
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-2',
+                    'input': '%s/test/sample-2.in',
+                    'output': '%s/test/sample-2.out',
+                },
+                'output': 'bar\n',
+                'exitcode': 0,
+            }, {
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-3',
+                    'input': '%s/test/sample-3.in',
+                    'output': '%s/test/sample-3.out',
+                },
+                'output': 'foo  bar \n',
+                'exitcode': 0,
+            }, {
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-4',
+                    'input': '%s/test/sample-4.in',
+                    'output': '%s/test/sample-4.out',
+                },
+                'output': 'foo \n bar \n',
                 'exitcode': 0,
             }],
         )
@@ -143,11 +287,11 @@ class TestTest(unittest.TestCase):
                 },
                 {
                     'path': 'test/sample-3.in',
-                    'data': 'foo\n'
+                    'data': 'foo 3.01\n'
                 },
                 {
                     'path': 'test/sample-3.out',
-                    'data': 'foo\n'
+                    'data': 'foo 3.02\n'
                 },
                 {
                     'path': 'test/sample-4.in',
@@ -176,7 +320,7 @@ class TestTest(unittest.TestCase):
                 'output': '1.0\n',
                 'exitcode': 0,
             }, {
-                'status': 'WA',
+                'status': 'AC',
                 'testcase': {
                     'name': 'sample-2',
                     'input': '%s/test/sample-2.in',
@@ -191,7 +335,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-3.in',
                     'output': '%s/test/sample-3.out',
                 },
-                'output': 'foo\n',
+                'output': 'foo 3.01\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -282,9 +426,9 @@ class TestTest(unittest.TestCase):
             }],
         )
 
-    def test_call_test_multiline_all(self):
+    def test_call_test_multiline(self):
         self.snippet_call_test(
-            args=['-c', cat(), '-m', 'simple'],
+            args=['-c', cat()],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -324,9 +468,9 @@ class TestTest(unittest.TestCase):
             }],
         )
 
-    def test_call_test_multiline_line(self):
+    def test_call_test_multiline_with_display_mode_diff(self):
         self.snippet_call_test(
-            args=['-c', cat(), '-m', 'side-by-side'],
+            args=['-c', cat(), '--display-mode', 'diff'],
             files=[
                 {
                     'path': 'test/sample-1.in',
@@ -965,7 +1109,7 @@ class TestTest(unittest.TestCase):
             replace_output_newline=False,
         )
 
-    def test_call_expected_uses_crlf(self):
+    def test_call_expected_uses_crlf_with_default_mode(self):
         data = self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\nbar\nbaz\n')")],
             files=[
@@ -991,9 +1135,61 @@ class TestTest(unittest.TestCase):
             replace_output_newline=False,
         )
 
-    def test_call_output_uses_both_lf_and_crlf(self):
+    def test_call_expected_uses_crlf_with_exact_match(self):
+        data = self.snippet_call_test(
+            args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\nbar\nbaz\n')"), '--compare-mode', 'exact-match'],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '',
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\r\nbar\r\nbaz\r\n',
+                },
+            ],
+            expected=[{
+                'status': 'WA',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\nbar\nbaz\n',
+                'exitcode': 0,
+            }],
+            replace_output_newline=False,
+        )
+
+    def test_call_output_uses_both_lf_and_crlf_with_default_mode(self):
         data = self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\nbaz\r\n')")],
+            files=[
+                {
+                    'path': 'test/sample-1.in',
+                    'data': '',
+                },
+                {
+                    'path': 'test/sample-1.out',
+                    'data': 'foo\nbar\nbaz\n'
+                },
+            ],
+            expected=[{
+                'status': 'AC',
+                'testcase': {
+                    'name': 'sample-1',
+                    'input': '%s/test/sample-1.in',
+                    'output': '%s/test/sample-1.out',
+                },
+                'output': 'foo\r\nbar\nbaz\r\n',
+                'exitcode': 0,
+            }],
+            replace_output_newline=False,
+        )
+
+    def test_call_output_uses_both_lf_and_crlf_with_exact_match(self):
+        data = self.snippet_call_test(
+            args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\nbaz\r\n')"), '--compare-mode', 'exact-match'],
             files=[
                 {
                     'path': 'test/sample-1.in',

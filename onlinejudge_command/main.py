@@ -17,7 +17,7 @@ from onlinejudge_command.subcommand.generate_input import generate_input
 from onlinejudge_command.subcommand.generate_output import generate_output
 from onlinejudge_command.subcommand.login import login
 from onlinejudge_command.subcommand.submit import submit
-from onlinejudge_command.subcommand.test import test
+from onlinejudge_command.subcommand.test import CompareMode, DisplayMode, test
 from onlinejudge_command.subcommand.test_reactive import test_reactive
 
 import onlinejudge.__about__ as api_version
@@ -128,10 +128,11 @@ tips:
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
     subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
-    subparser.add_argument('-m', '--display-mode', choices=['simple', 'side-by-side'], default='simple', help='mode to display an output with the correct answer (default: simple)')
-    subparser.add_argument('-S', '--side-by-side', dest='display_mode', action='store_const', const='side-by-side', help='display an output and the correct answer with side by side mode (equivalent to --display-mode side-by-side)')
-    subparser.add_argument('--no-rstrip', action='store_false', dest='rstrip')
-    subparser.add_argument('--rstrip', action='store_true', help='rstrip output before compare (default)')
+    subparser.add_argument('-m', '--compare-mode', choices=[mode.value for mode in CompareMode], default=CompareMode.CRLF_INSENSITIVE_EXACT_MATCH.value, help='mode to compare outputs. The default behavoir is exact-match to ensure that you always get AC on remote judge servers when you got AC on local tests for the same cases.  (default: crlf-insensitive-exact-match)')
+    subparser.add_argument('-M', '--display-mode', choices=[mode.value for mode in DisplayMode], default=DisplayMode.SUMMARY.value, help='mode to display outputs  (default: summary)')
+    subparser.add_argument('-S', '--ignore-spaces', dest='compare_mode', action='store_const', const=CompareMode.IGNORE_SPACES.value, help="ignore spaces to compare outputs, but doesn't ignore newlines  (equivalent to --compare-mode=ignore-spaces")
+    subparser.add_argument('-N', '--ignore-spaces-and-newlines', dest='compare_mode', action='store_const', const=CompareMode.IGNORE_SPACES_AND_NEWLINES.value, help='ignore spaces and newlines to compare outputs  (equivalent to --compare-mode=ignore-spaces-and-newlines')
+    subparser.add_argument('-D', '--diff', dest='display_mode', action='store_const', const=DisplayMode.DIFF.value, help='display the diff  (equivalent to --display-mode=diff)')
     subparser.add_argument('-s', '--silent', action='store_true', help='don\'t report output and correct answer even if not AC  (for --mode all)')
     subparser.add_argument('-e', '--error', type=float, help='check as floating point number: correct if its absolute or relative error doesn\'t exceed it')
     subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
