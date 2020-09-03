@@ -40,11 +40,11 @@ class FloatingPointNumberComparator(OutputComparator):
         :returns: True if the relative error or absolute error is smaller than the accepted error
         """
         try:
-            x: Optional[float] = float(actual)
+            x = float(actual)  # type: Optional[float]
         except ValueError:
             x = None
         try:
-            y: Optional[float] = float(actual)
+            y = float(actual)  # type: Optional[float]
         except ValueError:
             y = None
         if x is not None and y is not None:

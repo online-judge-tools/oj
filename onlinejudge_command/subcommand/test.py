@@ -59,13 +59,13 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
         is_exact = False
         if compare_mode == CompareMode.EXACT_MATCH and error is None:
             is_exact = True
-            file_comparator: output_comparators.OutputComparator = output_comparators.ExactComparator()
+            file_comparator = output_comparators.ExactComparator()  # type: output_comparators.OutputComparator
         elif compare_mode == CompareMode.CRLF_INSENSITIVE_EXACT_MATCH and error is None:
             is_exact = True
             file_comparator = output_comparators.CRLFInsensitiveComparator(output_comparators.ExactComparator())
         else:
             if error is not None:
-                word_comparator: output_comparators.OutputComparator = output_comparators.FloatingPointNumberComparator(rel_tol=error, abs_tol=error)
+                word_comparator = output_comparators.FloatingPointNumberComparator(rel_tol=error, abs_tol=error)  # type: output_comparators.OutputComparator
             else:
                 word_comparator = output_comparators.ExactComparator()
             if compare_mode in (CompareMode.EXACT_MATCH, CompareMode.CRLF_INSENSITIVE_EXACT_MATCH, CompareMode.IGNORE_SPACES):
