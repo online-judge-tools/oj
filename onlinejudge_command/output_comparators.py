@@ -4,7 +4,6 @@
 import abc
 import math
 import pathlib
-import shlex
 import tempfile
 from logging import getLogger
 from typing import *
@@ -103,11 +102,12 @@ class SpecialJudge:
             with open(str(actual_output_path), 'wb') as fh:
                 fh.write(actual_output)
 
+            # if you use shlex.quote, it fails on Windows. why?
             command = ' '.join([
                 self.judge_command,  # already quoted and joined command
-                shlex.quote(str(input_path.resolve())),
-                shlex.quote(str(actual_output_path.resolve())),
-                shlex.quote(str(expected_output_path.resolve() if expected_output_path is not None else '')),
+                str(input_path.resolve()),
+                str(actual_output_path.resolve()),
+                str(expected_output_path.resolve() if expected_output_path is not None else ''),
             ])
 
             logger.info('$ %s', command)
