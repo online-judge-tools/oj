@@ -2,9 +2,9 @@
 import collections
 import concurrent.futures
 import contextlib
+import enum
 import itertools
 import json
-import math
 import os
 import pathlib
 import re
@@ -19,6 +19,7 @@ from typing import *
 
 import diff_match_patch
 import onlinejudge_command.format_utils as fmtutils
+import onlinejudge_command.output_comparators as output_comparators
 import onlinejudge_command.utils as utils
 
 if TYPE_CHECKING:
@@ -30,87 +31,58 @@ MEMORY_WARNING = 500  # megabyte
 MEMORY_PRINT = 100  # megabyte
 
 
-def compare_as_floats(xs_: str, ys_: str, error: float) -> bool:
-    def f(x):
-        try:
-            y = float(x)
-            if not math.isfinite(y):
-                logger.warning('not an real number found: %f', y)
-            return y
-        except ValueError:
-            return x
-
-    xs = list(map(f, xs_.split()))
-    ys = list(map(f, ys_.split()))
-    if len(xs) != len(ys):
-        return False
-    for x, y in zip(xs, ys):
-        if isinstance(x, float) and isinstance(y, float):
-            if not math.isclose(x, y, rel_tol=error, abs_tol=error):
-                return False
-        else:
-            if x != y:
-                return False
-    return True
+class CompareMode(enum.Enum):
+    EXACT_MATCH = 'exact-match'
+    CRLF_INSENSITIVE_EXACT_MATCH = 'crlf-insensitive-exact-match'
+    IGNORE_SPACES = 'ignore-spaces'
+    IGNORE_SPACES_AND_NEWLINES = 'ignore-spaces-and-newlines'
 
 
-def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], mode: str, error: Optional[float], does_print_input: bool, silent: bool, rstrip: bool, judge: Optional[str]) -> str:
-    rstrip_targets = ' \t\r\n\f\v\0'  # ruby's one, follow AnarchyGolf
+class DisplayMode(enum.Enum):
+    SUMMARY = 'summary'
+    DIFF = 'diff'
 
+
+def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], display_mode: DisplayMode, error: Optional[float], does_print_input: bool, silent: bool, compare_mode: CompareMode, judge_command: Optional[str]) -> str:
     # prepare the comparing function
-    if error is not None:  # float mode
-        match = lambda a, b: compare_as_floats(a, b, error)
-    elif judge is not None:  # special judge mode
+    if judge_command is not None:
+        special_judge = output_comparators.SpecialJudge(judge_command=judge_command, is_silent=silent)
 
-        def match(a: str, b: str) -> bool:
-            # On Windows, a temp file is not created if we use "with" statement,
-            user_output = tempfile.NamedTemporaryFile(delete=False)
-            judge_result = False
-            try:
-                if rstrip:
-                    user_output.write(a.rstrip(rstrip_targets).encode())
-                else:
-                    user_output.write(a.encode())
-                user_output.close()
-
-                arg0 = judge
-                arg1 = str(test_input_path.resolve())
-                arg2 = user_output.name
-                arg3 = str((str(test_output_path.resolve()) if test_output_path is not None else ''))
-
-                actual_command = '{} {} {} {}'.format(arg0, arg1, arg2, arg3)  # TODO: quote arguments for paths including spaces; see https://github.com/kmyk/online-judge-tools/pull/584
-                logger.info('$ %s', actual_command)
-                info, proc = utils.exec_command(actual_command)
-                if not silent:
-                    logger.info(utils.NO_HEADER + 'judge\'s output:\n%s', utils.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
-                judge_result = (proc.returncode == 0)
-            finally:
-                os.unlink(user_output.name)
-            return judge_result
+        def match(actual: bytes, expected: bytes) -> bool:
+            # the second argument is ignored
+            return special_judge.run(
+                actual_output=actual,
+                input_path=test_input_path,
+                expected_output_path=test_output_path,
+            )
     else:
+        is_exact = False
+        if compare_mode == CompareMode.EXACT_MATCH and error is None:
+            is_exact = True
+            file_comparator = output_comparators.ExactComparator()  # type: output_comparators.OutputComparator
+        elif compare_mode == CompareMode.CRLF_INSENSITIVE_EXACT_MATCH and error is None:
+            is_exact = True
+            file_comparator = output_comparators.CRLFInsensitiveComparator(output_comparators.ExactComparator())
+        else:
+            if error is not None:
+                word_comparator = output_comparators.FloatingPointNumberComparator(rel_tol=error, abs_tol=error)  # type: output_comparators.OutputComparator
+            else:
+                word_comparator = output_comparators.ExactComparator()
+            if compare_mode in (CompareMode.EXACT_MATCH, CompareMode.CRLF_INSENSITIVE_EXACT_MATCH, CompareMode.IGNORE_SPACES):
+                file_comparator = output_comparators.SplitLinesComparator(output_comparators.SplitComparator(word_comparator))
+            elif compare_mode == CompareMode.IGNORE_SPACES_AND_NEWLINES:
+                file_comparator = output_comparators.SplitComparator(word_comparator)
+            else:
+                assert False
+            file_comparator = output_comparators.CRLFInsensitiveComparator(file_comparator)
 
-        def match(a: str, b: str) -> bool:
-            if a == b:
-                return True
-            if rstrip and a.rstrip(rstrip_targets) == b.rstrip(rstrip_targets):
-                logger.warning('WA if no rstrip')
-                return True
-            if a == b.replace('\n', '\r\n'):
-                logger.warning(r'WA if not replacing "\r\n" with "\n"')
-                return True
-            if rstrip and a.rstrip(rstrip_targets) == b.replace('\n', '\r\n').rstrip(rstrip_targets):
-                logger.warning('WA if no rstrip')
-                logger.warning(r'WA if not replacing "\r\n" with "\n"')
-                return True
-            if a.replace('\n', '\r\n') == b:
-                logger.warning(r'WA if not replacing "\n" with "\r\n"')
-                return True
-            if rstrip and a.replace('\n', '\r\n').rstrip(rstrip_targets) == b.rstrip(rstrip_targets):
-                # TODO: use a smart way if you need more equality patterns
-                logger.warning('WA if no rstrip')
-                logger.warning(r'WA if not replacing "\n" with "\r\n"')
-                return True
-            return False
+        def match(actual: bytes, expected: bytes) -> bool:
+            result = file_comparator(actual, expected)
+            if not result and is_exact:
+                non_stcict_comparator = output_comparators.CRLFInsensitiveComparator(output_comparators.SplitComparator(output_comparators.ExactComparator()))
+                if non_stcict_comparator(actual, expected):
+                    logger.warning('This was AC if spaces and newlines were ignored. Please use --ignore-spaces (-S) option or --ignore-spaces-and-newline (-N) option.')
+            return result
 
     # prepare the function to print the input
     is_input_printed = False
@@ -138,22 +110,22 @@ def compare_and_report(proc: subprocess.Popen, answer: str, memory: Optional[flo
         print_input()
 
     # check WA or not
-    if (test_output_path is not None) or (judge is not None):
+    if (test_output_path is not None) or (judge_command is not None):
         if test_output_path is not None:
             with test_output_path.open('rb') as outf:
                 expected = outf.read().decode()
-        else:  # only if --judge-command option
+        else:  # only if --judge option
             expected = ''
             logger.warning('expected output is not found')
         # compare
-        if not match(answer, expected):
+        if not match(answer.encode(), expected.encode()):
             logger.info(utils.FAILURE + '' + utils.red('WA'))
             print_input()
             if not silent:
-                if mode == 'simple':
+                if display_mode == DisplayMode.SUMMARY:
                     logger.info(utils.NO_HEADER + 'output:\n%s', utils.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
                     logger.info(utils.NO_HEADER + 'expected:\n%s', utils.make_pretty_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
-                elif mode == 'side-by-side':
+                elif display_mode == DisplayMode.DIFF:
                     if max(answer.count('\n'), expected.count('\n')) <= 40:
                         display_side_by_side_color(answer, expected)
                     else:
@@ -201,7 +173,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
             else:
                 logger.warning('memory: %f MB', memory)
 
-        status = compare_and_report(proc, answer, memory, test_input_path, test_output_path, mle=args.mle, mode=args.display_mode, error=args.error, does_print_input=args.print_input, silent=args.silent, rstrip=args.rstrip, judge=args.judge)
+        status = compare_and_report(proc, answer, memory, test_input_path, test_output_path, mle=args.mle, display_mode=DisplayMode(args.display_mode), error=args.error, does_print_input=args.print_input, silent=args.silent, compare_mode=CompareMode(args.compare_mode), judge_command=args.judge)
 
     # return the result
     testcase = {
