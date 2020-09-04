@@ -147,7 +147,9 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
 
     # check WA or not
     if match_result is not None and not match_result:
-        logger.info(utils.FAILURE + '' + utils.red('WA'))
+        if status == JudgeStatus.AC:
+            logger.info(utils.FAILURE + '' + utils.red('WA'))
+        status = JudgeStatus.WA
         print_input()
         if not silent:
             if test_output_path is not None:
@@ -165,11 +167,10 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
                     pretty_printers.display_snipped_side_by_side_color(answer, expected)
             else:
                 assert False
-        status = JudgeStatus.WA
     if match_result is None:
         if not silent:
-            header = ('output:\n' if is_input_printed else '')
-            logger.info(utils.NO_HEADER + '%s%s', header, pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            print_input()
+            logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
     if status == JudgeStatus.AC:
         logger.info(utils.SUCCESS + '' + utils.green('AC'))
 
