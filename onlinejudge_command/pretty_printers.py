@@ -1,20 +1,158 @@
 import collections
+import enum
 import itertools
 import re
 import shutil
 from logging import getLogger
 from typing import *
 
+import colorama
 import diff_match_patch
 import onlinejudge_command.utils as utils
 
 logger = getLogger(__name__)
 
 
+class _PrettyTokenType(enum.Enum):
+    BODY = 'BODY'
+    WHITESPACE = 'WHITESPACE'
+    NEWLINE = 'NEWLINE'
+    HINT = 'HINT'
+
+
+_PrettyToken = NamedTuple('_PrettyToken', [
+    ('type', _PrettyTokenType),
+    ('value', str),
+])
+
+
+def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail: int, char_in_line: int) -> List[_PrettyToken]:
+    """`_tokenize_large_file_content` constructs the intermediate representations. They have no color infomation.
+    """
+
+    assert head + tail < limit
+
+    def from_line(line: str) -> List[_PrettyToken]:
+        body = line.rstrip()
+        newline = line[len(body):]
+        tokens = []
+        tokens.append(_PrettyToken(_PrettyTokenType.BODY, body))
+        if newline:
+            if newline in ('\n', '\r\n'):
+                tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
+            else:
+                whitespace = newline.rstrip('\n')
+                newline = newline[len(whitespace):]
+                if whitespace:
+                    tokens.append(_PrettyToken(_PrettyTokenType.WHITESPACE, whitespace))
+                tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(trailing whitespace)'))
+                if newline:
+                    tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
+        return tokens
+
+    def candidate_do_nothing(text: str) -> List[_PrettyToken]:
+        tokens = []
+        for line in text.splitlines(keepends=True):
+            tokens += from_line(line)
+        return tokens
+
+    def candidate_line_based(text: str) -> List[_PrettyToken]:
+        lines = text.splitlines(keepends=True)
+        if len(lines) < limit:
+            return candidate_do_nothing(text)
+
+        tokens = []
+        for line in lines[:head]:
+            tokens += from_line(line)
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '... ({} lines) ...\n'.format(len(lines[head:-tail]))))
+        for line in lines[-tail:]:
+            tokens += from_line(line)
+        return tokens
+
+    def candidate_char_based(text: str) -> List[_PrettyToken]:
+        if len(text) < char_in_line * limit:
+            return candidate_do_nothing(text)
+
+        l = len(text[:char_in_line * head].rstrip())
+        r = len(text) - char_in_line * tail
+        tokens = []
+        for line in text[:l].splitlines(keepends=True):
+            tokens += from_line(line)
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '... ({} chars) ...'.format(r - l)))
+        for line in text[r:].splitlines(keepends=True):
+            tokens += from_line(line)
+        return tokens
+
+    def count_size(tokens: Iterable[_PrettyToken]) -> int:
+        size = 0
+        for _, s in tokens:
+            size += len(s)
+        return size
+
+    if not content:
+        return [_PrettyToken(_PrettyTokenType.HINT, '(empty)')]
+
+    tokens = []
+    try:
+        text = content.decode()
+    except UnicodeDecodeError as e:
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, str(e)))
+        text = content.decode(errors='replace')
+
+    candidates = [
+        candidate_do_nothing(text),
+        candidate_line_based(text),
+        candidate_char_based(text),
+    ]  # type: List[List[_PrettyToken]]
+    tokens.extend(min(candidates, key=count_size))
+
+    assert len(tokens) >= 1
+    if tokens[-1][0] == _PrettyTokenType.BODY:
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(no trailing newline)'))
+    if not text.rstrip('\n'):
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(only newline)'))
+
+    return tokens
+
+
+def _render_tokens_for_large_file_content(*, tokens: List[_PrettyToken], font_bold: Callable[[str], str], font_dim: Callable[[str], str]) -> str:
+    """`_tokenize_large_file_content` generate the result string. It is colored.
+    """
+
+    result = []
+    for key, value in tokens:
+        if key == _PrettyTokenType.BODY:
+            value = font_bold(value)
+        elif key == _PrettyTokenType.WHITESPACE:
+            value = font_dim(value.replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r'))
+        elif key == _PrettyTokenType.NEWLINE:
+            value = font_dim(value.replace('\r', '\\r'))
+        elif key == _PrettyTokenType.HINT:
+            value = font_dim(value)
+        else:
+            assert False
+        result.append(value)
+    return ''.join(result)
+
+
+def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
+    char_in_line, _ = shutil.get_terminal_size()
+    char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
+    tokens = _tokenize_large_file_content(content=content, limit=limit, head=head, tail=tail, char_in_line=char_in_line)
+
+    if bold:
+        font_bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
+    else:
+        font_bold = lambda s: s
+    font_dim = lambda s: colorama.Style.DIM + s + colorama.Style.RESET_ALL
+    return _render_tokens_for_large_file_content(tokens=tokens, font_bold=font_bold, font_dim=font_dim)
+
+
 def _space_padding(s: str, max_length: int) -> str:
     return s + " " * max_length
 
 
+# NOTE: untested
 def display_side_by_side_color(answer: str, expected: str) -> None:
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
 
@@ -27,6 +165,7 @@ def display_side_by_side_color(answer: str, expected: str) -> None:
             logger.info(utils.NO_HEADER + '%s', _space_padding(ans_line, max_chars - ans_chars) + "|" + exp_line)
 
 
+# NOTE: untested
 def display_snipped_side_by_side_color(answer: str, expected: str) -> None:
     """
     Display first differ line and its previous 3 lines and its next 3 lines.

@@ -8,6 +8,7 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.format_utils as fmtutils
+import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
 
 if TYPE_CHECKING:
@@ -47,7 +48,7 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
             logger.info('skipped.')
             return
         assert answer is not None
-        logger.info(utils.NO_HEADER + '' + utils.make_pretty_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
+        logger.info(utils.NO_HEADER + '' + pretty_printers.make_pretty_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
 
         # find the destination path
         match_result = fmtutils.match_with_format(args.directory, args.format, test_input_path)  # type: Optional[Match[Any]]

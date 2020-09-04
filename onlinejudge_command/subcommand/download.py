@@ -7,6 +7,7 @@ from typing import *
 
 import onlinejudge_command.download_history
 import onlinejudge_command.format_utils as format_utils
+import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
 import requests.exceptions
 
@@ -88,7 +89,7 @@ def download(args: 'argparse.Namespace') -> None:
         for ext, path, data in iterate_files_to_write(sample, i=i):
             content = ''
             if not args.silent:
-                content = '\n' + utils.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True)
+                content = '\n' + pretty_printers.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True)
             logger.info('%sput: %s%s', ext, sample.name, content)
             if not args.dry_run:
                 path.parent.mkdir(parents=True, exist_ok=True)

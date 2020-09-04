@@ -6,7 +6,6 @@ import os
 import pathlib
 import platform
 import shlex
-import shutil
 import signal
 import subprocess
 import sys
@@ -168,127 +167,6 @@ def remove_suffix(s: str, suffix: str) -> str:
 
 
 tzinfo_jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
-
-_PRETTY_BODY = 'BODY'
-_PRETTY_WHITESPACE = 'WHITESPACE'
-_PRETTY_NEWLINE = 'NEWLINE'
-_PRETTY_HINT = 'HINT'
-
-
-def _make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int) -> List[Tuple[str, str]]:
-    """`_make_pretty_large_file_content` is an internal helper function.
-
-    This function constructs only the intermediate representations. They have no color infomation.
-    """
-
-    assert head + tail < limit
-
-    char_in_line, _ = shutil.get_terminal_size()
-    char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
-
-    def from_line(line: str) -> List[Tuple[str, str]]:
-        body = line.rstrip()
-        newline = line[len(body):]
-        tokens = []
-        tokens.append((_PRETTY_BODY, body))
-        if newline:
-            if newline in ('\n', '\r\n'):
-                tokens.append((_PRETTY_NEWLINE, newline))
-            else:
-                whitespace = newline.rstrip('\n')
-                newline = newline[len(whitespace):]
-                if whitespace:
-                    tokens.append((_PRETTY_WHITESPACE, whitespace))
-                tokens.append((_PRETTY_HINT, '(trailing whitespace)'))
-                if newline:
-                    tokens.append((_PRETTY_NEWLINE, newline))
-        return tokens
-
-    def candidate_do_nothing(text: str) -> List[Tuple[str, str]]:
-        tokens = []
-        for line in text.splitlines(keepends=True):
-            tokens += from_line(line)
-        return tokens
-
-    def candidate_line_based(text: str) -> List[Tuple[str, str]]:
-        lines = text.splitlines(keepends=True)
-        if len(lines) < limit:
-            return candidate_do_nothing(text)
-
-        tokens = []
-        for line in lines[:head]:
-            tokens += from_line(line)
-        tokens.append((_PRETTY_HINT, '... ({} lines) ...\n'.format(len(lines[head:-tail]))))
-        for line in lines[-tail:]:
-            tokens += from_line(line)
-        return tokens
-
-    def candidate_char_based(text: str) -> List[Tuple[str, str]]:
-        if len(text) < char_in_line * limit:
-            return candidate_do_nothing(text)
-
-        l = len(text[:char_in_line * head].rstrip())
-        r = len(text) - char_in_line * tail
-        tokens = []
-        for line in text[:l].splitlines(keepends=True):
-            tokens += from_line(line)
-        tokens.append((_PRETTY_HINT, '... ({} chars) ...'.format(r - l)))
-        for line in text[r:].splitlines(keepends=True):
-            tokens += from_line(line)
-        return tokens
-
-    def count_size(tokens: Iterable[Tuple[str, str]]) -> int:
-        size = 0
-        for _, s in tokens:
-            size += len(s)
-        return size
-
-    if not content:
-        return [(_PRETTY_HINT, '(empty)')]
-
-    tokens = []
-    try:
-        text = content.decode()
-    except UnicodeDecodeError as e:
-        tokens.append((_PRETTY_HINT, str(e)))
-        text = content.decode(errors='replace')
-
-    candidates = [
-        candidate_do_nothing(text),
-        candidate_line_based(text),
-        candidate_char_based(text),
-    ]  # type: List[List[Tuple[str, str]]]
-    tokens.extend(min(candidates, key=count_size))
-
-    assert len(tokens) >= 1
-    if tokens[-1][0] == _PRETTY_BODY:
-        tokens.append((_PRETTY_HINT, '(no trailing newline)'))
-    if not text.rstrip('\n'):
-        tokens.append((_PRETTY_HINT, '(only newline)'))
-
-    return tokens
-
-
-def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
-    font_dim = lambda s: colorama.Style.DIM + s + colorama.Style.RESET_ALL
-    font_bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
-
-    tokens = _make_pretty_large_file_content(content=content, limit=limit, head=head, tail=tail)
-    result = []
-    for key, value in tokens:
-        if key == _PRETTY_BODY:
-            if bold:
-                value = font_bold(value)
-        elif key == _PRETTY_WHITESPACE:
-            value = font_dim(value.replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r'))
-        elif key == _PRETTY_NEWLINE:
-            value = font_dim(value.replace('\r', '\\r'))
-        elif key == _PRETTY_HINT:
-            value = font_dim(value)
-        else:
-            assert False
-        result.append(value)
-    return ''.join(result)
 
 
 def is_windows_subsystem_for_linux() -> bool:
