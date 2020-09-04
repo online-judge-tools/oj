@@ -1,4 +1,5 @@
 import collections
+import enum
 import itertools
 import re
 import shutil
@@ -11,16 +12,22 @@ import onlinejudge_command.utils as utils
 
 logger = getLogger(__name__)
 
-_PRETTY_BODY = 'BODY'
-_PRETTY_WHITESPACE = 'WHITESPACE'
-_PRETTY_NEWLINE = 'NEWLINE'
-_PRETTY_HINT = 'HINT'
+
+class _PrettyTokenType(enum.Enum):
+    BODY = 'BODY'
+    WHITESPACE = 'WHITESPACE'
+    NEWLINE = 'NEWLINE'
+    HINT = 'HINT'
 
 
-def _make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int) -> List[Tuple[str, str]]:
-    """`_make_pretty_large_file_content` is an internal helper function.
+_PrettyToken = NamedTuple('_PrettyToken', [
+    ('type', _PrettyTokenType),
+    ('value', str),
+])
 
-    This function constructs only the intermediate representations. They have no color infomation.
+
+def _tokenize_large_file_content(content: bytes, limit: int, head: int, tail: int) -> List[_PrettyToken]:
+    """`_tokenize_large_file_content` constructs the intermediate representations. They have no color infomation.
     """
 
     assert head + tail < limit
@@ -28,31 +35,31 @@ def _make_pretty_large_file_content(content: bytes, limit: int, head: int, tail:
     char_in_line, _ = shutil.get_terminal_size()
     char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
 
-    def from_line(line: str) -> List[Tuple[str, str]]:
+    def from_line(line: str) -> List[_PrettyToken]:
         body = line.rstrip()
         newline = line[len(body):]
         tokens = []
-        tokens.append((_PRETTY_BODY, body))
+        tokens.append(_PrettyToken(_PrettyTokenType.BODY, body))
         if newline:
             if newline in ('\n', '\r\n'):
-                tokens.append((_PRETTY_NEWLINE, newline))
+                tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
             else:
                 whitespace = newline.rstrip('\n')
                 newline = newline[len(whitespace):]
                 if whitespace:
-                    tokens.append((_PRETTY_WHITESPACE, whitespace))
-                tokens.append((_PRETTY_HINT, '(trailing whitespace)'))
+                    tokens.append(_PrettyToken(_PrettyTokenType.WHITESPACE, whitespace))
+                tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(trailing whitespace)'))
                 if newline:
-                    tokens.append((_PRETTY_NEWLINE, newline))
+                    tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
         return tokens
 
-    def candidate_do_nothing(text: str) -> List[Tuple[str, str]]:
+    def candidate_do_nothing(text: str) -> List[_PrettyToken]:
         tokens = []
         for line in text.splitlines(keepends=True):
             tokens += from_line(line)
         return tokens
 
-    def candidate_line_based(text: str) -> List[Tuple[str, str]]:
+    def candidate_line_based(text: str) -> List[_PrettyToken]:
         lines = text.splitlines(keepends=True)
         if len(lines) < limit:
             return candidate_do_nothing(text)
@@ -60,12 +67,12 @@ def _make_pretty_large_file_content(content: bytes, limit: int, head: int, tail:
         tokens = []
         for line in lines[:head]:
             tokens += from_line(line)
-        tokens.append((_PRETTY_HINT, '... ({} lines) ...\n'.format(len(lines[head:-tail]))))
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '... ({} lines) ...\n'.format(len(lines[head:-tail]))))
         for line in lines[-tail:]:
             tokens += from_line(line)
         return tokens
 
-    def candidate_char_based(text: str) -> List[Tuple[str, str]]:
+    def candidate_char_based(text: str) -> List[_PrettyToken]:
         if len(text) < char_in_line * limit:
             return candidate_do_nothing(text)
 
@@ -74,63 +81,70 @@ def _make_pretty_large_file_content(content: bytes, limit: int, head: int, tail:
         tokens = []
         for line in text[:l].splitlines(keepends=True):
             tokens += from_line(line)
-        tokens.append((_PRETTY_HINT, '... ({} chars) ...'.format(r - l)))
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '... ({} chars) ...'.format(r - l)))
         for line in text[r:].splitlines(keepends=True):
             tokens += from_line(line)
         return tokens
 
-    def count_size(tokens: Iterable[Tuple[str, str]]) -> int:
+    def count_size(tokens: Iterable[_PrettyToken]) -> int:
         size = 0
         for _, s in tokens:
             size += len(s)
         return size
 
     if not content:
-        return [(_PRETTY_HINT, '(empty)')]
+        return [_PrettyToken(_PrettyTokenType.HINT, '(empty)')]
 
     tokens = []
     try:
         text = content.decode()
     except UnicodeDecodeError as e:
-        tokens.append((_PRETTY_HINT, str(e)))
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, str(e)))
         text = content.decode(errors='replace')
 
     candidates = [
         candidate_do_nothing(text),
         candidate_line_based(text),
         candidate_char_based(text),
-    ]  # type: List[List[Tuple[str, str]]]
+    ]  # type: List[List[_PrettyToken]]
     tokens.extend(min(candidates, key=count_size))
 
     assert len(tokens) >= 1
-    if tokens[-1][0] == _PRETTY_BODY:
-        tokens.append((_PRETTY_HINT, '(no trailing newline)'))
+    if tokens[-1][0] == _PrettyTokenType.BODY:
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(no trailing newline)'))
     if not text.rstrip('\n'):
-        tokens.append((_PRETTY_HINT, '(only newline)'))
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(only newline)'))
 
     return tokens
 
 
-def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
+def _render_tokens_for_large_file_content(*, tokens: List[_PrettyToken], bold: bool) -> str:
+    """`_tokenize_large_file_content` generate the result string. It is colored.
+    """
+
     font_dim = lambda s: colorama.Style.DIM + s + colorama.Style.RESET_ALL
     font_bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
 
-    tokens = _make_pretty_large_file_content(content=content, limit=limit, head=head, tail=tail)
     result = []
     for key, value in tokens:
-        if key == _PRETTY_BODY:
+        if key == _PrettyTokenType.BODY:
             if bold:
                 value = font_bold(value)
-        elif key == _PRETTY_WHITESPACE:
+        elif key == _PrettyTokenType.WHITESPACE:
             value = font_dim(value.replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r'))
-        elif key == _PRETTY_NEWLINE:
+        elif key == _PrettyTokenType.NEWLINE:
             value = font_dim(value.replace('\r', '\\r'))
-        elif key == _PRETTY_HINT:
+        elif key == _PrettyTokenType.HINT:
             value = font_dim(value)
         else:
             assert False
         result.append(value)
     return ''.join(result)
+
+
+def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
+    tokens = _tokenize_large_file_content(content=content, limit=limit, head=head, tail=tail)
+    return _render_tokens_for_large_file_content(tokens=tokens, bold=bold)
 
 
 def _space_padding(s: str, max_length: int) -> str:
