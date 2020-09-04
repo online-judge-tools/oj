@@ -7,11 +7,10 @@ import webbrowser
 from logging import getLogger
 from typing import *
 
+import onlinejudge.dispatch as dispatch
 import onlinejudge_command.download_history
 import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
-
-import onlinejudge.dispatch as dispatch
 from onlinejudge.type import *
 
 if TYPE_CHECKING:

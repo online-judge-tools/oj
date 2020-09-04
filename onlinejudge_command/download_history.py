@@ -7,7 +7,6 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.utils as utils
-
 from onlinejudge.type import Problem
 
 logger = getLogger(__name__)

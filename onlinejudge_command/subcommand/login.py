@@ -8,10 +8,10 @@ import time
 from logging import getLogger
 from typing import *
 
-import onlinejudge_command.utils as utils
 import requests
 
 import onlinejudge.dispatch as dispatch
+import onlinejudge_command.utils as utils
 from onlinejudge.type import LoginError, Service
 
 if TYPE_CHECKING:

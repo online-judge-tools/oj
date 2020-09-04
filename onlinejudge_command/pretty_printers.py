@@ -8,6 +8,7 @@ from typing import *
 
 import colorama
 import diff_match_patch
+
 import onlinejudge_command.utils as utils
 
 logger = getLogger(__name__)

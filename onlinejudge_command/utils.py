@@ -17,10 +17,10 @@ from typing import *
 from typing.io import *
 
 import colorama
-import onlinejudge_command.__about__ as version
 import requests
 
 import onlinejudge.utils as utils
+import onlinejudge_command.__about__ as version
 from onlinejudge.type import *
 
 logger = getLogger(__name__)
