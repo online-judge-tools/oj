@@ -26,14 +26,11 @@ _PrettyToken = NamedTuple('_PrettyToken', [
 ])
 
 
-def _tokenize_large_file_content(content: bytes, limit: int, head: int, tail: int) -> List[_PrettyToken]:
+def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail: int, char_in_line: int) -> List[_PrettyToken]:
     """`_tokenize_large_file_content` constructs the intermediate representations. They have no color infomation.
     """
 
     assert head + tail < limit
-
-    char_in_line, _ = shutil.get_terminal_size()
-    char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
 
     def from_line(line: str) -> List[_PrettyToken]:
         body = line.rstrip()
@@ -118,18 +115,14 @@ def _tokenize_large_file_content(content: bytes, limit: int, head: int, tail: in
     return tokens
 
 
-def _render_tokens_for_large_file_content(*, tokens: List[_PrettyToken], bold: bool) -> str:
+def _render_tokens_for_large_file_content(*, tokens: List[_PrettyToken], font_bold: Callable[[str], str], font_dim: Callable[[str], str]) -> str:
     """`_tokenize_large_file_content` generate the result string. It is colored.
     """
-
-    font_dim = lambda s: colorama.Style.DIM + s + colorama.Style.RESET_ALL
-    font_bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
 
     result = []
     for key, value in tokens:
         if key == _PrettyTokenType.BODY:
-            if bold:
-                value = font_bold(value)
+            value = font_bold(value)
         elif key == _PrettyTokenType.WHITESPACE:
             value = font_dim(value.replace(' ', '_').replace('\t', '\\t').replace('\r', '\\r'))
         elif key == _PrettyTokenType.NEWLINE:
@@ -143,8 +136,16 @@ def _render_tokens_for_large_file_content(*, tokens: List[_PrettyToken], bold: b
 
 
 def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
-    tokens = _tokenize_large_file_content(content=content, limit=limit, head=head, tail=tail)
-    return _render_tokens_for_large_file_content(tokens=tokens, bold=bold)
+    char_in_line, _ = shutil.get_terminal_size()
+    char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
+    tokens = _tokenize_large_file_content(content=content, limit=limit, head=head, tail=tail, char_in_line=char_in_line)
+
+    if bold:
+        font_bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
+    else:
+        font_bold = lambda s: s
+    font_dim = lambda s: colorama.Style.DIM + s + colorama.Style.RESET_ALL
+    return _render_tokens_for_large_file_content(tokens=tokens, font_bold=font_bold, font_dim=font_dim)
 
 
 def _space_padding(s: str, max_length: int) -> str:
