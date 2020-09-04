@@ -46,7 +46,7 @@ def submit(args: 'argparse.Namespace') -> None:
         code: bytes = fh.read()
     format_config = {
         'dos2unix': args.format_dos2unix or args.golf,
-        'rstrip': args.format_dos2unix or args.golf,
+        'rstrip': args.format_rstrip or args.golf,
     }
     code = format_code(code, **format_config)
 
