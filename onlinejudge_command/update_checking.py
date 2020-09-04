@@ -39,7 +39,7 @@ def get_latest_version_from_pypi(package_name: str) -> str:
     update_interval = 60 * 60 * 8  # 8 hours
 
     # load cache
-    cache = {}  # type: Dict[str, Any]
+    cache: Dict[str, Any] = {}
     if version_cache_path.exists():
         try:
             logger.debug('load the cache for update checking: %s', str(version_cache_path))

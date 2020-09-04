@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 
 
 def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
-    data = {}  # type: Dict[str, str]
+    data: Dict[str, str] = {}
     data["name"] = sample.name
     data["input"] = sample.input_data.decode()
     if sample.output_data is not None:
@@ -74,7 +74,7 @@ def download(args: 'argparse.Namespace') -> None:
             table['n'] = name
             table['b'] = os.path.basename(name)
             table['d'] = os.path.dirname(name)
-            path = args.directory / format_utils.percentformat(args.format, table)  # type: pathlib.Path
+            path: pathlib.Path = args.directory / format_utils.percentformat(args.format, table)
             yield ext, path, data
 
     for i, sample in enumerate(samples):

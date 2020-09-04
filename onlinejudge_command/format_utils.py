@@ -30,7 +30,7 @@ def percentformat(s: str, table: Dict[str, str]) -> str:
 
 def percentparse(s: str, format: str, table: Dict[str, str]) -> Optional[Dict[str, str]]:
     table = {key: '(?P<{}>{})'.format(key, value) for key, value in table.items()}
-    used = set()  # type: Set[str]
+    used: Set[str] = set()
     pattern = ''
     for token in percentsplit(re.escape(format).replace('\\%', '%')):
         if token.startswith('%'):
@@ -84,7 +84,7 @@ def is_backup_or_hidden_file(path: pathlib.Path) -> bool:
 
 
 def drop_backup_or_hidden_files(paths: List[pathlib.Path]) -> List[pathlib.Path]:
-    result = []  # type: List[pathlib.Path]
+    result: List[pathlib.Path] = []
     for path in paths:
         if is_backup_or_hidden_file(path):
             logger.warning('ignore a backup file: %s', path)
@@ -94,7 +94,7 @@ def drop_backup_or_hidden_files(paths: List[pathlib.Path]) -> List[pathlib.Path]
 
 
 def construct_relationship_of_files(paths: List[pathlib.Path], directory: pathlib.Path, format: str) -> Dict[str, Dict[str, pathlib.Path]]:
-    tests = collections.defaultdict(dict)  # type: Dict[str, Dict[str, pathlib.Path]]
+    tests: Dict[str, Dict[str, pathlib.Path]] = collections.defaultdict(dict)
     for path in paths:
         m = match_with_format(directory, format, path.resolve())
         if not m:

@@ -20,10 +20,9 @@ class _PrettyTokenType(enum.Enum):
     HINT = 'HINT'
 
 
-_PrettyToken = NamedTuple('_PrettyToken', [
-    ('type', _PrettyTokenType),
-    ('value', str),
-])
+class _PrettyToken(NamedTuple):
+    type: _PrettyTokenType
+    value: str
 
 
 def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail: int, char_in_line: int) -> List[_PrettyToken]:
@@ -99,11 +98,11 @@ def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail:
         tokens.append(_PrettyToken(_PrettyTokenType.HINT, str(e)))
         text = content.decode(errors='replace')
 
-    candidates = [
+    candidates: List[List[_PrettyToken]] = [
         candidate_do_nothing(text),
         candidate_line_based(text),
         candidate_char_based(text),
-    ]  # type: List[List[_PrettyToken]]
+    ]
     tokens.extend(min(candidates, key=count_size))
 
     assert len(tokens) >= 1
@@ -171,7 +170,7 @@ def display_snipped_side_by_side_color(answer: str, expected: str) -> None:
     Display first differ line and its previous 3 lines and its next 3 lines.
     """
     max_chars = shutil.get_terminal_size()[0] // 2 - 2
-    deq = collections.deque(maxlen=7)  # type: Deque[Tuple[Optional[int], bool, str, str, int, int]]
+    deq: Deque[Tuple[Optional[int], bool, str, str, int, int]] = collections.deque(maxlen=7)
 
     count_from_first_difference = 0
     i = 0

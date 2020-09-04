@@ -60,13 +60,13 @@ def build_match_function(*, compare_mode: CompareMode, error: Optional[float], j
     is_exact = False
     if compare_mode == CompareMode.EXACT_MATCH and error is None:
         is_exact = True
-        file_comparator = output_comparators.ExactComparator()  # type: output_comparators.OutputComparator
+        file_comparator: output_comparators.OutputComparator = output_comparators.ExactComparator()
     elif compare_mode == CompareMode.CRLF_INSENSITIVE_EXACT_MATCH and error is None:
         is_exact = True
         file_comparator = output_comparators.CRLFInsensitiveComparator(output_comparators.ExactComparator())
     else:
         if error is not None:
-            word_comparator = output_comparators.FloatingPointNumberComparator(rel_tol=error, abs_tol=error)  # type: output_comparators.OutputComparator
+            word_comparator: output_comparators.OutputComparator = output_comparators.FloatingPointNumberComparator(rel_tol=error, abs_tol=error)
         else:
             word_comparator = output_comparators.ExactComparator()
         if compare_mode in (CompareMode.EXACT_MATCH, CompareMode.CRLF_INSENSITIVE_EXACT_MATCH, CompareMode.IGNORE_SPACES):
@@ -186,9 +186,9 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
     with test_input_path.open() as inf:
         info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle, gnu_time=args.gnu_time)
         # TODO: the `answer` should be bytes, not str
-        answer = (info['answer'] or b'').decode(errors='replace')  # type: str
-        elapsed = info['elapsed']  # type: float
-        memory = info['memory']  # type: Optional[float]
+        answer: str = (info['answer'] or b'').decode(errors='replace')
+        elapsed: float = info['elapsed']
+        memory: Optional[float] = info['memory']
 
     # lock is require to avoid mixing logs if in parallel
     nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext() after updating Python to 3.7
@@ -261,7 +261,7 @@ def test(args: 'argparse.Namespace') -> None:
         raise RuntimeError('--mle is used but GNU time does not exist')
 
     # run tests
-    history = []  # type: List[Dict[str, Any]]
+    history: List[Dict[str, Any]] = []
     if args.jobs is None:
         for name, paths in sorted(tests.items()):
             history += [test_single_case(name, paths['in'], paths.get('out'), args=args)]
@@ -270,16 +270,16 @@ def test(args: 'argparse.Namespace') -> None:
             logger.warning("-j/--jobs opiton is unstable on Windows environmet")
         with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
             lock = threading.Lock()
-            futures = []  # type: List[concurrent.futures.Future]
+            futures: List[concurrent.futures.Future] = []
             for name, paths in sorted(tests.items()):
                 futures += [executor.submit(test_single_case, name, paths['in'], paths.get('out'), lock=lock, args=args)]
             for future in futures:
                 history += [future.result()]
 
     # summarize
-    slowest = -1.0  # type: float
+    slowest: float = -1.0
     slowest_name = ''
-    heaviest = -1.0  # type: float
+    heaviest: float = -1.0
     heaviest_name = ''
     ac_count = 0
     for result in history:

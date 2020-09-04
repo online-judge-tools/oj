@@ -40,11 +40,11 @@ class FloatingPointNumberComparator(OutputComparator):
         :returns: True if the relative error or absolute error is smaller than the accepted error
         """
         try:
-            x = float(actual)  # type: Optional[float]
+            x: Optional[float] = float(actual)
         except ValueError:
             x = None
         try:
-            y = float(expected)  # type: Optional[float]
+            y: Optional[float] = float(expected)
         except ValueError:
             y = None
         if x is not None and y is not None:
@@ -100,7 +100,7 @@ class SpecialJudge:
     def run(self, *, actual_output: bytes, input_path: pathlib.Path, expected_output_path: Optional[pathlib.Path]) -> bool:
         with tempfile.TemporaryDirectory() as tempdir:
             actual_output_path = pathlib.Path(tempdir) / 'actual.out'
-            with open(str(actual_output_path), 'wb') as fh:
+            with open(actual_output_path, 'wb') as fh:
                 fh.write(actual_output)
 
             # if you use shlex.quote, it fails on Windows. why?
