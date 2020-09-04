@@ -320,7 +320,7 @@ class TestTest(unittest.TestCase):
                 'output': '1.0\n',
                 'exitcode': 0,
             }, {
-                'status': 'AC',
+                'status': 'WA',
                 'testcase': {
                     'name': 'sample-2',
                     'input': '%s/test/sample-2.in',
