@@ -135,21 +135,26 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
     if proc.returncode is None:
         logger.info(utils.FAILURE + '' + utils.red('TLE'))
         status = JudgeStatus.TLE
-        print_input()
+        if not silent:
+            print_input()
     elif memory is not None and mle is not None and memory > mle:
         logger.info(utils.FAILURE + '' + utils.red('MLE'))
         status = JudgeStatus.MLE
-        print_input()
+        if not silent:
+            print_input()
     elif proc.returncode != 0:
         logger.info(utils.FAILURE + '' + utils.red('RE') + ': return code %d', proc.returncode)
         status = JudgeStatus.RE
-        print_input()
+        if not silent:
+            print_input()
 
     # check WA or not
     if match_result is not None and not match_result:
-        logger.info(utils.FAILURE + '' + utils.red('WA'))
-        print_input()
+        if status == JudgeStatus.AC:
+            logger.info(utils.FAILURE + '' + utils.red('WA'))
+        status = JudgeStatus.WA
         if not silent:
+            print_input()
             if test_output_path is not None:
                 with test_output_path.open('rb') as outf:
                     expected = outf.read().decode()
@@ -165,11 +170,10 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
                     pretty_printers.display_snipped_side_by_side_color(answer, expected)
             else:
                 assert False
-        status = JudgeStatus.WA
     if match_result is None:
         if not silent:
-            header = ('output:\n' if is_input_printed else '')
-            logger.info(utils.NO_HEADER + '%s%s', header, pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            print_input()
+            logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
     if status == JudgeStatus.AC:
         logger.info(utils.SUCCESS + '' + utils.green('AC'))
 
