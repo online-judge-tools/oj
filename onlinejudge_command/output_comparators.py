@@ -43,7 +43,7 @@ class FloatingPointNumberComparator(OutputComparator):
         except ValueError:
             x = None
         try:
-            y = float(actual)  # type: Optional[float]
+            y = float(expected)  # type: Optional[float]
         except ValueError:
             y = None
         if x is not None and y is not None:
