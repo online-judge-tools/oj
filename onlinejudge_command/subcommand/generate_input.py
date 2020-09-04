@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 
 @contextlib.contextmanager
 def BufferedExecutor(lock: Optional[threading.Lock]):
-    buf = []  # type: List[Tuple[Callable, List[Any], Dict[str, Any]]]
+    buf: List[Tuple[Callable, List[Any], Dict[str, Any]]] = []
 
     def submit(f, *args, **kwargs):
         nonlocal buf
@@ -85,13 +85,13 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
         # generate input
         submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, timeout=tle)
-        input_data = info['answer']  # type: bytes
+        input_data: bytes = info['answer']
         if not check_status(info, proc, submit=submit):
             return None
 
         # generate output
         if command is None:
-            output_data = None  # type: Optional[bytes]
+            output_data: Optional[bytes] = None
         else:
             submit(logger.info, 'generate output...')
             info, proc = utils.exec_command(command, input=input_data, timeout=tle)
@@ -122,7 +122,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         # generate input
         submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, stdin=None, timeout=tle)
-        input_data = info['answer']  # type: Optional[bytes]
+        input_data: Optional[bytes] = info['answer']
         if not check_status(info, proc, submit=submit):
             return None
         assert input_data is not None
@@ -130,7 +130,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         # generate output
         submit(logger.info, 'generate output...')
         info, proc = utils.exec_command(command, input=input_data, timeout=tle)
-        output_data = info['answer']  # type: Optional[bytes]
+        output_data: Optional[bytes] = info['answer']
         if not check_status(info, proc, submit=submit):
             return None
         assert output_data is not None
@@ -138,9 +138,9 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         # hack
         submit(logger.info, 'hack...')
         info, proc = utils.exec_command(hack, input=input_data, timeout=tle)
-        answer = (info['answer'] or b'').decode()  # type: str
-        elapsed = info['elapsed']  # type: float
-        memory = info['memory']  # type: Optional[float]
+        answer: str = (info['answer'] or b'').decode()
+        elapsed: float = info['elapsed']
+        memory: Optional[float] = info['memory']
 
         # compare
         status = 'AC'
@@ -205,7 +205,7 @@ def generate_input(args: argparse.Namespace) -> None:
     else:
         with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
             lock = threading.Lock()
-            futures = []  # type: List[concurrent.futures.Future]
+            futures: List[concurrent.futures.Future] = []
 
             if not args.hack:
                 # generate concurrently

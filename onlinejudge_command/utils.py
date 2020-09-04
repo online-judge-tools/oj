@@ -17,10 +17,10 @@ from typing import *
 from typing.io import *
 
 import colorama
-import onlinejudge_command.__about__ as version
 import requests
 
 import onlinejudge.utils as utils
+import onlinejudge_command.__about__ as version
 from onlinejudge.type import *
 
 logger = getLogger(__name__)
@@ -53,7 +53,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         assert stdin is None
         stdin = subprocess.PIPE  # type: ignore
     if gnu_time is not None:
-        context = tempfile.NamedTemporaryFile(delete=True)  # type: Any
+        context: Any = tempfile.NamedTemporaryFile(delete=True)
     else:
         context = contextlib.ExitStack()  # TODO: we should use contextlib.nullcontext() if possible
     with context as fh:
@@ -78,7 +78,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
         except PermissionError:
             logger.error('Permission denied: %s', command)
             sys.exit(1)
-        answer = None  # type: Optional[bytes]
+        answer: Optional[bytes] = None
         try:
             answer, _ = proc.communicate(input=input, timeout=timeout)
         except subprocess.TimeoutExpired:
@@ -93,7 +93,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
                 proc.terminate()
 
         end = time.perf_counter()
-        memory = None  # type: Optional[float]
+        memory: Optional[float] = None
         if gnu_time is not None:
             with open(fh.name) as fh1:
                 reported = fh1.read()

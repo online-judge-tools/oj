@@ -7,11 +7,10 @@ import webbrowser
 from logging import getLogger
 from typing import *
 
+import onlinejudge.dispatch as dispatch
 import onlinejudge_command.download_history
 import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
-
-import onlinejudge.dispatch as dispatch
 from onlinejudge.type import *
 
 if TYPE_CHECKING:
@@ -44,7 +43,7 @@ def submit(args: 'argparse.Namespace') -> None:
 
     # read code
     with args.file.open('rb') as fh:
-        code = fh.read()  # type: bytes
+        code: bytes = fh.read()
     format_config = {
         'dos2unix': args.format_dos2unix or args.golf,
         'rstrip': args.format_dos2unix or args.golf,
@@ -57,8 +56,8 @@ def submit(args: 'argparse.Namespace') -> None:
 
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
         # guess or select language ids
-        language_dict = {language.id: language.name for language in problem.get_available_languages(session=sess)}  # type: Dict[LanguageId, str]
-        matched_lang_ids = None  # type: Optional[List[str]]
+        language_dict: Dict[LanguageId, str] = {language.id: language.name for language in problem.get_available_languages(session=sess)}
+        matched_lang_ids: Optional[List[str]] = None
         if args.language in language_dict:
             matched_lang_ids = [args.language]
         else:
@@ -304,7 +303,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
         if two_found and three_found:
             logger.info('both Python2 and Python3 are available for version of Python')
             if python_version in ('2', '3'):
-                versions = [int(python_version)]  # type: List[Optional[int]]
+                versions: List[Optional[int]] = [int(python_version)]
             elif python_version == 'all':
                 versions = [2, 3]
             else:

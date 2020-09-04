@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import onlinejudge_command.__about__ as version
 from setuptools import find_packages, setup
+
+import onlinejudge_command.__about__ as version
 
 setup(
     name=version.__package_name__,
@@ -10,7 +11,7 @@ setup(
     url=version.__url__,
     license=version.__license__,
     description=version.__description__,
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=[
         'online-judge-api-client >= 10.3.0, < 11',
         'colorama >= 0.3, < 1',

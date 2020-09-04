@@ -27,8 +27,8 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
     # run the command
     with test_input_path.open() as inf:
         info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle)
-        answer = info['answer']  # type: Optional[bytes]
-        elapsed = info['elapsed']  # type: float
+        answer: Optional[bytes] = info['answer']
+        elapsed: float = info['elapsed']
 
     # acquire lock to print logs properly, if in parallel
     nullcontext = contextlib.ExitStack()
@@ -51,9 +51,9 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
         logger.info(utils.NO_HEADER + '' + pretty_printers.make_pretty_large_file_content(answer, limit=40, head=20, tail=10, bold=True))
 
         # find the destination path
-        match_result = fmtutils.match_with_format(args.directory, args.format, test_input_path)  # type: Optional[Match[Any]]
+        match_result: Optional[Match[Any]] = fmtutils.match_with_format(args.directory, args.format, test_input_path)
         if match_result is not None:
-            matched_name = match_result.groupdict()['name']  # type: str
+            matched_name: str = match_result.groupdict()['name']
         else:
             assert False
         test_output_path = fmtutils.path_from_format(args.directory, args.format, name=matched_name, ext='out')
@@ -93,7 +93,7 @@ def generate_output(args: 'argparse.Namespace') -> None:
     else:
         with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
             lock = threading.Lock()
-            futures = []  # type: List[concurrent.futures.Future]
+            futures: List[concurrent.futures.Future] = []
             for name, paths in sorted(tests.items()):
                 futures += [executor.submit(generate_output_single_case_exists_ok, name, paths['in'], paths.get('out'), lock=lock, args=args)]
             for future in futures:

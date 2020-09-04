@@ -8,10 +8,10 @@ import time
 from logging import getLogger
 from typing import *
 
-import onlinejudge_command.utils as utils
 import requests
 
 import onlinejudge.dispatch as dispatch
+import onlinejudge_command.utils as utils
 from onlinejudge.type import LoginError, Service
 
 if TYPE_CHECKING:
@@ -113,7 +113,7 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
         logger.info('Opening the URL via WebDriver: %s', url)
         logger.info('Please do the followings:\n    1. login in the GUI browser\n    2. close the GUI browser')
         driver.get(url)
-        cookies = []  # type: List[Dict[str, str]]
+        cookies: List[Dict[str, str]] = []
         try:
             while driver.current_url:
                 cookies = driver.get_cookies()
@@ -125,7 +125,7 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
     logger.info('Copying cookies via WebDriver...')
     for c in cookies:
         logger.debug('set cookie: %s', c['name'])
-        morsel = http.cookies.Morsel()  # type: http.cookies.Morsel
+        morsel: http.cookies.Morsel = http.cookies.Morsel()
         morsel.set(c['name'], c['value'], c['value'])
         morsel.update({key: value for key, value in c.items() if morsel.isReservedKey(key)})
         if not morsel['expires']:
