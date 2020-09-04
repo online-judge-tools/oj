@@ -62,6 +62,10 @@ format string for --format:
   %b                    os.path.basename(name)
   %d                    os.path.dirname(name)
   %%                    '%' itself
+
+tips:
+  You can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
+    e.g. $ oj-api get-problem https://atcoder.jp/contests/agc001/tasks/agc001_a | jq -cr '.result.tests | to_entries[] | [{path: "test/sample-\(.key).in", data: .value.input}, {path: "test/sample-\(.key).out", data: .value.output}][] | {path, data: @sh "\(.data)"} | "mkdir -p test; echo -n \(.data) > \(.path)"' | sh
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (default: "sample-%%i.%%e" if not --system)')  # default must be None for --system
@@ -95,7 +99,6 @@ supported services:
   yukicoder
   HackerRank
   Toph (Problem Archive)
-
 ''')
     subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')
     subparser.add_argument('file', type=pathlib.Path)
@@ -123,7 +126,8 @@ format string for --format:
   (both %s and %e are required.)
 
 tips:
-  You can do similar things with shell: e.g. `for f in test/*.in ; do echo $f ; diff <(./a.out < $f) ${f/.in/.out} ; done`
+  You can do similar things with shell
+    e.g. $ for f in test/*.in ; do echo $f ; ./a.out < $f | diff - ${f%.in}.out ; done
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
@@ -156,7 +160,8 @@ format string for --format:
   (both %s and %e are required.)
 
 tips:
-  You can do similar things with shell: e.g. `for f in test/*.in ; do ./a.out < $f > ${f/.in/.out} ; done`
+  You can do similar things with shell
+    e.g. $ for f in test/*.in ; do ./a.out < $f > ${f%.in}.out ; done
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
@@ -175,7 +180,8 @@ format string for --format:
   (both %d and %e are required.)
 
 tips:
-  You can do similar things with shell: e.g. `for i in {000..099} ; do ./generate.py > test/random-$i.in ; done`
+  You can do similar things with shell
+    e.g. $ for i in `seq 100` ; do python3 generate.py > test/random-$i.in ; done
 ''')
     subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
     subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
@@ -190,6 +196,9 @@ tips:
 
     # test reactive
     subparser = subparsers.add_parser('test-reactive', aliases=['t/r'], help='test for reactive problem', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+tips:
+  You can do similar things with shell
+    e.g. $ mkfifo a.pipe && ./a.out < a.pipe | python3 judge.py > a.pipe
 ''')
     subparser.add_argument('-c', '--command', default='./a.out', help='your solution to be tested. (default: "./a.out")')
     subparser.add_argument('judge', help='judge program using standard I/O')
