@@ -135,23 +135,26 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
     if proc.returncode is None:
         logger.info(utils.FAILURE + '' + utils.red('TLE'))
         status = JudgeStatus.TLE
-        print_input()
+        if not silent:
+            print_input()
     elif memory is not None and mle is not None and memory > mle:
         logger.info(utils.FAILURE + '' + utils.red('MLE'))
         status = JudgeStatus.MLE
-        print_input()
+        if not silent:
+            print_input()
     elif proc.returncode != 0:
         logger.info(utils.FAILURE + '' + utils.red('RE') + ': return code %d', proc.returncode)
         status = JudgeStatus.RE
-        print_input()
+        if not silent:
+            print_input()
 
     # check WA or not
     if match_result is not None and not match_result:
         if status == JudgeStatus.AC:
             logger.info(utils.FAILURE + '' + utils.red('WA'))
         status = JudgeStatus.WA
-        print_input()
         if not silent:
+            print_input()
             if test_output_path is not None:
                 with test_output_path.open('rb') as outf:
                     expected = outf.read().decode()
