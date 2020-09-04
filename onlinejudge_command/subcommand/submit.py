@@ -55,6 +55,19 @@ def submit(args: 'argparse.Namespace') -> None:
     logger.info(utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(code, limit=30, head=10, tail=10, bold=True))
 
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
+        # check the login status
+        try:
+            is_logged_in = problem.get_service().is_logged_in(session=sess)
+        except Exception as e:
+            logger.exception('failed to check the login status: %s', e)
+            sys.exit(1)
+        else:
+            if is_logged_in:
+                logger.info('You are logged in.')
+            else:
+                logger.error('You are not logged in. Please run $ oj login %s', problem.get_url())
+                sys.exit(1)
+
         # guess or select language ids
         language_dict: Dict[LanguageId, str] = {language.id: language.name for language in problem.get_available_languages(session=sess)}
         matched_lang_ids: Optional[List[str]] = None
