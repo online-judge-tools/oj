@@ -44,11 +44,6 @@ def submit(args: 'argparse.Namespace') -> None:
     # read code
     with args.file.open('rb') as fh:
         code: bytes = fh.read()
-    format_config = {
-        'dos2unix': args.format_dos2unix or args.golf,
-        'rstrip': args.format_rstrip or args.golf,
-    }
-    code = format_code(code, **format_config)
 
     # report code
     logger.info('code (%d byte):', len(code))
@@ -390,13 +385,3 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
                 for name in data['names']:
                     lang_ids += select_ids_of_matched_languages([name], language_dict.keys(), language_dict=language_dict, split=data.get('split', False))
         return sorted(set(lang_ids))
-
-
-def format_code(code: bytes, dos2unix: bool = False, rstrip: bool = False) -> bytes:
-    if dos2unix:
-        logger.info('dos2unix...')
-        code = code.replace(b'\r\n', b'\n')
-    if rstrip:
-        logger.info('rstrip...')
-        code = code.rstrip()
-    return code
