@@ -34,7 +34,9 @@ def download(args: 'argparse.Namespace') -> None:
     # prepare values
     problem = dispatch.problem_from_url(args.url)
     if problem is None:
-        raise requests.exceptions.InvalidURL('The contest "%s" is not supported' % args.url)
+        if dispatch.contest_from_url(args.url) is not None:
+            logger.warning('You specified a URL for a contest instead of a problem. If you want to download for all problems of a contest at once, please try to use `oj-prepare` command of https://github.com/online-judge-tools/template-generator')
+        raise requests.exceptions.InvalidURL('The URL "%s" is not supported' % args.url)
     is_default_format = args.format is None and args.directory is None  # must be here since args.directory and args.format are overwritten
     if args.directory is None:
         args.directory = pathlib.Path('test')
