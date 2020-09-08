@@ -25,6 +25,7 @@ def fifo() -> Generator[Tuple[Any, Any], None, None]:
     # os.close(fdw), os.close(fdr) are unnecessary
 
 
+# TODO: write smoke tests for this subcommand
 def test_reactive(args: 'argparse.Namespace') -> None:
     with fifo() as (fhr1, fhw1):
         with fifo() as (fhr2, fhw2):

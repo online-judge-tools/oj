@@ -8,7 +8,8 @@ from onlinejudge.service.toph import TophService
 from onlinejudge.service.yukicoder import YukicoderService
 
 
-class LoginTest(unittest.TestCase):
+# TODO: add tests for login without `--check` opiton. Copy credentials used in tests https://github.com/online-judge-tools/api-client and write tests.
+class LoginCheckTest(unittest.TestCase):
     def snippet_call_login_check_failure(self, url):
         with tests.utils.sandbox(files=[]) as tempdir:
             path = 'cookie.jar'  # use dummy cookie to check in an empty state

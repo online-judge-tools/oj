@@ -3,6 +3,7 @@ import unittest
 import tests.command_download
 
 
+# TODO: move these tests to https://github.com/online-judge-tools/api-client
 class DownloadCSAcademyTest(unittest.TestCase):
     def snippet_call_download(self, *args, **kwargs):
         tests.command_download.snippet_call_download(self, *args, **kwargs)
