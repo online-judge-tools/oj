@@ -1,4 +1,3 @@
-# Python Version: 3.x
 import json
 import pathlib
 import time

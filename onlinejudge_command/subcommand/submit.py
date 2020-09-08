@@ -1,4 +1,3 @@
-# Python Version: 3.x
 import pathlib
 import re
 import sys

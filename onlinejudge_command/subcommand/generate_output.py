@@ -1,4 +1,3 @@
-# Python Version: 3.x
 import concurrent.futures
 import contextlib
 import os

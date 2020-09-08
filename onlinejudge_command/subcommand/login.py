@@ -1,4 +1,3 @@
-# Python Version: 3.x
 import datetime
 import getpass
 import http.cookies

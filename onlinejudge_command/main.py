@@ -1,5 +1,3 @@
-# Python Version: 3.x
-# -*- coding: utf-8 -*-
 import argparse
 import pathlib
 import sys
