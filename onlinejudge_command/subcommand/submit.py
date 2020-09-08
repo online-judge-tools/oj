@@ -157,6 +157,7 @@ def submit(args: 'argparse.Namespace') -> None:
                 browser.open_new_tab(submission.get_url())
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], language_dict, split: bool = False, remove: bool = False) -> List[str]:
     result = []
     for lang_id in lang_ids:
@@ -171,11 +172,13 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
     return result
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def is_cplusplus_description(description: str) -> bool:
     # Here, 'clang' is not used as intended. Think about strings like "C++ (Clang)", "Clang++" (this includes "g++" as a substring), or "C (Clang)".
     return 'c++' in description.lower() or 'g++' in description.lower()
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def parse_cplusplus_compiler(description: str) -> str:
     """
     :param description: must be for C++
@@ -189,6 +192,7 @@ def parse_cplusplus_compiler(description: str) -> str:
     return 'gcc'  # by default
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def parse_cplusplus_version(description: str) -> Optional[str]:
     """
     :param description: must be for C++
@@ -201,10 +205,12 @@ def parse_cplusplus_version(description: str) -> Optional[str]:
     return None
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def is_python_description(description: str) -> bool:
     return 'python' in description.lower() or 'pypy' in description.lower()
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def parse_python_version(description: str) -> Optional[int]:
     """
     :param description: must be for Python
@@ -220,6 +226,7 @@ def parse_python_version(description: str) -> Optional[int]:
     return None
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def parse_python_interpreter(description: str) -> str:
     """
     :param description: must be for Python
@@ -232,6 +239,7 @@ def parse_python_interpreter(description: str) -> str:
         return 'cpython'
 
 
+# TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781
 def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, cxx_latest: bool = False, cxx_compiler: str = 'all', python_version: str = 'all', python_interpreter: str = 'all') -> List[str]:
     assert cxx_compiler in ('gcc', 'clang', 'all')
     assert python_version in ('2', '3', 'auto', 'all')
