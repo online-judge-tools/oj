@@ -188,3 +188,13 @@ def webbrowser_register_explorer_exe() -> None:
         return
     instance = webbrowser.GenericBrowser('explorer.exe')
     webbrowser.register('explorer', None, instance)  # TODO: use `preferred=True` to solve the issue that terminal is cleared, when the version of Python becomes 3.7 or higher
+
+
+def get_default_command() -> str:
+    """get_default_command returns a command to execute the default output of g++ or clang++. The value is basically `./a.out`, but `.\a.exe` on Windows.
+
+    The type of return values must be `str` and must not be `pathlib.Path`, because the strings `./a.out` and `a.out` are different as commands but same as a path.
+    """
+    if platform.system() == 'Windows':
+        return r'.\a.exe'
+    return './a.out'
