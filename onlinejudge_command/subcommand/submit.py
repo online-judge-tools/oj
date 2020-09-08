@@ -1,3 +1,4 @@
+import argparse
 import pathlib
 import re
 import sys
@@ -12,13 +13,10 @@ import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
 from onlinejudge.type import *
 
-if TYPE_CHECKING:
-    import argparse
-
 logger = getLogger(__name__)
 
 
-def submit(args: 'argparse.Namespace') -> None:
+def submit(args: argparse.Namespace) -> None:
     # guess url
     history = onlinejudge_command.download_history.DownloadHistory()
     if args.file.parent.resolve() == pathlib.Path.cwd():

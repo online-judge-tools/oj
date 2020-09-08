@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import getpass
 import http.cookies
@@ -12,9 +13,6 @@ import requests
 import onlinejudge.dispatch as dispatch
 import onlinejudge_command.utils as utils
 from onlinejudge.type import LoginError, Service
-
-if TYPE_CHECKING:
-    import argparse
 
 logger = getLogger(__name__)
 
@@ -143,7 +141,7 @@ def is_logged_in_with_message(service: Service, *, session: requests.Session) ->
         return False
 
 
-def login(args: 'argparse.Namespace') -> None:
+def login(args: argparse.Namespace) -> None:
     service = dispatch.service_from_url(args.url)
     if service is None:
         sys.exit(1)

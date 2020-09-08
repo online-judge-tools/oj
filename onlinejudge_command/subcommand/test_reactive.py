@@ -1,3 +1,4 @@
+import argparse
 import contextlib
 import os
 import subprocess
@@ -6,9 +7,6 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.utils as utils
-
-if TYPE_CHECKING:
-    import argparse
 
 logger = getLogger(__name__)
 
@@ -25,7 +23,7 @@ def fifo() -> Generator[Tuple[Any, Any], None, None]:
 
 
 # TODO: write smoke tests for this subcommand
-def test_reactive(args: 'argparse.Namespace') -> None:
+def test_reactive(args: argparse.Namespace) -> None:
     with fifo() as (fhr1, fhw1):
         with fifo() as (fhr2, fhw2):
             with subprocess.Popen(args.command, shell=True, stdin=fhr2, stdout=fhw1, stderr=sys.stderr) as proc1:

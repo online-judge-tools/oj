@@ -1,3 +1,4 @@
+import argparse
 import concurrent.futures
 import contextlib
 import os
@@ -10,13 +11,10 @@ import onlinejudge_command.format_utils as fmtutils
 import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
 
-if TYPE_CHECKING:
-    import argparse
-
 logger = getLogger(__name__)
 
 
-def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *, lock: Optional[threading.Lock] = None, args: 'argparse.Namespace') -> None:
+def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *, lock: Optional[threading.Lock] = None, args: argparse.Namespace) -> None:
 
     # print the header
     if lock is None:
@@ -65,7 +63,7 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
         logger.info(utils.SUCCESS + 'saved to: %s', test_output_path)
 
 
-def generate_output_single_case_exists_ok(test_name: str, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, lock: Optional[threading.Lock] = None, args: 'argparse.Namespace') -> None:
+def generate_output_single_case_exists_ok(test_name: str, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, lock: Optional[threading.Lock] = None, args: argparse.Namespace) -> None:
     if test_output_path is not None:
         nullcontext = contextlib.ExitStack()
         with lock or nullcontext:
@@ -77,7 +75,7 @@ def generate_output_single_case_exists_ok(test_name: str, test_input_path: pathl
         generate_output_single_case(test_name, test_input_path, lock=lock, args=args)
 
 
-def generate_output(args: 'argparse.Namespace') -> None:
+def generate_output(args: argparse.Namespace) -> None:
     # list tests
     if not args.test:
         args.test = fmtutils.glob_with_format(args.directory, args.format)  # by default

@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import pathlib
@@ -14,9 +15,6 @@ import onlinejudge_command.utils as utils
 from onlinejudge.service.yukicoder import YukicoderProblem
 from onlinejudge.type import SampleParseError, TestCase
 
-if TYPE_CHECKING:
-    import argparse
-
 logger = getLogger(__name__)
 
 
@@ -29,7 +27,7 @@ def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
     return data
 
 
-def download(args: 'argparse.Namespace') -> None:
+def download(args: argparse.Namespace) -> None:
     # prepare values
     problem = dispatch.problem_from_url(args.url)
     if problem is None:
