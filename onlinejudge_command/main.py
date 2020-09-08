@@ -1,5 +1,3 @@
-# Python Version: 3.x
-# -*- coding: utf-8 -*-
 import argparse
 import pathlib
 import sys
@@ -29,6 +27,8 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-c', '--cookie', type=pathlib.Path, default=utils.default_cookie_path, help='path to cookie. (default: {})'.format(utils.default_cookie_path))
     parser.add_argument('--version', action='store_true', help='print the online-judge-tools version number')
+
+    # TODO: configure subparsers in each module for the subcommand, not this module for the entry point
     subparsers = parser.add_subparsers(dest='subcommand', help='for details, see "{} COMMAND --help"'.format(sys.argv[0]))
 
     # download
@@ -211,6 +211,8 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
     # print the version to use for user-supporting
     logger.info('online-judge-tools %s (+ online-judge-api-client %s)', version.__version__, api_version.__version__)
 
+    # TODO: make functions for subcommand take a named tuple instead of the raw result of argparse. Using named tuples make code well-typed.
+    # TODO: make functions for subcommand always return. The current implementation sometimes calls sys.exit(1), but this is not so good to write tests.
     if args.subcommand in ['download', 'd', 'dl']:
         download(args)
     elif args.subcommand in ['login', 'l']:

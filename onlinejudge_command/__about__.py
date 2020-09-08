@@ -1,4 +1,3 @@
-# Python Version: 3.x
 __package_name__ = 'online-judge-tools'
 __author__ = 'Kimiyuki Onaka'
 __email__ = 'kimiyuki95@gmail.com'
