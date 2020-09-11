@@ -3,7 +3,9 @@ import logging
 
 import colorama
 
-colorama.init()
+# This initializes colorama.
+# The `strip=False` argument is required for PyCharm. See https://github.com/online-judge-tools/oj/issues/823
+colorama.init(strip=False)
 
 log_colors_level = {
     logging.DEBUG: '[' + colorama.Fore.RED + 'DEBUG' + colorama.Style.RESET_ALL + '] ',
