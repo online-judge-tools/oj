@@ -28,7 +28,7 @@ class TestTest(unittest.TestCase):
         return json_bytes
 
     def snippet_call_test(self, args, files, expected, verbose=True, replace_output_newline=True):
-        result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--json'] + args, files=files)
+        result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--output-json-for-test'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(self.extract_json_from_bytes_array(result['proc'].stdout).decode())
         if expected is None:

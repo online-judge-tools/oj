@@ -97,5 +97,5 @@ def download(args: argparse.Namespace) -> None:
                 logger.info(utils.SUCCESS + 'saved to: %s', path)
 
     # print json
-    if args.json:
+    if args.output_json_for_test:
         print(json.dumps(list(map(convert_sample_to_dict, samples))))
