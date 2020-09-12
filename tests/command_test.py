@@ -15,6 +15,7 @@ from tests.utils import cat, sleep_1sec
 
 class TestTest(unittest.TestCase):
     def extract_json_from_bytes_array(self, input_bytes: bytes) -> bytes:
+        # https://github.com/online-judge-tools/oj/pull/825
         start_index = 0
         end_index = 0
         for i in range(len(input_bytes) - 1):
