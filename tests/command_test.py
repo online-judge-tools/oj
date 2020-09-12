@@ -14,23 +14,22 @@ from tests.utils import cat, sleep_1sec
 
 
 class TestTest(unittest.TestCase):
-    def extract_json_data_from_bytes_array(self, input_bytes):
-        startIndex = 0
-        endIndex = 0
+    def extract_json_from_bytes_array(self, input_bytes: bytes) -> bytes:
+        start_index = 0
+        end_index = 0
         for i in range(len(input_bytes) - 1):
             if bytes([input_bytes[i]]) == b'[' and bytes([input_bytes[i + 1]]) == b'{':
-                startIndex = i
+                start_index = i
             if bytes([input_bytes[i]]) == b'}' and bytes([input_bytes[i + 1]]) == b']':
-                endIndex = i + 2
+                end_index = i + 2
 
-        json_bytes = input_bytes[startIndex:endIndex]
-        return json.loads(json_bytes.decode())
+        json_bytes = input_bytes[start_index:end_index]
+        return json_bytes
 
     def snippet_call_test(self, args, files, expected, verbose=True, replace_output_newline=True):
         result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--json'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
-        print(type(result['proc'].stdout.decode()))
-        data = self.extract_json_data_from_bytes_array(result['proc'].stdout)
+        data = json.loads(self.extract_json_from_bytes_array(result['proc'].stdout).decode())
         if expected is None:
             return data
         else:
