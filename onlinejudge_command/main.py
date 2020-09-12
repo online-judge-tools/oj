@@ -240,7 +240,7 @@ def main(args: Optional[List[str]] = None) -> None:
     level = INFO
     if parsed.verbose:
         level = DEBUG
-    handler = StreamHandler()
+    handler = StreamHandler(sys.stdout)
     handler.setFormatter(log_formatter.LogFormatter())
     basicConfig(level=level, handlers=[handler])
 
