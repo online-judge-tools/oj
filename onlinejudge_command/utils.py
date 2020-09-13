@@ -13,7 +13,7 @@ import time
 import webbrowser
 from logging import getLogger
 from typing import *
-from typing.io import *
+from typing import BinaryIO  # It seems we cannot import BinaryIO with wildcard-import
 
 import colorama
 import requests
@@ -47,7 +47,7 @@ def textfile(s: str) -> str:  # should have trailing newline
         return s + '\n'
 
 
-def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Optional[bytes] = None, timeout: Optional[float] = None, gnu_time: Optional[str] = None) -> Tuple[Dict[str, Any], subprocess.Popen]:
+def exec_command(command_str: str, *, stdin: Optional[BinaryIO] = None, input: Optional[bytes] = None, timeout: Optional[float] = None, gnu_time: Optional[str] = None) -> Tuple[Dict[str, Any], subprocess.Popen]:
     if input is not None:
         assert stdin is None
         stdin = subprocess.PIPE  # type: ignore
@@ -70,7 +70,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
             preexec_fn = os.setsid
 
         try:
-            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr, preexec_fn=preexec_fn)
+            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr, preexec_fn=preexec_fn)  # pylint: disable=subprocess-popen-preexec-fn
         except FileNotFoundError:
             logger.error('No such file or directory: %s', command)
             sys.exit(1)

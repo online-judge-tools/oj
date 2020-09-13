@@ -186,7 +186,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
         logger.info('%s', test_name)
 
     # run the binary
-    with test_input_path.open() as inf:
+    with test_input_path.open('rb') as inf:
         info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle, gnu_time=args.gnu_time)
         # TODO: the `answer` should be bytes, not str
         answer: str = (info['answer'] or b'').decode(errors='replace')
@@ -233,8 +233,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
 def check_gnu_time(gnu_time: str) -> bool:
     try:
         with tempfile.NamedTemporaryFile(delete=True) as fh:
-            proc = subprocess.run([gnu_time, '-f', '%M KB', '-o', fh.name, '--', 'true'])
-            assert proc.returncode == 0
+            subprocess.check_call([gnu_time, '-f', '%M KB', '-o', fh.name, '--', 'true'])
             with open(fh.name) as fh1:
                 data = fh1.read()
             int(utils.remove_suffix(data.rstrip().splitlines()[-1], ' KB'))
@@ -243,7 +242,7 @@ def check_gnu_time(gnu_time: str) -> bool:
         raise  # NameError is not a runtime error caused by the environment, but a coding mistake
     except AttributeError:
         raise  # AttributeError is also a mistake
-    except Exception as e:
+    except Exception:
         logger.debug(traceback.format_exc())
     return False
 

@@ -11,7 +11,7 @@ from onlinejudge.type import Problem
 logger = getLogger(__name__)
 
 
-class DownloadHistory(object):
+class DownloadHistory:
     def __init__(self, path: pathlib.Path = utils.user_cache_dir / 'download-history.jsonl'):
         self.path = path
 
@@ -55,7 +55,7 @@ class DownloadHistory(object):
             for line in fh:
                 try:
                     data = json.loads(line)
-                except json.decoder.JSONDecodeError as e:
+                except json.decoder.JSONDecodeError:
                     logger.warning('corrupted line found in: %s', self.path)
                     logger.debug('%s', traceback.format_exc())
                     continue

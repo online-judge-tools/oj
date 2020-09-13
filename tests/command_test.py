@@ -8,6 +8,7 @@ import signal
 import sys
 import threading
 import unittest
+from typing import *
 
 import tests.utils
 from tests.utils import cat, sleep_1sec
@@ -27,7 +28,7 @@ class TestTest(unittest.TestCase):
         json_bytes = input_bytes[start_index:end_index]
         return json_bytes
 
-    def snippet_call_test(self, args, files, expected, verbose=True, replace_output_newline=True):
+    def snippet_call_test(self, args, files, expected, verbose=True, replace_output_newline=True) -> Optional[Dict[str, Any]]:
         result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--output-json-for-test'] + args, files=files)
         self.assertTrue(result['proc'].stdout)
         data = json.loads(self.extract_json_from_bytes_array(result['proc'].stdout).decode())
@@ -48,6 +49,7 @@ class TestTest(unittest.TestCase):
                 else:
                     a_output = a['output']
                 self.assertEqual(a_output, b['output'])
+            return None
 
     def test_call_test_simple(self):
         self.snippet_call_test(
@@ -1011,7 +1013,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_stderr(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c("import sys; print('foo', file=sys.stderr)")],
             files=[
                 {
@@ -1031,7 +1033,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_runtime_error(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c("exit(1)")],
             files=[
                 {
@@ -1051,7 +1053,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_stderr_and_fail(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c("import sys; print('good bye', file=sys.stderr); exit(255)")],
             files=[
                 {
@@ -1076,7 +1078,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_non_unicode(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c("import sys; sys.stdout.buffer.write(bytes(range(256)))")],
             files=[
                 {
@@ -1096,7 +1098,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_output_uses_crlf(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\r\nbaz\r\n')")],
             files=[
                 {
@@ -1122,7 +1124,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_expected_uses_crlf_with_default_mode(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\nbar\nbaz\n')")],
             files=[
                 {
@@ -1148,7 +1150,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_expected_uses_crlf_with_exact_match(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\nbar\nbaz\n')"), '--compare-mode', 'exact-match'],
             files=[
                 {
@@ -1174,7 +1176,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_output_uses_both_lf_and_crlf_with_default_mode(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\nbaz\r\n')")],
             files=[
                 {
@@ -1200,7 +1202,7 @@ class TestTest(unittest.TestCase):
         )
 
     def test_call_output_uses_both_lf_and_crlf_with_exact_match(self):
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'foo\r\nbar\nbaz\r\n')"), '--compare-mode', 'exact-match'],
             files=[
                 {
@@ -1228,7 +1230,7 @@ class TestTest(unittest.TestCase):
     @unittest.skipIf(not pathlib.Path('/proc').exists(), "procfs is required")
     def test_call_test_check_no_orphan_with_tle(self):
         marker = 'orphan-%08x' % random.randrange(2**32)
-        data = self.snippet_call_test(
+        self.snippet_call_test(
             args=['-c', tests.utils.python_c("import time; time.sleep(100)  # {}".format(marker)), '--tle', '1'],
             files=[
                 {

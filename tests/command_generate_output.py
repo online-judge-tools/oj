@@ -7,7 +7,7 @@ from tests.utils import cat
 
 class GenerateOutputTest(unittest.TestCase):
     def snippet_call_generate_output(self, args, input_files, expected_values, disallowed_files=None):
-        with tests.utils.sandbox(input_files) as tempdir:
+        with tests.utils.sandbox(input_files) as _:
             tests.utils.run(['generate-output'] + args, check=True)
             for expect in expected_values:
                 with open(expect['path']) as f:

@@ -158,7 +158,7 @@ def display_side_by_side_color(answer: str, expected: str) -> None:
 
     logger.info(utils.NO_HEADER + 'output:' + " " * (max_chars - 7) + "|" + "expected:")
     logger.info(utils.NO_HEADER + '%s', "-" * max_chars + "|" + "-" * max_chars)
-    for _, diff_found, ans_line, exp_line, ans_chars, exp_chars in _side_by_side_diff(answer, expected):
+    for _, diff_found, ans_line, exp_line, ans_chars, _ in _side_by_side_diff(answer, expected):
         if diff_found:
             logger.info(utils.NO_HEADER + '%s', utils.red(_space_padding(ans_line, max_chars - ans_chars)) + "|" + utils.green(exp_line))
         else:
@@ -176,7 +176,8 @@ def display_snipped_side_by_side_color(answer: str, expected: str) -> None:
     count_from_first_difference = 0
     i = 0
     for flag, diff_found, ans_line, exp_line, ans_chars, exp_chars in _side_by_side_diff(answer, expected):
-        if flag: i += 1
+        if flag:
+            i += 1
         if count_from_first_difference > 0:
             count_from_first_difference += 1
         line_num = i if flag else None
@@ -270,8 +271,7 @@ def _side_by_side_diff(old_text: str, new_text: str) -> Generator[Tuple[bool, bo
         if lines:
             if change_type == 0:
                 # Push out open entry
-                for entry in _yield_open_entry(open_entry):
-                    yield entry
+                yield from _yield_open_entry(open_entry)
 
                 # Directly push out lines until last
                 for line in lines[:-1]:
