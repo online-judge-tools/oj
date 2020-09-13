@@ -13,7 +13,6 @@ import time
 import webbrowser
 from logging import getLogger
 from typing import *
-from typing.io import *
 
 import colorama
 import requests
@@ -70,7 +69,7 @@ def exec_command(command_str: str, *, stdin: Optional[IO[Any]] = None, input: Op
             preexec_fn = os.setsid
 
         try:
-            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr, preexec_fn=preexec_fn)
+            proc = subprocess.Popen(command, stdin=stdin, stdout=subprocess.PIPE, stderr=sys.stderr, preexec_fn=preexec_fn)  # pylint: disable=subprocess-popen-preexec-fn
         except FileNotFoundError:
             logger.error('No such file or directory: %s', command)
             sys.exit(1)

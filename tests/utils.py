@@ -75,7 +75,7 @@ def python_script(path):
     return '{} "{}"'.format(sys.executable, path)
 
 
-def is_logged_in(service, memo={}):
+def is_logged_in(service, memo={}):  # pylint: disable=dangerous-default-value
     # functools.lru_cache is unusable since Service are unhashable
     url = service.get_url()
     if url not in memo:

@@ -1,5 +1,6 @@
 import http.client
 import logging
+from typing import *
 
 import colorama
 
@@ -21,11 +22,11 @@ log_colors_semantics = {
     'FAILURE': '[' + colorama.Fore.RED + 'FAILURE' + colorama.Style.RESET_ALL + '] ',
 }
 
-status_code_messages = set([str(int(key)) + ' ' + str(value) for key, value in http.client.responses.items()])
+status_code_messages: Set[str] = {str(int(key)) + ' ' + str(value) for key, value in http.client.responses.items()}
 
 
 class LogFormatter(logging.Formatter):
-    def __init__(self, datefmt=None):
+    def __init__(self, datefmt: Optional[str] = None):
         fmt = '[%(levelname)s] %(message)s'
         super().__init__(fmt=fmt, datefmt=datefmt)
 

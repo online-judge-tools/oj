@@ -11,7 +11,7 @@ from onlinejudge.service.yukicoder import YukicoderService
 # TODO: add tests for login without `--check` opiton. Copy credentials used in tests https://github.com/online-judge-tools/api-client and write tests.
 class LoginCheckTest(unittest.TestCase):
     def snippet_call_login_check_failure(self, url):
-        with tests.utils.sandbox(files=[]) as tempdir:
+        with tests.utils.sandbox(files=[]) as _:
             path = 'cookie.jar'  # use dummy cookie to check in an empty state
             proc = tests.utils.run(['--cookie', path, 'login', '--check', url])
             self.assertEqual(proc.returncode, 1)
