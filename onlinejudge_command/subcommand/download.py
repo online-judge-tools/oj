@@ -97,5 +97,5 @@ def download(args: argparse.Namespace) -> None:
                 logger.info(utils.SUCCESS + 'saved to: %s', path)
 
     if args.log_file:
-        with args.log_file.open(mode='w') as fh:
-            json.dump(list(map(convert_sample_to_dict, samples)), fh)
+        with args.log_file.open(mode='w') as fhs:
+            json.dump(list(map(convert_sample_to_dict, samples)), fhs)
