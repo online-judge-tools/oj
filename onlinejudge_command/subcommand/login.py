@@ -40,7 +40,7 @@ def get_webdriver() -> Any:
     :raises ImportError: of Selenium
     """
 
-    import selenium.webdriver
+    import selenium.webdriver  # pylint: disable=import-error,import-outside-toplevel
 
     logger.info('Trying to open Chrome via WebDriver...')
     try:
@@ -102,7 +102,7 @@ def login_with_browser(service: Service, *, session: requests.Session) -> None:
     :raises WebDriverException:
     """
 
-    import selenium.webdriver
+    import selenium.webdriver  # pylint: disable=import-error,import-outside-toplevel
 
     with get_webdriver() as driver:
         # get cookies via Selenium

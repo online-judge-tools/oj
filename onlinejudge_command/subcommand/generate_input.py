@@ -86,7 +86,7 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
         info, proc = utils.exec_command(generator, timeout=tle)
         input_data: bytes = info['answer']
         if not check_status(info, proc, submit=submit):
-            return None
+            return
 
         # generate output
         if command is None:
@@ -96,7 +96,7 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
             info, proc = utils.exec_command(command, input=input_data, timeout=tle)
             output_data = info['answer']
             if not check_status(info, proc, submit=submit):
-                return None
+                return
 
         # write result
         submit(write_result, input_data=input_data, output_data=output_data, input_path=input_path, output_path=output_path, print_data=True)
@@ -138,8 +138,6 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         submit(logger.info, 'hack...')
         info, proc = utils.exec_command(hack, input=input_data, timeout=tle)
         answer: str = (info['answer'] or b'').decode()
-        elapsed: float = info['elapsed']
-        memory: Optional[float] = info['memory']
 
         # compare
         status = 'AC'

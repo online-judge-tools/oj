@@ -6,7 +6,7 @@ import tests.utils
 
 class GenerateInputTest(unittest.TestCase):
     def snippet_call_generate_input(self, args, input_files, expected_values, disallowed_files=None):
-        with tests.utils.sandbox(input_files) as tempdir:
+        with tests.utils.sandbox(input_files) as _:
             tests.utils.run(['generate-input'] + args, check=True)
             for expect in expected_values:
                 self.assertTrue(os.path.exists(expect['path']))

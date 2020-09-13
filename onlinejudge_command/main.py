@@ -64,7 +64,7 @@ format string for --format:
 
 tips:
   You can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
-    e.g. $ oj-api get-problem https://atcoder.jp/contests/agc001/tasks/agc001_a | jq -cr '.result.tests | to_entries[] | [{path: "test/sample-\(.key).in", data: .value.input}, {path: "test/sample-\(.key).out", data: .value.output}][] | {path, data: @sh "\(.data)"} | "mkdir -p test; echo -n \(.data) > \(.path)"' | sh
+    e.g. $ oj-api get-problem https://atcoder.jp/contests/agc001/tasks/agc001_a | jq -cr '.result.tests | to_entries[] | [{path: "test/sample-\\(.key).in", data: .value.input}, {path: "test/sample-\\(.key).out", data: .value.output}][] | {path, data: @sh "\\(.data)"} | "mkdir -p test; echo -n \\(.data) > \\(.path)"' | sh
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (default: "sample-%%i.%%e" if not --system)')  # default must be None for --system

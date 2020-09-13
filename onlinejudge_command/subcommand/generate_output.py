@@ -22,7 +22,7 @@ def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *
         logger.info('%s', test_name)
 
     # run the command
-    with test_input_path.open() as inf:
+    with test_input_path.open('rb') as inf:
         info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle)
         answer: Optional[bytes] = info['answer']
         elapsed: float = info['elapsed']
