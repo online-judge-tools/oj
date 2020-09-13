@@ -186,7 +186,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
         logger.info('%s', test_name)
 
     # run the binary
-    with test_input_path.open() as inf:
+    with test_input_path.open('rb') as inf:
         info, proc = utils.exec_command(args.command, stdin=inf, timeout=args.tle, gnu_time=args.gnu_time)
         # TODO: the `answer` should be bytes, not str
         answer: str = (info['answer'] or b'').decode(errors='replace')
