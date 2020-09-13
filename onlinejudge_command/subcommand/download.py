@@ -98,4 +98,4 @@ def download(args: argparse.Namespace) -> None:
 
     if args.log_file:
         with args.log_file.open(mode='w') as fh:
-            json.dumps(list(map(convert_sample_to_dict, samples)), fh)
+            json.dump(list(map(convert_sample_to_dict, samples)), fh)
