@@ -6,9 +6,9 @@ import random
 import shutil
 import signal
 import sys
+import tempfile
 import threading
 import unittest
-import tempfile
 from typing import *
 
 import tests.utils
