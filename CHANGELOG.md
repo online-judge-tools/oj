@@ -1,5 +1,23 @@
 # Change Log
 
+## 11.0.0 / 2020-09-04
+
+-   [#816](https://github.com/online-judge-tools/oj/pull/816) (breaking changes) remove Python 3.5 support
+-   [#811](https://github.com/online-judge-tools/oj/pull/811) [#790](https://github.com/online-judge-tools/oj/pull/790) (breaking changes) update the `test` subcommand
+    -   `--print-input` is now default.
+    -   `--ignore-spaces` option and `--ignore-spaces-and-newlines` option are added.
+    -   Now it always ignores the difference between CRLF and LF.
+    -   Some options are renamed or removed.
+    -   The current default behavior uses exact matching but ignores the difference of CRLF and LF.
+        -   The previous default used exact matching but ignored trailing spaces and newlines of files. It was the same to the matching algorithm in Anarchy Golf.
+-   [#819](https://github.com/online-judge-tools/oj/pull/819) (breaking changes) remove some options from `submit`
+    -   The options `--format-dos2unix`, `--format-rstrip`, `--golf` are removed. They are options for code golf.
+-   [#821](https://github.com/online-judge-tools/oj/pull/821) replace the default command of `test` subcommand on Windows with `.\a.exe`
+-   [#818](https://github.com/online-judge-tools/oj/pull/818) improve the output of `test` subcommand
+-   [#813](https://github.com/online-judge-tools/oj/pull/813) [#819](https://github.com/online-judge-tools/oj/pull/819) update some hint messages
+-   [#825](https://github.com/online-judge-tools/oj/pull/825) (breaking changes) change to print logs to stdout instead of stderr  ([@ryo-n](https://github.com/ryo-n))
+    -   `--json` options of some subcommands are also removed. They used stdout.
+
 ## 10.1.3 / 2020-09-01
 
 -   [#806](https://github.com/online-judge-tools/oj/pull/806) fix a bug of `generate-input` subcommand about logging  ([@rsk0315](https://github.com/rsk0315))
