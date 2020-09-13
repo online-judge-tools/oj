@@ -308,7 +308,7 @@ def test(args: 'argparse.Namespace') -> None:
     else:
         logger.info(utils.FAILURE + 'test ' + utils.red('failed') + ': %d AC / %d cases', ac_count, len(tests))
 
-    if args.json:
+    if args.output_json_for_test:
         print(json.dumps(history))
 
     if ac_count != len(tests):
