@@ -73,7 +73,7 @@ tips:
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
     subparser.add_argument('-s', '--silent', action='store_true')
     subparser.add_argument('--yukicoder-token', type=str)
-    subparser.add_argument('--output-json-for-test', action='store_true', help=argparse.SUPPRESS)
+    subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
 
     # login
     subparser = subparsers.add_parser('login', aliases=['l'], help='login to a service', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
@@ -144,7 +144,7 @@ tips:
     subparser.add_argument('--gnu-time', help='used to measure memory consumption (default: "time")', default='time')
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
-    subparser.add_argument('--output-json-for-test', action='store_true', help=argparse.SUPPRESS)
+    subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
     subparser.add_argument('--judge-command', dest='judge', default=None, help='specify judge command instead of default diff judge. See https://online-judge-tools.readthedocs.io/en/master/introduction.en.html#test-for-special-forms-of-problem for details')
     subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
 

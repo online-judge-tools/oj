@@ -307,8 +307,9 @@ def test(args: 'argparse.Namespace') -> None:
     else:
         logger.info(utils.FAILURE + 'test ' + utils.red('failed') + ': %d AC / %d cases', ac_count, len(tests))
 
-    if args.output_json_for_test:
-        print(json.dumps(history))
+    if args.log_file:
+        with args.log_file.open(mode='w') as fh:
+            json.dump(history, fh)
 
     if ac_count != len(tests):
         sys.exit(1)

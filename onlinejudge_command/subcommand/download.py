@@ -96,6 +96,6 @@ def download(args: argparse.Namespace) -> None:
                     fh.write(data)
                 logger.info(utils.SUCCESS + 'saved to: %s', path)
 
-    # print json
-    if args.output_json_for_test:
-        print(json.dumps(list(map(convert_sample_to_dict, samples))))
+    if args.log_file:
+        with args.log_file.open(mode='w') as fhs:
+            json.dump(list(map(convert_sample_to_dict, samples)), fhs)

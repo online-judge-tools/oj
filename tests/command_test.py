@@ -6,6 +6,7 @@ import random
 import shutil
 import signal
 import sys
+import tempfile
 import threading
 import unittest
 from typing import *
@@ -15,23 +16,13 @@ from tests.utils import cat, sleep_1sec
 
 
 class TestTest(unittest.TestCase):
-    def extract_json_from_bytes_array(self, input_bytes: bytes) -> bytes:
-        # https://github.com/online-judge-tools/oj/pull/825
-        start_index = 0
-        end_index = 0
-        for i in range(len(input_bytes) - 1):
-            if bytes([input_bytes[i]]) == b'[' and bytes([input_bytes[i + 1]]) == b'{':
-                start_index = i
-            if bytes([input_bytes[i]]) == b'}' and bytes([input_bytes[i + 1]]) == b']':
-                end_index = i + 2
-
-        json_bytes = input_bytes[start_index:end_index]
-        return json_bytes
-
     def snippet_call_test(self, args, files, expected, verbose=True, replace_output_newline=True) -> Optional[Dict[str, Any]]:
-        result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--output-json-for-test'] + args, files=files)
-        self.assertTrue(result['proc'].stdout)
-        data = json.loads(self.extract_json_from_bytes_array(result['proc'].stdout).decode())
+        with tempfile.TemporaryDirectory() as tempdir_:
+            tempdir = pathlib.Path(tempdir_)
+            log_file_path = tempdir / 'test.json'
+            result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--log-file=' + str(log_file_path)] + args, files=files)
+            with log_file_path.open(mode='rb') as fh:
+                data = json.load(fh)
         if expected is None:
             return data
         else:
