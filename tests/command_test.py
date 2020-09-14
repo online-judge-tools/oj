@@ -17,11 +17,12 @@ from tests.utils import cat, sleep_1sec
 
 class TestTest(unittest.TestCase):
     def snippet_call_test(self, args, files, expected, verbose=True, replace_output_newline=True) -> Optional[Dict[str, Any]]:
-        temp_dir = tempfile.TemporaryDirectory()
-        log_file_path = temp_dir.name + '/test.json'
-        result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--log-file=' + log_file_path] + args, files=files)
-        with open(log_file_path, 'rb') as fh:
-            data = json.load(fh)
+        with tempfile.TemporaryDirectory() as tempdir_:
+            tempdir = pathlib.Path(tempdir_)
+            log_file_path = tempdir / 'test.json'
+            result = tests.utils.run_in_sandbox(args=(['-v'] if verbose else []) + ['test', '--log-file=' + str(log_file_path)] + args, files=files)
+            with log_file_path.open(mode='rb') as fh:
+                data = json.load(fh)
         if expected is None:
             return data
         else:
