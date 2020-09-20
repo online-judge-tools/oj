@@ -1,13 +1,19 @@
 #  Contribution and Hacking Guide
 
-## For committer of this online-judge-tools
+-   [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/.github/CONTRIBUTING.md) of [online-judge-tools](https://github.com/online-judge-tools) organization
+-   [DESIGN.md](https://github.com/online-judge-tools/oj/blob/master/DESIGN.md)
 
--   See also the [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/.github/CONTRIBUTING.md) of this GitHub organization.
--   The code to interact with web servers of online judges exist in [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client) repository.
 
-## For developpers of programs which uses online-judge-tools
+## For committer of `oj` command / `oj` コマンド本体への貢献者へ
 
-TL;DR: Use [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client).
+-   See also the [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/.github/CONTRIBUTING.md) of this GitHub organization. / この GitHub organization の [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/.github/CONTRIBUTING.md) も読んでください。
+-   See also the [DESIGN.md](https://github.com/online-judge-tools/oj/blob/master/DESIGN.md) of this repository, if possible. / 可能なら、この repository の [DESIGN.md](https://github.com/online-judge-tools/oj/blob/master/DESIGN.md) も読んでください。
+-   The code to interact with web servers of online judges exist in [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client) repository. / オンラインジャッジのサーバと直接通信するコードは [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client) レポジトリにあります。
+
+
+## For developpers of programs which uses `oj` command / `oj` コマンドを用いたツールの開発者へ
+
+TL;DR: Use [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client) instead for programs. / プログラムからの利用には代わりに [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client) を使ってください
 
 There are many ways to use online-judge-tools for your tool.
 
