@@ -1,12 +1,14 @@
 #  Contribution and Hacking Guide
 
--   [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/.github/CONTRIBUTING.md) of [online-judge-tools](https://github.com/online-judge-tools) organization
+links:
+
+-   [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/CONTRIBUTING.md) of [online-judge-tools](https://github.com/online-judge-tools) organization
 -   [DESIGN.md](https://github.com/online-judge-tools/oj/blob/master/DESIGN.md)
 
 
 ## For committer of `oj` command / `oj` コマンド本体への貢献者へ
 
--   See also the [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/.github/CONTRIBUTING.md) of this GitHub organization. / この GitHub organization の [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/.github/CONTRIBUTING.md) も読んでください。
+-   See also the [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/CONTRIBUTING.md) of this GitHub organization. / この GitHub organization の [CONTRIBUTING.md](https://github.com/online-judge-tools/.github/blob/master/CONTRIBUTING.md) も読んでください。
 -   See also the [DESIGN.md](https://github.com/online-judge-tools/oj/blob/master/DESIGN.md) of this repository, if possible. / 可能なら、この repository の [DESIGN.md](https://github.com/online-judge-tools/oj/blob/master/DESIGN.md) も読んでください。
 -   The code to interact with web servers of online judges exist in [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client) repository. / オンラインジャッジのサーバと直接通信するコードは [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client) レポジトリにあります。
 
