@@ -75,7 +75,29 @@ def check_status(info: Dict[str, Any], proc: subprocess.Popen, *, submit: Callab
     return True
 
 
-def generate_input_single_case(generator: str, *, input_path: pathlib.Path, output_path: pathlib.Path, command: Optional[str], tle: Optional[float], name: str, lock: Optional[threading.Lock] = None) -> None:
+def check_randomness_of_generator(input_data: bytes, *, name: str, lock: Optional[threading.Lock], generated_input_hashes: Dict[bytes, str]) -> Optional[str]:
+    """check_randomness_of_generator() checks the generated inputs. This adds some overheads but is needed for foolproof. Many users forget to initialize their library and use fixed seeds.
+
+    :returns: a previous name of the input when it was already once generated. None if it's a new input.
+    """
+
+    # To prevent consuming unlimited memories, do nothing if the user's generator is properly implemented.
+    limit = 100
+    if len(generated_input_hashes) >= limit:
+        return None
+
+    input_digest = hashlib.sha1(input_data).digest()
+    nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext after Python 3.7
+    with lock or nullcontext:
+        if len(generated_input_hashes) < limit:
+            if input_digest in generated_input_hashes:
+                return generated_input_hashes[input_digest]
+            else:
+                generated_input_hashes[input_digest] = name
+    return None
+
+
+def generate_input_single_case(generator: str, *, input_path: pathlib.Path, output_path: pathlib.Path, command: Optional[str], tle: Optional[float], name: str, lock: Optional[threading.Lock] = None, generated_input_hashes: Dict[bytes, str]) -> None:
     with BufferedExecutor(lock) as submit:
 
         # print the header
@@ -88,6 +110,11 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
         input_data: bytes = info['answer']
         if not check_status(info, proc, submit=submit):
             return
+
+        # check the randomness of generator
+        conflicted_name = check_randomness_of_generator(input_data, name=name, lock=lock, generated_input_hashes=generated_input_hashes)
+        if conflicted_name is not None:
+            submit(logger.warning, 'The same input is already generated at %s. Please use a random input generator.', conflicted_name)
 
         # generate output
         if command is None:
@@ -112,7 +139,7 @@ def simple_match(a: str, b: str) -> bool:
     return False
 
 
-def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[float], attempt: int, lock: Optional[threading.Lock] = None, generated_input_hashes: Dict[bytes, int]) -> Optional[Tuple[bytes, bytes]]:
+def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[float], attempt: int, lock: Optional[threading.Lock] = None, generated_input_hashes: Dict[bytes, str]) -> Optional[Tuple[bytes, bytes]]:
     with BufferedExecutor(lock) as submit:
 
         # print the header
@@ -127,22 +154,13 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
             return None
         assert input_data is not None
 
-        # check the generated input because many users fail to use randomness. This adds some overheads but is needed for foolproof.
-        generated_input_hashes_length_limit = 100
-        if len(generated_input_hashes) < generated_input_hashes_length_limit:
-            input_digest = hashlib.sha1(input_data).digest()
-            nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext after Python 3.7
-            with lock or nullcontext:
-                if len(generated_input_hashes) < generated_input_hashes_length_limit:
-                    if input_digest in generated_input_hashes:
-                        last_attempt = generated_input_hashes[input_digest]
-                        submit(logger.warning, 'The same input is already generated at %d-th attempt. Please use a random input generator.', last_attempt)
-                        submit(logger.info, utils.NO_HEADER + 'input:')
-                        submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
-                    else:
-                        generated_input_hashes[input_digest] = attempt
-                        if len(generated_input_hashes) == generated_input_hashes_length_limit:
-                            submit(logger.debug, 'generated_input_hashes is saturated')
+        # check the randomness of generator
+        name = '{}-th attempt'
+        conflicted_name = check_randomness_of_generator(input_data, name=name, lock=lock, generated_input_hashes=generated_input_hashes)
+        if conflicted_name is not None:
+            submit(logger.warning, 'The same input is already generated at %s. Please use a random input generator.', conflicted_name)
+            submit(logger.info, utils.NO_HEADER + 'input:')
+            submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
 
         # generate output
         submit(logger.info, 'generate output...')
@@ -204,15 +222,15 @@ def generate_input(args: argparse.Namespace) -> None:
                 yield (name, input_path, output_path)
 
     # generate cases
+    generated_input_hashes: Dict[bytes, str] = {}
     if args.jobs is None:
         for name, input_path, output_path in itertools.islice(iterate_path(), args.count):
             if not args.hack:
                 # generate serially
-                generate_input_single_case(args.generator, input_path=input_path, output_path=output_path, command=args.command, tle=args.tle, name=name)
+                generate_input_single_case(args.generator, input_path=input_path, output_path=output_path, command=args.command, tle=args.tle, name=name, generated_input_hashes=generated_input_hashes)
 
             else:
                 # hack serially
-                generated_input_hashes: Dict[bytes, int] = {}
                 for attempt in itertools.count(1):
                     data = try_hack_once(args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, generated_input_hashes=generated_input_hashes)
                     if data is not None:
@@ -226,14 +244,13 @@ def generate_input(args: argparse.Namespace) -> None:
             if not args.hack:
                 # generate concurrently
                 for name, input_path, output_path in itertools.islice(iterate_path(), args.count):
-                    futures += [executor.submit(generate_input_single_case, args.generator, input_path=input_path, output_path=output_path, command=args.command, tle=args.tle, name=name, lock=lock)]
+                    futures += [executor.submit(generate_input_single_case, args.generator, input_path=input_path, output_path=output_path, command=args.command, tle=args.tle, name=name, lock=lock, generated_input_hashes=generated_input_hashes)]
                 for future in futures:
                     future.result()
 
             else:
                 # hack concurrently
                 attempt = 0
-                generated_input_hashes = {}
                 for _ in range(args.jobs):
                     attempt += 1
                     futures += [executor.submit(try_hack_once, args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, lock=lock, generated_input_hashes=generated_input_hashes)]
@@ -246,7 +263,7 @@ def generate_input(args: argparse.Namespace) -> None:
                                 continue
                             data = futures[i].result()
                             attempt += 1
-                            futures[i] = executor.submit(try_hack_once, args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, lock=lock, generate_input_hashes=generated_input_hashes)
+                            futures[i] = executor.submit(try_hack_once, args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, lock=lock, generated_input_hashes=generated_input_hashes)
                             if data is not None:
                                 break
                     write_result(*data, input_path=input_path, output_path=output_path, print_data=False, lock=lock)
