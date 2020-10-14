@@ -1,6 +1,7 @@
 import argparse
 import concurrent.futures
 import contextlib
+import hashlib
 import itertools
 import os
 import pathlib
@@ -38,7 +39,7 @@ def BufferedExecutor(lock: Optional[threading.Lock]):
 
 def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path: pathlib.Path, output_path: pathlib.Path, print_data: bool, lock: Optional[threading.Lock] = None) -> None:
     # acquire lock to print logs properly, if in parallel
-    nullcontext = contextlib.ExitStack()
+    nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext after Python 3.7
     with lock or nullcontext:
 
         if not input_path.parent.is_dir():
@@ -111,7 +112,7 @@ def simple_match(a: str, b: str) -> bool:
     return False
 
 
-def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[float], attempt: int, lock: Optional[threading.Lock] = None) -> Optional[Tuple[bytes, bytes]]:
+def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[float], attempt: int, lock: Optional[threading.Lock] = None, generated_input_hashes: Dict[bytes, int]) -> Optional[Tuple[bytes, bytes]]:
     with BufferedExecutor(lock) as submit:
 
         # print the header
@@ -125,6 +126,23 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         if not check_status(info, proc, submit=submit):
             return None
         assert input_data is not None
+
+        # check the generated input because many users fail to use randomness. This adds some overheads but is needed for foolproof.
+        generated_input_hashes_length_limit = 100
+        if len(generated_input_hashes) < generated_input_hashes_length_limit:
+            input_digest = hashlib.sha1(input_data).digest()
+            nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext after Python 3.7
+            with lock or nullcontext:
+                if len(generated_input_hashes) < generated_input_hashes_length_limit:
+                    if input_digest in generated_input_hashes:
+                        last_attempt = generated_input_hashes[input_digest]
+                        submit(logger.warning, 'The same input is already generated at %d-th attempt. Please use a random input generator.', last_attempt)
+                        submit(logger.info, utils.NO_HEADER + 'input:')
+                        submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+                    else:
+                        generated_input_hashes[input_digest] = attempt
+                        if len(generated_input_hashes) == generated_input_hashes_length_limit:
+                            submit(logger.debug, 'generated_input_hashes is saturated')
 
         # generate output
         submit(logger.info, 'generate output...')
@@ -194,8 +212,9 @@ def generate_input(args: argparse.Namespace) -> None:
 
             else:
                 # hack serially
+                generated_input_hashes: Dict[bytes, int] = {}
                 for attempt in itertools.count(1):
-                    data = try_hack_once(args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt)
+                    data = try_hack_once(args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, generated_input_hashes=generated_input_hashes)
                     if data is not None:
                         write_result(*data, input_path=input_path, output_path=output_path, print_data=False)
                         break
@@ -214,9 +233,10 @@ def generate_input(args: argparse.Namespace) -> None:
             else:
                 # hack concurrently
                 attempt = 0
+                generated_input_hashes = {}
                 for _ in range(args.jobs):
                     attempt += 1
-                    futures += [executor.submit(try_hack_once, args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, lock=lock)]
+                    futures += [executor.submit(try_hack_once, args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, lock=lock, generated_input_hashes=generated_input_hashes)]
                 for _, input_path, output_path in itertools.islice(iterate_path(), args.count):
                     data = None
                     while data is None:
@@ -226,7 +246,7 @@ def generate_input(args: argparse.Namespace) -> None:
                                 continue
                             data = futures[i].result()
                             attempt += 1
-                            futures[i] = executor.submit(try_hack_once, args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, lock=lock)
+                            futures[i] = executor.submit(try_hack_once, args.generator, command=args.command, hack=args.hack, tle=args.tle, attempt=attempt, lock=lock, generate_input_hashes=generated_input_hashes)
                             if data is not None:
                                 break
                     write_result(*data, input_path=input_path, output_path=output_path, print_data=False, lock=lock)
