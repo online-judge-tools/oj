@@ -186,7 +186,8 @@ tips:
     subparser.add_argument('--width', type=int, default=3, help='specify the width of indices of cases. (default: 3)')
     subparser.add_argument('--name', help='specify the base name of cases. (default: "random")')
     subparser.add_argument('-c', '--command', help='specify your solution to generate output')
-    subparser.add_argument('--hack', help='specify your solution to be compared the reference solution given by --command')
+    subparser.add_argument('--hack-expected', dest='command', help='alias of --command')
+    subparser.add_argument('--hack', '--hack-actual', dest='hack', help='specify your wrong solution to be compared with the reference solution given by --hack-expected')
     subparser.add_argument('generator', type=str, help='your program to generate test cases')
     subparser.add_argument('count', nargs='?', type=int, help='the number of cases to generate (default: 100)')
 
