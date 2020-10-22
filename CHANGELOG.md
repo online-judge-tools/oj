@@ -1,5 +1,12 @@
 # Change Log
 
+## 11.1.0 / 2020-10-23
+
+-   [#833](https://github.com/online-judge-tools/oj/pull/833)
+    -   add aliases `--hack-actual` and `--hack-expected` for `--hack` option of `generate-input` subcommand
+    -   make `generate-input` subcommand print warnings when the given input generator doesn't generate random input cases
+    -   improve `--help` messages
+
 ## 11.0.0 / 2020-09-04
 
 -   [#816](https://github.com/online-judge-tools/oj/pull/816) (breaking changes) remove Python 3.5 support
