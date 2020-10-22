@@ -82,7 +82,7 @@ def check_randomness_of_generator(input_data: bytes, *, name: str, lock: Optiona
     """
 
     # To prevent consuming unlimited memories, do nothing if the user's generator is properly implemented.
-    limit = 100
+    limit = 1000
     if len(generated_input_hashes) >= limit:
         return None
 
@@ -94,6 +94,8 @@ def check_randomness_of_generator(input_data: bytes, *, name: str, lock: Optiona
                 return generated_input_hashes[input_digest]
             else:
                 generated_input_hashes[input_digest] = name
+                if len(generated_input_hashes) == limit:
+                    logger.info('Conflict checking of generated inputs is disabled now because it seems the given input generator has enough randomness.')  # This prints a log line but it's safe because here is in a lock.
     return None
 
 
