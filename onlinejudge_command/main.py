@@ -63,6 +63,8 @@ format string for --format:
   %%                    '%' itself
 
 tips:
+  This subcommand doesn't have the feature to download all test cases for all problems in a contest at once. If you want to do this, please use `oj-prepare` command at https://github.com/online-judge-tools/template-generator instead.
+
   You can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
     e.g. $ oj-api get-problem https://atcoder.jp/contests/agc001/tasks/agc001_a | jq -cr '.result.tests | to_entries[] | [{path: "test/sample-\\(.key).in", data: .value.input}, {path: "test/sample-\\(.key).out", data: .value.output}][] | {path, data: @sh "\\(.data)"} | "mkdir -p test; echo -n \\(.data) > \\(.path)"' | sh
 ''')
@@ -83,6 +85,10 @@ supported services:
   yukicoder
   HackerRank
   Toph
+
+tips:
+  You can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
+    e.g. $ USERNAME=foo PASSWORD=bar oj-api login-service https://atcoder.jp/
 ''')
     subparser.add_argument('url')
     subparser.add_argument('-u', '--username')
@@ -98,6 +104,12 @@ supported services:
   yukicoder
   HackerRank
   Toph (Problem Archive)
+
+tips:
+  This subcommand has the feature to guess the problem to submit to. To guess the problem, run `oj download https://...` in the same directory without `--directory` option before using `oj submit ...`.
+
+  you can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
+    e.g. $ oj-api submit-code --file main.cpp --language $(oj-api guess-language-id --file main.cpp https://atcoder.jp/contests/agc001/tasks/agc001_a | jq -r .result.id) https://atcoder.jp/contests/agc001/tasks/agc001_a
 ''')
     subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')
     subparser.add_argument('file', type=pathlib.Path)
@@ -122,6 +134,8 @@ format string for --format:
   (both %s and %e are required.)
 
 tips:
+  There is a feature to use special judges. See https://online-judge-tools.readthedocs.io/en/master/introduction.en.html#test-for-problems-with-special-judge for details.
+
   You can do similar things with shell
     e.g. $ for f in test/*.in ; do echo $f ; ./a.out < $f | diff - ${f%.in}.out ; done
 ''')
@@ -145,7 +159,7 @@ tips:
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
     subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
-    subparser.add_argument('--judge-command', dest='judge', default=None, help='specify judge command instead of default diff judge. See https://online-judge-tools.readthedocs.io/en/master/introduction.en.html#test-for-special-forms-of-problem for details')
+    subparser.add_argument('--judge-command', dest='judge', default=None, help='specify judge command instead of default diff judge. The given command (e.g. `./judge`) will be called as `$ ./judge input.txt actual-output.txt expected-output.txt` and should return the result with the exit code of its `main` function.')
     subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
 
     # generate output
@@ -176,6 +190,11 @@ format string for --format:
   (both %d and %e are required.)
 
 tips:
+  There is a command to automatically generate a input generator, `oj-template` command. See https://github.com/online-judge-tools/template-generator .
+
+  This subcommand has also the feature to find a hack case.
+    e.g. for a target program `a.out`, a correct (but possibly slow) program `naive`, and a random input-case generator `generate.py`, run $ oj g/i --hack-actual ./a.out --hack-expected ./naive 'python3 generate.py'
+
   You can do similar things with shell
     e.g. $ for i in `seq 100` ; do python3 generate.py > test/random-$i.in ; done
 ''')
@@ -186,7 +205,8 @@ tips:
     subparser.add_argument('--width', type=int, default=3, help='specify the width of indices of cases. (default: 3)')
     subparser.add_argument('--name', help='specify the base name of cases. (default: "random")')
     subparser.add_argument('-c', '--command', help='specify your solution to generate output')
-    subparser.add_argument('--hack', help='specify your solution to be compared the reference solution given by --command')
+    subparser.add_argument('--hack-expected', dest='command', help='alias of --command')
+    subparser.add_argument('--hack', '--hack-actual', dest='hack', help='specify your wrong solution to be compared with the reference solution given by --hack-expected')
     subparser.add_argument('generator', type=str, help='your program to generate test cases')
     subparser.add_argument('count', nargs='?', type=int, help='the number of cases to generate (default: 100)')
 
