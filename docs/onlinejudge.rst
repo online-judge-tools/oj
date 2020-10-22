@@ -1,26 +1,6 @@
 onlinejudge package
 ===================
 
-Subpackages
------------
-
-.. toctree::
-
-    onlinejudge.service
-
-Submodules
-----------
-
-.. toctree::
-
-   onlinejudge.dispatch
-   onlinejudge.type
-   onlinejudge.utils
-
-Module contents
----------------
-
-.. automodule:: onlinejudge
-    :members:
-    :undoc-members:
-    :show-inheritance:
+`onlinejudge` module is not recommended now.
+Please use `oj-api` command instead.
+See https://github.com/online-judge-tools/api-client

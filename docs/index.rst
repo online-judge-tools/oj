@@ -10,8 +10,6 @@ Welcome to online-judge-tools's documentation!
    :maxdepth: 10
    :caption: Contents:
 
-   modules
-
    introduction.en
    introduction.ja
    run-ci-on-your-library.en
