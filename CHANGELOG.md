@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.1.1 / 2020-11-07
+
+-   [#839](https://github.com/online-judge-tools/oj/pull/839) improve the error messages about updating packages ([@granddaifuku](https://github.com/granddaifuku))
+
 ## 11.1.0 / 2020-10-23
 
 -   [#833](https://github.com/online-judge-tools/oj/pull/833)
