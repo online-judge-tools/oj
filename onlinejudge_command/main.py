@@ -275,13 +275,13 @@ def main(args: Optional[List[str]] = None) -> None:
         logger.info('The operation you specified is not supported yet. Pull requests are welcome.')
         logger.info('see: https://github.com/online-judge-tools/oj')
         if not is_updated:
-            logger.info('hint: try updating the version of online-judge-tools')
+            logger.info('hint: try updating the version of online-judge-tools: $ pip3 install -U online-judge-tools online-judge-api-client')
         sys.exit(1)
     except Exception as e:
         logger.debug('\n' + traceback.format_exc())
         logger.exception(str(e))
         if not is_updated:
-            logger.info('hint: try updating the version of online-judge-tools')
+            logger.info('hint: try updating the version of online-judge-tools: $ pip3 install -U online-judge-tools online-judge-api-client')
         sys.exit(1)
 
 
