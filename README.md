@@ -1,7 +1,6 @@
 # Online Judge Tools
 
 [![test](https://github.com/online-judge-tools/oj/workflows/test/badge.svg)](https://github.com/online-judge-tools/oj/actions)
-[![Documentation Status](https://readthedocs.org/projects/online-judge-tools/badge/?version=master)](https://online-judge-tools.readthedocs.io/en/master/)
 [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools)
 [![Downloads](https://pepy.tech/badge/online-judge-tools)](https://pepy.tech/project/online-judge-tools)
 [![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)](https://github.com/kmyk/online-judge-tools/blob/master/LICENSE)
@@ -24,8 +23,11 @@ Tools to help solving problems on various online judges. This automates download
 -   Generate input files from generators
 -   Generate output files from input and reference implementation
 
+For the detailed documentation, read [docs/getting-started.md](https://github.com/online-judge-tools/oj/blob/master/docs/getting-started.md).
+For Japanese: 日本語バージョンのドキュメントは [docs/getting-started.ja.md](https://github.com/online-judge-tools/oj/blob/master/docs/getting-started.ja.md) にあります。
+
 Many online judges (Codeforces, AtCoder, HackerRank, etc.) are supported.
-For details, see [the table of online-judge-tools/api-client](https://github.com/online-judge-tools/api-client#supported-websites).
+For the full list, see [the table of online-judge-tools/api-client](https://github.com/online-judge-tools/api-client#supported-websites).
 
 ## How to install
 
@@ -160,13 +162,8 @@ For other questions, use [Gitter](https://gitter.im/online-judge-tools/community
 
 ### Articles
 
-in English:
-
--   [Introduction to online-judge-tools (English)](https://online-judge-tools.readthedocs.io/en/master/introduction.en.html) (the official documentation, translated)
-
 in Japanese:
 
--   [Introduction to online-judge-tools (Japanese)](https://online-judge-tools.readthedocs.io/en/master/introduction.ja.html) (the official documentation)
 -   [online-judge-toolsを導入しよう！ &#183; ますぐれメモ](https://blog.masutech.work/posts/compro/oj-introduction/)
 -   [online-judge-toolsをVimから呼んで楽をする - Leverage Copy](https://maguroguma.hatenablog.com/entry/2020/08/19/090000)
 
