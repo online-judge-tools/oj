@@ -1,4 +1,4 @@
-# Online Judge Tools
+# online-judge-tools/oj
 
 [![test](https://github.com/online-judge-tools/oj/workflows/test/badge.svg)](https://github.com/online-judge-tools/oj/actions)
 [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools)
@@ -6,7 +6,7 @@
 [![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)](https://github.com/kmyk/online-judge-tools/blob/master/LICENSE)
 [![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community)
 
-Tools to help solving problems on various online judges. This automates downloading sample cases, generating additional test cases, testing for your code, and submitting it.
+`oj` is a command to help solving problems on various online judges. This command automates downloading sample cases, generating additional test cases, testing for your code, and submitting it.
 
 ## Screencast
 
