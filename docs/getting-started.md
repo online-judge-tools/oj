@@ -1,8 +1,8 @@
-# Getting Started
+# Getting Started for `oj` command
 
 [このドキュメントの日本語バージョン](./getting-started.ja.md)
 
-online-judge-tools is a tool set to automate typical tasks that exist in
+`oj` command is a command to automate typical tasks that exist in
 competitive programming.
 
 
@@ -15,7 +15,7 @@ installed.
 $ pip3 install --user online-judge-tools
 ```
 
-Linux or Mac OS is recommended for the OS, but it also works on Windows.
+Linux (including Windows Subsystem for Linux) or macOS is recommended for the OS, but it also works on Windows.
 
 
 ## Testing with sample cases
@@ -33,7 +33,7 @@ and for every submission is quite troublesome. Doing the tedious tasks
 manually is easy to be omitted or be mistaken. This problem can be
 solved by automation.
 
-By online-judge-tools, you can automate testing with sample cases.
+By `oj` command, you can automate testing with sample cases.
 Specifically, it automatically does the following:
 
 1.  Open the problem page and get sample cases
@@ -114,7 +114,7 @@ a mistake in selecting the "problem" or "language" at the time of
 submission? If you have any such experience, we recommend automating
 submission.
 
-By online-judge-tools, you can automate submission. For exampl,e if you
+By `oj` command, you can automate submission. For exampl,e if you
 want to submit the file `main.cpp` to the problem
 <https://codeforces.com/contest/1200/problem/F>, you can do
 `oj s https://codeforces.com/contest/1200/problem/F`. The actual output
@@ -247,11 +247,8 @@ can debug using randomly generated cases. Specifically:
 4.  Test your solution using the testcases generated in (2.) and (3.)
 5.  Analyze the hack case found in (4.) to find bugs
 
-online-judge-tools also has features to help with this. You can use the
-command `oj g/i` for (2.) and the command `oj g/o` for (3.). Also, a
-tool
-[online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator)
-can automatically generates a program of (1.).
+`oj` command also has features to help with this. You can use the
+command `oj g/i` for (2.) and the command `oj g/o` for (3.). Also, another command [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator) can automatically generates a program of (1.).
 
 For example, for a problem
 <https://onlinejudge.u-aizu.ac.jp/courses/library/7/DPL/1/DPL_1_B>, you
@@ -448,46 +445,7 @@ assert False
 
 ## List of supported services
 
-Supported service as of `v8.0.0` (2020-02-14) is as follows.
-
-Download sample (`oj d`):
-
--   [Aizu Online Judge
-    (Arena)](https://onlinejudge.u-aizu.ac.jp/services/arena.html)
--   [Aizu Online Judge](https://onlinejudge.u-aizu.ac.jp/home)
--   [Anarchy Golf](http://golf.shinh.org/)
--   [AtCoder](https://atcoder.jp/)
--   [Codeforces](https://codeforces.com/)
--   [CS Academy](https://csacademy.com/)
--   [Facebook Hacker Cup](https://www.facebook.com/hackercup/)
--   [HackerRank](https://www.hackerrank.com/)
--   [Kattis](https://open.kattis.com/)
--   [PKU JudgeOnline](http://poj.org/)
--   [Toph (Problem Archive)](https://toph.co/)
--   [CodeChef](https://www.codechef.com/)
--   [Sphere online judge](https://www.spoj.com/)
--   [yukicoder](https://yukicoder.me/)
--   [Library Checker](https://judge.yosupo.jp)
-
-Login (`oj login`):
-
--   All services (when using Selenium)
--   AtCoder (direct password input)
--   Codeforces (direct password input)
-
-Submit (`oj s`)
-
--   AtCoder
--   Codeforces
--   Topcoder (Marathon Match)
--   yukicoder
--   HackerRank
--   Toph (Problem Archive)
-
-Download system case (`oj d --system`):
-
--   Aizu Online Judge
--   yukicoder
+Please see the table at [online-judge-tools/api-client](https://github.com/online-judge-tools/api-client#supported-websites).
 
 
 ## Missing features

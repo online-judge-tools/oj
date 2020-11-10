@@ -1,21 +1,19 @@
-# Getting Started (日本語)
+# Getting Started for `oj` command (日本語)
 
-[English version of this document](./getting-started.ja.md)
+[English version of this document](./getting-started.md)
 
-online-judge-tools
-は競技プログラミングを行う上で存在する典型作業を自動化するためのツールです。
+`oj` コマンドは競技プログラミングを行う上で存在する典型作業を自動化するためのコマンドです。
 
 
 ## インストール
 
-Python
-が導入されている環境であれば、次のコマンドだけでインストールができます。
+Python が導入されている環境であれば、次のコマンドだけでインストールができます。
 
 ```console
 $ pip3 install --user online-judge-tools
 ```
 
-OS には Linux か Mac OS を推奨しますが、 Windows 上でも動作します。
+OS には Linux (Windows Subsystem for Linux を含む) か macOS を推奨しますが、Windows 上でも動作します。
 
 
 ## サンプルケースのテスト
@@ -29,7 +27,7 @@ OS には Linux か Mac OS を推奨しますが、 Windows 上でも動作し�
 面倒な作業を手動で行うのは省略されたり間違えたりしやすく、よくありません。
 この問題は、自動化によって解決できます。
 
-online-judge-tools を使えばサンプルケースのテストの自動化が可能です。
+`oj` コマンドを使えばサンプルケースのテストの自動化が可能です。
 具体的には以下を自動でしてくれます:
 
 1.  問題ページを開いてサンプルを取得する
@@ -108,7 +106,7 @@ expected:
 ところで、提出時に「提出先の問題」「提出の言語」の選択を間違えてしまいペナルティを食らった経験はありますか？
 もしそのような経験が一度でもあるのなら、提出を自動化することをおすすめします。
 
-online-judge-tools を使えば提出の自動化が可能です。 たとえば、問題
+`oj` コマンドを使えば提出の自動化が可能です。 たとえば、問題
 <https://codeforces.com/contest/1200/problem/F> にファイル `main.cpp`
 を提出したいときは `oj s https://codeforces.com/contest/1200/problem/F`
 を実行すればよいです。実際に実行したときの出力は次のようになります:
@@ -190,7 +188,7 @@ Opening in existing browser session.
     で作ったテストケースを使って、問題のプログラムをテストする
 5.  (4.) で見つかった撃墜ケースを分析してバグを見つける
 
-online-judge-tools には、これを助ける機能もあります。 (2.) には `oj g/i`
+`oj` コマンドには、これを助ける機能もあります。 (2.) には `oj g/i`
 というコマンド、 (3.) には `oj g/o` というコマンドが使えます。 また (1.)
 のプログラムを半自動生成するためのツール
 [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator)
@@ -390,47 +388,7 @@ assert False
 
 ## 対応しているサービスの一覧
 
-オンラインジャッジのサーバーと通信を行なうような機能については利用できるサービスが制限されることがあります。
-`v8.0.0` (2020-02-15) 時点での対応サービスは以下のようになります。
-
-サンプルのダウンロード (`oj d`):
-
--   [Aizu Online Judge
-    (Arena)](https://onlinejudge.u-aizu.ac.jp/services/arena.html)
--   [Aizu Online Judge](https://onlinejudge.u-aizu.ac.jp/home)
--   [Anarchy Golf](http://golf.shinh.org/)
--   [AtCoder](https://atcoder.jp/)
--   [Codeforces](https://codeforces.com/)
--   [CS Academy](https://csacademy.com/)
--   [Facebook Hacker Cup](https://www.facebook.com/hackercup/)
--   [HackerRank](https://www.hackerrank.com/)
--   [Kattis](https://open.kattis.com/)
--   [PKU JudgeOnline](http://poj.org/)
--   [Toph (Problem Archive)](https://toph.co/)
--   [CodeChef](https://www.codechef.com/)
--   [Sphere online judge](https://www.spoj.com/)
--   [yukicoder](https://yukicoder.me/)
--   [Library Checker](https://judge.yosupo.jp)
-
-ログイン (`oj login`):
-
--   すべてのサービス (Selenium 使用時)
--   AtCoder (パスワード直入力)
--   Codeforces (パスワード直入力)
-
-提出 (`oj s`)
-
--   AtCoder
--   Codeforces
--   Topcoder (Marathon Match)
--   yukicoder
--   HackerRank
--   Toph (Problem Archive)
-
-システムケースのダウンロード (`oj d --system`):
-
--   Aizu Online Judge
--   yukicoder
+[online-judge-tools/api-client](https://github.com/online-judge-tools/api-client#supported-websites) にある表を参照してください。
 
 
 ## 存在しない機能
@@ -438,47 +396,34 @@ assert False
 「それが何であるか」を説明するには「何ができるか」を言う必要がありますが、それだけでは十分ではありません。
 「何ができないか」についても言うべきです。
 
-online-judge-tools には、次のような機能は存在しません:
+`oj` コマンドには、次のような機能は存在しません:
 
--   コンテストに対応するディレクトリを用意する機能
+-   コンテストのためのディレクトリを一括で用意する機能
 
-    online-judge-tools
-    は「個々の問題を解くことを助ける」ためのツールであり、それ以外は責任の範囲外です。
-    これに対応するための機能は内部的には存在する
-    ([onlinejudge.type.Contest.list\_problems](https://online-judge-tools.readthedocs.io/en/master/onlinejudge.type.html#onlinejudge.type.Contest.list_problems))
-    ので、必要なら各自でこれを利用するスクリプトを書いてください。既存の
-    wrapper ([Tatamo/atcoder-cli](https://github.com/Tatamo/atcoder-cli)
-    など) を利用することもできます。
+    `oj` コマンドは「個々の問題を解くことを助ける」ためのコマンドであり、それ以外は責任の範囲外です。
+    「コンテストのためのディレクトリを一括で用意する機能」は `oj` コマンドには含まれていません。この機能がほしい場合は [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator/blob/master/README.ja.md) に含まれている `oj-prepare` コマンドや、[@Tatamo](https://github.com/Tatamo) が作成している [Tatamo/atcoder-cli](https://github.com/Tatamo/atcoder-cli) など) を利用してください。
 
     同様の理由で、たとえば「精進の進捗を管理する機能」なども存在しません。
 
 -   テンプレートを生成する機能
 
-    テンプレートの生成はプログラミング一般の領域の問題であるので
-    online-judge-tools の責任の範囲外です。 たとえば Vim なら
-    [thinca/vim-template](https://github.com/thinca/vim-template/blob/master/doc/template.jax)
-    などのプラグインでより汎用的に対応できます。
+    純粋なテンプレートの生成はプログラミング一般の領域の問題であるので `oj` コマンドの責任の範囲外です。
+    既存のツールを利用してください。
+    たとえば Vim なら [thinca/vim-template](https://github.com/thinca/vim-template/blob/master/doc/template.jax) などのプラグインでより汎用的に対応できます。
 
-    たとえば「ソースコードを自動で診断してバグのありそうな所を探す機能」なども同様の「より一般的なツールとして存在する」という理由によって存在しません。
+    「テンプレートの生成」が「競技プログラミングの問題を解析してその問題専用の main 関数や入出力部分を生成する」という意味であれば、これは [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator/blob/master/README.ja.md) に含まれている `oj-tempate` コマンドによって実現可能です。
+    同様の機能は [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools) にもあります。
 
 -   自動でコンパイルする機能
 
     シェルの機能を使えば十分です。
-    また、コンパイルの方法などは言語や環境の数だけ無数にあり、いちいち対応するのはかなり大変なためです。
-    テストの前に再コンパイルしたいのなら `g++ main.cpp && oj t`
-    などとしてください。
-
--   入力を受けとる部分のコードを自動生成する機能
-
-    過去には存在していましたが、
-    [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools)
-    に任せることにして削除しました。そちらを利用してください。
+    また、コンパイルの方法などは言語や環境の数だけ無数にあり、すべて対応していくのはかなり大変なためです。
+    テストの前に再コンパイルしたいのなら `g++ main.cpp && oj t` などとしてください。
 
 -   提出予約をする機能
 
     シェルの機能を使えば十分であるため、そのような指定をするオプションはありません。
-    たとえば 1 時間後に提出するには `sleep 3600 && oj s --yes main.cpp`
-    としてください。
+    たとえば 1 時間後に提出するには `sleep 3600 && oj s --yes main.cpp` としてください。
 
 -   提出結果を解析する機能
 
@@ -491,6 +436,5 @@ online-judge-tools には、次のような機能は存在しません:
 
     存在しません。
     設定ファイルはある種の「隠れた状態」を導入し、メンテナンスやサポートのコストを増大させるためです。
-    内部で HTTP の通信に使っているクッキー (+ 例外として、提出先 URL
-    の推測 `oj s` のための履歴)
-    以外は、入力されたコマンドのみに依存して動作します。
+    内部で HTTP の通信に使っているクッキー (+ 例外として、提出先 URL の推測 `oj s` のための履歴) 以外は、入力されたコマンドのみに依存して動作します。
+    シェルの設定ファイル (`~/.bashrc` など) を代わりに利用してください。

@@ -1,4 +1,4 @@
-# Online Judge Tools
+# online-judge-tools/oj
 
 [![test](https://github.com/online-judge-tools/oj/workflows/test/badge.svg)](https://github.com/online-judge-tools/oj/actions)
 [![PyPI](https://img.shields.io/pypi/v/online-judge-tools.svg)](https://pypi.python.org/pypi/online-judge-tools)
@@ -6,7 +6,7 @@
 [![PyPI](https://img.shields.io/pypi/l/online-judge-tools.svg)](https://github.com/kmyk/online-judge-tools/blob/master/LICENSE)
 [![Join the chat at https://gitter.im/online-judge-tools/community](https://badges.gitter.im/online-judge-tools/community.svg)](https://gitter.im/online-judge-tools/community)
 
-Tools to help solving problems on various online judges. This automates downloading sample cases, generating additional test cases, testing for your code, and submitting it.
+`oj` is a command to help solving problems on various online judges. This command automates downloading sample cases, generating additional test cases, testing for your code, and submitting it.
 
 ## Screencast
 
@@ -37,7 +37,7 @@ The package is <https://pypi.python.org/pypi/online-judge-tools> [![PyPI](https:
 $ pip3 install online-judge-tools
 ```
 
-For detailed instructions, read [the FAQ](#faq).
+For detailed instructions, read [docs/INSTALL.md](https://github.com/online-judge-tools/oj/blob/master/docs/INSTALL.md).
 
 
 ## How to use
@@ -100,42 +100,6 @@ $ oj download http://agc001.contest.atcoder.jp/tasks/agc001_a
 ```
 
 ## FAQ
-
-### I cannot install online-judge-tools. What is `$ pip3 install online-judge-tools`? Please help!
-
-Do following steps.
-
-1.  If you use a Windows environment, use [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). For beginners, Linux (especially, Ubuntu) is often easier than Windows.
-    -   Also, if you use Visual Studio Code (or other IDEs), close it and forget it for a while. Don't use consoles in IDEs.
-1.  :snake: Install [Python](https://www.python.org/). If you use Ubuntu (including Ubuntu in WSL), run `$ sudo apt install python3`.
-1.  Check your Python with running `$ python3 --version`. If it says `Python 3.x.y`, it's OK.
-    -   If it says something like `Command 'python3' not found`, you have failed to install Python.
-    -   If the version of Python is too old, it's not OK. The `x` must be greater than or equal to `5`. If `x` is lower than `5`, upgrade your Python.
-1.  :package: Install [pip](https://pip.pypa.io/en/stable/). If you use Ubuntu (including Ubuntu in WSL), run `$ sudo apt install python3-pip`.
-1.  Check your pip with running `$ pip3 --version`. If it says something like `pip x.y.z ...`, it's OK.
-    -   If it says something like `Command 'pip3' not found`, you have failed to install pip.
-    -   Even if `pip3` is not found, you may be able to use `python3 -m pip` instead of `pip3`. Try `$ python3 -m pip --version`. If it says `pip x.y.z ...`, it's OK.
-    -   Don't use `pip` or `pip2`. Use `pip3`.
-1.  :dart: Run `$ pip3 install online-judge-tools` to install online-judge-tools. If it says `Successfully installed online-judge-tools-x.y.z` (or, `Requirement already satisfied: online-judge-tools`), it's OK.
-    -   If it says `Permission denied`, run `$ sudo pip3 install online-judge-tools` or `$ pip3 install --user online-judge-tools`.
-1.  Check online-judge-tools with `$ oj --version`. If It must say something like `online-judge-tools x.y.z`.
-    -   If it says something like `Command 'oj' not found`, you need to set [`PATH`](https://en.wikipedia.org/wiki/PATH_%28variable%29).
-        1.  Find the path of the `oj` file with running `$ find / -name oj 2> /dev/null`. The file is often at `/home/ubuntu/.local/bin/oj` or `/usr/local/bin/oj`.
-        1.  Check the found `oj` file is actually `oj`, with running `$ /home/ubuntu/.local/bin/oj --version`.
-        1.  Add the directory which contains the `oj` to your `PATH`. For example, if `oj` is `/home/ubuntu/.local/bin/oj`, write `export PATH="/home/ubuntu/.local/bin:$PATH"` in the end of `~/.bashrc`.
-            -   Don't write `export PATH="$PATH:/home/ubuntu/.local/bin/oj"`. It's not a directory.
-            -   If you don't use bash, write a right settings to the right file depending on your shell. For example, if you use Mac OS, your shell might zsh. For zsh, write the same command to `~/.zshrc`.
-        1.  Reload the configuration with `source ~/.bashrc`.
-            -   If you don't use bash, use an appropriate way.
-        1.  Check your `PATH` with `$ echo $PATH`. If it says `/home/ubuntu/.local/bin:...`, it's OK.
-    -   If it says something like `ModuleNotFoundError: No module named 'onlinejudge'`, you have failed to install online-judge-tools and your environment is broken. Run `$ pip3 install --force-reinstall online-judge-tools` to reinstall.
-    -   If it says something like `SyntaxError: invalid syntax`, you have used `pip2` by mistake. Run `$ pip2 uninstall online-judge-tools`, and retry to install.
-1.  That's all.
-
-If you couldn't read many sentences of above instructions (e.g. if you didn't know what "run `$ python3 --version`" means), please ask your friends for help.
-If you cannot install online-judge-tools even following the instructions, please add comments to [this issue](https://github.com/kmyk/online-judge-tools/issues/717).
-
-### Other questions
 
 -   I usually make one directory per one contest (or, site). Can I keep using this style?
     -   Yes, you can use the `--directory` (`-d`) option or `$ rm -rf test/`. However, we don't recommend this style, because you should make additional test cases by yourself and run stress tests to maximize your rating.
