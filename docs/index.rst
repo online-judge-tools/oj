@@ -6,15 +6,8 @@
 Welcome to online-judge-tools's documentation!
 ==============================================
 
-.. toctree::
-   :maxdepth: 10
-   :caption: Contents:
-
-   introduction.en
-   introduction.ja
-   run-ci-on-your-library.en
-   run-ci-on-your-library.ja
-
+This documentation is now obsoleted.
+Please read `README.md <https://github.com/online-judge-tools/oj/blob/master/README.md>`_ instead.
 
 Indices and tables
 ==================
