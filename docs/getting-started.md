@@ -1,23 +1,24 @@
-Introduction to online-judge-tools (English)
-============================================
+# Getting Started
+
+[このドキュメントの日本語バージョン](./getting-started.ja.md)
 
 online-judge-tools is a tool set to automate typical tasks that exist in
 competitive programming.
 
-How to Install
---------------
+
+## How to Install
 
 You can install with the following command if Python is already
 installed.
 
-``` {.sourceCode .console}
+```console
 $ pip3 install --user online-judge-tools
 ```
 
 Linux or Mac OS is recommended for the OS, but it also works on Windows.
 
-Testing with sample cases
--------------------------
+
+## Testing with sample cases
 
 Do you test with sample cases before submission? Have you ever felt it
 troublesome and omitted? You should always test before submitting, since
@@ -42,7 +43,7 @@ Specifically, it automatically does the following:
 You can download the sample cases by `oj d URL` and test your solution
 with the downloaded sample cases by `oj t`. For example:
 
-``` {.sourceCode .console}
+```console
 $ oj d https://atcoder.jp/contests/agc001/tasks/agc001_a
 [x] problem recognized: AtCoderProblem.from_url('https://atcoder.jp/contests/agc001/tasks/agc001_a')
 [x] load cookie from: /home/ubuntu/.local/share/online-judge-tools/cookie.jar
@@ -102,8 +103,8 @@ you want to test against commands other than `./a.out` (e.g.
 get testcases that are used for system tests instead of samples. Run
 `oj d --help` or `oj t --help` to see other features.
 
-Submit
-------
+
+## Submit
 
 When submitting your solution, you have to select "Problem to submit
 for" and "Language of the solution" with your mouse, copy and paste the
@@ -119,7 +120,55 @@ want to submit the file `main.cpp` to the problem
 `oj s https://codeforces.com/contest/1200/problem/F`. The actual output
 is as follows:
 
-``` {.sourceCode .console}
+```console
+$ oj d https://atcoder.jp/contests/agc001/tasks/agc001_a
+[x] problem recognized: AtCoderProblem.from_url('https://atcoder.jp/contests/agc001/tasks/agc001_a')
+[x] load cookie from: /home/ubuntu/.local/share/online-judge-tools/cookie.jar
+[x] GET: https://atcoder.jp/contests/agc001/tasks/agc001_a
+[x] 200 OK
+[x] save cookie to: /home/ubuntu/.local/share/online-judge-tools/cookie.jar
+[x] append history to: /home/ubuntu/.cache/online-judge-tools/download-history.jsonl
+
+[*] sample 0
+[x] input: Input example 1
+2
+1 3 1 2
+[+] saved to: test/sample-1.in
+[x] output: Input example 1
+3
+[+] saved to: test/sample-1.out
+
+[*] sample 1
+[x] input: Input example 2
+5
+100 1 2 3 14 15 58 58 58 29
+[+] saved to: test/sample-2.in
+[x] output: Sample output 2
+135
+[+] saved to: test/sample-2.out
+
+$ g++ main.cpp
+
+$ oj t
+[*] 2 cases found
+
+[*] sample-1
+[x] time: 0.003978 sec
+[+] AC
+
+[*] sample-2
+[x] time: 0.004634 sec
+[-] WA
+output:
+3
+
+expected:
+135
+
+
+[x] slowest: 0.004634 sec  (for sample-2)
+[x] max memory: 2.344000 MB  (for sample-1)
+[-] test failed: 1 AC / 2 cases
 $ oj s https://codeforces.com/contest/1200/problem/F main.cpp
 [x] read history from: /home/ubuntu/.cache/online-judge-tools/download-history.jsonl
 [x] found urls in history:
@@ -181,8 +230,8 @@ If you already executed `oj d URL` in the same directory,
 URL specification mistakes, we recommend using this labor-saving form.
 The language is automatically recognized and set appropriately.
 
-Stress test
------------
+
+## Stress test
 
 What should you do when you get a situation where you implemented your
 solution and submitted it because it passes the sample cases but it gets
@@ -208,7 +257,7 @@ For example, for a problem
 <https://onlinejudge.u-aizu.ac.jp/courses/library/7/DPL/1/DPL_1_B>, you
 can use `oj` command as follows.
 
-``` {.sourceCode .console}
+```console
 $ cat generate.py
 #!/usr/bin/env python3
 import random
@@ -317,87 +366,87 @@ basic feature of `oj g/o` is almost equivalent to
 some ways such as `--hack` option and parallelization option `-j`, etc.,
 for cases where it is difficult to find hacking cases.
 
-Test for problems with special judge
-------------------------------------
 
--   Problems with accepted errors
+## Test for problems with special judge
 
-    You can use the `-e` option for problems with errors, e.g. problems
-    which accept answers which absolute or relative error are within
-    10⁻⁶. In this case, use `oj t -e 1e-6`.
+### Problems with accepted errors
 
--   Problems with multiple solutions
+You can use the `-e` option for problems with errors, e.g. problems
+which accept answers which absolute or relative error are within
+10⁻⁶. In this case, use `oj t -e 1e-6`.
 
-    You can validate simply by using
-    [assert](https://cpprefjp.github.io/reference/cassert/assert.html)
-    in your solution.
+### Problems with multiple solutions
 
-    Also, you can write a program for the judge side, and use it for
-    test. For example, if the problem is
-    <https://atcoder.jp/contests/abc074/tasks/arc083_a>, write the
-    following program as the judge program and save it as `judge.py`,
-    then `oj t --judge-command "python3 judge.py"` will run the tests.
+You can validate simply by using
+[assert](https://cpprefjp.github.io/reference/cassert/assert.html)
+in your solution.
 
-> ``` {.sourceCode .python}
-> import sys
-> # input
-> with open(sys.argv[1]) as testcase:
->     A, B, C, D, E, F = list(map(int, testcase.readline().split()))
-> with open(sys.argv[2]) as your_output:
->     y_all, y_sugar = list(map(int, your_output.readline().split()))
-> with open(sys.argv[3]) as expected_output:
->     e_all, e_sugar = list(map(int, expected_output.readline().split()))
-> # check
-> assert 100 * A <= y_all <= F
-> y_water = y_all - y_sugar
-> assert any(100 * A * i + 100 * B * j == y_water for i in range(3001) for j in range(3001))
-> assert any(C * i + D * j == y_sugar for i in range(3001) for j in range(3001))
-> assert y_sugar <= E * y_water / 100
-> assert y_sugar * e_all == e_sugar * y_all
-> assert (e_sugar > 0 and y_sugar == 0) is False
-> ```
->
-> > A program for judge can get the input of a testcase, the output of
-> > your program, and the expected output of the testcase, via files.
-> > The command for judge is executed as
-> > `<command> <input> <your_output> <expected_output>`. `<command>` is
-> > the command specified via the option of `oj` command. `<input>`,
-> > `<your_output>`, and `<expected_output>` are file paths of the input
-> > of the testcase, the output of your program, and the expected output
-> > of the testcase, respectively. If the exit code of the judge command
-> > is 0, then the output becomes `AC`, otherwise `WA`.
+Also, you can write a program for the judge side, and use it for
+test. For example, if the problem is
+<https://atcoder.jp/contests/abc074/tasks/arc083_a>, write the
+following program as the judge program and save it as `judge.py`,
+then `oj t --judge-command "python3 judge.py"` will run the tests.
 
--   Reactive problems
+```python
+import sys
+# input
+with open(sys.argv[1]) as testcase:
+    A, B, C, D, E, F = list(map(int, testcase.readline().split()))
+with open(sys.argv[2]) as your_output:
+    y_all, y_sugar = list(map(int, your_output.readline().split()))
+with open(sys.argv[3]) as expected_output:
+    e_all, e_sugar = list(map(int, expected_output.readline().split()))
+# check
+assert 100 * A <= y_all <= F
+y_water = y_all - y_sugar
+assert any(100 * A * i + 100 * B * j == y_water for i in range(3001) for j in range(3001))
+assert any(C * i + D * j == y_sugar for i in range(3001) for j in range(3001))
+assert y_sugar <= E * y_water / 100
+assert y_sugar * e_all == e_sugar * y_all
+assert (e_sugar > 0 and y_sugar == 0) is False
+```
 
-   There is a problem submitting a program that works interactively with
+A program for judge can get the input of a testcase, the output of
+your program, and the expected output of the testcase, via files.
+The command for judge is executed as
+`<command> <input> <your_output> <expected_output>`. `<command>` is
+the command specified via the option of `oj` command. `<input>`,
+`<your_output>`, and `<expected_output>` are file paths of the input
+of the testcase, the output of your program, and the expected output
+of the testcase, respectively. If the exit code of the judge command
+is 0, then the output becomes `AC`, otherwise `WA`.
+
+### Reactive problems
+
+There is a problem submitting a program that works interactively with
 the judge program.    The command `oj t/r` is provided to run tests for
 such a problem.
 
-    For example, if the problem is
+For example, if the problem is
 <https://codeforces.com/gym/101021/problem/A>, write the following
 program as the judge program and save it as `judge.py` and run
 `oj t/r ./judge.py` command.
 
-> ``` {.sourceCode .python}
-> #!/usr/bin/env python3
-> import sys
-> import random
-> n = random.randint(1, 10 ** 6)
-> print('[*] n =', n, file=sys.stderr)
-> for i in range(25 + 1):
->     s = input()
->     if s.startswith('!'):
->         x = int(s.split()[1])
->         assert x == n
->         exit()
->     else:
->         print('<' if n < int(s) else '>=')
->         sys.stdout.flush()
-> assert False
-> ```
+```python
+#!/usr/bin/env python3
+import sys
+import random
+n = random.randint(1, 10 ** 6)
+print('[*] n =', n, file=sys.stderr)
+for i in range(25 + 1):
+    s = input()
+    if s.startswith('!'):
+        x = int(s.split()[1])
+        assert x == n
+        exit()
+    else:
+        print('<' if n < int(s) else '>=')
+        sys.stdout.flush()
+assert False
+```
 
-List of supported services
---------------------------
+
+## List of supported services
 
 Supported service as of `v8.0.0` (2020-02-14) is as follows.
 
@@ -440,7 +489,7 @@ Download system case (`oj d --system`):
 -   Aizu Online Judge
 -   yukicoder
 
-Missing features
-----------------
+
+## Missing features
 
 (Omitted. Read the Japanese version of this page.)

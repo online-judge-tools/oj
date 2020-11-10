@@ -1,23 +1,24 @@
-Introduction to online-judge-tools (Japanese)
-=============================================
+# Getting Started (日本語)
+
+[English version of this document](./getting-started.ja.md)
 
 online-judge-tools
 は競技プログラミングを行う上で存在する典型作業を自動化するためのツールです。
 
-インストール
-------------
+
+## インストール
 
 Python
 が導入されている環境であれば、次のコマンドだけでインストールができます。
 
-``` {.sourceCode .console}
+```console
 $ pip3 install --user online-judge-tools
 ```
 
 OS には Linux か Mac OS を推奨しますが、 Windows 上でも動作します。
 
-サンプルケースのテスト
-----------------------
+
+## サンプルケースのテスト
 
 あなたは提出前にサンプルケースを使ったテストをしていますか？
 面倒に感じて省略してしまったことはありませんか？
@@ -39,7 +40,7 @@ online-judge-tools を使えばサンプルケースのテストの自動化が�
 で行なえ、ダウンロードしたサンプルに対するテストは `oj t` で行なえます。
 たとえば以下のように使います。
 
-``` {.sourceCode .console}
+```console
 $ oj d https://atcoder.jp/contests/agc001/tasks/agc001_a
 [x] problem recognized: AtCoderProblem.from_url('https://atcoder.jp/contests/agc001/tasks/agc001_a')
 [x] load cookie from: /home/ubuntu/.local/share/online-judge-tools/cookie.jar
@@ -100,8 +101,8 @@ expected:
 `--system` オプションを使ってください。 その他の機能について確認するには
 `oj d --help` や `oj t --help` を実行してください。
 
-提出
-----
+
+## 提出
 
 実装した解法の提出を行う際には、「プログラムの提出先となる問題」と「提出するプログラムの実装言語」をマウスで選択しソースコードをテキストボックスにコピペして送信ボタンを押すことが一般的です。
 ところで、提出時に「提出先の問題」「提出の言語」の選択を間違えてしまいペナルティを食らった経験はありますか？
@@ -112,7 +113,7 @@ online-judge-tools を使えば提出の自動化が可能です。 たとえば
 を提出したいときは `oj s https://codeforces.com/contest/1200/problem/F`
 を実行すればよいです。実際に実行したときの出力は次のようになります:
 
-``` {.sourceCode .console}
+```console
 $ oj s https://codeforces.com/contest/1200/problem/F main.cpp
 [x] read history from: /home/ubuntu/.cache/online-judge-tools/download-history.jsonl
 [x] found urls in history:
@@ -174,8 +175,8 @@ Opening in existing browser session.
 の指定ミスを防ぐために、こちらの省力形の利用を推奨しています。
 また、言語は自動で認識され適切に設定されます。
 
-ストレステスト
---------------
+
+## ストレステスト
 
 「実装をしてサンプルが合ったので提出をしたのに、 WA や RE
 になってしまった。しかし原因がまったく分からない」という状況になったとき、どうすればいいでしょうか？
@@ -199,7 +200,7 @@ online-judge-tools には、これを助ける機能もあります。 (2.) に�
 <https://onlinejudge.u-aizu.ac.jp/courses/library/7/DPL/1/DPL_1_B>
 に対して以下のように利用します。
 
-``` {.sourceCode .console}
+```console
 $ cat generate.py
 #!/usr/bin/env python3
 import random
@@ -309,85 +310,85 @@ $ oj g/o -c ./tle
 なかなか撃墜ケースが見つからない場合のために、より効率的に行なうオプション
 `--hack` や並列化オプション `-j` なども用意されています。
 
-特殊な形式の問題に対するテスト
-------------------------------
 
--   誤差ジャッジ
+## 特殊な形式の問題に対するテスト
 
-> 「絶対誤差あるいは相対誤差で 10⁻⁶
-> 以内の出力を正答とします」のような問題に対するテストは、 `-e`
-> オプションで対応できます。 たとえば `oj t -e 1e-6` とします。
+### 誤差ジャッジ
 
--   解が複数ある問題
+「絶対誤差あるいは相対誤差で 10⁻⁶
+以内の出力を正答とします」のような問題に対するテストは、 `-e`
+オプションで対応できます。 たとえば `oj t -e 1e-6` とします。
 
-> 実装したプログラムの中で
-> [assert](https://cpprefjp.github.io/reference/cassert/assert.html)
-> を用いることで、解答の正当性を簡易にチェックすることが可能です。
->
-> あるいは、複雑なチェックが必要な場合や想定解答の内容をチェックに用いたい場合は、ジャッジ側のプログラムを自作して解答の正否の判定に用いることができます。
-> たとえば問題 <https://atcoder.jp/contests/abc074/tasks/arc083_a>
-> であれば、次のようなジャッジ側プログラムを書いて `judge.py`
-> という名前で保存し、 `oj t --judge-command "python3 judge.py"`
-> とすればテストが実行されます。
->
-> ``` {.sourceCode .python}
-> import sys
-> # input
-> with open(sys.argv[1]) as testcase:
->     A, B, C, D, E, F = list(map(int, testcase.readline().split()))
-> with open(sys.argv[2]) as your_output:
->     y_all, y_sugar = list(map(int, your_output.readline().split()))
-> with open(sys.argv[3]) as expected_output:
->     e_all, e_sugar = list(map(int, expected_output.readline().split()))
-> # check
-> assert 100 * A <= y_all <= F
-> y_water = y_all - y_sugar
-> assert any(100 * A * i + 100 * B * j == y_water for i in range(3001) for j in range(3001))
-> assert any(C * i + D * j == y_sugar for i in range(3001) for j in range(3001))
-> assert y_sugar <= E * y_water / 100
-> assert y_sugar * e_all == e_sugar * y_all
-> assert (e_sugar > 0 and y_sugar == 0) is False
-> ```
->
-> ジャッジ側のプログラムは、テストケースの入力、解答（あなたのプログラムの出力）、想定解答をファイル入力を用いて取得することができます。
-> judgeのコマンドは `<command> <input> <your_output> <expected_output>`
-> のように実行され、 `<command>`
-> には引数で指定したジャッジの実行コマンドが入ります。 `<input>` ,
-> `<your_output>` , `<expected_output>`
-> にはそれぞれ、テストケースの入力、解答、想定解答が格納されたファイルのパスが入ります。
-> サンプルに示すようにコマンドライン引数を用いて各ファイルを読み込み、解答の正否を判定してください。
-> ジャッジプログラムの終了コードが0になった場合に正答(AC)となり、それ以外は誤答(WA)となります。
+### 解が複数ある問題
 
--   リアクティブ問題
+実装したプログラムの中で
+[assert](https://cpprefjp.github.io/reference/cassert/assert.html)
+を用いることで、解答の正当性を簡易にチェックすることが可能です。
 
-> ジャッジプログラムと対話的に動作するプログラムを提出する問題があります。
-> これをテストするためのコマンド `oj t/r` が用意されています。
->
-> たとえば問題 <https://codeforces.com/gym/101021/problem/A>
-> であれば、次のようなジャッジ側プログラムを書いて `judge.py`
-> という名前で保存し、 `oj t/r ./judge.py`
-> とすればテストが実行されます。
->
-> ``` {.sourceCode .python}
-> #!/usr/bin/env python3
-> import sys
-> import random
-> n = random.randint(1, 10 ** 6)
-> print('[*] n =', n, file=sys.stderr)
-> for i in range(25 + 1):
->     s = input()
->     if s.startswith('!'):
->         x = int(s.split()[1])
->         assert x == n
->         exit()
->     else:
->         print('<' if n < int(s) else '>=')
->         sys.stdout.flush()
-> assert False
-> ```
+あるいは、複雑なチェックが必要な場合や想定解答の内容をチェックに用いたい場合は、ジャッジ側のプログラムを自作して解答の正否の判定に用いることができます。
+たとえば問題 <https://atcoder.jp/contests/abc074/tasks/arc083_a>
+であれば、次のようなジャッジ側プログラムを書いて `judge.py`
+という名前で保存し、 `oj t --judge-command "python3 judge.py"`
+とすればテストが実行されます。
 
-対応しているサービスの一覧
---------------------------
+```console
+import sys
+# input
+with open(sys.argv[1]) as testcase:
+    A, B, C, D, E, F = list(map(int, testcase.readline().split()))
+with open(sys.argv[2]) as your_output:
+    y_all, y_sugar = list(map(int, your_output.readline().split()))
+with open(sys.argv[3]) as expected_output:
+    e_all, e_sugar = list(map(int, expected_output.readline().split()))
+# check
+assert 100 * A <= y_all <= F
+y_water = y_all - y_sugar
+assert any(100 * A * i + 100 * B * j == y_water for i in range(3001) for j in range(3001))
+assert any(C * i + D * j == y_sugar for i in range(3001) for j in range(3001))
+assert y_sugar <= E * y_water / 100
+assert y_sugar * e_all == e_sugar * y_all
+assert (e_sugar > 0 and y_sugar == 0) is False
+```
+
+ジャッジ側のプログラムは、テストケースの入力、解答（あなたのプログラムの出力）、想定解答をファイル入力を用いて取得することができます。
+judgeのコマンドは `<command> <input> <your_output> <expected_output>`
+のように実行され、 `<command>`
+には引数で指定したジャッジの実行コマンドが入ります。 `<input>` ,
+`<your_output>` , `<expected_output>`
+にはそれぞれ、テストケースの入力、解答、想定解答が格納されたファイルのパスが入ります。
+サンプルに示すようにコマンドライン引数を用いて各ファイルを読み込み、解答の正否を判定してください。
+ジャッジプログラムの終了コードが0になった場合に正答(AC)となり、それ以外は誤答(WA)となります。
+
+### リアクティブ問題
+
+ジャッジプログラムと対話的に動作するプログラムを提出する問題があります。
+これをテストするためのコマンド `oj t/r` が用意されています。
+
+たとえば問題 <https://codeforces.com/gym/101021/problem/A>
+であれば、次のようなジャッジ側プログラムを書いて `judge.py`
+という名前で保存し、 `oj t/r ./judge.py`
+とすればテストが実行されます。
+
+```python
+#!/usr/bin/env python3
+import sys
+import random
+n = random.randint(1, 10 ** 6)
+print('[*] n =', n, file=sys.stderr)
+for i in range(25 + 1):
+    s = input()
+    if s.startswith('!'):
+        x = int(s.split()[1])
+        assert x == n
+        exit()
+    else:
+        print('<' if n < int(s) else '>=')
+        sys.stdout.flush()
+assert False
+```
+
+
+## 対応しているサービスの一覧
 
 オンラインジャッジのサーバーと通信を行なうような機能については利用できるサービスが制限されることがあります。
 `v8.0.0` (2020-02-15) 時点での対応サービスは以下のようになります。
@@ -431,8 +432,8 @@ $ oj g/o -c ./tle
 -   Aizu Online Judge
 -   yukicoder
 
-存在しない機能
---------------
+
+## 存在しない機能
 
 「それが何であるか」を説明するには「何ができるか」を言う必要がありますが、それだけでは十分ではありません。
 「何ができないか」についても言うべきです。
@@ -493,5 +494,3 @@ online-judge-tools には、次のような機能は存在しません:
     内部で HTTP の通信に使っているクッキー (+ 例外として、提出先 URL
     の推測 `oj s` のための履歴)
     以外は、入力されたコマンドのみに依存して動作します。
-
-
