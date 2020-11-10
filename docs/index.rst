@@ -7,7 +7,11 @@ Welcome to online-judge-tools's documentation!
 ==============================================
 
 This documentation is now obsoleted.
-Please read `README.md <https://github.com/online-judge-tools/oj/blob/master/README.md>`_ instead.
+Please read `README.md <https://github.com/online-judge-tools/oj>`_ instead.
+
+.. raw:: html
+
+   <script type="text/javascript">setTimeout(function() { location.href = "https://github.com/online-judge-tools/oj"; }, 3000);</script>
 
 Indices and tables
 ==================
