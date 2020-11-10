@@ -1,6 +1,6 @@
 # Getting Started (日本語)
 
-[English version of this document](./getting-started.ja.md)
+[English version of this document](./getting-started.md)
 
 online-judge-tools
 は競技プログラミングを行う上で存在する典型作業を自動化するためのツールです。
