@@ -17,6 +17,8 @@ $ pip3 install --user online-judge-tools
 
 Linux (including Windows Subsystem for Linux) or macOS is recommended for the OS, but it also works on Windows.
 
+For detailed instructions, read [docs/INSTALL.md](./INSTALL.md).
+
 
 ## Testing with sample cases
 
