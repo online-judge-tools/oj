@@ -15,6 +15,8 @@ $ pip3 install --user online-judge-tools
 
 OS には Linux (Windows Subsystem for Linux を含む) か macOS を推奨しますが、Windows 上でも動作します。
 
+詳細な手順については [docs/INSTALL.ja.md](./INSTALL.ja.md) を読んでください。
+
 
 ## サンプルケースのテスト
 
