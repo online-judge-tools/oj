@@ -452,4 +452,38 @@ Please see the table at [online-judge-tools/api-client](https://github.com/onlin
 
 ## Missing features
 
-(Omitted. Read the Japanese version of this page.)
+To describe "what it is", it's necessary to tell about "what it can do". But it's not sufficient. Also we should tell about "what it cannot do".
+
+In `oj` command, there are no features like:
+
+-   The feature to prepare the directory for a contest at once
+
+    For the feature to prepare the directory for a contest, please use a related command, `oj-prepare` in [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator).
+
+    `oj` command is "a command to help with solving individual problems (mainly, with testing)", so other things are out of scope.
+
+-   The feature to generate template code
+
+    To analyze a problem of competitive programming and automatically generate the template code for the given problem including the main function and the input/output part, you can use `oj-template` command in [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator).
+
+-   The feature to automatically compile code before running tests
+
+    `oj` command doesn't have such a feature because using shell is sufficient.
+    Please use your shell. For example, `$ g++ main.cpp && oj t` does this feature.
+
+    There are too many ways to compile and run source code of various language. Also, we don't ignore users who use minor programming languages or minor online judges. So, implementing this feature is not realistic.
+
+-   The feature to schedule to submit code
+
+    `oj` command doesn't have such a feature because using shell is sufficient.
+    Please use your shell. For example, `$ sleep 3600 && oj s --yes main.cpp` will submit your code after one hour.
+
+
+-   Configuration files
+
+    `oj` command doesn't have such a feature because using shell is sufficient.
+    Please use the configuration file of your shell (e.g. `~/.bashrc`).
+    Please use aliases of shell functions.
+
+    Configuration files introduce "implicit states" and increase the costs of maintenance and user-supporting.
+    Except internal cookies for HTTP accessing (and, as an exception, the history to guess URLs to submit in `oj s`)

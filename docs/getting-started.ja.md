@@ -402,41 +402,31 @@ assert False
 
 -   コンテストのためのディレクトリを一括で用意する機能
 
-    `oj` コマンドは「個々の問題を解くことを助ける」ためのコマンドであり、それ以外は責任の範囲外です。
     「コンテストのためのディレクトリを一括で用意する機能」は `oj` コマンドには含まれていません。この機能がほしい場合は [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator/blob/master/README.ja.md) に含まれている `oj-prepare` コマンドや、[@Tatamo](https://github.com/Tatamo) が作成している [Tatamo/atcoder-cli](https://github.com/Tatamo/atcoder-cli) など) を利用してください。
 
-    同様の理由で、たとえば「精進の進捗を管理する機能」なども存在しません。
+    `oj` コマンドは「個々の問題を解くことを (主にテストの実行によって) 助ける」ためのコマンドであり、それ以外は責任の範囲外です。
 
 -   テンプレートを生成する機能
 
-    純粋なテンプレートの生成はプログラミング一般の領域の問題であるので `oj` コマンドの責任の範囲外です。
-    既存のツールを利用してください。
-    たとえば Vim なら [thinca/vim-template](https://github.com/thinca/vim-template/blob/master/doc/template.jax) などのプラグインでより汎用的に対応できます。
-
-    「テンプレートの生成」が「競技プログラミングの問題を解析してその問題専用の main 関数や入出力部分を生成する」という意味であれば、これは [online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator/blob/master/README.ja.md) に含まれている `oj-tempate` コマンドによって実現可能です。
+    競技プログラミングの問題を解析してその問題専用の main 関数や入出力部分を生成するには、[online-judge-tools/template-generator](https://github.com/online-judge-tools/template-generator/blob/master/README.ja.md) に含まれている `oj-tempate` コマンドを使ってください。
     同様の機能は [kyuridenamida/atcoder-tools](https://github.com/kyuridenamida/atcoder-tools) にもあります。
 
 -   自動でコンパイルする機能
 
-    シェルの機能を使えば十分です。
-    また、コンパイルの方法などは言語や環境の数だけ無数にあり、すべて対応していくのはかなり大変なためです。
-    テストの前に再コンパイルしたいのなら `g++ main.cpp && oj t` などとしてください。
+    シェルの機能を使えば十分であるため、そのような機能はありません。
+    テストの前に再コンパイルしたいのなら `$ g++ main.cpp && oj t` などとしてください。
+
+    また、コンパイルの方法などは言語や環境の数だけ無数にあり、すべて対応していくのはかなり大変なためです。また、マイナー言語のユーザやマイナーなオンラインジャッジのユーザを無視したくはありません。
 
 -   提出予約をする機能
 
-    シェルの機能を使えば十分であるため、そのような指定をするオプションはありません。
-    たとえば 1 時間後に提出するには `sleep 3600 && oj s --yes main.cpp` としてください。
-
--   提出結果を解析する機能
-
-    存在しません。あまりやりすぎると問題になることが予想されるためです。
-    これを実装するための機能は内部的には存在する
-    ([onlinejudge.service.atcoder.AtCoderSubmissionData](https://online-judge-tools.readthedocs.io/en/master/onlinejudge.service.atcoder.html#onlinejudge.service.atcoder.AtCoderSubmissionData))
-    ので、必要なら各自でこれを利用するスクリプトを書いてください。
+    シェルの機能を使えば十分であるため、そのような機能はありません。
+    たとえば 1 時間後に提出するには `$ sleep 3600 && oj s --yes main.cpp` としてください。
 
 -   設定ファイル
 
-    存在しません。
+    シェルの設定ファイル (`~/.bashrc` など) を代わりに利用してください。
+    alias やシェル関数を書いてください。
+
     設定ファイルはある種の「隠れた状態」を導入し、メンテナンスやサポートのコストを増大させるためです。
     内部で HTTP の通信に使っているクッキー (+ 例外として、提出先 URL の推測 `oj s` のための履歴) 以外は、入力されたコマンドのみに依存して動作します。
-    シェルの設定ファイル (`~/.bashrc` など) を代わりに利用してください。
