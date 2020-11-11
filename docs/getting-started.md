@@ -231,7 +231,7 @@ URL specification mistakes, we recommend using this labor-saving form.
 The language is automatically recognized and set appropriately.
 
 
-## Stress test
+## Random testing
 
 What should you do when you get a situation where you implemented your
 solution and submitted it because it passes the sample cases but it gets
