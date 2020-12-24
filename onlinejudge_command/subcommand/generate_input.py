@@ -157,7 +157,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         assert input_data is not None
 
         # check the randomness of generator
-        name = '{}-th attempt'
+        name = '{}-th attempt'.format(attempt)
         conflicted_name = check_randomness_of_generator(input_data, name=name, lock=lock, generated_input_hashes=generated_input_hashes)
         if conflicted_name is not None:
             submit(logger.warning, 'The same input is already generated at %s. Please use a random input generator.', conflicted_name)
