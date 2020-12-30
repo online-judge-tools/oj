@@ -38,7 +38,7 @@ $ pip3 install online-judge-tools
 ```
 
 For detailed instructions, read [docs/INSTALL.md](https://github.com/online-judge-tools/oj/blob/master/docs/INSTALL.md).
-For Japanese: 日本語バージョンのドキュメントは [docs/INSTALL.ja.md](https://github.com/online-judge-tools/oj/blob/master/docs/INSTALL.md) にあります。
+For Japanese: 日本語バージョンのドキュメントは [docs/INSTALL.ja.md](https://github.com/online-judge-tools/oj/blob/master/docs/INSTALL.ja.md) にあります。
 
 
 ## How to use
