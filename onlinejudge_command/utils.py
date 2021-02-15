@@ -1,6 +1,7 @@
 import contextlib
 import datetime
 import functools
+import http.cookiejar
 import os
 import pathlib
 import platform
@@ -24,6 +25,12 @@ from onlinejudge.type import *
 
 logger = getLogger(__name__)
 
+# These strings can control logging output.
+NO_HEADER = 'NO_HEADER: '
+HINT = 'HINT: '
+SUCCESS = 'SUCCESS: '
+FAILURE = 'FAILURE: '
+
 user_data_dir = utils.user_data_dir
 user_cache_dir = utils.user_cache_dir
 default_cookie_path = utils.default_cookie_path
@@ -34,8 +41,12 @@ def new_session_with_our_user_agent(*, path: pathlib.Path) -> Iterator[requests.
     session = requests.Session()
     session.headers['User-Agent'] = '{}/{} (+{})'.format(version.__package_name__, version.__version__, version.__url__)
     logger.debug('User-Agent: %s', session.headers['User-Agent'])
-    with utils.with_cookiejar(session, path=path) as session:
-        yield session
+    try:
+        with utils.with_cookiejar(session, path=path) as session:
+            yield session
+    except http.cookiejar.LoadError:
+        logger.info(HINT + 'You can delete the broken cookie.jar file: %s', str(path))
+        raise
 
 
 def textfile(s: str) -> str:  # should have trailing newline
@@ -105,13 +116,6 @@ def exec_command(command_str: str, *, stdin: Optional[BinaryIO] = None, input: O
         'memory': memory,  # Optional[float], in megabyte
     }
     return info, proc
-
-
-# These strings can control logging output.
-NO_HEADER = 'NO_HEADER: '
-HINT = 'HINT: '
-SUCCESS = 'SUCCESS: '
-FAILURE = 'FAILURE: '
 
 
 def green(s: str) -> str:
