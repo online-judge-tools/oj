@@ -1,5 +1,10 @@
 # Change Log
 
+## 11.1.2 / 2021-02-15
+
+-   [#852](https://github.com/online-judge-tools/oj/pull/852) show a hint message when cookie.jar is broken
+-   [#848](https://github.com/online-judge-tools/oj/pull/848) fix a message of generate-input command with --hack option
+
 ## 11.1.1 / 2020-11-07
 
 -   [#839](https://github.com/online-judge-tools/oj/pull/839) improve the error messages about updating packages ([@granddaifuku](https://github.com/granddaifuku))
