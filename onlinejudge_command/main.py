@@ -134,7 +134,7 @@ format string for --format:
   (both %s and %e are required.)
 
 tips:
-  There is a feature to use special judges. See https://online-judge-tools.readthedocs.io/en/master/introduction.en.html#test-for-problems-with-special-judge for details.
+  There is a feature to use special judges. See https://github.com/online-judge-tools/oj/blob/master/docs/getting-started.md for details.
 
   You can do similar things with shell
     e.g. $ for f in test/*.in ; do echo $f ; ./a.out < $f | diff - ${f%.in}.out ; done
