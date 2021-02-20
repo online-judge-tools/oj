@@ -1,5 +1,10 @@
 # Change Log
 
+## 11.1.3 / 2021-02-21
+
+-   [#854](https://github.com/online-judge-tools/oj/pull/854) fix a link in the help message ([@shuuji3](https://github.com/shuuji3))
+-   [#857](https://github.com/online-judge-tools/oj/pull/857) add some links to the getting started page from the help message
+
 ## 11.1.2 / 2021-02-15
 
 -   [#852](https://github.com/online-judge-tools/oj/pull/852) show a hint message when cookie.jar is broken
