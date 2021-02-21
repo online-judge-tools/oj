@@ -48,7 +48,11 @@ tips:
     subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
 
 
-def run(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> bool:
+    """
+    :returns: whether the submission is succeeded or not.
+    """
+
     # guess url
     history = onlinejudge_command.download_history.DownloadHistory()
     if args.file.parent.resolve() == pathlib.Path.cwd():
@@ -63,12 +67,12 @@ def run(args: argparse.Namespace) -> None:
         else:
             logger.error('failed to guess the URL to submit')
             logger.info('please manually specify URL as: $ oj submit URL FILE')
-            sys.exit(1)
+            return False
 
     # parse url
     problem = dispatch.problem_from_url(args.url)
     if problem is None:
-        sys.exit(1)
+        return False
 
     # read code
     with args.file.open('rb') as fh:
@@ -84,13 +88,13 @@ def run(args: argparse.Namespace) -> None:
             is_logged_in = problem.get_service().is_logged_in(session=sess)
         except Exception as e:
             logger.exception('failed to check the login status: %s', e)
-            sys.exit(1)
+            return False
         else:
             if is_logged_in:
                 logger.info('You are logged in.')
             else:
                 logger.error('You are not logged in. Please run $ oj login %s', problem.get_url())
-                sys.exit(1)
+                return False
 
         # guess or select language ids
         language_dict: Dict[LanguageId, str] = {language.id: language.name for language in problem.get_available_languages(session=sess)}
@@ -135,7 +139,7 @@ def run(args: argparse.Namespace) -> None:
                 logger.info('You have to choose:')
             for lang_id in sorted(matched_lang_ids or language_dict.keys()):
                 logger.info(utils.NO_HEADER + '%s (%s)', lang_id, language_dict[LanguageId(lang_id)])
-            sys.exit(1)
+            return False
 
         # confirm
         guessed_unmatch = ([problem.get_url()] != guessed_urls)
@@ -154,24 +158,24 @@ def run(args: argparse.Namespace) -> None:
                 c = sys.stdin.readline().rstrip()
                 if c != key:
                     logger.info('terminated.')
-                    return
+                    return False
             else:
                 sys.stdout.write('Are you sure? [y/N] ')
                 sys.stdout.flush()
                 c = sys.stdin.read(1)
                 if c.lower() != 'y':
                     logger.info('terminated.')
-                    return
+                    return False
 
         # submit
         try:
             submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess)
         except NotLoggedInError:
             logger.info(utils.FAILURE + 'login required')
-            sys.exit(1)
+            return False
         except SubmissionError:
             logger.info(utils.FAILURE + 'submission failed')
-            sys.exit(1)
+            return False
 
         # show result
         if args.open:
@@ -184,6 +188,8 @@ def run(args: argparse.Namespace) -> None:
             else:
                 logger.info('open the submission page with browser: %s', browser)
                 browser.open_new_tab(submission.get_url())
+
+    return True
 
 
 # TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781

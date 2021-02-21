@@ -2,7 +2,6 @@ import argparse
 import datetime
 import getpass
 import http.cookies
-import sys
 import textwrap
 import time
 from logging import getLogger
@@ -162,18 +161,22 @@ def is_logged_in_with_message(service: Service, *, session: requests.Session) ->
         return False
 
 
-def run(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> bool:
+    """
+    :returns: whether it is logged in or not.
+    """
+
     service = dispatch.service_from_url(args.url)
     if service is None:
-        sys.exit(1)
+        return False
 
     with utils.new_session_with_our_user_agent(path=args.cookie) as session:
 
         if is_logged_in_with_message(service, session=session):
-            return
+            return True
         else:
             if args.check:
-                sys.exit(1)
+                return False
 
         if args.use_browser in ('always', 'auto'):
             try:
@@ -183,10 +186,7 @@ def run(args: argparse.Namespace) -> None:
             except WebDriverException as e:
                 logger.debug(e)
             else:
-                if is_logged_in_with_message(service, session=session):
-                    return
-                else:
-                    sys.exit(1)
+                return is_logged_in_with_message(service, session=session)
 
         if args.use_browser in ('never', 'auto'):
             if args.use_browser == 'auto':
@@ -200,9 +200,6 @@ def run(args: argparse.Namespace) -> None:
             except Exception as e:
                 logger.exception(e)
             else:
-                if is_logged_in_with_message(service, session=session):
-                    return
-                else:
-                    sys.exit(1)
+                return is_logged_in_with_message(service, session=session)
 
-        sys.exit(1)
+        return False

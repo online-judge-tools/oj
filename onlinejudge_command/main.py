@@ -3,7 +3,7 @@ import pathlib
 import sys
 import traceback
 from logging import DEBUG, INFO, StreamHandler, basicConfig, getLogger
-from typing import List, Optional
+from typing import *
 
 import onlinejudge.__about__ as api_version
 import onlinejudge_command.__0_workaround_for_conflict  # pylint: disable=unused-import
@@ -47,37 +47,41 @@ tips:
     return parser
 
 
-def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
+def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     if args.version:
         print('online-judge-tools {} (+ online-judge-api-client {})'.format(version.__version__, api_version.__version__))
-        sys.exit(0)
+        return 0
     logger.debug('args: %s', str(args))
 
     # print the version to use for user-supporting
     logger.info('online-judge-tools %s (+ online-judge-api-client %s)', version.__version__, api_version.__version__)
 
     # TODO: make functions for subcommand take a named tuple instead of the raw result of argparse. Using named tuples make code well-typed.
-    # TODO: make functions for subcommand always return. The current implementation sometimes calls sys.exit(1), but this is not so good to write tests.
     if args.subcommand in ['download', 'd', 'dl']:
         subcommand_download.run(args)
     elif args.subcommand in ['login', 'l']:
-        subcommand_login.run(args)
+        if not subcommand_login.run(args):
+            return 1
     elif args.subcommand in ['submit', 's']:
-        subcommand_submit.run(args)
+        if not subcommand_submit.run(args):
+            return 1
     elif args.subcommand in ['test', 't']:
-        subcommand_test.run(args)
+        if not subcommand_test.run(args):
+            return 1
     elif args.subcommand in ['test-reactive', 't/r']:
-        subcommand_test_reactive.run(args)
+        if not subcommand_test_reactive.run(args):
+            return 1
     elif args.subcommand in ['generate-output', 'g/o']:
         subcommand_generate_output.run(args)
     elif args.subcommand in ['generate-input', 'g/i']:
         subcommand_generate_input.run(args)
     else:
         parser.print_help(file=sys.stderr)
-        sys.exit(1)
+        return 1
+    return 0
 
 
-def main(args: Optional[List[str]] = None) -> None:
+def main(args: Optional[List[str]] = None) -> 'NoReturn':
     parser = get_parser()
     parsed = parser.parse_args(args=args)
 
@@ -93,7 +97,7 @@ def main(args: Optional[List[str]] = None) -> None:
     is_updated = update_checking.run()
 
     try:
-        run_program(parsed, parser=parser)
+        sys.exit(run_program(parsed, parser=parser))
     except NotImplementedError as e:
         logger.debug('\n' + traceback.format_exc())
         logger.error('NotImplementedError')

@@ -6,7 +6,6 @@ import json
 import os
 import pathlib
 import subprocess
-import sys
 import tempfile
 import threading
 import traceback
@@ -286,7 +285,7 @@ def check_gnu_time(gnu_time: str) -> bool:
     return False
 
 
-def run(args: 'argparse.Namespace') -> None:
+def run(args: 'argparse.Namespace') -> int:
     # list tests
     if not args.test:
         args.test = fmtutils.glob_with_format(args.directory, args.format)  # by default
@@ -350,5 +349,5 @@ def run(args: 'argparse.Namespace') -> None:
         with args.log_file.open(mode='w') as fh:
             json.dump(history, fh)
 
-    if ac_count != len(tests):
-        sys.exit(1)
+    # return the result
+    return ac_count == len(tests)

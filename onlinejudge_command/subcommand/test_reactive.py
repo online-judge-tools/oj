@@ -34,16 +34,21 @@ def fifo() -> Generator[Tuple[Any, Any], None, None]:
 
 
 # TODO: write smoke tests for this subcommand
-def run(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> bool:
     with fifo() as (fhr1, fhw1):
         with fifo() as (fhr2, fhw2):
             with subprocess.Popen(args.command, shell=True, stdin=fhr2, stdout=fhw1, stderr=sys.stderr) as proc1:
                 with subprocess.Popen(args.judge, shell=True, stdin=fhr1, stdout=fhw2, stderr=sys.stderr) as proc2:
                     proc1.communicate()
                     proc2.communicate()
+
+                    result = True
                     if proc1.returncode != 0:
                         logger.info(utils.FAILURE + 'RE: solution returns %d', proc1.returncode)
+                        result = False
                     if proc2.returncode == 0:
                         logger.info(utils.SUCCESS + 'AC')
                     else:
                         logger.info(utils.FAILURE + 'WA: judge returns %d', proc2.returncode)
+                        result = False
+                    return result
