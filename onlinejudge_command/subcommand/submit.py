@@ -16,7 +16,43 @@ from onlinejudge.type import *
 logger = getLogger(__name__)
 
 
-def submit(args: argparse.Namespace) -> None:
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('submit', aliases=['s'], help='submit your solution', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+supported services:
+  AtCoder
+  Codeforces
+  yukicoder
+  HackerRank
+  Toph (Problem Archive)
+
+tips:
+  This subcommand has the feature to guess the problem to submit to. To guess the problem, run `oj download https://...` in the same directory without `--directory` option before using `oj submit ...`.
+
+  you can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
+    e.g. $ oj-api submit-code --file main.cpp --language $(oj-api guess-language-id --file main.cpp https://atcoder.jp/contests/agc001/tasks/agc001_a | jq -r .result.id) https://atcoder.jp/contests/agc001/tasks/agc001_a
+''')
+    subparser.add_argument('url', nargs='?', help='the URL of the problem to submit. if not given, guessed from history of download command.')
+    subparser.add_argument('file', type=pathlib.Path)
+    subparser.add_argument('-l', '--language', help='narrow down language choices if ambiguous')
+    subparser.add_argument('--no-guess', action='store_false', dest='guess')
+    subparser.add_argument('-g', '--guess', action='store_true', help='guess the language for your file (default)')
+    subparser.add_argument('--no-guess-latest', action='store_false', dest='guess_cxx_latest')
+    subparser.add_argument('--guess-cxx-latest', action='store_true', help='use the lasest version for C++ (default)')
+    subparser.add_argument('--guess-cxx-compiler', choices=('gcc', 'clang', 'all'), default='gcc', help='use the specified C++ compiler if both of GCC and Clang are available (default: gcc)')
+    subparser.add_argument('--guess-python-version', choices=('2', '3', 'auto', 'all'), default='auto', help='default: auto')
+    subparser.add_argument('--guess-python-interpreter', choices=('cpython', 'pypy', 'all'), default='cpython', help='use the specified Python interpreter if both of CPython and PyPy are available (default: cpython)')
+    subparser.add_argument('--no-open', action='store_false', dest='open')
+    subparser.add_argument('--open', action='store_true', default=True, help='open the result page after submission (default)')
+    subparser.add_argument('-w', '--wait', metavar='SECOND', type=float, default=3, help='sleep before submitting')
+    subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
+
+
+def run(args: argparse.Namespace) -> bool:
+    """
+    :returns: whether the submission is succeeded or not.
+    """
+
     # guess url
     history = onlinejudge_command.download_history.DownloadHistory()
     if args.file.parent.resolve() == pathlib.Path.cwd():
@@ -31,12 +67,12 @@ def submit(args: argparse.Namespace) -> None:
         else:
             logger.error('failed to guess the URL to submit')
             logger.info('please manually specify URL as: $ oj submit URL FILE')
-            sys.exit(1)
+            return False
 
     # parse url
     problem = dispatch.problem_from_url(args.url)
     if problem is None:
-        sys.exit(1)
+        return False
 
     # read code
     with args.file.open('rb') as fh:
@@ -52,13 +88,13 @@ def submit(args: argparse.Namespace) -> None:
             is_logged_in = problem.get_service().is_logged_in(session=sess)
         except Exception as e:
             logger.exception('failed to check the login status: %s', e)
-            sys.exit(1)
+            return False
         else:
             if is_logged_in:
                 logger.info('You are logged in.')
             else:
                 logger.error('You are not logged in. Please run $ oj login %s', problem.get_url())
-                sys.exit(1)
+                return False
 
         # guess or select language ids
         language_dict: Dict[LanguageId, str] = {language.id: language.name for language in problem.get_available_languages(session=sess)}
@@ -103,7 +139,7 @@ def submit(args: argparse.Namespace) -> None:
                 logger.info('You have to choose:')
             for lang_id in sorted(matched_lang_ids or language_dict.keys()):
                 logger.info(utils.NO_HEADER + '%s (%s)', lang_id, language_dict[LanguageId(lang_id)])
-            sys.exit(1)
+            return False
 
         # confirm
         guessed_unmatch = ([problem.get_url()] != guessed_urls)
@@ -122,24 +158,24 @@ def submit(args: argparse.Namespace) -> None:
                 c = sys.stdin.readline().rstrip()
                 if c != key:
                     logger.info('terminated.')
-                    return
+                    return False
             else:
                 sys.stdout.write('Are you sure? [y/N] ')
                 sys.stdout.flush()
                 c = sys.stdin.read(1)
                 if c.lower() != 'y':
                     logger.info('terminated.')
-                    return
+                    return False
 
         # submit
         try:
             submission = problem.submit_code(code, language_id=LanguageId(args.language), session=sess)
         except NotLoggedInError:
             logger.info(utils.FAILURE + 'login required')
-            sys.exit(1)
+            return False
         except SubmissionError:
             logger.info(utils.FAILURE + 'submission failed')
-            sys.exit(1)
+            return False
 
         # show result
         if args.open:
@@ -152,6 +188,8 @@ def submit(args: argparse.Namespace) -> None:
             else:
                 logger.info('open the submission page with browser: %s', browser)
                 browser.open_new_tab(submission.get_url())
+
+    return True
 
 
 # TODO: replace this function with the same function in https://github.com/online-judge-tools/api-client. See https://github.com/online-judge-tools/oj/issues/781

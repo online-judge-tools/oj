@@ -2,7 +2,6 @@ import argparse
 import datetime
 import getpass
 import http.cookies
-import sys
 import textwrap
 import time
 from logging import getLogger
@@ -15,6 +14,27 @@ import onlinejudge_command.utils as utils
 from onlinejudge.type import LoginError, Service
 
 logger = getLogger(__name__)
+
+
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('login', aliases=['l'], help='login to a service', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+supported services:
+  AtCoder
+  Codeforces
+  yukicoder
+  HackerRank
+  Toph
+
+tips:
+  You can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
+    e.g. $ USERNAME=foo PASSWORD=bar oj-api login-service https://atcoder.jp/
+''')
+    subparser.add_argument('url')
+    subparser.add_argument('-u', '--username')
+    subparser.add_argument('-p', '--password')
+    subparser.add_argument('--check', action='store_true', help='check whether you are logged in or not')
+    subparser.add_argument('--use-browser', choices=('always', 'auto', 'never'), default='auto', help='specify whether it uses a GUI web browser to login or not  (default: auto)')
 
 
 def login_with_password(service: Service, *, username: Optional[str], password: Optional[str], session: requests.Session) -> None:
@@ -141,18 +161,22 @@ def is_logged_in_with_message(service: Service, *, session: requests.Session) ->
         return False
 
 
-def login(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> bool:
+    """
+    :returns: whether it is logged in or not.
+    """
+
     service = dispatch.service_from_url(args.url)
     if service is None:
-        sys.exit(1)
+        return False
 
     with utils.new_session_with_our_user_agent(path=args.cookie) as session:
 
         if is_logged_in_with_message(service, session=session):
-            return
+            return True
         else:
             if args.check:
-                sys.exit(1)
+                return False
 
         if args.use_browser in ('always', 'auto'):
             try:
@@ -162,10 +186,7 @@ def login(args: argparse.Namespace) -> None:
             except WebDriverException as e:
                 logger.debug(e)
             else:
-                if is_logged_in_with_message(service, session=session):
-                    return
-                else:
-                    sys.exit(1)
+                return is_logged_in_with_message(service, session=session)
 
         if args.use_browser in ('never', 'auto'):
             if args.use_browser == 'auto':
@@ -179,9 +200,6 @@ def login(args: argparse.Namespace) -> None:
             except Exception as e:
                 logger.exception(e)
             else:
-                if is_logged_in_with_message(service, session=session):
-                    return
-                else:
-                    sys.exit(1)
+                return is_logged_in_with_message(service, session=session)
 
-        sys.exit(1)
+        return False

@@ -4,6 +4,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
+from typing import *
 
 
 @contextlib.contextmanager
@@ -35,11 +36,11 @@ def sandbox(files):
             yield tempdir
 
 
-def run(args, *, env=None, check=False, pipe_stderr=False):
+def run(args: List[str], *, env=None, check=False, pipe_stderr=False) -> subprocess.CompletedProcess:
     env = env or dict(os.environ)
     env['PYTHONPATH'] = str(pathlib.Path(__file__).parent.parent)  # this is required to run in sandboxes
     err = subprocess.PIPE if pipe_stderr else sys.stderr
-    return subprocess.run([sys.executable, '-m', 'onlinejudge_command.main'] + args, stdout=subprocess.PIPE, stderr=err, env=env, check=check)
+    return subprocess.run([sys.executable, '-m', 'onlinejudge_command.main'] + args, stdout=subprocess.PIPE, stderr=err, env=env, check=check)  # type: ignore
 
 
 def run_in_sandbox(args, files, pipe_stderr=False):

@@ -17,6 +17,38 @@ import onlinejudge_command.utils as utils
 logger = getLogger(__name__)
 
 
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('generate-input', aliases=['g/i'], help='generate input files from given generator', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+format string for --format:
+  %s                    name
+  %e                    extension: "in" or "out"
+  (both %d and %e are required.)
+
+tips:
+  For the random testing, you can read a tutorial: https://github.com/online-judge-tools/oj/blob/master/docs/getting-started.md#random-testing
+
+  There is a command to automatically generate a input generator, `oj-template` command. See https://github.com/online-judge-tools/template-generator .
+
+  This subcommand has also the feature to find a hack case.
+    e.g. for a target program `a.out`, a correct (but possibly slow) program `naive`, and a random input-case generator `generate.py`, run $ oj g/i --hack-actual ./a.out --hack-expected ./naive 'python3 generate.py'
+
+  You can do similar things with shell
+    e.g. $ for i in `seq 100` ; do python3 generate.py > test/random-$i.in ; done
+''')
+    subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
+    subparser.add_argument('-j', '--jobs', type=int, help='run tests in parallel')
+    subparser.add_argument('--width', type=int, default=3, help='specify the width of indices of cases. (default: 3)')
+    subparser.add_argument('--name', help='specify the base name of cases. (default: "random")')
+    subparser.add_argument('-c', '--command', help='specify your solution to generate output')
+    subparser.add_argument('--hack-expected', dest='command', help='alias of --command')
+    subparser.add_argument('--hack', '--hack-actual', dest='hack', help='specify your wrong solution to be compared with the reference solution given by --hack-expected')
+    subparser.add_argument('generator', type=str, help='your program to generate test cases')
+    subparser.add_argument('count', nargs='?', type=int, help='the number of cases to generate (default: 100)')
+
+
 @contextlib.contextmanager
 def BufferedExecutor(lock: Optional[threading.Lock]):
     buf: List[Tuple[Callable, List[Any], Dict[str, Any]]] = []
@@ -199,7 +231,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
             return (input_data, output_data)
 
 
-def generate_input(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     if args.hack and not args.command:
         raise RuntimeError('--hack must be used with --command')
 

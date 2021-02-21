@@ -18,6 +18,54 @@ from onlinejudge.type import SampleParseError, TestCase
 logger = getLogger(__name__)
 
 
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('download', aliases=['d', 'dl'], help='download sample cases', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+supported services:
+  Anarchy Golf
+  Aizu Online Judge (including the Arena)
+  AtCoder
+  Codeforces
+  yukicoder
+  CS Academy
+  HackerRank
+  PKU JudgeOnline
+  Kattis
+  Toph (Problem Archive)
+  CodeChef
+  Facebook Hacker Cup
+  Google Code Jam
+  Library Checker (https://judge.yosupo.jp/)
+
+supported services with --system:
+  Aizu Online Judge
+  yukicoder
+  Library Checker (https://judge.yosupo.jp/)
+
+format string for --format:
+  %i                    index: 1, 2, 3, ...
+  %e                    extension: "in" or "out"
+  %n                    name: e.g. "Sample Input 1", "system_test3.txt", ...
+  %b                    os.path.basename(name)
+  %d                    os.path.dirname(name)
+  %%                    '%' itself
+
+tips:
+  This subcommand doesn't have the feature to download all test cases for all problems in a contest at once. If you want to do this, please use `oj-prepare` command at https://github.com/online-judge-tools/template-generator instead.
+
+  You can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
+    e.g. $ oj-api get-problem https://atcoder.jp/contests/agc001/tasks/agc001_a | jq -cr '.result.tests | to_entries[] | [{path: "test/sample-\\(.key).in", data: .value.input}, {path: "test/sample-\\(.key).out", data: .value.output}][] | {path, data: @sh "\\(.data)"} | "mkdir -p test; echo -n \\(.data) > \\(.path)"' | sh
+''')
+    subparser.add_argument('url')
+    subparser.add_argument('-f', '--format', help='a format string to specify paths of cases (default: "sample-%%i.%%e" if not --system)')  # default must be None for --system
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, help='a directory name for test cases (default: test/)')  # default must be None for guessing in submit command
+    subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
+    subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
+    subparser.add_argument('-s', '--silent', action='store_true')
+    subparser.add_argument('--yukicoder-token', type=str)
+    subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
+
+
 def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
     data: Dict[str, str] = {}
     data["name"] = sample.name
@@ -27,7 +75,7 @@ def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
     return data
 
 
-def download(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     # prepare values
     problem = dispatch.problem_from_url(args.url)
     if problem is None:

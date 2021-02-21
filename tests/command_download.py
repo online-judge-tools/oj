@@ -4,10 +4,10 @@ import unittest
 
 import requests.exceptions
 
+import onlinejudge_command.subcommand.download as subcommand_download
 import tests.utils
 from onlinejudge.type import SampleParseError
 from onlinejudge_command.main import get_parser
-from onlinejudge_command.subcommand.download import download
 
 
 def get_files_from_json(samples):
@@ -50,7 +50,7 @@ def snippet_call_download_raises(self, expected_exception, url, is_system=False,
         args.append("--silent")
     args = get_parser().parse_args(args=args)
     with self.assertRaises(expected_exception):
-        download(args)
+        subcommand_download.run(args)
 
 
 def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_silent=False, type='files'):
@@ -65,7 +65,7 @@ def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_sil
         if is_silent:
             args += ['--silent']
         args = get_parser().parse_args(args=args)
-        download(args)
+        subcommand_download.run(args)
 
         args = ['download', url2]
         if is_system:
@@ -75,7 +75,7 @@ def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_sil
         args = get_parser().parse_args(args=args)
         # download from url2 should be aborted.
         with self.assertRaises(FileExistsError):
-            download(args)
+            subcommand_download.run(args)
 
         # check download from url1 is not overwritten
         result = {}

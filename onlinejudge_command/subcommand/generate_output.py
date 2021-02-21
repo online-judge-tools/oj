@@ -14,6 +14,28 @@ import onlinejudge_command.utils as utils
 logger = getLogger(__name__)
 
 
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('generate-output', aliases=['g/o'], help='generate output files from input and reference implementation', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+format string for --format:
+  %s                    name
+  %e                    extension: "in" or "out"
+  (both %s and %e are required.)
+
+tips:
+  You can do similar things with shell
+    e.g. $ for f in test/*.in ; do ./a.out < $f > ${f%.in}.out ; done
+''')
+    subparser.add_argument('-c', '--command', default=utils.get_default_command(), help='your solution to be tested. (default: "{}")'.format(utils.get_default_command()))
+    subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
+    subparser.add_argument('-j', '--jobs', type=int, help='run tests in parallel')
+    subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of input cases. (if empty: globbed from --format)')
+    subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
+    subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
+
+
 def generate_output_single_case(test_name: str, test_input_path: pathlib.Path, *, lock: Optional[threading.Lock] = None, args: argparse.Namespace) -> None:
 
     # print the header
@@ -75,7 +97,7 @@ def generate_output_single_case_exists_ok(test_name: str, test_input_path: pathl
         generate_output_single_case(test_name, test_input_path, lock=lock, args=args)
 
 
-def generate_output(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     # list tests
     if not args.test:
         args.test = fmtutils.glob_with_format(args.directory, args.format)  # by default

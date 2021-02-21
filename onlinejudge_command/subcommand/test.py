@@ -6,7 +6,6 @@ import json
 import os
 import pathlib
 import subprocess
-import sys
 import tempfile
 import threading
 import traceback
@@ -19,6 +18,45 @@ import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
 
 logger = getLogger(__name__)
+
+
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('test', aliases=['t'], help='test your code', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+format string for --format:
+  %s                    name
+  %e                    extension: "in" or "out"
+  (both %s and %e are required.)
+
+tips:
+  There is a feature to use special judges. See https://github.com/online-judge-tools/oj/blob/master/docs/getting-started.md#test-for-problems-with-special-judge for details.
+
+  You can do similar things with shell
+    e.g. $ for f in test/*.in ; do echo $f ; ./a.out < $f | diff - ${f%.in}.out ; done
+''')
+    subparser.add_argument('-c', '--command', default=utils.get_default_command(), help='your solution to be tested. (default: "{}")'.format(utils.get_default_command()))
+    subparser.add_argument('-f', '--format', default='%s.%e', help='a format string to recognize the relationship of test cases. (default: "%%s.%%e")')
+    subparser.add_argument('-d', '--directory', type=pathlib.Path, default=pathlib.Path('test'), help='a directory name for test cases (default: test/)')
+    subparser.add_argument('-m', '--compare-mode', choices=[mode.value for mode in CompareMode], default=CompareMode.CRLF_INSENSITIVE_EXACT_MATCH.value, help='mode to compare outputs. The default behavoir is exact-match to ensure that you always get AC on remote judge servers when you got AC on local tests for the same cases.  (default: crlf-insensitive-exact-match)')
+    subparser.add_argument('-M', '--display-mode', choices=[mode.value for mode in DisplayMode], default=DisplayMode.SUMMARY.value, help='mode to display outputs  (default: summary)')
+    subparser.add_argument('-S', '--ignore-spaces', dest='compare_mode', action='store_const', const=CompareMode.IGNORE_SPACES.value, help="ignore spaces to compare outputs, but doesn't ignore newlines  (equivalent to --compare-mode=ignore-spaces")
+    subparser.add_argument('-N', '--ignore-spaces-and-newlines', dest='compare_mode', action='store_const', const=CompareMode.IGNORE_SPACES_AND_NEWLINES.value, help='ignore spaces and newlines to compare outputs  (equivalent to --compare-mode=ignore-spaces-and-newlines')
+    subparser.add_argument('-D', '--diff', dest='display_mode', action='store_const', const=DisplayMode.DIFF.value, help='display the diff  (equivalent to --display-mode=diff)')
+    subparser.add_argument('-s', '--silent', action='store_true', help='don\'t report output and correct answer even if not AC  (for --mode all)')
+    subparser.add_argument('-e', '--error', type=float, help='check as floating point number: correct if its absolute or relative error doesn\'t exceed it')
+    subparser.add_argument('-t', '--tle', type=float, help='set the time limit (in second) (default: inf)')
+    subparser.add_argument('--mle', type=float, help='set the memory limit (in megabyte) (default: inf)')
+    subparser.add_argument('-i', '--print-input', action='store_true', default=True, help='print input cases if not AC  (default)')
+    subparser.add_argument('--no-print-input', action='store_false', dest='print_input')
+    subparser.add_argument('-j', '--jobs', metavar='N', type=int, help='specifies the number of jobs to run simultaneously  (default: no parallelization)')
+    subparser.add_argument('--print-memory', action='store_true', help='print the amount of memory which your program used, even if it is small enough')
+    subparser.add_argument('--gnu-time', help='used to measure memory consumption (default: "time")', default='time')
+    subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
+    subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
+    subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
+    subparser.add_argument('--judge-command', dest='judge', default=None, help='specify judge command instead of default diff judge. The given command (e.g. `./judge`) will be called as `$ ./judge input.txt actual-output.txt expected-output.txt` and should return the result with the exit code of its `main` function.')
+    subparser.add_argument('test', nargs='*', type=pathlib.Path, help='paths of test cases. (if empty: globbed from --format)')
+
 
 MEMORY_WARNING = 500  # megabyte
 MEMORY_PRINT = 100  # megabyte
@@ -247,7 +285,7 @@ def check_gnu_time(gnu_time: str) -> bool:
     return False
 
 
-def test(args: 'argparse.Namespace') -> None:
+def run(args: 'argparse.Namespace') -> int:
     # list tests
     if not args.test:
         args.test = fmtutils.glob_with_format(args.directory, args.format)  # by default
@@ -311,5 +349,5 @@ def test(args: 'argparse.Namespace') -> None:
         with args.log_file.open(mode='w') as fh:
             json.dump(history, fh)
 
-    if ac_count != len(tests):
-        sys.exit(1)
+    # return the result
+    return ac_count == len(tests)
