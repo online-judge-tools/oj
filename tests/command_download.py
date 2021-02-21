@@ -23,7 +23,7 @@ def get_files_from_json(samples):
 
 
 def snippet_call_download(self, url, files, is_system=False, is_silent=False, type='files'):
-    assert type in 'files' or 'json'
+    assert type in ('files', 'json')
     if type == 'json':
         files = get_files_from_json(files)
 
@@ -54,7 +54,7 @@ def snippet_call_download_raises(self, expected_exception, url, is_system=False,
 
 
 def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_silent=False, type='files'):
-    assert type in 'files' or 'json'
+    assert type in ('files', 'json')
     if type == 'json':
         files = get_files_from_json(files)
 
