@@ -17,6 +17,27 @@ from onlinejudge.type import LoginError, Service
 logger = getLogger(__name__)
 
 
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('login', aliases=['l'], help='login to a service', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+supported services:
+  AtCoder
+  Codeforces
+  yukicoder
+  HackerRank
+  Toph
+
+tips:
+  You can do similar things with shell and oj-api command. see https://github.com/online-judge-tools/api-client
+    e.g. $ USERNAME=foo PASSWORD=bar oj-api login-service https://atcoder.jp/
+''')
+    subparser.add_argument('url')
+    subparser.add_argument('-u', '--username')
+    subparser.add_argument('-p', '--password')
+    subparser.add_argument('--check', action='store_true', help='check whether you are logged in or not')
+    subparser.add_argument('--use-browser', choices=('always', 'auto', 'never'), default='auto', help='specify whether it uses a GUI web browser to login or not  (default: auto)')
+
+
 def login_with_password(service: Service, *, username: Optional[str], password: Optional[str], session: requests.Session) -> None:
     def get_credentials() -> Tuple[str, str]:
         nonlocal username, password

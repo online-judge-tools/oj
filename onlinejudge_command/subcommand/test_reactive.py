@@ -11,6 +11,17 @@ import onlinejudge_command.utils as utils
 logger = getLogger(__name__)
 
 
+def add_subparser(subparsers: argparse.Action) -> None:
+    subparsers_add_parser: Callable[..., argparse.ArgumentParser] = subparsers.add_parser  # type: ignore
+    subparser = subparsers_add_parser('test-reactive', aliases=['t/r'], help='test for reactive problem', formatter_class=argparse.RawTextHelpFormatter, epilog='''\
+tips:
+  You can do similar things with shell
+    e.g. $ mkfifo a.pipe && ./a.out < a.pipe | python3 judge.py > a.pipe
+''')
+    subparser.add_argument('-c', '--command', default=utils.get_default_command(), help='your solution to be tested. (default: "{}")'.format(utils.get_default_command()))
+    subparser.add_argument('judge', help='judge program using standard I/O')
+
+
 @contextlib.contextmanager
 def fifo() -> Generator[Tuple[Any, Any], None, None]:
     fdr, fdw = os.pipe()
