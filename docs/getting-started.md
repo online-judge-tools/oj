@@ -422,7 +422,7 @@ the judge program.    The command `oj t/r` is provided to run tests for
 such a problem.
 
 For example, if the problem is
-<https://codeforces.com/gym/101021/problem/A>, write the following
+<https://codeforces.com/gym/101021/problem/0>, write the following
 program as the judge program and save it as `judge.py` and run
 `oj t/r ./judge.py` command.
 

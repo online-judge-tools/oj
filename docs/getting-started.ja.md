@@ -364,7 +364,7 @@ judgeのコマンドは `<command> <input> <your_output> <expected_output>`
 ジャッジプログラムと対話的に動作するプログラムを提出する問題があります。
 これをテストするためのコマンド `oj t/r` が用意されています。
 
-たとえば問題 <https://codeforces.com/gym/101021/problem/A>
+たとえば問題 <https://codeforces.com/gym/101021/problem/0>
 であれば、次のようなジャッジ側プログラムを書いて `judge.py`
 という名前で保存し、 `oj t/r ./judge.py`
 とすればテストが実行されます。
