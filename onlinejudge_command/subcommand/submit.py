@@ -48,7 +48,7 @@ tips:
     subparser.add_argument('-y', '--yes', action='store_true', help='don\'t confirm')
 
 
-def submit(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     # guess url
     history = onlinejudge_command.download_history.DownloadHistory()
     if args.file.parent.resolve() == pathlib.Path.cwd():

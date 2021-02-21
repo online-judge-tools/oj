@@ -11,8 +11,6 @@ from onlinejudge.service.codeforces import CodeforcesService
 from onlinejudge.service.hackerrank import HackerRankService
 from onlinejudge.service.toph import TophService
 from onlinejudge.service.yukicoder import YukicoderService
-from onlinejudge_command.main import get_parser
-from onlinejudge_command.subcommand.submit import submit
 
 
 class SubmitArgumentsTest(unittest.TestCase):
@@ -95,9 +93,7 @@ class SubmitArgumentsTest(unittest.TestCase):
 
         with tests.utils.sandbox(files):
             with self.assertRaises(requests.exceptions.HTTPError):
-                args = ["submit", '-y', '--no-open', url, 'main.cpp']
-                args = get_parser().parse_args(args=args)
-                submit(args)
+                tests.utils.run(["submit", '-y', '--no-open', url, 'main.cpp'], check=True)
 
 
 class SubmitAtCoderTest(unittest.TestCase):

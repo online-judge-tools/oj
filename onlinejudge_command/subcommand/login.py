@@ -162,7 +162,7 @@ def is_logged_in_with_message(service: Service, *, session: requests.Session) ->
         return False
 
 
-def login(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     service = dispatch.service_from_url(args.url)
     if service is None:
         sys.exit(1)

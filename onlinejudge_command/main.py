@@ -59,19 +59,19 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> No
     # TODO: make functions for subcommand take a named tuple instead of the raw result of argparse. Using named tuples make code well-typed.
     # TODO: make functions for subcommand always return. The current implementation sometimes calls sys.exit(1), but this is not so good to write tests.
     if args.subcommand in ['download', 'd', 'dl']:
-        subcommand_download.download(args)
+        subcommand_download.run(args)
     elif args.subcommand in ['login', 'l']:
-        subcommand_login.login(args)
+        subcommand_login.run(args)
     elif args.subcommand in ['submit', 's']:
-        subcommand_submit.submit(args)
+        subcommand_submit.run(args)
     elif args.subcommand in ['test', 't']:
-        subcommand_test.test(args)
+        subcommand_test.run(args)
     elif args.subcommand in ['test-reactive', 't/r']:
-        subcommand_test_reactive.test_reactive(args)
+        subcommand_test_reactive.run(args)
     elif args.subcommand in ['generate-output', 'g/o']:
-        subcommand_generate_output.generate_output(args)
+        subcommand_generate_output.run(args)
     elif args.subcommand in ['generate-input', 'g/i']:
-        subcommand_generate_input.generate_input(args)
+        subcommand_generate_input.run(args)
     else:
         parser.print_help(file=sys.stderr)
         sys.exit(1)

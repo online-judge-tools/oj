@@ -231,7 +231,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
             return (input_data, output_data)
 
 
-def generate_input(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     if args.hack and not args.command:
         raise RuntimeError('--hack must be used with --command')
 

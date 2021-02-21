@@ -75,7 +75,7 @@ def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
     return data
 
 
-def download(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     # prepare values
     problem = dispatch.problem_from_url(args.url)
     if problem is None:

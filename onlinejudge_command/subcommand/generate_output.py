@@ -97,7 +97,7 @@ def generate_output_single_case_exists_ok(test_name: str, test_input_path: pathl
         generate_output_single_case(test_name, test_input_path, lock=lock, args=args)
 
 
-def generate_output(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     # list tests
     if not args.test:
         args.test = fmtutils.glob_with_format(args.directory, args.format)  # by default

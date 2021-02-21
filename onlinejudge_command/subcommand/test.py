@@ -286,7 +286,7 @@ def check_gnu_time(gnu_time: str) -> bool:
     return False
 
 
-def test(args: 'argparse.Namespace') -> None:
+def run(args: 'argparse.Namespace') -> None:
     # list tests
     if not args.test:
         args.test = fmtutils.glob_with_format(args.directory, args.format)  # by default
