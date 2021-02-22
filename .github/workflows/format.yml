@@ -17,10 +17,17 @@ jobs:
     - name: Install dependencies
       run: pip3 install .[dev]
 
-    - name: Run tests
-      run: |
-        oj -h
-        pylint --rcfile=setup.cfg onlinejudge_command tests setup.py
-        isort --check-only --diff onlinejudge_command tests setup.py
-        yapf --diff --recursive onlinejudge_command tests setup.py | tee yapf.patch && test ! -s yapf.patch
-        mypy onlinejudge_command tests setup.py
+    - name: Run --version
+      run: oj --version
+
+    - name: Run pylint
+      run: pylint --rcfile=setup.cfg onlinejudge_command tests setup.py
+
+    - name: Run isort
+      run: isort --check-only --diff onlinejudge_command tests setup.py
+
+    - name: Run yapf
+      run: yapf --diff --recursive onlinejudge_command tests setup.py
+
+    - name: Run mypy
+      run: mypy onlinejudge_command tests setup.py

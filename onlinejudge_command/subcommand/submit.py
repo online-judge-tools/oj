@@ -199,7 +199,7 @@ def select_ids_of_matched_languages(words: List[str], lang_ids: List[str], langu
         desc = language_dict[lang_id].lower()
         if split:
             desc = desc.split()
-        pred = all([word.lower() in desc for word in words])
+        pred = all(word.lower() in desc for word in words)
         if remove:
             pred = not pred
         if pred:
@@ -336,7 +336,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
 
         # interpreter
         lang_ids = list(filter(lambda lang_id: is_python_description(language_dict[lang_id]), lang_ids))
-        if any([parse_python_interpreter(language_dict[lang_id]) == 'pypy' for lang_id in lang_ids]):
+        if any(parse_python_interpreter(language_dict[lang_id]) == 'pypy' for lang_id in lang_ids):
             logger.info('PyPy is available for Python interpreter')
         if python_interpreter != 'all':
             lang_ids = list(filter(lambda lang_id: parse_python_interpreter(language_dict[lang_id]) == python_interpreter, lang_ids))
