@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import pathlib
+import textwrap
 from logging import getLogger
 from typing import *
 
@@ -12,6 +13,7 @@ import onlinejudge_command.download_history
 import onlinejudge_command.format_utils as format_utils
 import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
+from onlinejudge.service.atcoder import AtCoderProblem
 from onlinejudge.service.yukicoder import YukicoderProblem
 from onlinejudge.type import SampleParseError, TestCase
 
@@ -39,6 +41,7 @@ supported services:
 
 supported services with --system:
   Aizu Online Judge
+  AtCoder
   yukicoder
   Library Checker (https://judge.yosupo.jp/)
 
@@ -63,6 +66,7 @@ tips:
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
     subparser.add_argument('-s', '--silent', action='store_true')
     subparser.add_argument('--yukicoder-token', type=str)
+    subparser.add_argument('--dropbox-token', type=str)
     subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
 
 
@@ -91,6 +95,22 @@ def run(args: argparse.Namespace) -> bool:
 
     # get samples from the server
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
+        if isinstance(problem, AtCoderProblem):
+            if not args.dropbox_token:
+                logger.info(utils.HINT + 'You need to give the access token. Please do the following:\n%s', textwrap.dedent("""
+                        1. Open the following URL in your browser:
+                            https://www.dropbox.com/oauth2/authorize?client_id=153gig8dqgk3ujg&response_type=code
+                        2. Authorize the app and take the access code.
+                        3. Run the following command with replacing the "${YOUR_ACCESS_CODE}":
+                            $ curl https://api.dropbox.com/oauth2/token --user 153gig8dqgk3ujg:5l7o7lh73o8i9ux --data grant_type=authorization_code --data code=${YOUR_ACCESS_CODE}
+                        4. Get the access token from the JSON. It is in the "access_token" field.
+                        5. Use the access token. For example:
+                            $ oj download """ + problem.get_url() + """ --system --dropbox-token=${YOUR_ACCESS_TOKEN}
+
+                    (Please take care that the access code and the access token are CONFIDENTIAL information. DON'T SHARE with other people!)
+                """))
+                raise SampleParseError("--dropbox-token is not given")
+            sess.headers['Authorization'] = 'Bearer {}'.format(args.dropbox_token)
         if args.yukicoder_token and isinstance(problem, YukicoderProblem):
             sess.headers['Authorization'] = 'Bearer {}'.format(args.yukicoder_token)
         try:
