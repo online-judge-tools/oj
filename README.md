@@ -131,6 +131,7 @@ in Japanese:
 
 -   [online-judge-toolsを導入しよう！ &#183; ますぐれメモ](https://blog.masutech.work/posts/compro/oj-introduction/)
 -   [online-judge-toolsをVimから呼んで楽をする - Leverage Copy](https://maguroguma.hatenablog.com/entry/2020/08/19/090000)
+-   [VSCodeでAtCoderのサンプルケースをサクッとテストする - Qiita](https://qiita.com/danpe919/items/7c5697df25fb567f1e71)
 
 ### Related Tools
 
