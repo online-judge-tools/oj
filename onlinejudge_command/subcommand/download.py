@@ -95,7 +95,7 @@ def run(args: argparse.Namespace) -> bool:
 
     # get samples from the server
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
-        if isinstance(problem, AtCoderProblem):
+        if isinstance(problem, AtCoderProblem) and args.system:
             if not args.dropbox_token:
                 logger.info(utils.HINT + 'You need to give the access token. Please do the following:\n%s', textwrap.dedent("""
                         1. Open the following URL in your browser:
