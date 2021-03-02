@@ -13,7 +13,7 @@ setup(
     description=version.__description__,
     python_requires='>=3.6',
     install_requires=[
-        'online-judge-api-client >= 10.3.0, < 11',
+        'online-judge-api-client >= 10.9.0, < 11',
         'colorama >= 0.3, < 1',
         'diff-match-patch >= 20181111',
         'requests >= 2, < 3',
