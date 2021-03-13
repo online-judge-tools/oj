@@ -1,10 +1,10 @@
 # How to Install `oj` command
 
-[English version of this document](./INSTAL.md)
+[English version of this document](./INSTALL.md)
 
 以下の手順を順番に実行してください。
 
-1.  もし Windows を使っているならば、まず [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/ja-jp/windows/wsl/about) を使ってください[^windows]。初心者にとって、Linux (特に Ubuntu) はたいてい Windows より簡単であるためです。
+1.  もし Windows を使っているならば、まず [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/ja-jp/windows/wsl/about) を使ってください。初心者にとって、Linux (特に Ubuntu) はたいてい Windows より簡単であるためです。
     -   また、Visual Studio Code (あるいは他の IDE) のウィンドウは閉じて、しばらく忘れていてください。IDE に付属するコンソールは利用しないでください。
     -   もちろん、もしあなたが上級者であったなら、生の Windows 環境で `oj` コマンドを使うことも可能でしょう。
 1.  :snake: [Python](https://www.python.org/) をインストールしてください。もし Ubuntu (WSL 内の Ubuntu を含む) を使っているなら `$ sudo apt install python3` を実行すればよいです.
