@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.1.4 / 2021-03-15
+
+-   [#866](https://github.com/online-judge-tools/oj/pull/866) improve error messages of `download` subcommand
+
 ## 11.1.3 / 2021-02-21
 
 -   [#854](https://github.com/online-judge-tools/oj/pull/854) fix a link in the help message ([@shuuji3](https://github.com/shuuji3))
