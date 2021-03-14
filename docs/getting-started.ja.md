@@ -331,7 +331,7 @@ $ oj g/o -c ./tle
 という名前で保存し、 `oj t --judge-command "python3 judge.py"`
 とすればテストが実行されます。
 
-```console
+```python
 import sys
 # input
 with open(sys.argv[1]) as testcase:
