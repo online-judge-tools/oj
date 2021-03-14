@@ -2,11 +2,8 @@ import hashlib
 import os
 import unittest
 
-import requests.exceptions
-
 import onlinejudge_command.subcommand.download as subcommand_download
 import tests.utils
-from onlinejudge.type import SampleParseError
 from onlinejudge_command.main import get_parser
 
 
@@ -42,15 +39,14 @@ def snippet_call_download(self, url, files, is_system=False, is_silent=False, ty
         self.assertEqual(files, result)
 
 
-def snippet_call_download_raises(self, expected_exception, url, is_system=False, is_silent=False):
+def snippet_call_download_failure(self, url, is_system=False, is_silent=False):
     args = ["download", url]
     if is_system:
         args.append("--system")
     if is_silent:
         args.append("--silent")
     args = get_parser().parse_args(args=args)
-    with self.assertRaises(expected_exception):
-        subcommand_download.run(args)
+    self.assertFalse(subcommand_download.run(args))
 
 
 def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_silent=False, type='files'):
@@ -65,7 +61,7 @@ def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_sil
         if is_silent:
             args += ['--silent']
         args = get_parser().parse_args(args=args)
-        subcommand_download.run(args)
+        self.assertTrue(subcommand_download.run(args))
 
         args = ['download', url2]
         if is_system:
@@ -74,8 +70,7 @@ def snippet_call_download_twice(self, url1, url2, files, is_system=False, is_sil
             args += ['--silent']
         args = get_parser().parse_args(args=args)
         # download from url2 should be aborted.
-        with self.assertRaises(FileExistsError):
-            subcommand_download.run(args)
+        self.assertFalse(subcommand_download.run(args))
 
         # check download from url1 is not overwritten
         result = {}
@@ -92,8 +87,8 @@ class DownloadTest(unittest.TestCase):
     def snippet_call_download(self, *args, **kwargs):
         tests.command_download.snippet_call_download(self, *args, **kwargs)
 
-    def snippet_call_download_raises(self, *args, **kwargs):
-        tests.command_download.snippet_call_download_raises(self, *args, **kwargs)
+    def snippet_call_download_failure(self, *args, **kwargs):
+        tests.command_download.snippet_call_download_failure(self, *args, **kwargs)
 
     def test_call_download_atcoder_abc114_c(self):
         self.snippet_call_download('https://atcoder.jp/contests/abc114/tasks/abc114_c', [
@@ -132,26 +127,26 @@ class DownloadTest(unittest.TestCase):
         ], type='json')
 
     def test_call_download_invalid_url(self):
-        self.snippet_call_download_raises(requests.exceptions.HTTPError, 'http://abc001.contest.atcoder.jp/tasks/abc001_100')
+        self.snippet_call_download_failure('http://abc001.contest.atcoder.jp/tasks/abc001_100')
 
     def test_call_download_413(self):
         # This task is not supported.
-        self.snippet_call_download_raises(SampleParseError, 'https://chokudai001.contest.atcoder.jp/tasks/chokudai_001_a')
+        self.snippet_call_download_failure('https://chokudai001.contest.atcoder.jp/tasks/chokudai_001_a')
 
 
 class DownloadInvalidTest(unittest.TestCase):
-    def snippet_call_download_raises(self, *args, **kwargs):
-        tests.command_download.snippet_call_download_raises(self, *args, **kwargs)
+    def snippet_call_download_failure(self, *args, **kwargs):
+        tests.command_download.snippet_call_download_failure(self, *args, **kwargs)
 
     def snippet_call_download_twice(self, *args, **kwargs):
         tests.command_download.snippet_call_download_twice(self, *args, **kwargs)
 
     def test_call_download_invalid(self):
-        self.snippet_call_download_raises(requests.exceptions.InvalidURL, 'https://not_exist_contest.jp/tasks/001_a')
+        self.snippet_call_download_failure('https://not_exist_contest.jp/tasks/001_a')
 
     def test_call_download_no_sample_found(self):
-        self.snippet_call_download_raises(SampleParseError, 'https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a')
-        self.snippet_call_download_raises(SampleParseError, 'https://open.kattis.com/problems/hello')
+        self.snippet_call_download_failure('https://atcoder.jp/contests/tenka1-2013-quala/tasks/tenka1_2013_qualA_a')
+        self.snippet_call_download_failure('https://open.kattis.com/problems/hello')
 
     def test_call_download_twice(self):
         self.snippet_call_download_twice('https://atcoder.jp/contests/abc114/tasks/abc114_c', 'https://atcoder.jp/contests/abc003/tasks/abc003_4', [

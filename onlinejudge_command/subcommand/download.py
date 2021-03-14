@@ -75,13 +75,14 @@ def convert_sample_to_dict(sample: TestCase) -> Dict[str, str]:
     return data
 
 
-def run(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> bool:
     # prepare values
     problem = dispatch.problem_from_url(args.url)
     if problem is None:
         if dispatch.contest_from_url(args.url) is not None:
             logger.warning('You specified a URL for a contest instead of a problem. If you want to download for all problems of a contest at once, please try to use `oj-prepare` command of https://github.com/online-judge-tools/template-generator')
-        raise requests.exceptions.InvalidURL('The URL "%s" is not supported' % args.url)
+        logger.error('The URL "%s" is not supported', args.url)
+        return False
     is_default_format = args.format is None and args.directory is None  # must be here since args.directory and args.format are overwritten
     if args.directory is None:
         args.directory = pathlib.Path('test')
@@ -92,13 +93,18 @@ def run(args: argparse.Namespace) -> None:
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
         if args.yukicoder_token and isinstance(problem, YukicoderProblem):
             sess.headers['Authorization'] = 'Bearer {}'.format(args.yukicoder_token)
-        if args.system:
-            samples = problem.download_system_cases(session=sess)
-        else:
-            samples = problem.download_sample_cases(session=sess)
+        try:
+            if args.system:
+                samples = problem.download_system_cases(session=sess)
+            else:
+                samples = problem.download_sample_cases(session=sess)
+        except (requests.exceptions.RequestException, SampleParseError):
+            logger.exception('Failed to download test cases')
+            return False
 
     if not samples:
-        raise SampleParseError("Sample not found")
+        logger.error("Sample not found")
+        return False
 
     # append the history for submit subcommand
     if not args.dry_run and is_default_format:
@@ -127,7 +133,9 @@ def run(args: argparse.Namespace) -> None:
     for i, sample in enumerate(samples):
         for _, path, _ in iterate_files_to_write(sample, i=i):
             if path.exists():
-                raise FileExistsError('Failed to download since file already exists: ' + str(path))
+                logger.error('Failed to download since file already exists: %s', str(path))
+                logger.info(utils.HINT + 'We recommend adding your own test cases to test/ directory, and using one directory per one problem. Please see also https://github.com/online-judge-tools/oj/blob/master/docs/getting-started.md#random-testing. If you wanted to keep using one directory per one contest, you can run like `$ rm -rf test/ && oj d https://...`.')
+                return False
 
     # write samples to files
     for i, sample in enumerate(samples):
@@ -147,3 +155,5 @@ def run(args: argparse.Namespace) -> None:
     if args.log_file:
         with args.log_file.open(mode='w') as fhs:
             json.dump(list(map(convert_sample_to_dict, samples)), fhs)
+
+    return True

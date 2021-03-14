@@ -58,7 +58,8 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
 
     # TODO: make functions for subcommand take a named tuple instead of the raw result of argparse. Using named tuples make code well-typed.
     if args.subcommand in ['download', 'd', 'dl']:
-        subcommand_download.run(args)
+        if not subcommand_download.run(args):
+            return 1
     elif args.subcommand in ['login', 'l']:
         if not subcommand_login.run(args):
             return 1
