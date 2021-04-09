@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.2.0 / 2021-04-09
+
+-   [#869](https://github.com/online-judge-tools/oj/pull/869) use `gtime` for GNU time on macOS
+
 ## 11.1.4 / 2021-03-15
 
 -   [#866](https://github.com/online-judge-tools/oj/pull/866) improve error messages of `download` subcommand
