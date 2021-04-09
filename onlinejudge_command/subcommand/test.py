@@ -5,6 +5,7 @@ import enum
 import json
 import os
 import pathlib
+import platform
 import subprocess
 import tempfile
 import threading
@@ -50,7 +51,7 @@ tips:
     subparser.add_argument('--no-print-input', action='store_false', dest='print_input')
     subparser.add_argument('-j', '--jobs', metavar='N', type=int, help='specifies the number of jobs to run simultaneously  (default: no parallelization)')
     subparser.add_argument('--print-memory', action='store_true', help='print the amount of memory which your program used, even if it is small enough')
-    subparser.add_argument('--gnu-time', help='used to measure memory consumption (default: "time")', default='time')
+    subparser.add_argument('--gnu-time', help='used to measure memory consumption (default: "time" on Linux, "gtime" on mac)', default=None)
     subparser.add_argument('--no-ignore-backup', action='store_false', dest='ignore_backup')
     subparser.add_argument('--ignore-backup', action='store_true', help='ignore backup files and hidden files (i.e. files like "*~", "\\#*\\#" and ".*") (default)')
     subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
@@ -294,8 +295,15 @@ def run(args: 'argparse.Namespace') -> int:
     tests = fmtutils.construct_relationship_of_files(args.test, args.directory, args.format)
 
     # check wheather GNU time is available
+    if args.gnu_time is None:
+        if platform.system() == 'Darwin':
+            args.gnu_time = 'gtime'
+        else:
+            args.gnu_time = 'time'
     if not check_gnu_time(args.gnu_time):
         logger.warning('GNU time is not available: %s', args.gnu_time)
+        if platform.system() == 'Darwin':
+            logger.info(utils.HINT + 'You can install GNU time with: $ brew install gnu-time')
         args.gnu_time = None
     if args.mle is not None and args.gnu_time is None:
         raise RuntimeError('--mle is used but GNU time does not exist')
