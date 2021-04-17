@@ -98,8 +98,12 @@ def run(args: argparse.Namespace) -> bool:
                 samples = problem.download_system_cases(session=sess)
             else:
                 samples = problem.download_sample_cases(session=sess)
-        except (requests.exceptions.RequestException, SampleParseError):
-            logger.exception('Failed to download test cases')
+        except requests.exceptions.RequestException as e:
+            logger.error('%s', e)
+            logger.error(utils.HINT + 'You may need to login to use `$ oj download ...` during contest. Please run: $ oj login %s', problem.get_service().get_url())
+            return False
+        except SampleParseError as e:
+            logger.error('%s', e)
             return False
 
     if not samples:
