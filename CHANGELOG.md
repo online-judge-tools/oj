@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.2.1 / 2021-04-17
+
+-   [#873](https://github.com/online-judge-tools/oj/pull/873) improve error messages for HTTP errors on `oj download`
+
 ## 11.2.0 / 2021-04-09
 
 -   [#869](https://github.com/online-judge-tools/oj/pull/869) use `gtime` for GNU time on macOS
