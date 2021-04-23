@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.3.0 / 2021-04-23
+
+-   [#862](https://github.com/online-judge-tools/oj/pull/862) allow downloading system cases of AtCoder with `$ oj download --system --dropbox-token=... https://...`
+
 ## 11.2.1 / 2021-04-17
 
 -   [#873](https://github.com/online-judge-tools/oj/pull/873) improve error messages for HTTP errors on `oj download`
