@@ -147,8 +147,7 @@ def run(args: argparse.Namespace) -> bool:
             samples_text = ('samples of "{}'.format('", "'.join(guessed_urls)) if guessed_urls else 'no samples')
             logger.warning('the problem "%s" is specified to submit, but %s were downloaded in this directory. this may be mis-operation', problem.get_url(), samples_text)
         if args.wait:
-            logger.info('sleep(%.2f)', args.wait)
-            time.sleep(args.wait)
+            time.sleep(args.wait / 2)
         if not args.yes:
             if guessed_unmatch:
                 problem_id = problem.get_url().rstrip('/').split('/')[-1].split('?')[-1]  # this is too ad-hoc
@@ -166,6 +165,8 @@ def run(args: argparse.Namespace) -> bool:
                 if c.lower() != 'y':
                     logger.info('terminated.')
                     return False
+        if args.wait:
+            time.sleep(args.wait / 2)
 
         # submit
         try:
