@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.3.1 / 2021-06-15
+
+-   [#877](https://github.com/online-judge-tools/oj/pull/877) hide a log message in `submit` subcommand
+
 ## 11.3.0 / 2021-04-23
 
 -   [#862](https://github.com/online-judge-tools/oj/pull/862) allow downloading system cases of AtCoder with `$ oj download --system --dropbox-token=... https://...`
