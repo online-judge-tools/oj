@@ -193,7 +193,7 @@ def webbrowser_register_explorer_exe() -> None:
     if sys.version_info < (3, 7):
         webbrowser.register('explorer', None, instance)  # TODO: remove this after Python 3.6 supprot is finished
     else:
-        webbrowser.register('explorer', None, instance, preferred=True)  # `preferred=True` is used to solve the issue that terminal is cleared
+        webbrowser.register('explorer', None, instance, preferred=True)  # `preferred=True` is used to solve the issue that terminal is cleared; However, some people said the issue remains even with this fix. HELP! https://github.com/online-judge-tools/oj/issues/879
 
 
 def get_default_command() -> str:
