@@ -2,7 +2,7 @@
 
 ## 11.3.2 / 2021-07-15
 
--   [#879](https://github.com/online-judge-tools/oj/pull/879) solve an issue that terminal logs are cleared on WSL after submissions (thanks @orisano)
+-   [#879](https://github.com/online-judge-tools/oj/pull/879) solve an issue that terminal logs are cleared on WSL after submissions (thanks [@orisano](https://github.com/orisano))
 
 ## 11.3.1 / 2021-06-15
 
