@@ -190,7 +190,10 @@ def webbrowser_register_explorer_exe() -> None:
     if not is_windows_subsystem_for_linux():
         return
     instance = webbrowser.GenericBrowser('explorer.exe')
-    webbrowser.register('explorer', None, instance)  # TODO: use `preferred=True` to solve the issue that terminal is cleared, when the version of Python becomes 3.7 or higher
+    if sys.version_info < (3, 7):
+        webbrowser.register('explorer', None, instance)  # TODO: remove this after Python 3.6 supprot is finished
+    else:
+        webbrowser.register('explorer', None, instance, preferred=True)  # `preferred=True` is used to solve the issue that terminal is cleared
 
 
 def get_default_command() -> str:
