@@ -69,7 +69,7 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
     elif args.subcommand in ['test', 't']:
         if not subcommand_test.run(args):
             return 1
-    elif args.subcommand in ['test-reactive', 't/r']:
+    elif args.subcommand in ['test-reactive', 't/r', 'test-interactive', 't/i']:
         if not subcommand_test_reactive.run(args):
             return 1
     elif args.subcommand in ['generate-output', 'g/o']:
