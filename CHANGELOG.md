@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.4.0 / 2021-07-20
+
+-   [#886](https://github.com/online-judge-tools/oj/pull/886) add `test-interactive` subcommand as an alias of `test-reactive` subcommand ([@cai-lw](https://github.com/cai-lw))
+
 ## 11.3.3 / 2021-07-17
 
 -   [#884](https://github.com/online-judge-tools/oj/pull/884) fix the issue of terminal logs again
