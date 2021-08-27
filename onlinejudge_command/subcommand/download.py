@@ -168,7 +168,7 @@ def run(args: argparse.Namespace) -> bool:
         for ext, path, data in iterate_files_to_write(sample, i=i):
             content = ''
             if not args.silent:
-                content = '\n' + pretty_printers.make_pretty_large_file_content(data, limit=40, head=20, tail=10, bold=True)
+                content = '\n' + pretty_printers.make_pretty_large_file_content(data, limit=40, head=20, tail=10)
             logger.info('%sput: %s%s', ext, sample.name, content)
             if not args.dry_run:
                 path.parent.mkdir(parents=True, exist_ok=True)

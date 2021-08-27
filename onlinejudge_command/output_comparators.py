@@ -114,5 +114,5 @@ class SpecialJudge:
             logger.info('$ %s', command)
             info, proc = utils.exec_command(command)
         if not self.is_silent:
-            logger.info(utils.NO_HEADER + 'judge\'s output:\n%s', pretty_printers.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + 'judge\'s output:\n%s', pretty_printers.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10))
         return proc.returncode == 0
