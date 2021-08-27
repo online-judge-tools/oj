@@ -2,14 +2,10 @@
 """
 
 import abc
+import enum
 import math
-import pathlib
-import tempfile
 from logging import getLogger
 from typing import *
-
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
 
 logger = getLogger(__name__)
 
@@ -92,27 +88,23 @@ class CRLFInsensitiveComparator(OutputComparator):
         return self.file_comparator(actual.replace(b'\r\n', b'\n'), expected.replace(b'\r\n', b'\n'))
 
 
-class SpecialJudge:
-    def __init__(self, judge_command: str, *, is_silent: bool):
-        self.judge_command = judge_command  # already quoted and joined command
-        self.is_silent = is_silent
+class CompareMode(enum.Enum):
+    EXACT_MATCH = 'exact-match'
+    CRLF_INSENSITIVE_EXACT_MATCH = 'crlf-insensitive-exact-match'
+    IGNORE_SPACES = 'ignore-spaces'
+    IGNORE_SPACES_AND_NEWLINES = 'ignore-spaces-and-newlines'
 
-    def run(self, *, actual_output: bytes, input_path: pathlib.Path, expected_output_path: Optional[pathlib.Path]) -> bool:
-        with tempfile.TemporaryDirectory() as tempdir:
-            actual_output_path = pathlib.Path(tempdir) / 'actual.out'
-            with open(actual_output_path, 'wb') as fh:
-                fh.write(actual_output)
 
-            # if you use shlex.quote, it fails on Windows. why?
-            command = ' '.join([
-                self.judge_command,  # already quoted and joined command
-                str(input_path.resolve()),
-                str(actual_output_path.resolve()),
-                str(expected_output_path.resolve() if expected_output_path is not None else ''),
-            ])
-
-            logger.info('$ %s', command)
-            info, proc = utils.exec_command(command)
-        if not self.is_silent:
-            logger.info(utils.NO_HEADER + 'judge\'s output:\n%s', pretty_printers.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10))
-        return proc.returncode == 0
+# This function is used from onlinejudge_command.pretty_printers.
+def check_lines_match(a: str, b: str, *, compare_mode: CompareMode) -> bool:
+    if compare_mode == CompareMode.EXACT_MATCH:
+        comparator: OutputComparator = ExactComparator()
+    elif compare_mode == CompareMode.CRLF_INSENSITIVE_EXACT_MATCH:
+        comparator = CRLFInsensitiveComparator(ExactComparator())
+    elif compare_mode == CompareMode.IGNORE_SPACES:
+        comparator = SplitComparator(ExactComparator())
+    elif compare_mode == CompareMode.IGNORE_SPACES_AND_NEWLINES:
+        raise RuntimeError('CompareMode.IGNORE_SPACES_AND_NEWLINES is not allowed for this function')
+    else:
+        assert False
+    return comparator(a.encode(), b.encode())
