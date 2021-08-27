@@ -79,7 +79,7 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
 
         if print_data:
             logger.info(utils.NO_HEADER + 'input:')
-            logger.info(utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
         with input_path.open('wb') as fh:
             fh.write(input_data)
         logger.info(utils.SUCCESS + 'saved to: %s', input_path)
@@ -87,7 +87,7 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
         if output_data is not None:
             if print_data:
                 logger.info(utils.NO_HEADER + 'output:')
-                logger.info(pretty_printers.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
+                logger.info(pretty_printers.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10))
             with output_path.open('wb') as fh:
                 fh.write(output_data)
             logger.info(utils.SUCCESS + 'saved to: %s', output_path)
@@ -194,7 +194,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         if conflicted_name is not None:
             submit(logger.warning, 'The same input is already generated at %s. Please use a random input generator.', conflicted_name)
             submit(logger.info, utils.NO_HEADER + 'input:')
-            submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
+            submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
 
         # generate output
         submit(logger.info, 'generate output...')
@@ -220,9 +220,9 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         expected = output_data.decode()
         if not simple_match(answer, expected):
             logger.info(utils.FAILURE + '' + utils.red('WA'))
-            logger.info(utils.NO_HEADER + 'input:\n%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10, bold=True))
-            logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
-            logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + 'input:\n%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
+            logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10))
+            logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10))
             status = 'WA'
 
         if status == 'AC':

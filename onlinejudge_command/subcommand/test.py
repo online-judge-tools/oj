@@ -166,7 +166,7 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
         if does_print_input and not is_input_printed:
             is_input_printed = True
             with test_input_path.open('rb') as inf:
-                logger.info(utils.NO_HEADER + 'input:\n%s', pretty_printers.make_pretty_large_file_content(inf.read(), limit=40, head=20, tail=10, bold=True))
+                logger.info(utils.NO_HEADER + 'input:\n%s', pretty_printers.make_pretty_large_file_content(inf.read(), limit=40, head=20, tail=10))
 
     # check TLE, RE or not
     status = JudgeStatus.AC
@@ -199,19 +199,22 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
             else:
                 expected = ''
             if display_mode == DisplayMode.SUMMARY:
-                logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
-                logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_large_file_content(expected.encode(), limit=40, head=20, tail=10, bold=True))
+                logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10))
+                logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_large_file_content(expected.encode(), limit=40, head=20, tail=10))
             elif display_mode == DisplayMode.DIFF:
                 if max(answer.count('\n'), expected.count('\n')) <= 40:
                     pretty_printers.display_side_by_side_color(answer, expected)
                 else:
                     pretty_printers.display_snipped_side_by_side_color(answer, expected)
+            elif display_mode == DisplayMode.ALL:
+                logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_all(answer.encode()))
+                logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_all(expected.encode()))
             else:
                 assert False
     if match_result is None:
         if not silent:
             print_input()
-            logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10, bold=True))
+            logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10))
     if status == JudgeStatus.AC:
         logger.info(utils.SUCCESS + '' + utils.green('AC'))
 

@@ -26,34 +26,71 @@ class _PrettyToken(NamedTuple):
     value: str
 
 
+def _tokenize_line(line: str) -> List[_PrettyToken]:
+    body = line.rstrip()
+    newline = line[len(body):]
+    tokens = []
+
+    # add the body of line
+    if body:
+        l = 0
+        while l < len(body):
+            r = l + 1
+            while r < len(body) and (body[l] in ' \t') == (body[r] in ' \t'):
+                r += 1
+            if body[l] in ' \t':
+                typ = _PrettyTokenType.WHITESPACE
+            else:
+                typ = _PrettyTokenType.BODY
+            tokens.append(_PrettyToken(typ, body[l:r]))
+            l = r
+
+    # add newlines
+    if newline:
+        if newline in ('\n', '\r\n'):
+            tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
+        else:
+            whitespace = newline.rstrip('\n')
+            newline = newline[len(whitespace):]
+            if whitespace:
+                tokens.append(_PrettyToken(_PrettyTokenType.WHITESPACE, whitespace))
+            tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(trailing whitespace)'))
+            if newline:
+                tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
+
+    return tokens
+
+
+def _decode_with_recovery(content: bytes) -> Tuple[List[_PrettyToken], str]:
+    tokens = []
+    try:
+        text = content.decode()
+    except UnicodeDecodeError as e:
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, str(e)))
+        text = content.decode(errors='replace')
+    return tokens, text
+
+
+def _warn_if_empty(tokens: List[_PrettyToken]) -> List[_PrettyToken]:
+    if not tokens:
+        return [_PrettyToken(_PrettyTokenType.HINT, '(empty)')]
+    if tokens[-1][0] == _PrettyTokenType.BODY:
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(no trailing newline)'))
+    if all(token.type == _PrettyTokenType.NEWLINE for token in tokens):
+        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(only newline)'))
+    return tokens
+
+
 def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail: int, char_in_line: int) -> List[_PrettyToken]:
     """`_tokenize_large_file_content` constructs the intermediate representations. They have no color infomation.
     """
 
     assert head + tail < limit
 
-    def from_line(line: str) -> List[_PrettyToken]:
-        body = line.rstrip()
-        newline = line[len(body):]
-        tokens = []
-        tokens.append(_PrettyToken(_PrettyTokenType.BODY, body))
-        if newline:
-            if newline in ('\n', '\r\n'):
-                tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
-            else:
-                whitespace = newline.rstrip('\n')
-                newline = newline[len(whitespace):]
-                if whitespace:
-                    tokens.append(_PrettyToken(_PrettyTokenType.WHITESPACE, whitespace))
-                tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(trailing whitespace)'))
-                if newline:
-                    tokens.append(_PrettyToken(_PrettyTokenType.NEWLINE, newline))
-        return tokens
-
     def candidate_do_nothing(text: str) -> List[_PrettyToken]:
         tokens = []
         for line in text.splitlines(keepends=True):
-            tokens += from_line(line)
+            tokens += _tokenize_line(line)
         return tokens
 
     def candidate_line_based(text: str) -> List[_PrettyToken]:
@@ -63,10 +100,10 @@ def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail:
 
         tokens = []
         for line in lines[:head]:
-            tokens += from_line(line)
+            tokens += _tokenize_line(line)
         tokens.append(_PrettyToken(_PrettyTokenType.HINT, '... ({} lines) ...\n'.format(len(lines[head:-tail]))))
         for line in lines[-tail:]:
-            tokens += from_line(line)
+            tokens += _tokenize_line(line)
         return tokens
 
     def candidate_char_based(text: str) -> List[_PrettyToken]:
@@ -77,10 +114,10 @@ def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail:
         r = len(text) - char_in_line * tail
         tokens = []
         for line in text[:l].splitlines(keepends=True):
-            tokens += from_line(line)
+            tokens += _tokenize_line(line)
         tokens.append(_PrettyToken(_PrettyTokenType.HINT, '... ({} chars) ...'.format(r - l)))
         for line in text[r:].splitlines(keepends=True):
-            tokens += from_line(line)
+            tokens += _tokenize_line(line)
         return tokens
 
     def count_size(tokens: Iterable[_PrettyToken]) -> int:
@@ -89,35 +126,27 @@ def _tokenize_large_file_content(*, content: bytes, limit: int, head: int, tail:
             size += len(s)
         return size
 
-    if not content:
-        return [_PrettyToken(_PrettyTokenType.HINT, '(empty)')]
-
-    tokens = []
-    try:
-        text = content.decode()
-    except UnicodeDecodeError as e:
-        tokens.append(_PrettyToken(_PrettyTokenType.HINT, str(e)))
-        text = content.decode(errors='replace')
-
-    candidates: List[List[_PrettyToken]] = [
-        candidate_do_nothing(text),
-        candidate_line_based(text),
-        candidate_char_based(text),
-    ]
-    tokens.extend(min(candidates, key=count_size))
-
-    assert len(tokens) >= 1
-    if tokens[-1][0] == _PrettyTokenType.BODY:
-        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(no trailing newline)'))
-    if not text.rstrip('\n'):
-        tokens.append(_PrettyToken(_PrettyTokenType.HINT, '(only newline)'))
-
+    # Choose the shortest one from the three candidates.
+    tokens, text = _decode_with_recovery(content)
+    if text:
+        candidates: List[List[_PrettyToken]] = [
+            candidate_do_nothing(text),
+            candidate_line_based(text),
+            candidate_char_based(text),
+        ]
+        tokens.extend(min(candidates, key=count_size))
+    tokens = _warn_if_empty(tokens)
     return tokens
 
 
-def _render_tokens_for_large_file_content(*, tokens: List[_PrettyToken], font_bold: Callable[[str], str], font_dim: Callable[[str], str]) -> str:
+def _render_tokens(*, tokens: List[_PrettyToken], font_bold: Optional[Callable[[str], str]] = None, font_dim: Optional[Callable[[str], str]] = None) -> str:
     """`_tokenize_large_file_content` generate the result string. It is colored.
     """
+
+    if font_bold is None:
+        font_bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
+    if font_dim is None:
+        font_dim = lambda s: colorama.Style.DIM + s + colorama.Style.RESET_ALL
 
     result = []
     for key, value in tokens:
@@ -135,17 +164,24 @@ def _render_tokens_for_large_file_content(*, tokens: List[_PrettyToken], font_bo
     return ''.join(result)
 
 
-def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int, bold: bool = False) -> str:
+def make_pretty_large_file_content(content: bytes, limit: int, head: int, tail: int) -> str:
     char_in_line, _ = shutil.get_terminal_size()
     char_in_line = max(char_in_line, 40)  # shutil.get_terminal_size() may return too small values (e.g. (0, 0) on Circle CI) successfully (i.e. fallback is not used). see https://github.com/kmyk/online-judge-tools/pull/611
     tokens = _tokenize_large_file_content(content=content, limit=limit, head=head, tail=tail, char_in_line=char_in_line)
+    return _render_tokens(tokens=tokens)
 
-    if bold:
-        font_bold = lambda s: colorama.Style.BRIGHT + s + colorama.Style.RESET_ALL
-    else:
-        font_bold = lambda s: s
-    font_dim = lambda s: colorama.Style.DIM + s + colorama.Style.RESET_ALL
-    return _render_tokens_for_large_file_content(tokens=tokens, font_bold=font_bold, font_dim=font_dim)
+
+def _tokenize_file_content_without_snipping(content: bytes) -> List[_PrettyToken]:
+    tokens, text = _decode_with_recovery(content)
+    for line in text.splitlines(keepends=True):
+        tokens += _tokenize_line(line)
+    tokens = _warn_if_empty(tokens)
+    return tokens
+
+
+def make_pretty_all(content: bytes) -> str:
+    tokens = _tokenize_file_content_without_snipping(content=content)
+    return _render_tokens(tokens=tokens)
 
 
 def _space_padding(s: str, max_length: int) -> str:

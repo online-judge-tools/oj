@@ -80,7 +80,7 @@ def run(args: argparse.Namespace) -> bool:
 
     # report code
     logger.info('code (%d byte):', len(code))
-    logger.info(utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(code, limit=30, head=10, tail=10, bold=True))
+    logger.info(utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(code, limit=30, head=10, tail=10))
 
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
         # check the login status
