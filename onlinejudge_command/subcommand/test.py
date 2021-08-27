@@ -17,6 +17,7 @@ import onlinejudge_command.format_utils as fmtutils
 import onlinejudge_command.output_comparators as output_comparators
 import onlinejudge_command.pretty_printers as pretty_printers
 import onlinejudge_command.utils as utils
+from onlinejudge_command.output_comparators import CompareMode
 
 logger = getLogger(__name__)
 
@@ -63,17 +64,37 @@ MEMORY_WARNING = 500  # megabyte
 MEMORY_PRINT = 100  # megabyte
 
 
-class CompareMode(enum.Enum):
-    EXACT_MATCH = 'exact-match'
-    CRLF_INSENSITIVE_EXACT_MATCH = 'crlf-insensitive-exact-match'
-    IGNORE_SPACES = 'ignore-spaces'
-    IGNORE_SPACES_AND_NEWLINES = 'ignore-spaces-and-newlines'
-
-
 class DisplayMode(enum.Enum):
     SUMMARY = 'summary'
     ALL = 'all'
     DIFF = 'diff'
+    DIFF_ALL = 'diff-all'
+
+
+class SpecialJudge:
+    def __init__(self, judge_command: str, *, is_silent: bool):
+        self.judge_command = judge_command  # already quoted and joined command
+        self.is_silent = is_silent
+
+    def run(self, *, actual_output: bytes, input_path: pathlib.Path, expected_output_path: Optional[pathlib.Path]) -> bool:
+        with tempfile.TemporaryDirectory() as tempdir:
+            actual_output_path = pathlib.Path(tempdir) / 'actual.out'
+            with open(actual_output_path, 'wb') as fh:
+                fh.write(actual_output)
+
+            # if you use shlex.quote, it fails on Windows. why?
+            command = ' '.join([
+                self.judge_command,  # already quoted and joined command
+                str(input_path.resolve()),
+                str(actual_output_path.resolve()),
+                str(expected_output_path.resolve() if expected_output_path is not None else ''),
+            ])
+
+            logger.info('$ %s', command)
+            info, proc = utils.exec_command(command)
+        if not self.is_silent:
+            logger.info(utils.NO_HEADER + 'judge\'s output:\n%s', pretty_printers.make_pretty_large_file_content(info['answer'] or b'', limit=40, head=20, tail=10))
+        return proc.returncode == 0
 
 
 def build_match_function(*, compare_mode: CompareMode, error: Optional[float], judge_command: Optional[str], silent: bool, test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path]) -> Callable[[bytes, bytes], bool]:
@@ -83,7 +104,7 @@ def build_match_function(*, compare_mode: CompareMode, error: Optional[float], j
     """
 
     if judge_command is not None:
-        special_judge = output_comparators.SpecialJudge(judge_command=judge_command, is_silent=silent)
+        special_judge = SpecialJudge(judge_command=judge_command, is_silent=silent)
 
         def run_judge_command(actual: bytes, expected: bytes) -> bool:
             # the second argument is ignored
@@ -152,7 +173,7 @@ class JudgeStatus(enum.Enum):
     MLE = 'MLE'
 
 
-def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], display_mode: DisplayMode, does_print_input: bool, silent: bool, match_result: Optional[bool]) -> JudgeStatus:
+def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float], test_input_path: pathlib.Path, test_output_path: Optional[pathlib.Path], *, mle: Optional[float], display_mode: DisplayMode, compare_mode: CompareMode, does_print_input: bool, silent: bool, match_result: Optional[bool]) -> JudgeStatus:
     """display_result prints the result of the test and its statistics.
 
     This function prints many logs and does some I/O.
@@ -201,14 +222,13 @@ def display_result(proc: subprocess.Popen, answer: str, memory: Optional[float],
             if display_mode == DisplayMode.SUMMARY:
                 logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10))
                 logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_large_file_content(expected.encode(), limit=40, head=20, tail=10))
-            elif display_mode == DisplayMode.DIFF:
-                if max(answer.count('\n'), expected.count('\n')) <= 40:
-                    pretty_printers.display_side_by_side_color(answer, expected)
-                else:
-                    pretty_printers.display_snipped_side_by_side_color(answer, expected)
             elif display_mode == DisplayMode.ALL:
                 logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_all(answer.encode()))
                 logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_all(expected.encode()))
+            elif display_mode == DisplayMode.DIFF:
+                logger.info(utils.NO_HEADER + pretty_printers.make_pretty_diff(answer.encode(), expected=expected, compare_mode=compare_mode, limit=40))
+            elif display_mode == DisplayMode.DIFF_ALL:
+                logger.info(utils.NO_HEADER + pretty_printers.make_pretty_diff(answer.encode(), expected=expected, compare_mode=compare_mode, limit=-1))
             else:
                 assert False
     if match_result is None:
@@ -253,7 +273,7 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
 
         match_function = build_match_function(compare_mode=CompareMode(args.compare_mode), error=args.error, judge_command=args.judge, silent=args.silent, test_input_path=test_input_path, test_output_path=test_output_path)
         match_result = run_checking_output(answer=answer.encode(), test_output_path=test_output_path, is_special_judge=args.judge is not None, match_function=match_function)
-        status = display_result(proc, answer, memory, test_input_path, test_output_path, mle=args.mle, display_mode=DisplayMode(args.display_mode), does_print_input=args.print_input, silent=args.silent, match_result=match_result)
+        status = display_result(proc, answer, memory, test_input_path, test_output_path, mle=args.mle, display_mode=DisplayMode(args.display_mode), compare_mode=CompareMode(args.compare_mode), does_print_input=args.print_input, silent=args.silent, match_result=match_result)
 
     # return the result
     testcase = {
