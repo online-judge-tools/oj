@@ -259,12 +259,12 @@ class MakeDiffBetweenFileAndFileTest(unittest.TestCase):
             _LineDiffOp(lineno=1, left=[
                 _PrettyToken(_PrettyTokenType.BODY, '4'),
                 _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
-                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, '-1'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_LEFT, '-1'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ], right=[
                 _PrettyToken(_PrettyTokenType.BODY, '4'),
                 _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
-                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, '5'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, '5'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ]),
         ]
@@ -290,18 +290,18 @@ class MakeDiffBetweenFileAndFileTest(unittest.TestCase):
                 _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
             ], right=[
                 _PrettyToken(type=_PrettyTokenType.BODY, value='1 '),
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='2 '),
+                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, value='2 '),
                 _PrettyToken(type=_PrettyTokenType.BODY, value='3'),
                 _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
             ]),
             _LineDiffOp(lineno=2, left=[
                 _PrettyToken(type=_PrettyTokenType.BODY, value='he'),
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value=' '),
+                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT_LEFT, value=' '),
                 _PrettyToken(type=_PrettyTokenType.BODY, value='llo word'),
                 _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
             ], right=[
                 _PrettyToken(type=_PrettyTokenType.BODY, value='hello wor'),
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='l'),
+                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, value='l'),
                 _PrettyToken(type=_PrettyTokenType.BODY, value='d'),
                 _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
             ]),
@@ -331,15 +331,15 @@ class MakeDiffBetweenFileAndFileTest(unittest.TestCase):
         compare_mode = CompareMode.CRLF_INSENSITIVE_EXACT_MATCH
         expected = [
             _LineDiffOp(lineno=1, left=None, right=[
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='bar'),
+                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, value='bar'),
                 _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
             ]),
             _LineDiffOp(lineno=4, left=[
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='hey'),
+                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT_LEFT, value='hey'),
                 _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
             ], right=None),
             _LineDiffOp(lineno=6, left=None, right=[
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='wow'),
+                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, value='wow'),
                 _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
             ]),
         ]
