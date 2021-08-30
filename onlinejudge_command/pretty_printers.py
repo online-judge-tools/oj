@@ -13,7 +13,8 @@ logger = getLogger(__name__)
 
 class _PrettyTokenType(enum.Enum):
     BODY = 'BODY'
-    BODY_HIGHLIGHT = 'BODY_HIGHLIGHT'
+    BODY_HIGHLIGHT_LEFT = 'BODY_HIGHLIGHT_LEFT'
+    BODY_HIGHLIGHT_RIGHT = 'BODY_HIGHLIGHT_RIGHT'
     WHITESPACE = 'WHITESPACE'
     NEWLINE = 'NEWLINE'
     HINT = 'HINT'
@@ -36,6 +37,22 @@ def _optimize_tokens(tokens: List[_PrettyToken]) -> List[_PrettyToken]:
     return optimized
 
 
+def _tokenize_str(s: str) -> List[_PrettyToken]:
+    tokens = []
+    l = 0
+    while l < len(s):
+        r = l + 1
+        while r < len(s) and (s[l] in ' \t') == (s[r] in ' \t'):
+            r += 1
+        if s[l] in ' \t':
+            typ = _PrettyTokenType.WHITESPACE
+        else:
+            typ = _PrettyTokenType.BODY
+        tokens.append(_PrettyToken(typ, s[l:r]))
+        l = r
+    return tokens
+
+
 def _tokenize_line(line: str) -> List[_PrettyToken]:
     body = line.rstrip()
     newline = line[len(body):]
@@ -43,17 +60,7 @@ def _tokenize_line(line: str) -> List[_PrettyToken]:
 
     # add the body of line
     if body:
-        l = 0
-        while l < len(body):
-            r = l + 1
-            while r < len(body) and (body[l] in ' \t') == (body[r] in ' \t'):
-                r += 1
-            if body[l] in ' \t':
-                typ = _PrettyTokenType.WHITESPACE
-            else:
-                typ = _PrettyTokenType.BODY
-            tokens.append(_PrettyToken(typ, body[l:r]))
-            l = r
+        tokens += _tokenize_str(body)
 
     # add newlines
     if newline:
@@ -172,7 +179,7 @@ def _render_tokens(
     if font_red is None:
         font_red = lambda s: colorama.Fore.RED + s + colorama.Style.RESET_ALL
     if font_blue is None:
-        font_blue = lambda s: colorama.Fore.BLUE + s + colorama.Style.RESET_ALL
+        font_blue = lambda s: colorama.Fore.CYAN + s + colorama.Style.RESET_ALL
     if font_normal is None:
         font_normal = lambda s: s
 
@@ -180,8 +187,9 @@ def _render_tokens(
     for key, value in tokens:
         if key == _PrettyTokenType.BODY:
             value = font_bold(value)
-        elif key == _PrettyTokenType.BODY_HIGHLIGHT:
-            assert font_red is not None
+        elif key == _PrettyTokenType.BODY_HIGHLIGHT_LEFT:
+            value = font_red(value)
+        elif key == _PrettyTokenType.BODY_HIGHLIGHT_RIGHT:
             value = font_red(value)
         elif key == _PrettyTokenType.WHITESPACE:
             value = font_dim(_replace_whitespace(value))
@@ -272,8 +280,8 @@ def _make_diff_between_line_and_line_by_comparing_word_by_word(a: str, b: str) -
             tokens_a.append(_PrettyToken(_PrettyTokenType.BODY, word_a))
             tokens_b.append(_PrettyToken(_PrettyTokenType.BODY, word_b))
         else:
-            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, word_a))
-            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, word_b))
+            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_LEFT, word_a))
+            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, word_b))
 
         l_a = r_a
         l_b = r_b
@@ -281,6 +289,17 @@ def _make_diff_between_line_and_line_by_comparing_word_by_word(a: str, b: str) -
 
     assert l_a == len(a) and l_b == len(b)  # The two strings have the same number of words, so this must be true.
     return tokens_a, tokens_b
+
+
+def _tokenize_str_with_highlight(s: str, *, is_right: bool) -> List[_PrettyToken]:
+    tokens: List[_PrettyToken] = []
+    for token in _tokenize_str(s):
+        if token.type == _PrettyTokenType.BODY:
+            typ = _PrettyTokenType.BODY_HIGHLIGHT_RIGHT if is_right else _PrettyTokenType.BODY_HIGHLIGHT_LEFT
+            tokens.append(_PrettyToken(typ, token.value))
+        else:
+            tokens.append(token)
+    return tokens
 
 
 def _make_diff_between_line_and_line_by_difflib(a: str, b: str) -> Tuple[List[_PrettyToken], List[_PrettyToken]]:
@@ -292,17 +311,17 @@ def _make_diff_between_line_and_line_by_difflib(a: str, b: str) -> Tuple[List[_P
     matcher.set_seqs(a.rstrip('\n'), b.rstrip('\n'))
     for (tag, l_a, r_a, l_b, r_b) in matcher.get_opcodes():
         if tag == 'replace':
-            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, a[l_a:r_a]))
-            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, b[l_b:r_b]))
+            tokens_a.extend(_tokenize_str_with_highlight(a[l_a:r_a], is_right=False))
+            tokens_b.extend(_tokenize_str_with_highlight(b[l_b:r_b], is_right=True))
         elif tag == 'delete':
             assert l_b == r_b
-            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, a[l_a:r_a]))
+            tokens_a.extend(_tokenize_str_with_highlight(a[l_a:r_a], is_right=False))
         elif tag == 'insert':
             assert l_a == r_a
-            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, b[l_b:r_b]))
+            tokens_b.extend(_tokenize_str_with_highlight(b[l_b:r_b], is_right=True))
         elif tag == 'equal':
-            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY, a[l_a:r_a]))
-            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY, b[l_b:r_b]))
+            tokens_a.extend(_tokenize_str(a[l_a:r_a]))
+            tokens_b.extend(_tokenize_str(b[l_b:r_b]))
         else:
             assert False
 
@@ -359,11 +378,12 @@ def _make_diff_between_file_and_file_by_comparing_line_by_line(a: str, b: str, *
     return ops
 
 
-def _tokenize_line_with_highlight(line: str) -> List[_PrettyToken]:
+def _tokenize_line_with_highlight(line: str, *, is_right: bool) -> List[_PrettyToken]:
     tokens: List[_PrettyToken] = []
     for token in _tokenize_line(line):
         if token.type == _PrettyTokenType.BODY:
-            tokens.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, token.value))
+            typ = _PrettyTokenType.BODY_HIGHLIGHT_RIGHT if is_right else _PrettyTokenType.BODY_HIGHLIGHT_LEFT
+            tokens.append(_PrettyToken(typ, token.value))
         else:
             tokens.append(token)
     return tokens
@@ -381,39 +401,39 @@ def _make_diff_between_file_and_file_by_difflib(a: str, b: str) -> List[_LineDif
     for (tag, l_a, r_a, l_b, r_b) in matcher.get_opcodes():
         if tag == 'replace':
             while l_a < r_a and l_a < l_b:
-                tokens = _tokenize_line_with_highlight(lines_a[l_a])
+                tokens = _tokenize_line_with_highlight(lines_a[l_a], is_right=False)
                 ops.append(_LineDiffOp(l_a, tokens, None))
                 l_a += 1
             while l_b < r_b and l_b < l_a:
-                tokens = _tokenize_line_with_highlight(lines_b[l_b])
+                tokens = _tokenize_line_with_highlight(lines_b[l_b], is_right=True)
                 ops.append(_LineDiffOp(l_b, None, tokens))
                 l_b += 1
             while l_a < r_a and l_b < r_b:
                 assert l_a == l_b
-                tokens_a = _tokenize_line_with_highlight(lines_a[l_a])
-                tokens_b = _tokenize_line_with_highlight(lines_b[l_b])
+                tokens_a = _tokenize_line_with_highlight(lines_a[l_a], is_right=False)
+                tokens_b = _tokenize_line_with_highlight(lines_b[l_b], is_right=True)
                 ops.append(_LineDiffOp(l_a, tokens_a, tokens_b))
                 l_a += 1
                 l_b += 1
             while l_a < r_a:
-                tokens = _tokenize_line_with_highlight(lines_a[l_a])
+                tokens = _tokenize_line_with_highlight(lines_a[l_a], is_right=False)
                 ops.append(_LineDiffOp(l_a, tokens, None))
                 l_a += 1
             while l_b < r_b:
-                tokens = _tokenize_line_with_highlight(lines_b[l_b])
+                tokens = _tokenize_line_with_highlight(lines_b[l_b], is_right=True)
                 ops.append(_LineDiffOp(l_b, None, tokens))
                 l_b += 1
 
         elif tag == 'delete':
             assert l_b == r_b
             for i in range(l_a, r_a):
-                tokens = _tokenize_line_with_highlight(lines_a[i])
+                tokens = _tokenize_line_with_highlight(lines_a[i], is_right=False)
                 ops.append(_LineDiffOp(i, tokens, None))
 
         elif tag == 'insert':
             assert l_a == r_a
             for i in range(l_b, r_b):
-                tokens = _tokenize_line_with_highlight(lines_b[i])
+                tokens = _tokenize_line_with_highlight(lines_b[i], is_right=True)
                 ops.append(_LineDiffOp(i, None, tokens))
 
         elif tag == 'equal':

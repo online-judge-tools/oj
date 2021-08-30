@@ -259,12 +259,12 @@ class MakeDiffBetweenFileAndFileTest(unittest.TestCase):
             _LineDiffOp(lineno=1, left=[
                 _PrettyToken(_PrettyTokenType.BODY, '4'),
                 _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
-                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, '-1'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_LEFT, '-1'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ], right=[
                 _PrettyToken(_PrettyTokenType.BODY, '4'),
                 _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
-                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT, '5'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, '5'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ]),
         ]
@@ -286,24 +286,32 @@ class MakeDiffBetweenFileAndFileTest(unittest.TestCase):
         compare_mode = CompareMode.CRLF_INSENSITIVE_EXACT_MATCH
         expected = [
             _LineDiffOp(lineno=0, left=[
-                _PrettyToken(type=_PrettyTokenType.BODY, value='1 3'),
-                _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
+                _PrettyToken(_PrettyTokenType.BODY, '1'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, '3'),
+                _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ], right=[
-                _PrettyToken(type=_PrettyTokenType.BODY, value='1 '),
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='2 '),
-                _PrettyToken(type=_PrettyTokenType.BODY, value='3'),
-                _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
+                _PrettyToken(_PrettyTokenType.BODY, '1'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, '2'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, '3'),
+                _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ]),
             _LineDiffOp(lineno=2, left=[
-                _PrettyToken(type=_PrettyTokenType.BODY, value='he'),
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value=' '),
-                _PrettyToken(type=_PrettyTokenType.BODY, value='llo word'),
-                _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
+                _PrettyToken(_PrettyTokenType.BODY, 'he'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, 'llo'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, 'word'),
+                _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ], right=[
-                _PrettyToken(type=_PrettyTokenType.BODY, value='hello wor'),
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='l'),
-                _PrettyToken(type=_PrettyTokenType.BODY, value='d'),
-                _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
+                _PrettyToken(_PrettyTokenType.BODY, 'hello'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, 'wor'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, 'l'),
+                _PrettyToken(_PrettyTokenType.BODY, 'd'),
+                _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ]),
         ]
 
@@ -331,16 +339,16 @@ class MakeDiffBetweenFileAndFileTest(unittest.TestCase):
         compare_mode = CompareMode.CRLF_INSENSITIVE_EXACT_MATCH
         expected = [
             _LineDiffOp(lineno=1, left=None, right=[
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='bar'),
-                _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, 'bar'),
+                _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ]),
             _LineDiffOp(lineno=4, left=[
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='hey'),
-                _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_LEFT, 'hey'),
+                _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ], right=None),
             _LineDiffOp(lineno=6, left=None, right=[
-                _PrettyToken(type=_PrettyTokenType.BODY_HIGHLIGHT, value='wow'),
-                _PrettyToken(type=_PrettyTokenType.NEWLINE, value='\n'),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, 'wow'),
+                _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ]),
         ]
 
@@ -364,16 +372,16 @@ class MakePrettyDiffTest(unittest.TestCase):
         char_in_line = 40
         limit = 40
         expected = textwrap.dedent("""\
-            output:             expected:<dim>
-            </dim><blue>1</blue>| <bold>1</bold><dim>_</dim><bold>2</bold><dim>_</dim><bold>3</bold><dim></dim>            <blue>1</blue>| <bold>1</bold><dim>_</dim><bold>2</bold><dim>_</dim><bold>3</bold><dim>
-            </dim><blue>2</blue>| <bold>4</bold><dim>_</dim><red>-1</red><dim></dim>             <blue>2</blue>| <bold>4</bold><dim>_</dim><red>5</red><dim>
-            </dim><blue>3</blue>| <bold>6</bold><dim></dim>                <blue>3</blue>| <bold>6</bold><dim>
-            </dim>""")
+            output:             expected:
+            1| 1_2_3            1| 1_2_3
+            2| 4_-1             2| 4_5
+            3| 6                3| 6
+            """)
 
-        font_dim = lambda s: '<dim>' + s + '</dim>'
-        font_bold = lambda s: '<bold>' + s + '</bold>'
-        font_red = lambda s: '<red>' + s + '</red>'
-        font_blue = lambda s: '<blue>' + s + '</blue>'
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
         tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
         actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
         self.assertEqual(actual, expected)
@@ -393,16 +401,16 @@ class MakePrettyDiffTest(unittest.TestCase):
         char_in_line = 40
         limit = 40
         expected = textwrap.dedent("""\
-            output:             expected:<dim>
-            </dim><blue>1</blue>| <bold>1 3</bold><dim></dim>              <blue>1</blue>| <bold>1 </bold><red>2 </red><bold>3</bold><dim>
-            </dim><blue>2</blue>| <bold>wow</bold><dim></dim>              <blue>2</blue>| <bold>wow</bold><dim>
-            </dim><blue>3</blue>| <bold>he</bold><red> </red><bold>llo word</bold><dim></dim>      <blue>3</blue>| <bold>hello wor</bold><red>l</red><bold>d</bold><dim>
-            </dim>""")
+            output:             expected:
+            1| 1_3              1| 1_2_3
+            2| wow              2| wow
+            3| he_llo_word      3| hello_world
+            """)
 
-        font_dim = lambda s: '<dim>' + s + '</dim>'
-        font_bold = lambda s: '<bold>' + s + '</bold>'
-        font_red = lambda s: '<red>' + s + '</red>'
-        font_blue = lambda s: '<blue>' + s + '</blue>'
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
         tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
         actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
         self.assertEqual(actual, expected)
@@ -429,21 +437,21 @@ class MakePrettyDiffTest(unittest.TestCase):
         char_in_line = 40
         limit = 40
         expected = textwrap.dedent("""\
-            output:             expected:<dim>
-            </dim><blue>1</blue>| <bold>foo</bold><dim></dim>              <blue>1</blue>| <bold>foo</bold><dim>
-            </dim>                    <blue>2</blue>| <red>bar</red><dim>
-            </dim><blue>2</blue>| <bold>baz</bold><dim></dim>              <blue>3</blue>| <bold>baz</bold><dim>
-            </dim><blue>3</blue>| <bold>hello</bold><dim></dim>            <blue>4</blue>| <bold>hello</bold><dim>
-            </dim><blue>4</blue>| <bold>world</bold><dim></dim>            <blue>5</blue>| <bold>world</bold><dim>
-            </dim><blue>5</blue>| <red>hey</red><dim></dim>              
-            <blue>6</blue>| <bold>wow</bold><dim></dim>              <blue>6</blue>| <bold>wow</bold><dim>
-            </dim>                    <blue>7</blue>| <red>wow</red><dim>
-            </dim>""")
+            output:             expected:
+            1| foo              1| foo
+                                2| bar
+            2| baz              3| baz
+            3| hello            4| hello
+            4| world            5| world
+            5| hey              
+            6| wow              6| wow
+                                7| wow
+            """)
 
-        font_dim = lambda s: '<dim>' + s + '</dim>'
-        font_bold = lambda s: '<bold>' + s + '</bold>'
-        font_red = lambda s: '<red>' + s + '</red>'
-        font_blue = lambda s: '<blue>' + s + '</blue>'
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
         tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
         actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
         self.assertEqual(actual, expected)
