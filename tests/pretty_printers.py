@@ -364,16 +364,16 @@ class MakePrettyDiffTest(unittest.TestCase):
         char_in_line = 40
         limit = 40
         expected = textwrap.dedent("""\
-            output:             expected:<dim>
-            </dim><blue>1</blue>| <bold>1</bold><dim>_</dim><bold>2</bold><dim>_</dim><bold>3</bold><dim></dim>            <blue>1</blue>| <bold>1</bold><dim>_</dim><bold>2</bold><dim>_</dim><bold>3</bold><dim>
-            </dim><blue>2</blue>| <bold>4</bold><dim>_</dim><red>-1</red><dim></dim>             <blue>2</blue>| <bold>4</bold><dim>_</dim><red>5</red><dim>
-            </dim><blue>3</blue>| <bold>6</bold><dim></dim>                <blue>3</blue>| <bold>6</bold><dim>
-            </dim>""")
+            output:             expected:
+            1| 1_2_3            1| 1_2_3
+            2| 4_-1             2| 4_5
+            3| 6                3| 6
+            """)
 
-        font_dim = lambda s: '<dim>' + s + '</dim>'
-        font_bold = lambda s: '<bold>' + s + '</bold>'
-        font_red = lambda s: '<red>' + s + '</red>'
-        font_blue = lambda s: '<blue>' + s + '</blue>'
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
         tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
         actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
         self.assertEqual(actual, expected)
@@ -393,16 +393,16 @@ class MakePrettyDiffTest(unittest.TestCase):
         char_in_line = 40
         limit = 40
         expected = textwrap.dedent("""\
-            output:             expected:<dim>
-            </dim><blue>1</blue>| <bold>1 3</bold><dim></dim>              <blue>1</blue>| <bold>1 </bold><red>2 </red><bold>3</bold><dim>
-            </dim><blue>2</blue>| <bold>wow</bold><dim></dim>              <blue>2</blue>| <bold>wow</bold><dim>
-            </dim><blue>3</blue>| <bold>he</bold><red> </red><bold>llo word</bold><dim></dim>      <blue>3</blue>| <bold>hello wor</bold><red>l</red><bold>d</bold><dim>
-            </dim>""")
+            output:             expected:
+            1| 1 3              1| 1 2 3
+            2| wow              2| wow
+            3| he llo word      3| hello world
+            """)
 
-        font_dim = lambda s: '<dim>' + s + '</dim>'
-        font_bold = lambda s: '<bold>' + s + '</bold>'
-        font_red = lambda s: '<red>' + s + '</red>'
-        font_blue = lambda s: '<blue>' + s + '</blue>'
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
         tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
         actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
         self.assertEqual(actual, expected)
@@ -429,21 +429,21 @@ class MakePrettyDiffTest(unittest.TestCase):
         char_in_line = 40
         limit = 40
         expected = textwrap.dedent("""\
-            output:             expected:<dim>
-            </dim><blue>1</blue>| <bold>foo</bold><dim></dim>              <blue>1</blue>| <bold>foo</bold><dim>
-            </dim>                    <blue>2</blue>| <red>bar</red><dim>
-            </dim><blue>2</blue>| <bold>baz</bold><dim></dim>              <blue>3</blue>| <bold>baz</bold><dim>
-            </dim><blue>3</blue>| <bold>hello</bold><dim></dim>            <blue>4</blue>| <bold>hello</bold><dim>
-            </dim><blue>4</blue>| <bold>world</bold><dim></dim>            <blue>5</blue>| <bold>world</bold><dim>
-            </dim><blue>5</blue>| <red>hey</red><dim></dim>              
-            <blue>6</blue>| <bold>wow</bold><dim></dim>              <blue>6</blue>| <bold>wow</bold><dim>
-            </dim>                    <blue>7</blue>| <red>wow</red><dim>
-            </dim>""")
+            output:             expected:
+            1| foo              1| foo
+                                2| bar
+            2| baz              3| baz
+            3| hello            4| hello
+            4| world            5| world
+            5| hey              
+            6| wow              6| wow
+                                7| wow
+            """)
 
-        font_dim = lambda s: '<dim>' + s + '</dim>'
-        font_bold = lambda s: '<bold>' + s + '</bold>'
-        font_red = lambda s: '<red>' + s + '</red>'
-        font_blue = lambda s: '<blue>' + s + '</blue>'
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
         tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
         actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
         self.assertEqual(actual, expected)
