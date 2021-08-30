@@ -286,21 +286,29 @@ class MakeDiffBetweenFileAndFileTest(unittest.TestCase):
         compare_mode = CompareMode.CRLF_INSENSITIVE_EXACT_MATCH
         expected = [
             _LineDiffOp(lineno=0, left=[
-                _PrettyToken(_PrettyTokenType.BODY, '1 3'),
+                _PrettyToken(_PrettyTokenType.BODY, '1'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, '3'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ], right=[
-                _PrettyToken(_PrettyTokenType.BODY, '1 '),
-                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, '2 '),
+                _PrettyToken(_PrettyTokenType.BODY, '1'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, '2'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
                 _PrettyToken(_PrettyTokenType.BODY, '3'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ]),
             _LineDiffOp(lineno=2, left=[
                 _PrettyToken(_PrettyTokenType.BODY, 'he'),
-                _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_LEFT, ' '),
-                _PrettyToken(_PrettyTokenType.BODY, 'llo word'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, 'llo'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, 'word'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
             ], right=[
-                _PrettyToken(_PrettyTokenType.BODY, 'hello wor'),
+                _PrettyToken(_PrettyTokenType.BODY, 'hello'),
+                _PrettyToken(_PrettyTokenType.WHITESPACE, ' '),
+                _PrettyToken(_PrettyTokenType.BODY, 'wor'),
                 _PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, 'l'),
                 _PrettyToken(_PrettyTokenType.BODY, 'd'),
                 _PrettyToken(_PrettyTokenType.NEWLINE, '\n'),
@@ -394,9 +402,9 @@ class MakePrettyDiffTest(unittest.TestCase):
         limit = 40
         expected = textwrap.dedent("""\
             output:             expected:
-            1| 1 3              1| 1 2 3
+            1| 1_3              1| 1_2_3
             2| wow              2| wow
-            3| he llo word      3| hello world
+            3| he_llo_word      3| hello_world
             """)
 
         font_dim = lambda s: s

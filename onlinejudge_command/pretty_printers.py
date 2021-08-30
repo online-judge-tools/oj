@@ -37,6 +37,22 @@ def _optimize_tokens(tokens: List[_PrettyToken]) -> List[_PrettyToken]:
     return optimized
 
 
+def _tokenize_str(s: str) -> List[_PrettyToken]:
+    tokens = []
+    l = 0
+    while l < len(s):
+        r = l + 1
+        while r < len(s) and (s[l] in ' \t') == (s[r] in ' \t'):
+            r += 1
+        if s[l] in ' \t':
+            typ = _PrettyTokenType.WHITESPACE
+        else:
+            typ = _PrettyTokenType.BODY
+        tokens.append(_PrettyToken(typ, s[l:r]))
+        l = r
+    return tokens
+
+
 def _tokenize_line(line: str) -> List[_PrettyToken]:
     body = line.rstrip()
     newline = line[len(body):]
@@ -44,17 +60,7 @@ def _tokenize_line(line: str) -> List[_PrettyToken]:
 
     # add the body of line
     if body:
-        l = 0
-        while l < len(body):
-            r = l + 1
-            while r < len(body) and (body[l] in ' \t') == (body[r] in ' \t'):
-                r += 1
-            if body[l] in ' \t':
-                typ = _PrettyTokenType.WHITESPACE
-            else:
-                typ = _PrettyTokenType.BODY
-            tokens.append(_PrettyToken(typ, body[l:r]))
-            l = r
+        tokens += _tokenize_str(body)
 
     # add newlines
     if newline:
@@ -160,7 +166,6 @@ def _render_tokens(
     font_bold: Optional[Callable[[str], str]] = None,
     font_dim: Optional[Callable[[str], str]] = None,
     font_red: Optional[Callable[[str], str]] = None,
-    font_green: Optional[Callable[[str], str]] = None,
     font_blue: Optional[Callable[[str], str]] = None,
     font_normal: Optional[Callable[[str], str]] = None,
 ) -> str:
@@ -286,6 +291,17 @@ def _make_diff_between_line_and_line_by_comparing_word_by_word(a: str, b: str) -
     return tokens_a, tokens_b
 
 
+def _tokenize_str_with_highlight(s: str, *, is_right: bool) -> List[_PrettyToken]:
+    tokens: List[_PrettyToken] = []
+    for token in _tokenize_str(s):
+        if token.type == _PrettyTokenType.BODY:
+            typ = _PrettyTokenType.BODY_HIGHLIGHT_RIGHT if is_right else _PrettyTokenType.BODY_HIGHLIGHT_LEFT
+            tokens.append(_PrettyToken(typ, token.value))
+        else:
+            tokens.append(token)
+    return tokens
+
+
 def _make_diff_between_line_and_line_by_difflib(a: str, b: str) -> Tuple[List[_PrettyToken], List[_PrettyToken]]:
     tokens_a = []
     tokens_b = []
@@ -295,17 +311,17 @@ def _make_diff_between_line_and_line_by_difflib(a: str, b: str) -> Tuple[List[_P
     matcher.set_seqs(a.rstrip('\n'), b.rstrip('\n'))
     for (tag, l_a, r_a, l_b, r_b) in matcher.get_opcodes():
         if tag == 'replace':
-            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_LEFT, a[l_a:r_a]))
-            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, b[l_b:r_b]))
+            tokens_a.extend(_tokenize_str_with_highlight(a[l_a:r_a], is_right=False))
+            tokens_b.extend(_tokenize_str_with_highlight(b[l_b:r_b], is_right=True))
         elif tag == 'delete':
             assert l_b == r_b
-            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_LEFT, a[l_a:r_a]))
+            tokens_a.extend(_tokenize_str_with_highlight(a[l_a:r_a], is_right=False))
         elif tag == 'insert':
             assert l_a == r_a
-            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY_HIGHLIGHT_RIGHT, b[l_b:r_b]))
+            tokens_b.extend(_tokenize_str_with_highlight(b[l_b:r_b], is_right=True))
         elif tag == 'equal':
-            tokens_a.append(_PrettyToken(_PrettyTokenType.BODY, a[l_a:r_a]))
-            tokens_b.append(_PrettyToken(_PrettyTokenType.BODY, b[l_b:r_b]))
+            tokens_a.extend(_tokenize_str(a[l_a:r_a]))
+            tokens_b.extend(_tokenize_str(b[l_b:r_b]))
         else:
             assert False
 
