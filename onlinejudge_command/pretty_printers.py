@@ -270,7 +270,7 @@ def _make_diff_between_line_and_line_by_comparing_word_by_word(a: str, b: str) -
         r_b = l_b + 1
         while r_a < len(a) and a[r_a] not in ' \t\r\n':
             r_a += 1
-        while r_b < len(a) and b[r_b] not in ' \t\r\n':
+        while r_b < len(b) and b[r_b] not in ' \t\r\n':
             r_b += 1
         word_a = a[l_a:r_a]
         word_b = b[l_b:r_b]

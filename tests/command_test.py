@@ -487,15 +487,15 @@ class TestTest(unittest.TestCase):
                 },
                 {
                     'path': 'test/sample-2.in',
-                    'data': 'bar\nfoobar\n'
+                    'data': 'bar baz\nfoo bar\n'
                 },
                 {
                     'path': 'test/sample-2.out',
-                    'data': 'bar\nbarbar\n'
+                    'data': 'hello world\nhello world\n'
                 },
                 {
                     'path': 'test/sample-3.in',
-                    'data': 'bar\nfoobar\n'
+                    'data': 'bar\nfoo\n'
                 },
                 {
                     'path': 'test/sample-3.out',
@@ -526,7 +526,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-2.in',
                     'output': '%s/test/sample-2.out',
                 },
-                'output': 'bar\nfoobar\n',
+                'output': 'bar baz\nfoo bar\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -535,7 +535,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-3.in',
                     'output': '%s/test/sample-3.out',
                 },
-                'output': 'bar\nfoobar\n',
+                'output': 'bar\nfoo\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
