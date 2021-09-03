@@ -3,7 +3,6 @@ import os
 import pathlib
 import platform
 import random
-import shutil
 import signal
 import sys
 import tempfile
@@ -487,15 +486,15 @@ class TestTest(unittest.TestCase):
                 },
                 {
                     'path': 'test/sample-2.in',
-                    'data': 'bar\nfoobar\n'
+                    'data': 'bar baz\nfoo bar\n'
                 },
                 {
                     'path': 'test/sample-2.out',
-                    'data': 'bar\nbarbar\n'
+                    'data': 'hello world\nhello world\n'
                 },
                 {
                     'path': 'test/sample-3.in',
-                    'data': 'bar\nfoobar\n'
+                    'data': 'bar\nfoo\n'
                 },
                 {
                     'path': 'test/sample-3.out',
@@ -526,7 +525,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-2.in',
                     'output': '%s/test/sample-2.out',
                 },
-                'output': 'bar\nfoobar\n',
+                'output': 'bar baz\nfoo bar\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -535,7 +534,7 @@ class TestTest(unittest.TestCase):
                     'input': '%s/test/sample-3.in',
                     'output': '%s/test/sample-3.out',
                 },
-                'output': 'bar\nfoobar\n',
+                'output': 'bar\nfoo\n',
                 'exitcode': 0,
             }, {
                 'status': 'WA',
@@ -1326,62 +1325,3 @@ class TestTest(unittest.TestCase):
         for cmdline in pathlib.Path('/proc').glob('*/cmdline'):
             with open(str(cmdline), 'rb') as fh:
                 self.assertNotIn(marker_for_callee.encode(), fh.read())
-
-
-@unittest.skip("This end-to-end test is too fragile. We should refactor the implementation and write unit tests.")
-class TestTestLog(unittest.TestCase):
-    max_chars = shutil.get_terminal_size()[0] // 2 - 2
-
-    def check_log_lines(self, result, expect):
-        self.assertEqual(len(result), len(expect))
-        for result_line, expect_line in zip(result, expect):
-            if expect_line.startswith('[x]'):
-                # Time and max memory can not be reproduced
-                self.assertTrue(result_line.startswith(expect_line))
-            else:
-                self.assertEqual(result_line, expect_line)
-
-    def snippet_call_test(self, args, files, expected_log_lines):
-        self.maxDiff = None
-        result = tests.utils.run_in_sandbox(args=['test'] + args, files=files, pipe_stderr=True)
-        print(result['proc'].stderr.decode(), file=sys.stderr)
-        self.check_log_lines(result['proc'].stderr.decode().split(os.linesep), expected_log_lines)
-
-    def test_trailing_spaces(self):
-        self.snippet_call_test(
-            args=['-c', tests.utils.python_c(r"import sys; sys.stdout.buffer.write(b'1\r\n2 \r\n3\n4  \t  \n5  \n6')")],
-            files=[
-                {
-                    'path': 'test/sample-1.in',
-                    'data': '',
-                },
-                {
-                    'path': 'test/sample-1.out',
-                    'data': '1\n2\n3\n',
-                },
-            ],
-            expected_log_lines=[
-                '[*] 1 cases found',
-                '',
-                '[*] sample-1',
-                '[x] time:',
-                '[-] WA',
-                'output:',
-                r'1\r',
-                r'2_\r(trailing spaces)',
-                r'3',
-                r'4__\t__(trailing spaces)',
-                r'5__(trailing spaces)',
-                r'6(no trailing newline)',
-                'expected:',
-                '1',
-                '2',
-                '3',
-                '',
-                '',
-                '[x] slowest:',
-                '[x] max memory:',
-                '[-] test failed: 0 AC / 1 cases',
-                '',
-            ],
-        )
