@@ -1,5 +1,11 @@
 # Change Log
 
+## 11.5.0 / 2021-09-09
+
+-   [#900](https://github.com/online-judge-tools/oj/pull/900) allow `$ oj g/i --hack-actual ...` without `--hack-expected`
+-   [#894](https://github.com/online-judge-tools/oj/pull/894) update `$ oj t --display-mode=diff`
+-   [#892](https://github.com/online-judge-tools/oj/pull/892) implemente `$ oj t --display-mode=all`
+
 ## 11.4.0 / 2021-07-20
 
 -   [#886](https://github.com/online-judge-tools/oj/pull/886) add `test-interactive` subcommand as an alias of `test-reactive` subcommand ([@cai-lw](https://github.com/cai-lw))
