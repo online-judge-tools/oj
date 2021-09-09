@@ -93,14 +93,20 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
             logger.info(utils.SUCCESS + 'saved to: %s', output_path)
 
 
-def check_status(info: Dict[str, Any], proc: subprocess.Popen, *, submit: Callable[..., None]) -> bool:
+def check_status(info: Dict[str, Any], proc: subprocess.Popen, *, submit: Callable[..., None], input_data: Optional[bytes]) -> bool:
     submit(logger.info, 'time: %f sec', info['elapsed'])
     if proc.returncode is None:
         submit(logger.info, utils.FAILURE + utils.red('TLE'))
+        if input_data is not None:
+            submit(logger.info, utils.NO_HEADER + 'input:')
+            submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
         submit(logger.info, 'skipped.')
         return False
     elif proc.returncode != 0:
         submit(logger.info, utils.FAILURE + utils.red('RE') + ': return code %d', proc.returncode)
+        if input_data is not None:
+            submit(logger.info, utils.NO_HEADER + 'input:')
+            submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
         submit(logger.info, 'skipped.')
         return False
     assert info['answer'] is not None
@@ -142,7 +148,7 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
         submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, timeout=tle)
         input_data: bytes = info['answer']
-        if not check_status(info, proc, submit=submit):
+        if not check_status(info, proc, submit=submit, input_data=input_data):
             return
 
         # check the randomness of generator
@@ -157,7 +163,7 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
             submit(logger.info, 'generate output...')
             info, proc = utils.exec_command(command, input=input_data, timeout=tle)
             output_data = info['answer']
-            if not check_status(info, proc, submit=submit):
+            if not check_status(info, proc, submit=submit, input_data=input_data):
                 return
 
         # write result
@@ -184,7 +190,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, stdin=None, timeout=tle)
         input_data: Optional[bytes] = info['answer']
-        if not check_status(info, proc, submit=submit):
+        if not check_status(info, proc, submit=submit, input_data=input_data):
             return None
         assert input_data is not None
 
@@ -200,7 +206,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         submit(logger.info, 'generate output...')
         info, proc = utils.exec_command(command, input=input_data, timeout=tle)
         output_data: Optional[bytes] = info['answer']
-        if not check_status(info, proc, submit=submit):
+        if not check_status(info, proc, submit=submit, input_data=input_data):
             return None
         assert output_data is not None
 
