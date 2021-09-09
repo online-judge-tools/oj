@@ -114,6 +114,23 @@ class GenerateInputTest(unittest.TestCase):
             },
         ])
 
+    def test_call_generate_input_hack_with_re(self):
+        self.snippet_call_generate_input(args=[tests.utils.python_script('generate.py'), '--hack-actual', tests.utils.python_script('err.py'), '-j', '4'], input_files=[
+            {
+                'path': 'generate.py',
+                'data': 'import random\nprint(random.randint(0, 10))\n'
+            },
+            {
+                'path': 'err.py',
+                'data': 'n = int(input())\nassert n != 0\nprint(n)\n'
+            },
+        ], expected_values=[
+            {
+                'path': 'test/hack-000.in',
+                'data': '0\n'
+            },
+        ])
+
     def test_call_generate_input_failure(self):
         self.snippet_call_generate_input(
             args=[tests.utils.python_script('generate.py'), '3'],

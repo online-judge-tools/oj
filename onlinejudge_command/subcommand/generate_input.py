@@ -43,7 +43,7 @@ tips:
     subparser.add_argument('--width', type=int, default=3, help='specify the width of indices of cases. (default: 3)')
     subparser.add_argument('--name', help='specify the base name of cases. (default: "random")')
     subparser.add_argument('-c', '--command', help='specify your solution to generate output')
-    subparser.add_argument('--hack-expected', dest='command', help='alias of --command')
+    subparser.add_argument('--hack-expected', dest='command', help='alias of --command. If this is not given, --hack runs until the actual solution fails with RE or TLE.')
     subparser.add_argument('--hack', '--hack-actual', dest='hack', help='specify your wrong solution to be compared with the reference solution given by --hack-expected')
     subparser.add_argument('generator', type=str, help='your program to generate test cases')
     subparser.add_argument('count', nargs='?', type=int, help='the number of cases to generate (default: 100)')
@@ -93,14 +93,20 @@ def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path:
             logger.info(utils.SUCCESS + 'saved to: %s', output_path)
 
 
-def check_status(info: Dict[str, Any], proc: subprocess.Popen, *, submit: Callable[..., None]) -> bool:
+def check_status(info: Dict[str, Any], proc: subprocess.Popen, *, submit: Callable[..., None], input_data: Optional[bytes]) -> bool:
     submit(logger.info, 'time: %f sec', info['elapsed'])
     if proc.returncode is None:
         submit(logger.info, utils.FAILURE + utils.red('TLE'))
+        if input_data is not None:
+            submit(logger.info, utils.NO_HEADER + 'input:')
+            submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
         submit(logger.info, 'skipped.')
         return False
     elif proc.returncode != 0:
         submit(logger.info, utils.FAILURE + utils.red('RE') + ': return code %d', proc.returncode)
+        if input_data is not None:
+            submit(logger.info, utils.NO_HEADER + 'input:')
+            submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
         submit(logger.info, 'skipped.')
         return False
     assert info['answer'] is not None
@@ -142,7 +148,7 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
         submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, timeout=tle)
         input_data: bytes = info['answer']
-        if not check_status(info, proc, submit=submit):
+        if not check_status(info, proc, submit=submit, input_data=input_data):
             return
 
         # check the randomness of generator
@@ -157,7 +163,7 @@ def generate_input_single_case(generator: str, *, input_path: pathlib.Path, outp
             submit(logger.info, 'generate output...')
             info, proc = utils.exec_command(command, input=input_data, timeout=tle)
             output_data = info['answer']
-            if not check_status(info, proc, submit=submit):
+            if not check_status(info, proc, submit=submit, input_data=input_data):
                 return
 
         # write result
@@ -173,7 +179,7 @@ def simple_match(a: str, b: str) -> bool:
     return False
 
 
-def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[float], attempt: int, lock: Optional[threading.Lock] = None, generated_input_hashes: Dict[bytes, str]) -> Optional[Tuple[bytes, bytes]]:
+def try_hack_once(generator: str, command: Optional[str], hack: str, *, tle: Optional[float], attempt: int, lock: Optional[threading.Lock] = None, generated_input_hashes: Dict[bytes, str]) -> Optional[Tuple[bytes, Optional[bytes]]]:
     with BufferedExecutor(lock) as submit:
 
         # print the header
@@ -184,7 +190,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         submit(logger.info, 'generate input...')
         info, proc = utils.exec_command(generator, stdin=None, timeout=tle)
         input_data: Optional[bytes] = info['answer']
-        if not check_status(info, proc, submit=submit):
+        if not check_status(info, proc, submit=submit, input_data=input_data):
             return None
         assert input_data is not None
 
@@ -196,13 +202,15 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
             submit(logger.info, utils.NO_HEADER + 'input:')
             submit(logger.info, utils.NO_HEADER + '%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
 
-        # generate output
-        submit(logger.info, 'generate output...')
-        info, proc = utils.exec_command(command, input=input_data, timeout=tle)
-        output_data: Optional[bytes] = info['answer']
-        if not check_status(info, proc, submit=submit):
-            return None
-        assert output_data is not None
+        # generate expected output
+        output_data: Optional[bytes] = None
+        if command is not None:
+            submit(logger.info, 'generate output...')
+            info, proc = utils.exec_command(command, input=input_data, timeout=tle)
+            output_data = info['answer']
+            if not check_status(info, proc, submit=submit, input_data=input_data):
+                return None
+            assert output_data is not None
 
         # hack
         submit(logger.info, 'hack...')
@@ -217,13 +225,14 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
         elif proc.returncode != 0:
             logger.info(utils.FAILURE + '' + utils.red('RE') + ': return code %d', proc.returncode)
             status = 'RE'
-        expected = output_data.decode()
-        if not simple_match(answer, expected):
-            logger.info(utils.FAILURE + '' + utils.red('WA'))
-            logger.info(utils.NO_HEADER + 'input:\n%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
-            logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10))
-            logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10))
-            status = 'WA'
+        if output_data is not None:
+            expected = output_data.decode()
+            if not simple_match(answer, expected):
+                logger.info(utils.FAILURE + '' + utils.red('WA'))
+                logger.info(utils.NO_HEADER + 'input:\n%s', pretty_printers.make_pretty_large_file_content(input_data, limit=40, head=20, tail=10))
+                logger.info(utils.NO_HEADER + 'output:\n%s', pretty_printers.make_pretty_large_file_content(answer.encode(), limit=40, head=20, tail=10))
+                logger.info(utils.NO_HEADER + 'expected:\n%s', pretty_printers.make_pretty_large_file_content(output_data, limit=40, head=20, tail=10))
+                status = 'WA'
 
         if status == 'AC':
             return None
@@ -233,7 +242,7 @@ def try_hack_once(generator: str, command: str, hack: str, *, tle: Optional[floa
 
 def run(args: argparse.Namespace) -> None:
     if args.hack and not args.command:
-        raise RuntimeError('--hack must be used with --command')
+        logger.info('--hack-actual is given but --hack-expected is not given. It will run until the actual solution gets RE or TLE.')
 
     if args.name is None:
         if args.hack:
