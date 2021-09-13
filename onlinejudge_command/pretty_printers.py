@@ -651,7 +651,7 @@ def _tokenize_pretty_diff(output: str, *, expected: str, compare_mode: CompareMo
     ops = _make_diff_between_file_and_file(output, expected, compare_mode=compare_mode)
     merged_ops = _add_lines_around_diff_lines(output, expected, ops=ops, size=4)
     merged_ops = _add_dots_between_gaps(output, expected, ops=merged_ops)
-    tokens = _tokens_from_line_diff_ops(merged_ops[:limit], char_in_line=char_in_line)
+    tokens = _tokens_from_line_diff_ops(merged_ops[:limit] if limit != -1 else merged_ops, char_in_line=char_in_line)
     if limit != -1:
         tokens += _summary_token_of_diff_ops(merged_ops[limit:])
     return tokens
