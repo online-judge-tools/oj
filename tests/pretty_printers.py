@@ -455,3 +455,45 @@ class MakePrettyDiffTest(unittest.TestCase):
         tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
         actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
         self.assertEqual(actual, expected)
+
+
+class MakePrettyDiffLimitTest(unittest.TestCase):
+    def test_with_limit(self) -> None:
+        a = ''.join([
+            'a\n',
+        ] * 100)
+        b = ''.join([
+            'b\n',
+        ] * 100)
+        compare_mode = CompareMode.CRLF_INSENSITIVE_EXACT_MATCH
+        char_in_line = 40
+        limit = 40
+        expected = 1 + limit + 1
+
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
+        tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
+        actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
+        self.assertEqual(len(actual.splitlines()), expected)
+
+    def test_without_limit(self) -> None:
+        a = ''.join([
+            'a\n',
+        ] * 100)
+        b = ''.join([
+            'b\n',
+        ] * 100)
+        compare_mode = CompareMode.CRLF_INSENSITIVE_EXACT_MATCH
+        char_in_line = 40
+        limit = -1
+        expected = 1 + 100
+
+        font_dim = lambda s: s
+        font_bold = lambda s: s
+        font_red = lambda s: s
+        font_blue = lambda s: s
+        tokens = _tokenize_pretty_diff(a, expected=b, compare_mode=compare_mode, char_in_line=char_in_line, limit=limit)
+        actual = _render_tokens(tokens=tokens, font_dim=font_dim, font_bold=font_bold, font_red=font_red, font_blue=font_blue)
+        self.assertEqual(len(actual.splitlines()), expected)
