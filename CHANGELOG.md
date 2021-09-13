@@ -1,5 +1,9 @@
 # Change Log
 
+## 11.5.1 / 2021-09-13
+
+-   [#902](https://github.com/online-judge-tools/oj/pull/902) fix a bug of `--display-mode=diff-all` that the last line is not shown
+
 ## 11.5.0 / 2021-09-09
 
 -   [#900](https://github.com/online-judge-tools/oj/pull/900) allow `$ oj g/i --hack-actual ...` without `--hack-expected`
