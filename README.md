@@ -134,9 +134,9 @@ expected:
 -   Can I automatically submit code after it passes tests?
     -   Yes, use your shell. Run `$ oj t && oj s main.cpp`. By the way, you need to take care of problems whose sample cases are not so strong.
 -   Can I remove the delays and the `[y/N]` confirmation before submitting code?
-    -   Yes, put `--wait=0` option and `--yes` option to `oj s` subcommand. Of course, we don't recommend this. They exist for failsafe. For example, please consider a situation where if you save 3 seconds, you will move up 3 places on the standings. In such a case, if you get a penalty of 5 minutes, then you will move down at least 300 places on the standings.
--   Is my password stored?
-    -   No, your password is not stored into any files. This program stores only your session tokens (but of course, it's still credentials). Please read [`onlinejudge/_implementation/command/login.py`](https://github.com/kmyk/online-judge-tools/blob/master/onlinejudge/_implementation/command/login.py).
+    -   Yes, put `--wait=0` option and `--yes` option to `oj s` subcommand. Of course, we don't recommend this. These options exist for failsafe. For example, please consider a situation where if you save 3 seconds, you will move up 3 places on the standings. In such a case, if you get a penalty of 5 minutes, then you will move down at least 300 places on the standings.
+-   Are my passwords stored?
+    -   No, your passwords are not stored into any files. This program stores only your session tokens (but of course, they're still credentials). Please read [`onlinejudge/_implementation/command/login.py`](https://github.com/kmyk/online-judge-tools/blob/master/onlinejudge/_implementation/command/login.py).
 -   Does the config file exist?
     -   No. You can use your `.bashrc` (or similar files) instead. It's a config file of your shell. Read [man bash](https://linux.die.net/man/1/bash) and write shell aliases or shell functions. For example, if you want to use Python code for tests by default, write `alias oj-test-python='oj t -c "python3 main.py"'` to `.bashrc` and use `$ oj-test-python`.
 
