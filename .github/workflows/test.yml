@@ -7,23 +7,15 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.6]  # workaround
-
-        # The current version of GitHub Actions can only re-run all jobs; it cannot re-run a specific job. Many unstable tests make CI impossible to pass.
-        # python-version: [3.5, 3.6]
-        # exclude:
-        # - os: windows-latest
-        #   python-version: 3.6
-        # - os: macos-latest
-        #   python-version: 3.6
+        python-version: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
