@@ -1,6 +1,9 @@
 name: test
 
-on: [pull_request]
+on:
+  pull_request:
+  schedule:
+    - cron: '00 15 * * FRI'  # At 00:00 on every Saturday in JST
 
 jobs:
   test:
