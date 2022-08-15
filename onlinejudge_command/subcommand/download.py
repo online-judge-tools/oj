@@ -99,10 +99,10 @@ def run(args: argparse.Namespace) -> bool:
             if not args.dropbox_token:
                 logger.info(utils.HINT + 'You need to give the access token. Please do the following:\n%s', textwrap.dedent("""
                         1. Open the following URL in your browser:
-                            https://www.dropbox.com/oauth2/authorize?client_id=153gig8dqgk3ujg&response_type=code
+                            https://www.dropbox.com/oauth2/authorize?client_id=c38wlsosanujy5z&response_type=code
                         2. Authorize the app and take the access code.
                         3. Run the following command with replacing the "${YOUR_ACCESS_CODE}":
-                            $ curl https://api.dropbox.com/oauth2/token --user 153gig8dqgk3ujg:5l7o7lh73o8i9ux --data grant_type=authorization_code --data code=${YOUR_ACCESS_CODE}
+                            $ curl https://api.dropbox.com/oauth2/token --user c38wlsosanujy5z:qgsndi0xoerw4j1 --data grant_type=authorization_code --data code=${YOUR_ACCESS_CODE}
                         4. Get the access token from the JSON. It is in the "access_token" field.
                         5. Use the access token. For example:
                             $ oj download """ + problem.get_url() + """ --system --dropbox-token=${YOUR_ACCESS_TOKEN}
