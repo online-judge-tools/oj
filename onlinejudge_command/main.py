@@ -17,7 +17,6 @@ import onlinejudge_command.subcommand.login as subcommand_login
 import onlinejudge_command.subcommand.submit as subcommand_submit
 import onlinejudge_command.subcommand.test as subcommand_test
 import onlinejudge_command.subcommand.test_reactive as subcommand_test_reactive
-import onlinejudge_command.subcommand.test_reactive_with_files as subcommand_test_reactive_with_files
 import onlinejudge_command.update_checking as update_checking
 import onlinejudge_command.utils as utils
 
@@ -46,7 +45,6 @@ tips:
     subcommand_generate_input.add_subparser(subparsers)
     subcommand_generate_reactive.add_subparser(subparsers)
     subcommand_test_reactive.add_subparser(subparsers)
-    subcommand_test_reactive_with_files.add_subparser(subparsers)
 
     return parser
 
@@ -75,9 +73,6 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
             return 1
     elif args.subcommand in ['test-reactive', 't/r', 'test-interactive', 't/i']:
         if not subcommand_test_reactive.run(args):
-            return 1
-    elif args.subcommand in ['test-reactive-with-files', 't/rf']:
-        if not subcommand_test_reactive_with_files.run(args):
             return 1
     elif args.subcommand in ['generate-output', 'g/o']:
         subcommand_generate_output.run(args)
