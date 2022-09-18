@@ -176,14 +176,13 @@ def try_hack_once(generator: Optional[str], hack: str, judge: str, *, tle: Optio
         submit(logger.info, '%d-th attempt', attempt)
 
         # generate input if generator is given
-        if generator is None:
-            input_data = None
-        else:
+        input_data: Optional[bytes] = None
+        if generator is not None:
             submit(logger.info, 'generate input...')
             info, proc = utils.exec_command(generator, stdin=None, timeout=tle)
-            input_data: Optional[bytes] = info['answer']
+            input_data = info['answer']
             if not check_status(info, proc, submit=submit, input_data=input_data):
-                return None
+                return (False, None)
             assert input_data is not None
     
         # check the randomness of generator
@@ -197,7 +196,7 @@ def try_hack_once(generator: Optional[str], hack: str, judge: str, *, tle: Optio
 
         # hack
         submit(logger.info, 'hack...')
-        if generator is not None:
+        if input_data is not None:
             with tempfile.NamedTemporaryFile(delete=True) as fh:
                 with open(fh.name, 'wb') as fh1:
                     fh1.write(input_data)
