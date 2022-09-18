@@ -11,8 +11,8 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.format_utils as fmtutils
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
+from onlinejudge_command import pretty_printers
+from onlinejudge_command import utils
 
 logger = getLogger(__name__)
 

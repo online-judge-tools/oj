@@ -14,8 +14,8 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.format_utils as fmtutils
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
+from onlinejudge_command import pretty_printers
+from onlinejudge_command import  utils
 
 logger = getLogger(__name__)
 
@@ -184,7 +184,7 @@ def try_hack_once(generator: Optional[str], hack: str, judge: str, *, tle: Optio
             if not check_status(info, proc, submit=submit, input_data=input_data):
                 return (False, None)
             assert input_data is not None
-    
+
         # check the randomness of generator
         name = '{}-th attempt'.format(attempt)
         if input_data is not None:
@@ -237,7 +237,7 @@ def run(args: argparse.Namespace) -> None:
     # generate cases
     generated_input_hashes: Dict[bytes, str] = {}
     if args.jobs is None:
-        for name, input_path in itertools.islice(iterate_path(), args.count):
+        for _, input_path in itertools.islice(iterate_path(), args.count):
             # hack serially
             for attempt in itertools.count(1):
                 (hacked, input_data) = try_hack_once(args.generator, hack=args.hack, judge=args.judge, tle=args.tle, attempt=attempt, generated_input_hashes=generated_input_hashes)
