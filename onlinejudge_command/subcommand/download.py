@@ -65,8 +65,8 @@ tips:
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
     subparser.add_argument('-s', '--silent', action='store_true')
-    subparser.add_argument('--yukicoder-token', type=str)
-    subparser.add_argument('--dropbox-token', type=str)
+    subparser.add_argument('--yukicoder-token', type=str, default=os.environ.get('YUKICODER_TOKEN'), help='[deprecated] specify the token of yukicoder. For a security reason, use the $YUKICODER_TOKEN envvar. (default: $YUKICODER_TOKEN)')
+    subparser.add_argument('--dropbox-token', type=str, default=os.environ.get('DROPBOX_TOKEN'), help='[deprecated] specify the token of dropbox. For a security reason, use the $DROPBOX_TOKEN envvar. (default: $DROPBOX_TOKEN)')
     subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
 
 
