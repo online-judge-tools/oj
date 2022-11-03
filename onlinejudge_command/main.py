@@ -1,4 +1,5 @@
 import argparse
+import os
 import pathlib
 import sys
 import traceback
@@ -85,6 +86,11 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
 def main(args: Optional[List[str]] = None) -> 'NoReturn':
     parser = get_parser()
     parsed = parser.parse_args(args=args)
+
+    if parsed.yukicoder_token:
+        os.environ['YUKICODER_TOKEN'] = parsed.yukicoder_token
+    if parsed.dropbox_token:
+        os.environ['DROPBOX_TOKEN'] = parsed.dropbox_token
 
     # configure the logger
     level = INFO
