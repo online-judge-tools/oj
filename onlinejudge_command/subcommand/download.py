@@ -110,9 +110,9 @@ def run(args: argparse.Namespace) -> bool:
                     (Please take care that the access code and the access token are CONFIDENTIAL information. DON'T SHARE with other people!)
                 """))
                 raise SampleParseError("--dropbox-token is not given")
-            sess.headers['Authorization'] = 'Bearer {}'.format(os.getenv['DROPBOX_TOKEN'])
+            sess.headers['Authorization'] = 'Bearer {}'.format(os.getenv('DROPBOX_TOKEN'))
         if 'YUKICODER_TOKEN' in os.environ and isinstance(problem, YukicoderProblem):
-            sess.headers['Authorization'] = 'Bearer {}'.format(os.getenv['YUKICODER_TOKEN'])
+            sess.headers['Authorization'] = 'Bearer {}'.format(os.getenv('YUKICODER_TOKEN'))
         try:
             if args.system:
                 samples = problem.download_system_cases(session=sess)
