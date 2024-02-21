@@ -338,7 +338,7 @@ def run(args: 'argparse.Namespace') -> int:
             history += [test_single_case(name, paths['in'], paths.get('out'), args=args)]
     else:
         if os.name == 'nt':
-            logger.warning("-j/--jobs opiton is unstable on Windows environment")
+            logger.warning("-j/--jobs option is unstable on Windows environment")
         with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
             lock = threading.Lock()
             futures: List[concurrent.futures.Future] = []
