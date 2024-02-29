@@ -51,6 +51,7 @@ $ oj test [-c COMMAND] [TEST...]
 $ oj test-reactive [-c COMMAND] JUDGE_COMMAND
 $ oj generate-input GENERATOR_COMMAND
 $ oj generate-output [-c COMMAND] [TEST...]
+$ oj generate-reactive [-g GENERATOR_COMMAND] HACKED_COMMAND JUDGE_COMMAND
 ```
 
 For details, see `$ oj --help`.

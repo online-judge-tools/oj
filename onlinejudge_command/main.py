@@ -12,6 +12,7 @@ import onlinejudge_command.log_formatter as log_formatter
 import onlinejudge_command.subcommand.download as subcommand_download
 import onlinejudge_command.subcommand.generate_input as subcommand_generate_input
 import onlinejudge_command.subcommand.generate_output as subcommand_generate_output
+import onlinejudge_command.subcommand.generate_reactive as subcommand_generate_reactive
 import onlinejudge_command.subcommand.login as subcommand_login
 import onlinejudge_command.subcommand.submit as subcommand_submit
 import onlinejudge_command.subcommand.test as subcommand_test
@@ -42,6 +43,7 @@ tips:
     subcommand_test.add_subparser(subparsers)
     subcommand_generate_output.add_subparser(subparsers)
     subcommand_generate_input.add_subparser(subparsers)
+    subcommand_generate_reactive.add_subparser(subparsers)
     subcommand_test_reactive.add_subparser(subparsers)
 
     return parser
@@ -76,6 +78,8 @@ def run_program(args: argparse.Namespace, parser: argparse.ArgumentParser) -> in
         subcommand_generate_output.run(args)
     elif args.subcommand in ['generate-input', 'g/i']:
         subcommand_generate_input.run(args)
+    elif args.subcommand in ['generate-reactive', 'g/r']:
+        subcommand_generate_reactive.run(args)
     else:
         parser.print_help(file=sys.stderr)
         return 1
