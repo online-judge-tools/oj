@@ -1,10 +1,10 @@
-import distutils.version
 import http.client
 import json
 import time
 from logging import getLogger
 from typing import *
 
+import packaging.version
 import requests
 
 import onlinejudge.__about__ as api_version
@@ -73,8 +73,8 @@ def get_latest_version_from_pypi(package_name: str) -> str:
 
 
 def is_update_available_on_pypi(package_name: str, current_version: str) -> bool:
-    a = distutils.version.StrictVersion(current_version)
-    b = distutils.version.StrictVersion(get_latest_version_from_pypi(package_name))
+    a = packaging.version.parse(current_version)
+    b = packaging.version.parse(get_latest_version_from_pypi(package_name))
     return a < b
 
 
