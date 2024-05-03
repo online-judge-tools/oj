@@ -15,6 +15,7 @@ setup(
     install_requires=[
         'online-judge-api-client >= 10.9.0, < 11',
         'colorama >= 0.3, < 1',
+        'packaging >= 24',
         'requests >= 2, < 3',
     ],
     packages=find_packages(exclude=('tests', 'docs')),
