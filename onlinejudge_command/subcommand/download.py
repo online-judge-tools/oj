@@ -8,14 +8,12 @@ from typing import *
 
 import requests.exceptions
 
-import onlinejudge.dispatch as dispatch
 import onlinejudge_command.download_history
-import onlinejudge_command.format_utils as format_utils
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
+from onlinejudge import dispatch
 from onlinejudge.service.atcoder import AtCoderProblem
 from onlinejudge.service.yukicoder import YukicoderProblem
 from onlinejudge.type import SampleParseError, TestCase
+from onlinejudge_command import format_utils, pretty_printers, utils
 
 logger = getLogger(__name__)
 

@@ -14,9 +14,7 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.format_utils as fmtutils
-import onlinejudge_command.output_comparators as output_comparators
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
+from onlinejudge_command import output_comparators, pretty_printers, utils
 from onlinejudge_command.output_comparators import CompareMode
 
 logger = getLogger(__name__)

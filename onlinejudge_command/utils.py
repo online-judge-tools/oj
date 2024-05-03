@@ -19,8 +19,8 @@ from typing import BinaryIO  # It seems we cannot import BinaryIO with wildcard-
 import colorama
 import requests
 
-import onlinejudge.utils as utils
 import onlinejudge_command.__about__ as version
+from onlinejudge import utils
 from onlinejudge.type import *
 
 logger = getLogger(__name__)
