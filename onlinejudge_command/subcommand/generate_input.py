@@ -11,8 +11,7 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.format_utils as fmtutils
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
+from onlinejudge_command import pretty_printers, utils
 
 logger = getLogger(__name__)
 
@@ -71,7 +70,7 @@ def BufferedExecutor(lock: Optional[threading.Lock]):
 
 def write_result(input_data: bytes, output_data: Optional[bytes], *, input_path: pathlib.Path, output_path: pathlib.Path, print_data: bool, lock: Optional[threading.Lock] = None) -> None:
     # acquire lock to print logs properly, if in parallel
-    nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext after Python 3.7
+    nullcontext = contextlib.nullcontext()
     with lock or nullcontext:
 
         if not input_path.parent.is_dir():
@@ -125,7 +124,7 @@ def check_randomness_of_generator(input_data: bytes, *, name: str, lock: Optiona
         return None
 
     input_digest = hashlib.sha1(input_data).digest()
-    nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext after Python 3.7
+    nullcontext = contextlib.nullcontext()
     with lock or nullcontext:
         if len(generated_input_hashes) < limit:
             if input_digest in generated_input_hashes:

@@ -11,7 +11,7 @@ setup(
     url=version.__url__,
     license=version.__license__,
     description=version.__description__,
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     install_requires=[
         'online-judge-api-client >= 10.9.0, < 11',
         'colorama >= 0.3, < 1',

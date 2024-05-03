@@ -2,8 +2,8 @@ import pathlib
 import textwrap
 import unittest
 
-import onlinejudge_command.subcommand.submit as submit
 from onlinejudge.type import Language, LanguageId
+from onlinejudge_command.subcommand import submit
 
 # https://atcoder.jp/contests/language-test-ver1
 languages_atcoder_3 = [

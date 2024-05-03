@@ -8,7 +8,6 @@ from typing import *
 import onlinejudge.__about__ as api_version
 import onlinejudge_command.__0_workaround_for_conflict  # pylint: disable=unused-import
 import onlinejudge_command.__about__ as version
-import onlinejudge_command.log_formatter as log_formatter
 import onlinejudge_command.subcommand.download as subcommand_download
 import onlinejudge_command.subcommand.generate_input as subcommand_generate_input
 import onlinejudge_command.subcommand.generate_output as subcommand_generate_output
@@ -16,8 +15,7 @@ import onlinejudge_command.subcommand.login as subcommand_login
 import onlinejudge_command.subcommand.submit as subcommand_submit
 import onlinejudge_command.subcommand.test as subcommand_test
 import onlinejudge_command.subcommand.test_reactive as subcommand_test_reactive
-import onlinejudge_command.update_checking as update_checking
-import onlinejudge_command.utils as utils
+from onlinejudge_command import log_formatter, update_checking, utils
 
 logger = getLogger(__name__)
 
@@ -99,7 +97,7 @@ def main(args: Optional[List[str]] = None) -> 'NoReturn':
 
     try:
         sys.exit(run_program(parsed, parser=parser))
-    except NotImplementedError as e:
+    except NotImplementedError:
         logger.debug('\n' + traceback.format_exc())
         logger.error('NotImplementedError')
         logger.info('The operation you specified is not supported yet. Pull requests are welcome.')

@@ -7,11 +7,10 @@ import webbrowser
 from logging import getLogger
 from typing import *
 
-import onlinejudge.dispatch as dispatch
 import onlinejudge_command.download_history
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
+from onlinejudge import dispatch
 from onlinejudge.type import *
+from onlinejudge_command import pretty_printers, utils
 
 logger = getLogger(__name__)
 
@@ -142,7 +141,7 @@ def run(args: argparse.Namespace) -> bool:
             return False
 
         # confirm
-        guessed_unmatch = ([problem.get_url()] != guessed_urls)
+        guessed_unmatch = [problem.get_url()] != guessed_urls
         if guessed_unmatch:
             samples_text = ('samples of "{}'.format('", "'.join(guessed_urls)) if guessed_urls else 'no samples')
             logger.warning('the problem "%s" is specified to submit, but %s were downloaded in this directory. this may be mis-operation', problem.get_url(), samples_text)
@@ -321,7 +320,10 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
             saved_lang_ids = lang_ids
             lang_ids = []
             for compiler in ('gcc', 'clang'):  # use the latest for each compiler
-                ids = list(filter(lambda lang_id: parse_cplusplus_compiler(language_dict[lang_id]) in (compiler, None), saved_lang_ids))
+                ids = []
+                for lang_id in saved_lang_ids:
+                    if parse_cplusplus_compiler(language_dict[lang_id]) in (compiler, None):
+                        ids.append(lang_id)
                 if not ids:
                     continue
                 ids.sort(key=lambda lang_id: (parse_cplusplus_version(language_dict[lang_id]) or '', language_dict[lang_id]))

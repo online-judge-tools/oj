@@ -14,9 +14,7 @@ from logging import getLogger
 from typing import *
 
 import onlinejudge_command.format_utils as fmtutils
-import onlinejudge_command.output_comparators as output_comparators
-import onlinejudge_command.pretty_printers as pretty_printers
-import onlinejudge_command.utils as utils
+from onlinejudge_command import output_comparators, pretty_printers, utils
 from onlinejudge_command.output_comparators import CompareMode
 
 logger = getLogger(__name__)
@@ -255,8 +253,8 @@ def test_single_case(test_name: str, test_input_path: pathlib.Path, test_output_
         elapsed: float = info['elapsed']
         memory: Optional[float] = info['memory']
 
-    # lock is require to avoid mixing logs if in parallel
-    nullcontext = contextlib.ExitStack()  # TODO: use contextlib.nullcontext() after updating Python to 3.7
+    # lock is required to avoid mixing logs if in parallel
+    nullcontext = contextlib.nullcontext()
     with lock or nullcontext:
         if lock is not None:
             logger.info('')

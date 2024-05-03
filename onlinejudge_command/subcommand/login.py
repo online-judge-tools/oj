@@ -9,9 +9,9 @@ from typing import *
 
 import requests
 
-import onlinejudge.dispatch as dispatch
-import onlinejudge_command.utils as utils
+from onlinejudge import dispatch
 from onlinejudge.type import LoginError, Service
+from onlinejudge_command import utils
 
 logger = getLogger(__name__)
 
