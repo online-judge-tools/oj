@@ -1,5 +1,17 @@
 # Change Log
 
+## 12.0.0 / 2024-05-03
+-   [#927](https://github.com/online-judge-tools/oj/pull/927) (breaking changes) bump minimum Python version to 3.8 (remove Python 3.6/3.7 support)
+-   [#926](https://github.com/online-judge-tools/oj/pull/926) add dependabot
+-   [#925](https://github.com/online-judge-tools/oj/pull/925) remove distutils, support Python 3.12 (thanks [@kzrnm](https://github.com/kzrnm))
+-   [#924](https://github.com/online-judge-tools/oj/pull/924) add gitignore (thanks [@kzrnm](https://github.com/kzrnm))
+-   [#922](https://github.com/online-judge-tools/oj/pull/922) opiton -> option
+-   [#921](https://github.com/online-judge-tools/oj/pull/921) fix typo (thanks [@newbie1111](https://github.com/newbie1111))
+-   [#920](https://github.com/online-judge-tools/oj/pull/920) fix broken CI (thanks [@key-moon](https://github.com/key-moon))
+-   [#911](https://github.com/online-judge-tools/oj/pull/911) add scheduled builds
+-   [#910](https://github.com/online-judge-tools/oj/pull/910) fix CI
+-   [#909](https://github.com/online-judge-tools/oj/pull/909) fix typos and ambiguous words in README.md
+
 ## 11.5.1 / 2021-09-13
 
 -   [#902](https://github.com/online-judge-tools/oj/pull/902) fix a bug of `--display-mode=diff-all` that the last line is not shown
