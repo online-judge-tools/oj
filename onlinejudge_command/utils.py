@@ -190,10 +190,7 @@ def webbrowser_register_explorer_exe() -> None:
     if not is_windows_subsystem_for_linux():
         return
     instance = webbrowser.GenericBrowser('explorer.exe')
-    if sys.version_info < (3, 7):
-        webbrowser.register('explorer', None, instance)  # TODO: remove this after Python 3.6 supprot is finished
-    else:
-        webbrowser.register('explorer', None, instance, preferred=True)  # `preferred=True` solves the issue that terminal logs are cleared on cmd.exe with stopping using wslview via www-browser. TODO: remove `preferred=True` after https://github.com/wslutilities/wslu/issues/199 is fixed.
+    webbrowser.register('explorer', None, instance, preferred=True)  # `preferred=True` solves the issue that terminal logs are cleared on cmd.exe with stopping using wslview via www-browser. TODO: remove `preferred=True` after https://github.com/wslutilities/wslu/issues/199 is fixed.
 
 
 def get_default_command() -> str:
