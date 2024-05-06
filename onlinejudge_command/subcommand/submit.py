@@ -394,7 +394,7 @@ def guess_lang_ids_of_file(filename: pathlib.Path, code: bytes, language_dict, c
              { 'names': [ 'crystal'               ], 'exts': [ 'cr'        ] },
              { 'names': [ 'd'                     ], 'exts': [ 'd'         ], 'split': True },
              { 'names': [ 'f#'                    ], 'exts': [ 'fs'        ] },
-             { 'names': [ 'fortran'               ], 'exts': [ 'for', 'f', 'f90', 'f95', 'f03' ] },
+             { 'names': [ 'fortran'               ], 'exts': [ 'for', 'f', 'f90', 'f95', 'f03', 'f08' ] },
              { 'names': [ 'go'                    ], 'exts': [ 'go'        ], 'split': True },
              { 'names': [ 'haskell'               ], 'exts': [ 'hs'        ] },
              { 'names': [ 'java'                  ], 'exts': [ 'java'      ] },
