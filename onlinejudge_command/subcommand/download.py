@@ -63,8 +63,8 @@ tips:
     subparser.add_argument('-n', '--dry-run', action='store_true', help='don\'t write to files')
     subparser.add_argument('-a', '--system', action='store_true', help='download system testcases')
     subparser.add_argument('-s', '--silent', action='store_true')
-    subparser.add_argument('--yukicoder-token', type=str)
-    subparser.add_argument('--dropbox-token', type=str)
+    subparser.add_argument('--yukicoder-token', type=str, help='[deprecated] specify the token of yukicoder. For a security reason, use the $YUKICODER_TOKEN envvar. (default: $YUKICODER_TOKEN)')
+    subparser.add_argument('--dropbox-token', type=str, help='[deprecated] specify the token of dropbox. For a security reason, use the $DROPBOX_TOKEN envvar. (default: $DROPBOX_TOKEN)')
     subparser.add_argument('--log-file', type=pathlib.Path, help=argparse.SUPPRESS)
 
 
@@ -94,7 +94,7 @@ def run(args: argparse.Namespace) -> bool:
     # get samples from the server
     with utils.new_session_with_our_user_agent(path=args.cookie) as sess:
         if isinstance(problem, AtCoderProblem) and args.system:
-            if not args.dropbox_token:
+            if 'DROPBOX_TOKEN' not in os.environ:
                 logger.info(utils.HINT + 'You need to give the access token. Please do the following:\n%s', textwrap.dedent("""
                         1. Open the following URL in your browser:
                             https://www.dropbox.com/oauth2/authorize?client_id=153gig8dqgk3ujg&response_type=code
@@ -108,9 +108,9 @@ def run(args: argparse.Namespace) -> bool:
                     (Please take care that the access code and the access token are CONFIDENTIAL information. DON'T SHARE with other people!)
                 """))
                 raise SampleParseError("--dropbox-token is not given")
-            sess.headers['Authorization'] = 'Bearer {}'.format(args.dropbox_token)
-        if args.yukicoder_token and isinstance(problem, YukicoderProblem):
-            sess.headers['Authorization'] = 'Bearer {}'.format(args.yukicoder_token)
+            sess.headers['Authorization'] = 'Bearer {}'.format(os.getenv('DROPBOX_TOKEN'))
+        if 'YUKICODER_TOKEN' in os.environ and isinstance(problem, YukicoderProblem):
+            sess.headers['Authorization'] = 'Bearer {}'.format(os.getenv('YUKICODER_TOKEN'))
         try:
             if args.system:
                 samples = problem.download_system_cases(session=sess)
